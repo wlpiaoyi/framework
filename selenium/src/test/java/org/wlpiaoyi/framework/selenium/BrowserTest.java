@@ -4,6 +4,7 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.openqa.selenium.By;
+import org.wlpiaoyi.framework.selenium.utils.WebElementUtils;
 import org.wlpiaoyi.framework.utils.exception.BusinessException;
 
 public class BrowserTest {
@@ -22,10 +23,10 @@ public class BrowserTest {
 
     @After
     public void tearDown() throws Exception {
-        if(!Browser.setElementValue(browser.getDriver().findElement(By.id("index-kw")), "test01"))
+        if(!WebElementUtils.setValue(browser.getDriver().findElement(By.id("index-kw")), "test01"))
             throw new BusinessException("set input value exception!!");
         Thread.sleep(500);
-        if(!Browser.setElementValue(browser.getDriver().findElement(By.id("index-kw")), "test02"))
+        if(!WebElementUtils.setValue(browser.getDriver().findElement(By.id("index-kw")), "test02"))
             throw new BusinessException("set input value exception!!");
         else{
             Thread.sleep(100);

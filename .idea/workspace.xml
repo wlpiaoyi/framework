@@ -2,9 +2,11 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="a877397b-93f3-422b-bee1-1317d55f59f2" name="Default Changelist" comment="">
-      <change beforePath="$PROJECT_DIR$/.gitignore" beforeDir="false" afterPath="$PROJECT_DIR$/.gitignore" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/selenium/src/main/java/org/wlpiaoyi/framework/selenium/utils/WebElementUtils.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/vcs.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/vcs.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/selenium/src/main/java/org/wlpiaoyi/framework/selenium/Browser.java" beforeDir="false" afterPath="$PROJECT_DIR$/selenium/src/main/java/org/wlpiaoyi/framework/selenium/Browser.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/selenium/src/test/java/org/wlpiaoyi/framework/selenium/BrowserTest.java" beforeDir="false" afterPath="$PROJECT_DIR$/selenium/src/test/java/org/wlpiaoyi/framework/selenium/BrowserTest.java" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
@@ -142,11 +144,18 @@
       <map>
         <entry key="MAIN">
           <value>
-            <State />
+            <State>
+              <option name="COLUMN_ORDER" />
+            </State>
           </value>
         </entry>
       </map>
     </option>
+  </component>
+  <component name="VcsManagerConfiguration">
+    <ignored-roots>
+      <path value="$PROJECT_DIR$/framework" />
+    </ignored-roots>
   </component>
   <component name="XDebuggerManager">
     <watches-manager>
