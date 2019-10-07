@@ -29,6 +29,7 @@ public class SocketProxy extends Thread implements SocketThread.SocketThreadInte
 
     public void run(){
         try{
+            System.out.println(this.listenPort);
             this.serverSocket = new ServerSocket(this.listenPort);
             while (this.serverSocket.isClosed() == false) {
                 try {
@@ -54,7 +55,6 @@ public class SocketProxy extends Thread implements SocketThread.SocketThreadInte
 
     public void start(){
         SocketProxy.servers.put(listenPort, this);
-        super.start();
     }
 
     public void close(){
@@ -145,8 +145,6 @@ public class SocketProxy extends Thread implements SocketThread.SocketThreadInte
     }
 
 
-
-
     /**
      * @param args
      */
@@ -159,14 +157,10 @@ public class SocketProxy extends Thread implements SocketThread.SocketThreadInte
                 if(option[0].equals("start")){
                     boolean isEncryption = new Boolean(option[1]).booleanValue();
                     int port = new Integer(option[2]).intValue();
-                    String proxyIP = null;
-                    int proxyPort = 0;
-                    if(option.length == 5){
-                        proxyIP = option[3];
-                        proxyPort = new  Integer(option[4]).intValue();
-                    }
                     SocketProxy socketProxy = new SocketProxy(isEncryption, port);
-                    if(proxyIP == null || proxyPort <= 0){
+                    if(option.length == 5){
+                        String proxyIP = option[3];
+                        int proxyPort = new  Integer(option[4]).intValue();
                         socketProxy.setProxy(proxyIP, proxyPort);
                     }
                     socketProxy.start();

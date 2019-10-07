@@ -2,11 +2,9 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="a877397b-93f3-422b-bee1-1317d55f59f2" name="Default Changelist" comment="">
-      <change afterPath="$PROJECT_DIR$/selenium/src/main/java/org/wlpiaoyi/framework/selenium/utils/WebElementUtils.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/vcs.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/vcs.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/selenium/src/main/java/org/wlpiaoyi/framework/selenium/Browser.java" beforeDir="false" afterPath="$PROJECT_DIR$/selenium/src/main/java/org/wlpiaoyi/framework/selenium/Browser.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/selenium/src/test/java/org/wlpiaoyi/framework/selenium/BrowserTest.java" beforeDir="false" afterPath="$PROJECT_DIR$/selenium/src/test/java/org/wlpiaoyi/framework/selenium/BrowserTest.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/proxy/src/main/java/org/wlpiaoyi/framework/proxy/socket/SocketProxy.java" beforeDir="false" afterPath="$PROJECT_DIR$/proxy/src/main/java/org/wlpiaoyi/framework/proxy/socket/SocketProxy.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/proxy/src/main/java/org/wlpiaoyi/framework/proxy/socket/SocketThread.java" beforeDir="false" afterPath="$PROJECT_DIR$/proxy/src/main/java/org/wlpiaoyi/framework/proxy/socket/SocketThread.java" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
@@ -70,7 +68,20 @@
       </list>
     </option>
   </component>
-  <component name="RunManager" selected="JUnit.BrowserTest">
+  <component name="RunManager" selected="Application.SocketProxy">
+    <configuration name="SocketProxy" type="Application" factoryName="Application" temporary="true" nameIsGenerated="true">
+      <option name="MAIN_CLASS_NAME" value="org.wlpiaoyi.framework.proxy.socket.SocketProxy" />
+      <module name="proxy" />
+      <extension name="coverage">
+        <pattern>
+          <option name="PATTERN" value="org.wlpiaoyi.framework.proxy.socket.*" />
+          <option name="ENABLED" value="true" />
+        </pattern>
+      </extension>
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
     <configuration name="BrowserTest" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
       <module name="selenium" />
       <extension name="coverage">
@@ -113,6 +124,7 @@
     </configuration>
     <recent_temporary>
       <list>
+        <item itemvalue="Application.SocketProxy" />
         <item itemvalue="JUnit.BrowserTest" />
         <item itemvalue="Maven.utile [package]" />
       </list>

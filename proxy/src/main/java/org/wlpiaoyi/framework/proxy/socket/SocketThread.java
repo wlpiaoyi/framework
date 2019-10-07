@@ -79,6 +79,7 @@ public class SocketThread extends Thread  {
             }
             osIn.write(this.ver);
             osIn.flush();
+            len = isIn.read(buffer);
             host = SocketProxyTools.getDomain(buffer, len, this.proxyType);
             port = SocketProxyTools.getPort(buffer, len);
             if(socketInterface != null){
