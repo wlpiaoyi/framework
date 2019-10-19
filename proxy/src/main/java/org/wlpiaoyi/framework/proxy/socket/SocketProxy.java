@@ -8,7 +8,16 @@ import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.*;
 
+//nohup java -jar proxy.socket.jar > proxy.socket.temp.log 2>&1 &
+/*
+vpnsetup_centos.sh
+wget https://git.io/vpnsetup -O vpnsetup_centos.sh && sudo \
+VPN_IPSEC_PSK='000000 \
+VPN_USER='vpnname' \
+VPN_PASSWORD='000000' \
+sh vpnsetup_centos.sh;
 
+ */
 public class SocketProxy extends Thread implements SocketThread.SocketThreadInterface {
 
     private static final Map<Integer, SocketProxy> servers = new HashMap<>();
@@ -16,18 +25,20 @@ public class SocketProxy extends Thread implements SocketThread.SocketThreadInte
     private final Set<SocketThread> clients = new HashSet<>();
 
     private final int listenPort;
-    private final boolean isEncryption;
 
     private Proxy proxy;
     private ServerSocket serverSocket;
 
-    public SocketProxy(boolean isEncryption, int listenPort){
-        this.isEncryption = isEncryption;
+    public SocketProxy(int listenPort){
         this.listenPort = listenPort;
         this.proxy = null;
     }
 
     public void run(){
+        this.synStart();
+    }
+
+    public void synStart(){
         try{
             System.out.println(this.listenPort);
             this.serverSocket = new ServerSocket(this.listenPort);
@@ -36,9 +47,9 @@ public class SocketProxy extends Thread implements SocketThread.SocketThreadInte
                     Socket socket = serverSocket.accept();
                     SocketThread socketThread;
                     if(this.proxy == null){
-                        socketThread =new SocketThread(socket, this.isEncryption);
+                        socketThread =new SocketThread(socket);
                     }else{
-                        socketThread = new SocketThread(socket, this.proxy, this.isEncryption);
+                        socketThread = new SocketThread(socket, this.proxy);
                     }
                     socketThread.setSocketInterface(this);
                     socketThread.start();
@@ -52,6 +63,12 @@ public class SocketProxy extends Thread implements SocketThread.SocketThreadInte
             this.close();
         }
     }
+
+
+    public void asynStart(){
+        SocketProxy.servers.put(listenPort, this);
+    }
+
 
     public void start(){
         SocketProxy.servers.put(listenPort, this);
@@ -112,11 +129,6 @@ public class SocketProxy extends Thread implements SocketThread.SocketThreadInte
         return listenPort;
     }
 
-    public boolean isEncryption() {
-        return isEncryption;
-    }
-
-
     public Proxy getProxy() {
         return proxy;
     }
@@ -149,30 +161,7 @@ public class SocketProxy extends Thread implements SocketThread.SocketThreadInte
      * @param args
      */
     public static void main(String[] args) {
-        Scanner scanner = new Scanner(System.in);
-        while (true){
-            String line = scanner.nextLine();
-            try{
-                String[] option = line.split(" ");
-                if(option[0].equals("start")){
-                    boolean isEncryption = new Boolean(option[1]).booleanValue();
-                    int port = new Integer(option[2]).intValue();
-                    SocketProxy socketProxy = new SocketProxy(isEncryption, port);
-                    if(option.length == 5){
-                        String proxyIP = option[3];
-                        int proxyPort = new  Integer(option[4]).intValue();
-                        socketProxy.setProxy(proxyIP, proxyPort);
-                    }
-                    socketProxy.start();
-                    System.out.println("serer hash:"+socketProxy.hashCode());
-                    new Thread(socketProxy).start();
-                }else if(option[0].equals("close")){
-                    int hash = new Integer(option[1]);
-                    SocketProxy.remove(hash);
-                }
-            }catch (Exception e){
-                e.printStackTrace();
-            }
-        }
+        SocketProxy socketProxy = new SocketProxy(8010);
+        socketProxy.synStart();
     }
 }

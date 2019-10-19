@@ -20,11 +20,12 @@ public class SocketProxyTools {
 
     //代理允许匿名
     public static final byte[] HANDLE_RESPONSE1 = {0x5, 0x0};
+
     //要求验证
-    public static final byte[] HANDLE_RESPONSE2 = {0x5, 0x2};
+//    public static final byte[] HANDLE_RESPONSE2 = {0x5, 0x2};
 
     //TCP单独部分
-    public static final byte[] DATA_REQUEEST_TCP = {0x5, 0x1};
+//    public static final byte[] DATA_REQUEEST_TCP = {0x5, 0x1};
 
 
     public static boolean IS_EQUES_BYTES(byte[] bytes0, byte[] bytes1){
@@ -62,6 +63,46 @@ public class SocketProxyTools {
             sb.append(" ");
         }
         return sb.toString();
+    }
+
+    public static final byte[] getConnectBytes(byte[] buffer ,int len , SocketProxyType proxyType){
+        byte domainL = 0;
+        byte[] domain = new byte[256];
+        if(SocketProxyTools.REQUEST_DATA_IS_HOST(buffer)){
+            //说明是网址地址
+            int size = SocketProxyTools.REQUEST_DATA_HOST_LENGTH(buffer); //网址长度
+            for(int i = 5; i < (5 + size); i++){
+                domain[domainL] = buffer[i];
+                domainL ++;
+            }
+
+        }else if(SocketProxyTools.REQUEST_DATA_IS_IP(buffer)){
+            if(proxyType == SocketProxyTools.SocketProxyType.Anonymity){
+                //说明是ip地址
+                for(int i = 7; i >= 4; i--){
+                    domain[domainL] = buffer[i];
+                    domainL++;
+                }
+            }else{
+                //说明是ip地址
+                for(int i = 4; i <= 7; i++){
+                    domain[domainL] = buffer[i];
+                    domainL++;
+                }
+            }
+        }
+        byte pmL = 2;
+        byte[] pm = new byte[]{buffer[len-2], buffer[len-1]};
+
+        byte[] results = new byte[domainL + pmL];
+        for (int i = 0; i < domainL; i++) {
+            results[i] = domain[i];
+        }
+        for (int i = 0; i < 2; i++) {
+            results[i + domainL] = pm[i];
+        }
+
+        return results;
     }
 
     /**

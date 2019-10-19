@@ -35,18 +35,18 @@ public class SocketThread extends Thread  {
     private WeakReference<SocketThreadInterface> socketInterface;
     private WeakReference<SocketThreadStream.SocketThreadStreamInterface> streamInterface;
 
-    public SocketThread(Socket socket, boolean isEncryption) {
+    public SocketThread(Socket socket) {
         this.socketIn = socket;
         this.proxy = null;
         this.proxyType = SocketProxyTools.SocketProxyType.Unkown;
-        this.ver = isEncryption ? SocketProxyTools.HANDLE_RESPONSE2 : SocketProxyTools.HANDLE_RESPONSE1;
+        this.ver = SocketProxyTools.HANDLE_RESPONSE1;
     }
 
-    public SocketThread(Socket socket, Proxy proxy, boolean isEncryption) {
+    public SocketThread(Socket socket, Proxy proxy) {
         this.socketIn = socket;
         this.proxy = proxy;
         this.proxyType = SocketProxyTools.SocketProxyType.Unkown;
-        this.ver = isEncryption ? SocketProxyTools.HANDLE_RESPONSE2 : SocketProxyTools.HANDLE_RESPONSE1;
+        this.ver = SocketProxyTools.HANDLE_RESPONSE1;
     }
 
     public void run() {
@@ -72,6 +72,7 @@ public class SocketThread extends Thread  {
             }else {
                 this.proxyType = SocketProxyTools.SocketProxyType.Unkown;
             }
+
             if(socketInterface != null){
                 try{
                     this.socketInterface.get().socketHandle(this, buffer, len);
@@ -100,10 +101,12 @@ public class SocketThread extends Thread  {
             }
             InputStream isOut = socketOut.getInputStream();
             OutputStream osOut = socketOut.getOutputStream();
-            for (int i = 4; i <= 9; i++) {
-                SocketProxyTools.CONNECT_OK[i] = buffer[i];
-            }
+
+//            for (int i = 4; i <= 9; i++) {
+//                SocketProxyTools.CONNECT_OK[i] = buffer[i];
+//            }
             osIn.write(SocketProxyTools.CONNECT_OK);
+
             osIn.flush();
             this.outStream = new SocketThreadStream(isIn, osOut, SocketThreadStream.StreamType.Output,
                     this.streamInterface != null ? this.streamInterface.get() : null);

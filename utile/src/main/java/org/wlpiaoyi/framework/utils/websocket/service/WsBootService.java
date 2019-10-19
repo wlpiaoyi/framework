@@ -3,6 +3,7 @@ package org.wlpiaoyi.framework.utils.websocket.service;
 
 import lombok.Getter;
 import lombok.NonNull;
+import org.wlpiaoyi.framework.utils.StringUtils;
 import org.wlpiaoyi.framework.utils.websocket.WebSocketListener;
 import org.wlpiaoyi.framework.utils.websocket.WsUtile;
 
@@ -45,7 +46,7 @@ public class WsBootService implements WsUtile.SendASyncMessageLitsener {
      * @return index[]: 0,uuid 1,message
      */
     public final String[] sendSyncMessage(@NonNull String message){
-        String uuid = WsUtile.getUUID64();
+        String uuid = StringUtils.getUUID64();
         return new String[]{uuid, this.sendSyncMessage(message, uuid)};
     }
 
@@ -67,9 +68,9 @@ public class WsBootService implements WsUtile.SendASyncMessageLitsener {
      * @return
      * @throws IOException
      */
-    public void sendASyncMessage(@NonNull String uuid, @NonNull String message) throws IOException {
-        String sendArg = uuid + ":" + message;
-        this.sendASyncMessage(sendArg);
+    public void sendAsyncMessage(@NonNull String uuid, @NonNull String message) throws IOException {
+        String sendArg = uuid + WsUtile.WS_SUFFIX + message;
+        this.sendAsyncMessage(sendArg);
     }
 
     /**
@@ -77,7 +78,7 @@ public class WsBootService implements WsUtile.SendASyncMessageLitsener {
      * @param message
      * @throws IOException
      */
-    public void sendASyncMessage(@NonNull String message) throws IOException {
+    public void sendAsyncMessage(@NonNull String message) throws IOException {
         this.session.getBasicRemote().sendText(message);
     }
 
@@ -148,7 +149,7 @@ public class WsBootService implements WsUtile.SendASyncMessageLitsener {
     @Override
     public final void ssmlSendASyncMessage(@NonNull String message) {
         try {
-            this.sendASyncMessage(message);
+            this.sendAsyncMessage(message);
         } catch (IOException e) {
             e.printStackTrace();
         }

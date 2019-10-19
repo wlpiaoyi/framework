@@ -1,70 +1,17 @@
 package org.wlpiaoyi.framework.utils.websocket;
 
 import lombok.NonNull;
+import org.wlpiaoyi.framework.utils.StringUtils;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.UUID;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 
 public class WsUtile {
 
-    public static final int UUID32_LENGHT = 32;
-    public static final int UUID64_LENGHT = 64;
+    public static final String WS_SUFFIX = "::";
 
-    /**
-     * 获得指定数目的UUID
-     * @param number int 需要获得的UUID数量
-     * @return String[] UUID数组
-     */
-    public static String[] getUUID32S(int number){
-        if(number < 1){
-            return null;
-        }
-        StringBuilder uuid = new StringBuilder();
-        String[] retArray = new String[number];
-        for(int i=0;i<number;i++){
-            retArray[i] = WsUtile.getUUID32();
-        }
-        return retArray;
-    }
-
-    /**
-     * 获得指定数目的UUID
-     * @param number int 需要获得的UUID数量
-     * @return String[] UUID数组
-     */
-    public static String[] getUUID64S(int number){
-        if(number < 1){
-            return null;
-        }
-        String[] retArray = new String[number];
-        for(int i=0;i<number;i++){
-            retArray[i] = WsUtile.getUUID64();
-        }
-        return retArray;
-    }
-
-
-    /**
-     * 获得一个UUID
-     * @return String UUID
-     */
-    public static String getUUID64(){
-        String uuid32_1 = WsUtile.getUUID32();
-        String uuid32_2 = WsUtile.getUUID32();
-        return uuid32_1 + uuid32_2;
-    }
-
-    /**
-     * 获得一个UUID
-     * @return String UUID
-     */
-    public static String getUUID32(){
-        String uuid = UUID.randomUUID().toString().replace("-", "");
-        return uuid;
-    }
 
     public static void setDownLatchForMapData(CountDownLatch downLatch, Map<String, Object> data){
         data.put("downLatch", downLatch);
@@ -103,7 +50,7 @@ public class WsUtile {
      */
     public static String ssmlSendSyncMessage(@NonNull String uuid, @NonNull String message, @NonNull SendASyncMessageLitsener sendASyncMessageLitsener){
 
-        String sendArg = uuid + ":" + message;
+        String sendArg = uuid + WsUtile.WS_SUFFIX + message;
         CountDownLatch downLatch = new CountDownLatch(1);
         Map<String, Object> data = new HashMap<>();
         Map<String, Map<String, Object>> resultMap = sendASyncMessageLitsener.getSsmlResultMap();
@@ -145,15 +92,24 @@ public class WsUtile {
         int index = 0;
         try{
             try{
+                boolean hasSuffix = false;
+                char chars = WsUtile.WS_SUFFIX.charAt(0);
                 for(char c : message.toCharArray()){
-                    if(index > WsUtile.UUID64_LENGHT + 1){
-                        index = 0;
+                    int startIndex = index;
+                    int endIndex = index + WsUtile.WS_SUFFIX.length();
+                    if(message.length() > endIndex && c == chars && message.substring(startIndex, endIndex).equals(WsUtile.WS_SUFFIX)){
+                        hasSuffix = true;
+                        break;
                     }
-                    if(c == ':') break;
                     uuid.append(c);
+                    if(index > StringUtils.UUID64_LENGHT) break;
                     index ++;
                 }
-            }catch (Exception e){e.printStackTrace();}
+                if(hasSuffix == false) index = 0;
+            }catch (Exception e){
+                e.printStackTrace();
+                index = 0;
+            }
             if(index > 0){
                 String result = message.substring(index + 1);
                 message = result;

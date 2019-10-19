@@ -46,7 +46,7 @@ public class SocketThreadStream extends Thread{
     public void run() {
         try {
             if(this.streamInterface != null) this.streamInterface.get().streamStart(this);
-            byte[] buffer = new byte[32768];
+            byte[] buffer = new byte[64];
             int len;
             while ((len = inputStream.read(buffer)) != -1) {
                 if (len > 0) {

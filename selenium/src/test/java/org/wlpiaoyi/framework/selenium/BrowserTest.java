@@ -5,6 +5,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.openqa.selenium.By;
 import org.wlpiaoyi.framework.selenium.utils.WebElementUtils;
+import org.wlpiaoyi.framework.utils.OSUtils;
 import org.wlpiaoyi.framework.utils.exception.BusinessException;
 
 public class BrowserTest {
@@ -15,10 +16,16 @@ public class BrowserTest {
     @Before
     public void setUp() throws Exception {
         browser = new Browser().setOptionHeadless(false).setUrl("https://www.baidu.com");
+        this.browser.setOptionHeadless(true);
+        this.browser.setOptionLoadimg(false);
+        this.browser.setDriverPath(System.getProperty("user.dir") +"/chromedriver");
+//        this.browser.setProxyServer("127.0.0.1:9000");
     }
     @Test
     public void test() {
-        browser.openDriver();
+        try{
+            browser.openChromeDriver();
+        }catch (Exception e) {e.printStackTrace();}
     }
 
     @After

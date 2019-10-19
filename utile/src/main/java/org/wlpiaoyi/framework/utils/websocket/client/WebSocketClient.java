@@ -27,18 +27,6 @@ public class WebSocketClient {
         this.socketEcho = new WebSocketEcho(TIME_OUT_SECONDS, this, listener, downLatch);
     }
 
-    /**
-     * 异步开启ws
-     */
-    public void asyncOpen() {
-        OkHttpClient client = new OkHttpClient.Builder()
-                .readTimeout(TIME_OUT_SECONDS, TimeUnit.MILLISECONDS)//设置读取超时时间
-                .writeTimeout(TIME_OUT_SECONDS, TimeUnit.MILLISECONDS)//设置写的超时时间
-                .connectTimeout(TIME_OUT_SECONDS, TimeUnit.MILLISECONDS)//设置连接超时时间
-                .build();
-        Request request = new Request.Builder().url(this.url).build();
-        client.newWebSocket(request, this.socketEcho);
-    }
 
     /**
      * 同步开启ws
@@ -55,6 +43,18 @@ public class WebSocketClient {
             return false;
         }
         return true;
+    }
+    /**
+     * 异步开启ws
+     */
+    public void asyncOpen() {
+        OkHttpClient client = new OkHttpClient.Builder()
+                .readTimeout(TIME_OUT_SECONDS, TimeUnit.MILLISECONDS)//设置读取超时时间
+                .writeTimeout(TIME_OUT_SECONDS, TimeUnit.MILLISECONDS)//设置写的超时时间
+                .connectTimeout(TIME_OUT_SECONDS, TimeUnit.MILLISECONDS)//设置连接超时时间
+                .build();
+        Request request = new Request.Builder().url(this.url).build();
+        client.newWebSocket(request, this.socketEcho);
     }
 
 
@@ -82,8 +82,8 @@ public class WebSocketClient {
      * @param message
      * @return
      */
-    public boolean sendASyncMessage(String message){
-        return this.socketEcho.sendASyncMessage(message);
+    public boolean sendAsyncMessage(String message){
+        return this.socketEcho.sendAsyncMessage(message);
     }
 
     /**
@@ -92,8 +92,8 @@ public class WebSocketClient {
      * @param message
      * @return
      */
-    public boolean sendASyncMessage(String uuid, String message){
-        return this.socketEcho.sendASyncMessage(uuid, message);
+    public String sendAsyncMessage(String uuid, String message){
+        return this.socketEcho.sendAsyncMessage(uuid, message);
     }
 
 

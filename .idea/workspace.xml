@@ -2,9 +2,26 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="a877397b-93f3-422b-bee1-1317d55f59f2" name="Default Changelist" comment="">
+      <change afterPath="$PROJECT_DIR$/chromedriver" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/selenium/chromedriver" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/selenium/geckodriver" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/selenium/operadriver" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/pom.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/proxy/src/main/java/org/wlpiaoyi/framework/proxy/socket/SocketProxy.java" beforeDir="false" afterPath="$PROJECT_DIR$/proxy/src/main/java/org/wlpiaoyi/framework/proxy/socket/SocketProxy.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/proxy/src/main/java/org/wlpiaoyi/framework/proxy/socket/SocketProxyTools.java" beforeDir="false" afterPath="$PROJECT_DIR$/proxy/src/main/java/org/wlpiaoyi/framework/proxy/socket/SocketProxyTools.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/proxy/src/main/java/org/wlpiaoyi/framework/proxy/socket/SocketThread.java" beforeDir="false" afterPath="$PROJECT_DIR$/proxy/src/main/java/org/wlpiaoyi/framework/proxy/socket/SocketThread.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/proxy/src/main/java/org/wlpiaoyi/framework/proxy/socket/SocketThreadStream.java" beforeDir="false" afterPath="$PROJECT_DIR$/proxy/src/main/java/org/wlpiaoyi/framework/proxy/socket/SocketThreadStream.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/selenium/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/selenium/pom.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/selenium/src/main/java/org/wlpiaoyi/framework/selenium/Browser.java" beforeDir="false" afterPath="$PROJECT_DIR$/selenium/src/main/java/org/wlpiaoyi/framework/selenium/Browser.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/selenium/src/test/java/org/wlpiaoyi/framework/selenium/BrowserTest.java" beforeDir="false" afterPath="$PROJECT_DIR$/selenium/src/test/java/org/wlpiaoyi/framework/selenium/BrowserTest.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/utile/src/main/java/org/wlpiaoyi/framework/utils/StringUtils.java" beforeDir="false" afterPath="$PROJECT_DIR$/utile/src/main/java/org/wlpiaoyi/framework/utils/StringUtils.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/utile/src/main/java/org/wlpiaoyi/framework/utils/websocket/WsUtile.java" beforeDir="false" afterPath="$PROJECT_DIR$/utile/src/main/java/org/wlpiaoyi/framework/utils/websocket/WsUtile.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/utile/src/main/java/org/wlpiaoyi/framework/utils/websocket/client/WebSocketClient.java" beforeDir="false" afterPath="$PROJECT_DIR$/utile/src/main/java/org/wlpiaoyi/framework/utils/websocket/client/WebSocketClient.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/utile/src/main/java/org/wlpiaoyi/framework/utils/websocket/client/WebSocketEcho.java" beforeDir="false" afterPath="$PROJECT_DIR$/utile/src/main/java/org/wlpiaoyi/framework/utils/websocket/client/WebSocketEcho.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/utile/src/main/java/org/wlpiaoyi/framework/utils/websocket/service/WsBootService.java" beforeDir="false" afterPath="$PROJECT_DIR$/utile/src/main/java/org/wlpiaoyi/framework/utils/websocket/service/WsBootService.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/utile/src/test/java/org/wlpiaoyi/framework/utils/websocket/client/WebSecketClientTest.java" beforeDir="false" afterPath="$PROJECT_DIR$/utile/src/test/java/org/wlpiaoyi/framework/utils/websocket/client/WebSecketClientTest.java" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
@@ -51,10 +68,23 @@
     <property name="last_opened_file_path" value="$PROJECT_DIR$" />
     <property name="nodejs_interpreter_path.stuck_in_default_project" value="undefined stuck path" />
     <property name="nodejs_npm_path_reset_for_default_project" value="true" />
+    <property name="nodejs_package_manager_path" value="npm" />
     <property name="project.structure.last.edited" value="Modules" />
     <property name="project.structure.proportion" value="0.15234375" />
     <property name="project.structure.side.proportion" value="0.2" />
-    <property name="settings.editor.selected.configurable" value="project.propVCSSupport.Mappings" />
+    <property name="settings.editor.selected.configurable" value="reference.projectsettings.compiler.javacompiler" />
+  </component>
+  <component name="RecentsManager">
+    <key name="MoveFile.RECENT_KEYS">
+      <recent name="Z:\Document\Developer\J2ee\framework\selenium" />
+    </key>
+    <key name="CopyClassDialog.RECENTS_KEY">
+      <recent name="org.wlpiaoyi.framework.utils.websocket.service" />
+    </key>
+    <key name="CopyFile.RECENT_KEYS">
+      <recent name="$PROJECT_DIR$" />
+      <recent name="$PROJECT_DIR$/selenium" />
+    </key>
   </component>
   <component name="RunDashboard">
     <option name="ruleStates">
@@ -69,6 +99,19 @@
     </option>
   </component>
   <component name="RunManager" selected="Application.SocketProxy">
+    <configuration name="Browser" type="Application" factoryName="Application" temporary="true" nameIsGenerated="true">
+      <option name="MAIN_CLASS_NAME" value="org.wlpiaoyi.framework.selenium.Browser" />
+      <module name="selenium" />
+      <extension name="coverage">
+        <pattern>
+          <option name="PATTERN" value="org.wlpiaoyi.framework.selenium.*" />
+          <option name="ENABLED" value="true" />
+        </pattern>
+      </extension>
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
     <configuration name="SocketProxy" type="Application" factoryName="Application" temporary="true" nameIsGenerated="true">
       <option name="MAIN_CLASS_NAME" value="org.wlpiaoyi.framework.proxy.socket.SocketProxy" />
       <module name="proxy" />
@@ -125,6 +168,7 @@
     <recent_temporary>
       <list>
         <item itemvalue="Application.SocketProxy" />
+        <item itemvalue="Application.Browser" />
         <item itemvalue="JUnit.BrowserTest" />
         <item itemvalue="Maven.utile [package]" />
       </list>
@@ -142,11 +186,20 @@
       <updated>1570187981131</updated>
       <workItem from="1570187985133" duration="1825000" />
       <workItem from="1570251283305" duration="7278000" />
+      <workItem from="1570589915810" duration="1172000" />
+      <workItem from="1570602794327" duration="127000" />
+      <workItem from="1570602932614" duration="604000" />
+      <workItem from="1570671205209" duration="782000" />
+      <workItem from="1570757982734" duration="17118000" />
+      <workItem from="1570846456259" duration="15724000" />
+      <workItem from="1570936045068" duration="405000" />
+      <workItem from="1570950777696" duration="1343000" />
+      <workItem from="1570974404837" duration="2000" />
+      <workItem from="1571129987354" duration="9161000" />
+      <workItem from="1571231886553" duration="3354000" />
+      <workItem from="1571366534481" duration="14225000" />
     </task>
     <servers />
-  </component>
-  <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="9103000" />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
     <option name="version" value="1" />
@@ -171,8 +224,8 @@
   </component>
   <component name="XDebuggerManager">
     <watches-manager>
-      <configuration name="JUnit">
-        <watch expression="e.printStackTrace();" language="JAVA" />
+      <configuration name="Application">
+        <watch expression="new String(bytes,&quot;UTF-8&quot;)" language="JAVA" />
       </configuration>
     </watches-manager>
   </component>

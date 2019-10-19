@@ -4,6 +4,8 @@ import lombok.NonNull;
 import okhttp3.Response;
 import okhttp3.WebSocket;
 import okio.ByteString;
+import org.jetbrains.annotations.Nullable;
+import org.wlpiaoyi.framework.utils.StringUtils;
 import org.wlpiaoyi.framework.utils.websocket.WebSocketListener;
 import org.wlpiaoyi.framework.utils.websocket.WsUtile;
 
@@ -38,7 +40,7 @@ final class WebSocketEcho extends okhttp3.WebSocketListener implements WsUtile.S
 
     @Override
     public void ssmlSendASyncMessage(@NonNull String message) {
-        this.sendASyncMessage(message);
+        this.sendAsyncMessage(message);
     }
 
     @Override
@@ -62,14 +64,16 @@ final class WebSocketEcho extends okhttp3.WebSocketListener implements WsUtile.S
     }
 
     /**
-     * 实现服务器异步线程安全主动推送
+     * 实现服务器异步主动推送
      * @param uuid
      * @param message
      * @return
      */
-    public boolean sendASyncMessage(@NonNull String uuid, @NonNull String message){
-        String sendArg = uuid + ":" + message;
-        return this.sendASyncMessage(sendArg);
+    public String sendAsyncMessage(@Nullable String uuid, @NonNull String message){
+        if(StringUtils.isBlank(uuid)) uuid = StringUtils.getUUID64();
+        String sendArg = uuid + WsUtile.WS_SUFFIX + message;
+        if(this.sendAsyncMessage(sendArg)) return uuid;
+        else return null;
     }
 
     /**
@@ -77,7 +81,7 @@ final class WebSocketEcho extends okhttp3.WebSocketListener implements WsUtile.S
      * @param text
      * @return
      */
-    public boolean sendASyncMessage(@NonNull String text){
+    public boolean sendAsyncMessage(@NonNull String text){
         return this.webSocket.send(text);
     }
 
@@ -88,7 +92,7 @@ final class WebSocketEcho extends okhttp3.WebSocketListener implements WsUtile.S
      * @return index[]: 0,uuid 1,message
      */
     public String[] sendSyncMessage(@NonNull String message){
-        String uuid = WsUtile.getUUID64();
+        String uuid = StringUtils.getUUID64();
         return new String[]{uuid, this.sendSyncMessage(uuid, message)};
     }
     /**

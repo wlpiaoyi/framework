@@ -72,7 +72,7 @@ public class WebSecketClientTest implements Runnable {
             dataMap.put("type", "send-close");
             dataMap.put("count", count ++);
             message =  gson.toJson(dataMap);
-            wsClient.sendASyncMessage(uuid, message);
+            wsClient.sendAsyncMessage(uuid, message);
         }catch (Exception e){
             e.printStackTrace();
         }
