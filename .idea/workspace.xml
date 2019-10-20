@@ -3,8 +3,9 @@
   <component name="ChangeListManager">
     <list default="true" id="a877397b-93f3-422b-bee1-1317d55f59f2" name="Default Changelist" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/pom.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/proxy/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/proxy/pom.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/proxy/src/main/java/org/wlpiaoyi/framework/proxy/socket/SocketProxy.java" beforeDir="false" afterPath="$PROJECT_DIR$/proxy/src/main/java/org/wlpiaoyi/framework/proxy/socket/SocketProxy.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/proxy/src/main/java/org/wlpiaoyi/framework/proxy/socket/StreamThread.java" beforeDir="false" afterPath="$PROJECT_DIR$/proxy/src/main/java/org/wlpiaoyi/framework/proxy/stream/StreamThread.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/proxy/src/main/java/org/wlpiaoyi/framework/proxy/stream/SocketThread.java" beforeDir="false" afterPath="$PROJECT_DIR$/proxy/src/main/java/org/wlpiaoyi/framework/proxy/socket/SocketThread.java" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
@@ -181,7 +182,7 @@
       <workItem from="1570974404837" duration="2000" />
       <workItem from="1571129987354" duration="9161000" />
       <workItem from="1571231886553" duration="3354000" />
-      <workItem from="1571366534481" duration="27042000" />
+      <workItem from="1571366534481" duration="27751000" />
     </task>
     <servers />
   </component>
@@ -210,7 +211,7 @@
     <breakpoint-manager>
       <breakpoints>
         <line-breakpoint enabled="true" type="java-line">
-          <url>file://$PROJECT_DIR$/proxy/src/main/java/org/wlpiaoyi/framework/proxy/socket/StreamThread.java</url>
+          <url>file://$PROJECT_DIR$/proxy/src/main/java/org/wlpiaoyi/framework/proxy/stream/StreamThread.java</url>
           <line>20</line>
           <option name="timeStamp" value="22" />
         </line-breakpoint>

@@ -1,8 +1,8 @@
-package org.wlpiaoyi.framework.proxy.stream;
+package org.wlpiaoyi.framework.proxy.socket;
 
 
 import lombok.Getter;
-import org.wlpiaoyi.framework.proxy.socket.StreamThread;
+import org.wlpiaoyi.framework.proxy.stream.StreamThread;
 import org.wlpiaoyi.framework.proxy.utils.Utils;
 
 import java.io.IOException;

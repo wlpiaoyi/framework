@@ -1,4 +1,4 @@
-package org.wlpiaoyi.framework.proxy.socket;
+package org.wlpiaoyi.framework.proxy.stream;
 
 import java.io.InputStream;
 import java.io.OutputStream;

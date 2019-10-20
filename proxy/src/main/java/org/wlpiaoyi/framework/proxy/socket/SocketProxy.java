@@ -1,8 +1,9 @@
 package org.wlpiaoyi.framework.proxy.socket;
 
 
+import lombok.Getter;
+import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
-import org.wlpiaoyi.framework.proxy.stream.SocketThread;
 
 import java.io.IOException;
 import java.net.InetSocketAddress;
@@ -22,15 +23,19 @@ sh vpnsetup_centos.sh;
 
  */
 @Slf4j
-public class SocketProxy extends Thread implements SocketThread.SocketThreadInterface {
+public class SocketProxy  implements SocketThread.SocketThreadInterface {
+
+
+    @Getter
+    private final int listenPort;
+
+    @Getter @Setter
+    private Proxy proxy;
 
     private static final Map<Integer, SocketProxy> servers = new HashMap<>();
 
     private final Set<SocketThread> clients = new HashSet<>();
 
-    private final int listenPort;
-
-    private Proxy proxy;
     private ServerSocket serverSocket;
 
     public SocketProxy(int listenPort){
@@ -38,13 +43,10 @@ public class SocketProxy extends Thread implements SocketThread.SocketThreadInte
         this.proxy = null;
     }
 
-    public void run(){
-        this.synStart();
-    }
-
     public void synStart(){
         try{
-            System.out.println(this.listenPort);
+            SocketProxy.servers.put(listenPort, this);
+            log.info("server start port:{}", listenPort);
             this.serverSocket = new ServerSocket(this.listenPort);
             while (this.serverSocket.isClosed() == false) {
                 try {
@@ -70,12 +72,9 @@ public class SocketProxy extends Thread implements SocketThread.SocketThreadInte
 
 
     public void asynStart(){
-        SocketProxy.servers.put(listenPort, this);
-    }
-
-
-    public void start(){
-        SocketProxy.servers.put(listenPort, this);
+        new Thread(() -> {
+            this.synStart();
+        }).start();
     }
 
     public void close(){
@@ -123,23 +122,9 @@ public class SocketProxy extends Thread implements SocketThread.SocketThreadInte
     }
 
 
-    public int getListenPort() {
-        return listenPort;
-    }
-
-    public Proxy getProxy() {
-        return proxy;
-    }
-
-    public void clearProxy() {
-        proxy = null;
-    }
-
     public void setProxy(String proxyIP,int proxyPort) {
         this.proxy = new Proxy(Proxy.Type.SOCKS, new InetSocketAddress(proxyIP, proxyPort));
-        System.out.println("set proxyHost:" + ((InetSocketAddress)proxy.address()).getHostName() + "porxyProt:"+ ((InetSocketAddress)proxy.address()).getPort());
     }
-
 
     public static final Set<Map.Entry<Integer, SocketProxy>> getServers() {
         return servers.entrySet();
