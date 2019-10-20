@@ -38,8 +38,17 @@ public class SocketProxy  implements SocketThread.SocketThreadInterface {
 
     private final ServerSocket serverSocket;
 
+    private byte[][] encryptionDatas;
+
     public SocketProxy(int listenPort) throws IOException {
         this.listenPort = listenPort;
+        this.encryptionDatas = null;
+        this.serverSocket = new ServerSocket(this.listenPort);
+        this.proxy = null;
+    }
+    public SocketProxy(int listenPort, byte[][] encryptionDatas) throws IOException {
+        this.listenPort = listenPort;
+        this.encryptionDatas = encryptionDatas;
         this.serverSocket = new ServerSocket(this.listenPort);
         this.proxy = null;
     }
@@ -53,9 +62,9 @@ public class SocketProxy  implements SocketThread.SocketThreadInterface {
                     Socket socket = serverSocket.accept();
                     SocketThread socketThread;
                     if(this.proxy == null){
-                        socketThread =new SocketThread(socket);
+                        socketThread =new SocketThread(socket, this.encryptionDatas);
                     }else{
-                        socketThread = new SocketThread(socket, this.proxy);
+                        socketThread = new SocketThread(socket, this.proxy, this.encryptionDatas);
                     }
                     socketThread.setSocketInterface(this);
                     socketThread.start();
@@ -142,7 +151,14 @@ public class SocketProxy  implements SocketThread.SocketThreadInterface {
      * @param args
      */
     public static void main(String[] args) throws IOException {
-        SocketProxy socketProxy = new SocketProxy(8010);
-        socketProxy.synStart();
+        byte[][] encryptionDatas = new byte[2][];
+        String name = "ikamobile";
+        String pwd = "ikamobile2416";
+        encryptionDatas[0] = name.getBytes("UTF-8");
+        encryptionDatas[1] = pwd.getBytes("UTF-8");
+        SocketProxy socketProxy1 = new SocketProxy(8011, encryptionDatas);
+        socketProxy1.asynStart();
+        SocketProxy socketProxy2 = new SocketProxy(8010);
+        socketProxy2.synStart();
     }
 }

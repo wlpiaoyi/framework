@@ -8,7 +8,9 @@ public class Utils {
         Encryption,
         Custom
     }
+
     public static final byte SOCKET_VERSION = 0x5;
+    public static final byte ENCRYPTION_VERSION = 0x1;
 
     //匿名代理
     public static final byte[] REQUEST_ANONYMITY = {SOCKET_VERSION, 0x1, 0x0};
@@ -17,10 +19,14 @@ public class Utils {
     //匿名或者用户名密码方式代理
     public static final byte[] REQUEST_CUSTOM = {SOCKET_VERSION, 0x2, 0x0, 0x2};
 
-    //代理允许匿名
+    //代理回应状态 无验证需求
     public static final byte[] RESPONSE_ANONYMITY = {SOCKET_VERSION, 0x0};
-    //代理用户名密码方式验证
-    public static final byte[] RESPONSE_ENCRYPTION = {SOCKET_VERSION, 0x2};
+    //代理回应状态 用户名/密码
+    public static final byte[] RESPONSE_ENCRYPTION= {SOCKET_VERSION, 0x2};
+    //代理回应状态 无可接受方法
+    public static final byte[] RESPONSE_UNKOWN= {0xF, 0xF};
+    //代理回应状态
+    public static final byte[] ENCRYPTION_OK = {0x1, 0x0};
 
 
     public static final byte[] CONNECT_OK = {SOCKET_VERSION, 0x0, 0x0, 0x1, 0, 0, 0, 0, 0, 0};
@@ -112,6 +118,56 @@ public class Utils {
         }
 
         return results;
+    }
+
+    /**
+     * 获取用户名长度
+     * @param buffer
+     * @return
+     */
+    public static final byte getEncryptionNameLength(byte[] buffer){
+        if(buffer.length < 5) return -1;
+        return buffer[1];
+    }
+
+    /**
+     * 获取用户名
+     * @param buffer
+     * @return
+     */
+    public static final byte[] getEncryptionName(byte[] buffer, int len){
+        if(len < 1) return null;
+        if(buffer.length < len + 4) return null;
+        byte[] nameBuffer = new byte[len];
+        for (int i = 0; i < len; i++) {
+            nameBuffer[i] = buffer[i + 2];
+        }
+        return nameBuffer;
+    }
+
+    /**
+     * 获取密码长度
+     * @param buffer
+     * @return
+     */
+    public static final byte getEncryptionPwdLenght(byte[] buffer, int nameLen){
+        if(buffer.length < 4 + nameLen) return -1;
+        return buffer[2 + nameLen];
+    }
+
+    /**
+     * 获取密码
+     * @param buffer
+     * @return
+     */
+    public static final byte[] getEncryptionPwd(byte[] buffer, int nameLen, int len){
+        if(len < 1) return null;
+        if(buffer.length < len + nameLen + 3) return null;
+        byte[] pwdBuffer = new byte[len];
+        for (int i = 0; i < len; i++) {
+            pwdBuffer[i] = buffer[i + nameLen + 3];
+        }
+        return pwdBuffer;
     }
 
     /**

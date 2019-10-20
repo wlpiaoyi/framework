@@ -44,31 +44,33 @@ public class SocketThread extends Thread  {
     private byte[] ver;
     private Utils.SocketProxyType proxyType;
 
+    private byte[][] encryptionDatas;
+
     private WeakReference<SocketThreadInterface> socketInterface;
     private WeakReference<StreamThread.StreamThreadInterface> streamInterface;
 
     public SocketThread(Socket socket) {
-        this.SocketThreadInit(socket, null, false);
+        this.SocketThreadInit(socket, null, null);
     }
 
     public SocketThread(Socket socket, Proxy proxy) {
-        this.SocketThreadInit(socket, proxy, false);
+        this.SocketThreadInit(socket, proxy, null);
     }
-    public SocketThread(Socket socket, boolean isEncryption) {
-        this.SocketThreadInit(socket, null, isEncryption);
-    }
-
-    public SocketThread(Socket socket, Proxy proxy, boolean isEncryption) {
-        this.SocketThreadInit(socket, proxy, isEncryption);
+    public SocketThread(Socket socket, byte[][] encryptionDatas) {
+        this.SocketThreadInit(socket, null, encryptionDatas);
     }
 
-    private final void SocketThreadInit(Socket socket, Proxy proxy, boolean isEncryption) {
+    public SocketThread(Socket socket, Proxy proxy, byte[][] encryptionDatas) {
+        this.SocketThreadInit(socket, proxy, encryptionDatas);
+    }
+
+    private final void SocketThreadInit(Socket socket, Proxy proxy, byte[][] encryptionDatas) {
         this.socketIn = socket;
         this.requestDomain = socketIn.getInetAddress().getHostAddress();
         this.requestPort = socketIn.getPort();
         this.proxy = proxy;
         this.proxyType = Utils.SocketProxyType.Unkown;
-        this.ver = isEncryption ? Utils.REQUEST_ENCRYPTION : Utils.RESPONSE_ANONYMITY;
+        this.encryptionDatas = encryptionDatas;
     }
 
     public void run() {
@@ -95,9 +97,42 @@ public class SocketThread extends Thread  {
                 this.proxyType = Utils.SocketProxyType.Custom;
             }else {
                 this.proxyType = Utils.SocketProxyType.Unkown;
+                osIn.write(Utils.RESPONSE_UNKOWN);
+                osIn.flush();
+                return;
             }
-            osIn.write(this.ver);
+
+            if(this.encryptionDatas != null && this.encryptionDatas.length == 2){
+                osIn.write(Utils.RESPONSE_ENCRYPTION);
+            }else {
+                osIn.write(Utils.RESPONSE_ANONYMITY);
+            }
             osIn.flush();
+
+
+            if(this.encryptionDatas != null && this.encryptionDatas.length == 2){
+                len = isIn.read(buffer);
+
+                byte nameL = Utils.getEncryptionNameLength(buffer);
+                byte[] name = Utils.getEncryptionName(buffer, nameL);
+                if(nameL < 1 || name == null || name.length != nameL) return;
+
+                byte pwdL = Utils.getEncryptionPwdLenght(buffer, nameL);
+                byte[] pwd = Utils.getEncryptionPwd(buffer, nameL, pwdL);
+                if(pwdL < 1 || pwd == null || pwd.length != pwdL) return;
+
+                if(!Utils.IS_EQUES_BYTES(this.encryptionDatas[0], name) || !Utils.IS_EQUES_BYTES(this.encryptionDatas[1], pwd)){
+                    byte[] response = Utils.ENCRYPTION_OK;
+                    response[1] = 0x01;
+                    osIn.write(response);
+                    osIn.flush();
+                    return;
+                }else {
+                    osIn.write(Utils.ENCRYPTION_OK);
+                    osIn.flush();
+                }
+            }
+
 
             len = isIn.read(buffer);
             this.responseDomain = Utils.getDomain(buffer, len, this.proxyType);
@@ -120,11 +155,7 @@ public class SocketThread extends Thread  {
             InputStream isOut = socketOut.getInputStream();
             OutputStream osOut = socketOut.getOutputStream();
 
-//            for (int i = 4; i <= 9; i++) {
-//                Utils.CONNECT_OK[i] = buffer[i];
-//            }
             osIn.write(Utils.CONNECT_OK);
-//            osIn.write(Utils.getConnectBytes(buffer,len,proxyType));
             osIn.flush();
             this.outStream = new StreamThread(isIn, osOut, StreamThread.StreamType.Output,
                     this.streamInterface != null ? this.streamInterface.get() : null);
