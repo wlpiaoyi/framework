@@ -1,5 +1,9 @@
-package org.wlpiaoyi.framework.proxy.socket;
+package org.wlpiaoyi.framework.proxy.stream;
 
+
+import lombok.Getter;
+import org.wlpiaoyi.framework.proxy.socket.StreamThread;
+import org.wlpiaoyi.framework.proxy.utils.Utils;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -15,120 +19,133 @@ public class SocketThread extends Thread  {
 
     public interface SocketThreadInterface{
 
-        void socketStart(SocketThread socketThread);
-        void socketHandle(SocketThread socketThread, byte[] buffer, int len);
-        void socketData(SocketThread socketThread, byte[] buffer, int len);
-        void socketConnected(SocketThread socketThread, String requestDomain, int requestPort);
-        void socketEnd(SocketThread socketThread);
-        void socketErro(SocketThread socketThread, Exception e);
+        boolean socketOpen(SocketThread socketThread);
+        boolean socketConnect(SocketThread socketThread);
+
+        void socketClose(SocketThread socketThread);
+        void socketException(SocketThread socketThread, Exception e);
 
     }
+
+    @Getter
+    private String requestDomain;
+    @Getter
+    private int requestPort;
+    @Getter
+    private String responseDomain = "";
+    @Getter
+    private int responsePort = -1;
 
     private Socket socketIn;
     private Socket socketOut;
-    private SocketThreadStream outStream;
-    private SocketThreadStream inStream;
+    private StreamThread outStream;
+    private StreamThread inStream;
     private Proxy proxy;
-    private final byte[] ver;
-    private SocketProxyTools.SocketProxyType proxyType;
+    private byte[] ver;
+    private Utils.SocketProxyType proxyType;
 
     private WeakReference<SocketThreadInterface> socketInterface;
-    private WeakReference<SocketThreadStream.SocketThreadStreamInterface> streamInterface;
+    private WeakReference<StreamThread.StreamThreadInterface> streamInterface;
 
     public SocketThread(Socket socket) {
-        this.socketIn = socket;
-        this.proxy = null;
-        this.proxyType = SocketProxyTools.SocketProxyType.Unkown;
-        this.ver = SocketProxyTools.HANDLE_RESPONSE1;
+        this.SocketThreadInit(socket, null, false);
     }
 
     public SocketThread(Socket socket, Proxy proxy) {
+        this.SocketThreadInit(socket, proxy, false);
+    }
+    public SocketThread(Socket socket, boolean isEncryption) {
+        this.SocketThreadInit(socket, null, isEncryption);
+    }
+
+    public SocketThread(Socket socket, Proxy proxy, boolean isEncryption) {
+        this.SocketThreadInit(socket, proxy, isEncryption);
+    }
+
+
+    private final void SocketThreadInit(Socket socket, Proxy proxy, boolean isEncryption) {
         this.socketIn = socket;
+        this.requestDomain = socketIn.getInetAddress().getHostAddress();
+        this.requestPort = socketIn.getPort();
         this.proxy = proxy;
-        this.proxyType = SocketProxyTools.SocketProxyType.Unkown;
-        this.ver = SocketProxyTools.HANDLE_RESPONSE1;
+        this.proxyType = Utils.SocketProxyType.Unkown;
+        this.ver = isEncryption ? Utils.REQUEST_ENCRYPTION : Utils.RESPONSE_ANONYMITY;
     }
 
     public void run() {
-        String host = "";
-        int port = 0;
         try {
+
+            boolean enableNext = true;
             if(socketInterface != null){
                 try{
-                    this.socketInterface.get().socketStart(this);
+                    enableNext = this.socketInterface.get().socketOpen(this);
                 }catch (Exception e){e.printStackTrace();}
             }
+            if (!enableNext) return;
+
             InputStream isIn = socketIn.getInputStream();
             OutputStream osIn = socketIn.getOutputStream();
             byte[] buffer = new byte[1024];
             int len = isIn.read(buffer);
 
-            if(SocketProxyTools.IS_EQUES_BYTES(SocketProxyTools.HANDLE_REQUEEST1, buffer)){
-                this.proxyType = SocketProxyTools.SocketProxyType.Anonymity;
-            }else if(SocketProxyTools.IS_EQUES_BYTES(SocketProxyTools.HANDLE_REQUEEST2, buffer)){
-                this.proxyType = SocketProxyTools.SocketProxyType.Encryption;
-            }else if(SocketProxyTools.IS_EQUES_BYTES(SocketProxyTools.HANDLE_REQUEEST3, buffer)){
-                this.proxyType = SocketProxyTools.SocketProxyType.ALL;
+            if(Utils.IS_EQUES_BYTES(Utils.REQUEST_ANONYMITY, buffer)){
+                this.proxyType = Utils.SocketProxyType.Anonymity;
+            }else if(Utils.IS_EQUES_BYTES(Utils.REQUEST_ENCRYPTION, buffer)){
+                this.proxyType = Utils.SocketProxyType.Encryption;
+            }else if(Utils.IS_EQUES_BYTES(Utils.REQUEST_CUSTOM, buffer)){
+                this.proxyType = Utils.SocketProxyType.Custom;
             }else {
-                this.proxyType = SocketProxyTools.SocketProxyType.Unkown;
-            }
-
-            if(socketInterface != null){
-                try{
-                    this.socketInterface.get().socketHandle(this, buffer, len);
-                }catch (Exception e){e.printStackTrace();}
+                this.proxyType = Utils.SocketProxyType.Unkown;
             }
             osIn.write(this.ver);
             osIn.flush();
+
             len = isIn.read(buffer);
-            host = SocketProxyTools.getDomain(buffer, len, this.proxyType);
-            port = SocketProxyTools.getPort(buffer, len);
+            this.responseDomain = Utils.getDomain(buffer, len, this.proxyType);
+            this.responsePort = Utils.getPort(buffer, len);
+            enableNext = true;
             if(socketInterface != null){
                 try{
-                    this.socketInterface.get().socketData(this, buffer, len);
+                    enableNext = this.socketInterface.get().socketConnect(this);
                 }catch (Exception e){e.printStackTrace();}
             }
+            if (!enableNext) return;
+
+
             if(this.proxy != null){
                 socketOut = new Socket(proxy);
-                socketOut.connect(new InetSocketAddress(host, port));//服务器的ip及地址
+                socketOut.connect(new InetSocketAddress(this.responseDomain, this.responsePort));//服务器的ip及地址
             }else{
-                socketOut = new Socket(host, port);
-            }
-            if(socketInterface != null){
-                try{
-                    this.socketInterface.get().socketConnected(this, host, port);
-                }catch (Exception e){e.printStackTrace();}
+                socketOut = new Socket(this.responseDomain, this.responsePort);
             }
             InputStream isOut = socketOut.getInputStream();
             OutputStream osOut = socketOut.getOutputStream();
 
 //            for (int i = 4; i <= 9; i++) {
-//                SocketProxyTools.CONNECT_OK[i] = buffer[i];
+//                Utils.CONNECT_OK[i] = buffer[i];
 //            }
-            osIn.write(SocketProxyTools.CONNECT_OK);
-
+            osIn.write(Utils.CONNECT_OK);
+//            osIn.write(Utils.getConnectBytes(buffer,len,proxyType));
             osIn.flush();
-            this.outStream = new SocketThreadStream(isIn, osOut, SocketThreadStream.StreamType.Output,
+            this.outStream = new StreamThread(isIn, osOut, StreamThread.StreamType.Output,
                     this.streamInterface != null ? this.streamInterface.get() : null);
             outStream.start();
-            this.inStream = new SocketThreadStream(isOut, osIn, SocketThreadStream.StreamType.Input,
+            this.inStream = new StreamThread(isOut, osIn, StreamThread.StreamType.Input,
                     this.streamInterface != null ? this.streamInterface.get() : null);
             inStream.start();
             outStream.join();
             inStream.join();
         } catch (Exception e) {
-            e.printStackTrace();
-            System.out.println(host + ":" + port);
             if(socketInterface != null){
                 try{
-                    this.socketInterface.get().socketErro(this, e);
+                    this.socketInterface.get().socketException(this, e);
                 }catch (Exception ex){e.printStackTrace();}
             }
         } finally {
             this.close();
             if(socketInterface != null){
                 try{
-                    this.socketInterface.get().socketEnd(this);
+                    this.socketInterface.get().socketClose(this);
                 }catch (Exception e){e.printStackTrace();}
             }
         }
@@ -164,7 +181,7 @@ public class SocketThread extends Thread  {
     public void setSocketInterface(SocketThreadInterface threadInterface){
         if(threadInterface != null) this.socketInterface = new WeakReference<>(threadInterface);
     }
-    public void setStreamInterface(SocketThreadStream.SocketThreadStreamInterface streamInterface){
+    public void setStreamInterface(StreamThread.StreamThreadInterface streamInterface){
         if(streamInterface != null) this.streamInterface = new WeakReference<>(streamInterface);
     }
 

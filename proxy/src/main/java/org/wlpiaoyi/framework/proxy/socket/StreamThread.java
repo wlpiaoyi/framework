@@ -6,18 +6,18 @@ import java.lang.ref.WeakReference;
 
 //00 00 0D 0A 30 0D 0A 0D 0A
 //61 63 68 65 0D 0A 0D 0A
-public class SocketThreadStream extends Thread{
+public class StreamThread extends Thread{
 
     public enum StreamType {
         Input,
         Output
     }
 
-    public interface SocketThreadStreamInterface{
-        void streamStart(SocketThreadStream stream);
-        void streaming(SocketThreadStream stream, byte[] buffer, int len);
-        void streamEnd(SocketThreadStream stream);
-        void streamErro(SocketThreadStream stream, Exception e);
+    public interface StreamThreadInterface {
+        void streamStart(StreamThread stream);
+        void streaming(StreamThread stream, byte[] buffer, int len);
+        void streamEnd(StreamThread stream);
+        void streamErro(StreamThread stream, Exception e);
     }
 
     private InputStream inputStream;
@@ -25,9 +25,9 @@ public class SocketThreadStream extends Thread{
     private StreamType streamType;
     private long recentExecuteTime;
 
-    private final WeakReference<SocketThreadStreamInterface> streamInterface;
+    private final WeakReference<StreamThreadInterface> streamInterface;
 
-    public SocketThreadStream(InputStream inputStream, OutputStream outputStream, StreamType streamType, SocketThreadStreamInterface streamInterface){
+    public StreamThread(InputStream inputStream, OutputStream outputStream, StreamType streamType, StreamThreadInterface streamInterface){
         this.inputStream = inputStream;
         this.outputStream = outputStream;
         this.streamType = streamType;

@@ -1,6 +1,9 @@
 package org.wlpiaoyi.framework.proxy.socket;
 
 
+import lombok.extern.slf4j.Slf4j;
+import org.wlpiaoyi.framework.proxy.stream.SocketThread;
+
 import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.net.Proxy;
@@ -18,6 +21,7 @@ VPN_PASSWORD='000000' \
 sh vpnsetup_centos.sh;
 
  */
+@Slf4j
 public class SocketProxy extends Thread implements SocketThread.SocketThreadInterface {
 
     private static final Map<Integer, SocketProxy> servers = new HashMap<>();
@@ -89,39 +93,33 @@ public class SocketProxy extends Thread implements SocketThread.SocketThreadInte
     }
 
     @Override
-    public void socketStart(SocketThread socketThread) {
+    public boolean socketOpen(SocketThread socketThread) {
         synchronized (this.clients){
             this.clients.add(socketThread);
         }
-        System.out.println("=======>"+this.clients.size());
+        log.info("socket ip:{} port:{} come in count ======>{}", socketThread.getRequestDomain(), socketThread.getRequestPort(), this.clients.size());
+        return true;
+    }
+
+
+    @Override
+    public boolean socketConnect(SocketThread socketThread) {
+        log.info("socket ip:{} port:{} connect to domain:{} port:{} ", socketThread.getRequestDomain(), socketThread.getRequestPort(), socketThread.getResponseDomain(), socketThread.getResponsePort());
+        return true;
     }
 
     @Override
-    public void socketHandle(SocketThread socketThread, byte[] buffer, int len) {
-
-    }
-
-    @Override
-    public void socketData(SocketThread socketThread, byte[] buffer, int len) {
-
-    }
-
-    @Override
-    public void socketConnected(SocketThread socketThread, String requestHost, int requestPort) {
-
-    }
-
-    @Override
-    public void socketEnd(SocketThread socketThread) {
+    public void socketClose(SocketThread socketThread) {
         synchronized (this.clients){
             this.clients.remove(socketThread);
         }
-        System.out.println("<======="+this.clients.size());
+        log.info("socket ip:{} port:{} come out count <======{}", socketThread.getRequestDomain(), socketThread.getRequestPort(), this.clients.size());
     }
 
     @Override
-    public void socketErro(SocketThread socketThread, Exception e) {
+    public void socketException(SocketThread socketThread, Exception e) {
         e.printStackTrace();
+        log.info("socket ip:{} port:{} exception domain:{} port:{} ", socketThread.getRequestDomain(), socketThread.getRequestPort(), socketThread.getResponseDomain(), socketThread.getResponsePort());
     }
 
 
@@ -134,7 +132,7 @@ public class SocketProxy extends Thread implements SocketThread.SocketThreadInte
     }
 
     public void clearProxy() {
-        proxy = null;System.out.println("clear proxy");
+        proxy = null;
     }
 
     public void setProxy(String proxyIP,int proxyPort) {
@@ -155,7 +153,6 @@ public class SocketProxy extends Thread implements SocketThread.SocketThreadInte
     public static SocketProxy get(int listenPort){
         return servers.get(listenPort);
     }
-
 
     /**
      * @param args
