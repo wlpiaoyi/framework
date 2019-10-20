@@ -4,8 +4,7 @@
     <list default="true" id="a877397b-93f3-422b-bee1-1317d55f59f2" name="Default Changelist" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/proxy/src/main/java/org/wlpiaoyi/framework/proxy/socket/SocketProxy.java" beforeDir="false" afterPath="$PROJECT_DIR$/proxy/src/main/java/org/wlpiaoyi/framework/proxy/socket/SocketProxy.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/proxy/src/main/java/org/wlpiaoyi/framework/proxy/socket/StreamThread.java" beforeDir="false" afterPath="$PROJECT_DIR$/proxy/src/main/java/org/wlpiaoyi/framework/proxy/stream/StreamThread.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/proxy/src/main/java/org/wlpiaoyi/framework/proxy/stream/SocketThread.java" beforeDir="false" afterPath="$PROJECT_DIR$/proxy/src/main/java/org/wlpiaoyi/framework/proxy/socket/SocketThread.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/proxy/src/main/java/org/wlpiaoyi/framework/proxy/socket/SocketThread.java" beforeDir="false" afterPath="$PROJECT_DIR$/proxy/src/main/java/org/wlpiaoyi/framework/proxy/socket/SocketThread.java" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
@@ -182,7 +181,7 @@
       <workItem from="1570974404837" duration="2000" />
       <workItem from="1571129987354" duration="9161000" />
       <workItem from="1571231886553" duration="3354000" />
-      <workItem from="1571366534481" duration="27751000" />
+      <workItem from="1571366534481" duration="28660000" />
     </task>
     <servers />
   </component>
@@ -208,19 +207,11 @@
     </ignored-roots>
   </component>
   <component name="XDebuggerManager">
-    <breakpoint-manager>
-      <breakpoints>
-        <line-breakpoint enabled="true" type="java-line">
-          <url>file://$PROJECT_DIR$/proxy/src/main/java/org/wlpiaoyi/framework/proxy/stream/StreamThread.java</url>
-          <line>20</line>
-          <option name="timeStamp" value="22" />
-        </line-breakpoint>
-      </breakpoints>
-    </breakpoint-manager>
     <watches-manager>
       <configuration name="Application">
         <watch expression="new String(Utils.getConnectBytes(buffer,len,proxyType),&quot;UTF-8&quot;)" language="JAVA" />
         <watch expression="Utils.getConnectBytes(buffer,len,proxyType)" language="JAVA" />
+        <watch expression="log.error (&quot;socket ip:&quot; + socketThread.getRequestDomain() + &quot;port:&quot; + socketThread.getRequestDomain() + &quot; exception domain:&quot; + socketThread.getRequestPort() + &quot; port:&quot; + socketThread.getResponseDomain(), e)" language="JAVA" />
       </configuration>
     </watches-manager>
   </component>

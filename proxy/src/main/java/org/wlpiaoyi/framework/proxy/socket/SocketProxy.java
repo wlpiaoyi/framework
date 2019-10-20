@@ -36,10 +36,11 @@ public class SocketProxy  implements SocketThread.SocketThreadInterface {
 
     private final Set<SocketThread> clients = new HashSet<>();
 
-    private ServerSocket serverSocket;
+    private final ServerSocket serverSocket;
 
-    public SocketProxy(int listenPort){
+    public SocketProxy(int listenPort) throws IOException {
         this.listenPort = listenPort;
+        this.serverSocket = new ServerSocket(this.listenPort);
         this.proxy = null;
     }
 
@@ -47,7 +48,6 @@ public class SocketProxy  implements SocketThread.SocketThreadInterface {
         try{
             SocketProxy.servers.put(listenPort, this);
             log.info("server start port:{}", listenPort);
-            this.serverSocket = new ServerSocket(this.listenPort);
             while (this.serverSocket.isClosed() == false) {
                 try {
                     Socket socket = serverSocket.accept();
@@ -117,8 +117,7 @@ public class SocketProxy  implements SocketThread.SocketThreadInterface {
 
     @Override
     public void socketException(SocketThread socketThread, Exception e) {
-        e.printStackTrace();
-        log.info("socket ip:{} port:{} exception domain:{} port:{} ", socketThread.getRequestDomain(), socketThread.getRequestPort(), socketThread.getResponseDomain(), socketThread.getResponsePort());
+        log.error ("socket ip:" + socketThread.getRequestDomain() + "port:" + socketThread.getRequestDomain() + " exception domain:" + socketThread.getRequestPort() + " port:" + socketThread.getResponseDomain(), e);
     }
 
 
@@ -142,7 +141,7 @@ public class SocketProxy  implements SocketThread.SocketThreadInterface {
     /**
      * @param args
      */
-    public static void main(String[] args) {
+    public static void main(String[] args) throws IOException {
         SocketProxy socketProxy = new SocketProxy(8010);
         socketProxy.synStart();
     }

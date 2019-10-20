@@ -62,7 +62,6 @@ public class SocketThread extends Thread  {
         this.SocketThreadInit(socket, proxy, isEncryption);
     }
 
-
     private final void SocketThreadInit(Socket socket, Proxy proxy, boolean isEncryption) {
         this.socketIn = socket;
         this.requestDomain = socketIn.getInetAddress().getHostAddress();
