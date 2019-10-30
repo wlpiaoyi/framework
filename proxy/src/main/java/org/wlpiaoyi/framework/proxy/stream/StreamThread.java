@@ -1,5 +1,8 @@
 package org.wlpiaoyi.framework.proxy.stream;
 
+import lombok.Getter;
+import org.wlpiaoyi.framework.proxy.stream.protocol.StreamCourse;
+
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.lang.ref.WeakReference;
@@ -13,47 +16,49 @@ public class StreamThread extends Thread{
         Output
     }
 
-    public interface StreamThreadInterface {
-        void streamStart(StreamThread stream);
-        void streaming(StreamThread stream, byte[] buffer, int len);
-        void streamEnd(StreamThread stream);
-        void streamErro(StreamThread stream, Exception e);
-    }
 
     private InputStream inputStream;
     private OutputStream outputStream;
+    @Getter
     private StreamType streamType;
+    @Getter
+    private long beginExecuteTime;
+    @Getter
     private long recentExecuteTime;
+    @Getter
+    private String host;
+    @Getter
+    private int port;
 
-    private final WeakReference<StreamThreadInterface> streamInterface;
+    private final WeakReference<StreamCourse> streamInterface;
 
-    public StreamThread(InputStream inputStream, OutputStream outputStream, StreamType streamType, StreamThreadInterface streamInterface){
+    public StreamThread(InputStream inputStream,
+                        OutputStream outputStream,
+                        StreamType streamType,
+                        String host,
+                        int port,
+                        StreamCourse streamCourse){
         this.inputStream = inputStream;
         this.outputStream = outputStream;
         this.streamType = streamType;
-        if(streamInterface != null)this.streamInterface = new WeakReference<>(streamInterface);
+        this.host = host;
+        this.port = port;
+        if(streamCourse != null)this.streamInterface = new WeakReference<>(streamCourse);
         else this.streamInterface = null;
-    }
-
-    public StreamType getStreamType(){
-        return this.streamType;
-    }
-
-    public long getRecentExecuteTime(){
-        return this.recentExecuteTime;
     }
 
     public void run() {
         try {
+            this.beginExecuteTime = System.currentTimeMillis();
             if(this.streamInterface != null) this.streamInterface.get().streamStart(this);
             byte[] buffer = new byte[64];
             int len;
             while ((len = inputStream.read(buffer)) != -1) {
                 if (len > 0) {
                     this.recentExecuteTime = System.currentTimeMillis();
+                    if(this.streamInterface != null) this.streamInterface.get().streaming(this, buffer, len);
                     outputStream.write(buffer, 0, len);
                     outputStream.flush();
-                    if(this.streamInterface != null) this.streamInterface.get().streaming(this, buffer, len);
                 }
             }
         } catch (Exception e) {

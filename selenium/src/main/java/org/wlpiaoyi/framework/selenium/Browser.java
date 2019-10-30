@@ -6,13 +6,6 @@ import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.chrome.ChromeDriverService;
 import org.openqa.selenium.chrome.ChromeOptions;
 import org.openqa.selenium.firefox.*;
-import org.openqa.selenium.ie.InternetExplorerDriver;
-import org.openqa.selenium.ie.InternetExplorerDriverService;
-import org.openqa.selenium.ie.InternetExplorerOptions;
-import org.openqa.selenium.opera.OperaDriver;
-import org.openqa.selenium.opera.OperaDriverService;
-import org.openqa.selenium.opera.OperaOptions;
-import org.wlpiaoyi.framework.utils.OSUtils;
 import org.wlpiaoyi.framework.utils.StringUtils;
 import org.wlpiaoyi.framework.utils.exception.BusinessException;
 
@@ -81,7 +74,6 @@ public class Browser {
     }
 
 
-
     public void openFirfoxDriver(){
 
         System.setProperty(FirefoxDriver.SystemProperty.BROWSER_LOGFILE,"/dev/null");
@@ -113,58 +105,58 @@ public class Browser {
         this.driver = new FirefoxDriver(driverService, options);
         this.openDriver();
     }
-
-    public void openIEDriver(){
-        InternetExplorerOptions option = new InternetExplorerOptions();
-        if(OSUtils.isWindows()){
-            if(StringUtils.isBlank(this.driverPath))
-                throw new BusinessException("the driverPath can't be null!");
-        }
-        if(StringUtils.isBlank(this.driverPath)){
-            InternetExplorerDriverService driverService = InternetExplorerDriverService.createDefaultService();
-            this.driver = new InternetExplorerDriver(driverService,option);
-        }else {
-            InternetExplorerDriverService driverService = new InternetExplorerDriverService.Builder()
-                    .usingDriverExecutable(new File(this.driverPath))
-                    .usingAnyFreePort().build();
-            this.driver = new InternetExplorerDriver(driverService,option);
-        }
-        this.openDriver();
-    }
-
-    public void openOpreaDriver(){
-        OperaOptions options = new OperaOptions();
-        options.addArguments("--no-sandbox");
-        options.addArguments("--disable-dev-shm-usage");
-
-        if(this.isOptionLoadimg()) options.addArguments("blink-settings=imagesEnabled=true");
-        else {
-            options.addArguments("blink-settings=imagesEnabled=false");
-            options.addArguments("--disable-gpu");
-        }
-
-        if(this.isOptionHeadless()) options.addArguments("--headless");;
-
-        if(this.optionLang != null && this.optionLang.length() > 0) options.addArguments("lang=" + this.optionLang);
-        options.setExperimentalOption("excludeSwitches", new String[]{"enable-automation"});
-
-        if(!StringUtils.isBlank(this.binaryPath))options.setBinary(this.binaryPath);
-
-        if(this.proxyServer != null && this.proxyServer.length() > 0){
-            options.addArguments("proxy-server=http://" + this.proxyServer);
-        }
-
-        OperaDriverService driverService;
-        if(StringUtils.isBlank(this.driverPath)){
-            driverService = OperaDriverService.createDefaultService();
-        }else {
-            driverService = new OperaDriverService.Builder()
-                    .usingDriverExecutable(new File(this.driverPath))
-                    .usingAnyFreePort().build();
-        }
-        this.driver = new OperaDriver(driverService,options);
-        this.openDriver();
-    }
+//
+//    public void openIEDriver(){
+//        InternetExplorerOptions option = new InternetExplorerOptions();
+//        if(OSUtils.isWindows()){
+//            if(StringUtils.isBlank(this.driverPath))
+//                throw new BusinessException("the driverPath can't be null!");
+//        }
+//        if(StringUtils.isBlank(this.driverPath)){
+//            InternetExplorerDriverService driverService = InternetExplorerDriverService.createDefaultService();
+//            this.driver = new InternetExplorerDriver(driverService,option);
+//        }else {
+//            InternetExplorerDriverService driverService = new InternetExplorerDriverService.Builder()
+//                    .usingDriverExecutable(new File(this.driverPath))
+//                    .usingAnyFreePort().build();
+//            this.driver = new InternetExplorerDriver(driverService,option);
+//        }
+//        this.openDriver();
+//    }
+//
+//    public void openOpreaDriver(){
+//        OperaOptions options = new OperaOptions();
+//        options.addArguments("--no-sandbox");
+//        options.addArguments("--disable-dev-shm-usage");
+//
+//        if(this.isOptionLoadimg()) options.addArguments("blink-settings=imagesEnabled=true");
+//        else {
+//            options.addArguments("blink-settings=imagesEnabled=false");
+//            options.addArguments("--disable-gpu");
+//        }
+//
+//        if(this.isOptionHeadless()) options.addArguments("--headless");;
+//
+//        if(this.optionLang != null && this.optionLang.length() > 0) options.addArguments("lang=" + this.optionLang);
+//        options.setExperimentalOption("excludeSwitches", new String[]{"enable-automation"});
+//
+//        if(!StringUtils.isBlank(this.binaryPath))options.setBinary(this.binaryPath);
+//
+//        if(this.proxyServer != null && this.proxyServer.length() > 0){
+//            options.addArguments("proxy-server=http://" + this.proxyServer);
+//        }
+//
+//        OperaDriverService driverService;
+//        if(StringUtils.isBlank(this.driverPath)){
+//            driverService = OperaDriverService.createDefaultService();
+//        }else {
+//            driverService = new OperaDriverService.Builder()
+//                    .usingDriverExecutable(new File(this.driverPath))
+//                    .usingAnyFreePort().build();
+//        }
+//        this.driver = new OperaDriver(driverService,options);
+//        this.openDriver();
+//    }
 
     public void openChromeDriver(){
 
@@ -178,6 +170,7 @@ public class Browser {
             options.setExperimentalOption("prefs", prefs);
         }
 
+        options.addArguments("--user-agent=iphone");
         options.addArguments("--disable-gpu");
 
         if(!StringUtils.isBlank(this.binaryPath))options.setBinary(this.binaryPath);
@@ -194,7 +187,8 @@ public class Browser {
         }
 
         if(this.proxyServer != null && this.proxyServer.length() > 0){
-            options.addArguments("proxy-server=http://" + this.proxyServer);
+            options.addArguments("proxy-server=socks://" + this.proxyServer);
+//            options.addArguments("proxy-server=http://" + this.proxyServer);
         }
 
         if(StringUtils.isBlank(this.driverPath)){
@@ -246,51 +240,79 @@ public class Browser {
     }
 
     public Browser setProxyServer(String proxyServer) {
+        if(this.driver != null) throw new BusinessException("can't set this value after loaded driver!!");
         this.proxyServer = proxyServer;
         return this;
     }
 
     public Browser setDeviceName(String deviceName) {
+        if(this.driver != null) throw new BusinessException("can't set this value after loaded driver!!");
         this.deviceName = deviceName;
         return this;
     }
 
     public Browser setUrl(String url) {
         this.url = url;
+        if(this.driver != null){
+            this.driver.get(url);
+        }
         return this;
     }
 
     public Browser setDimension(Dimension dimension) {
         this.dimension = dimension;
+        if(this.driver != null){
+            this.driver.manage().window().setSize(this.dimension);
+        }
         return this;
     }
 
     public Browser setCookies(List<Cookie> cookies) {
         this.cookies = cookies;
+        if(this.driver != null ){
+            synchronized (this.driver){
+                this.driver.manage().deleteAllCookies();
+                if(cookies != null)
+                for (Cookie cookie : cookies){
+                    this.driver.manage().addCookie(cookie);
+                }
+            }
+        }
         return this;
     }
 
+
+    public void addCookie(Cookie cookie) {
+        if(this.driver == null) throw new BusinessException("can't set this value before loaded driver!!");
+        this.driver.manage().addCookie(cookie);
+    }
+
     public Browser setOptionHeadless(boolean optionHeadless) {
+        if(this.driver != null) throw new BusinessException("can't set this value after loaded driver!!");
         this.optionHeadless = optionHeadless;
         return this;
     }
 
     public Browser setOptionLang(String optionLang) {
+        if(this.driver != null) throw new BusinessException("can't set this value after loaded driver!!");
         this.optionLang = optionLang;
         return this;
     }
 
     public Browser setOptionLoadimg(boolean optionLoadimg) {
+        if(this.driver != null) throw new BusinessException("can't set this value after loaded driver!!");
         this.optionLoadimg = optionLoadimg;
         return this;
     }
 
     public Browser setBinaryPath(String binaryPath) {
+        if(this.driver != null) throw new BusinessException("can't set this value after loaded driver!!");
         this.binaryPath = binaryPath;
         return this;
     }
 
     public Browser setDriverPath(String driverPath) {
+        if(this.driver != null) throw new BusinessException("can't set this value after loaded driver!!");
         this.driverPath = driverPath;
         return this;
     }

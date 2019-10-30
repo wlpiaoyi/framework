@@ -2,7 +2,11 @@ package org.wlpiaoyi.framework.proxy.socket;
 
 
 import lombok.Getter;
+import lombok.Setter;
+import org.wlpiaoyi.framework.proxy.socket.protocol.SocketControl;
+import org.wlpiaoyi.framework.proxy.socket.protocol.SocketCourse;
 import org.wlpiaoyi.framework.proxy.stream.StreamThread;
+import org.wlpiaoyi.framework.proxy.stream.protocol.StreamCourse;
 import org.wlpiaoyi.framework.proxy.utils.Utils;
 
 import java.io.IOException;
@@ -15,39 +19,34 @@ import java.net.Socket;
 
 
 
-public class SocketThread extends Thread  {
+public class SocketThread extends Thread{
 
-    public interface SocketThreadInterface{
-
-        boolean socketOpen(SocketThread socketThread);
-        boolean socketConnect(SocketThread socketThread);
-
-        void socketClose(SocketThread socketThread);
-        void socketException(SocketThread socketThread, Exception e);
-
-    }
 
     @Getter
     private String requestDomain;
     @Getter
     private int requestPort;
     @Getter
-    private String responseDomain = "";
+    private String responseDomain;
     @Getter
-    private int responsePort = -1;
+    private int responsePort;
+    @Getter
+    private byte[][] encryptionDatas;
+    @Getter @Setter
+    private Object userInfo;
 
     private Socket socketIn;
     private Socket socketOut;
     private StreamThread outStream;
     private StreamThread inStream;
     private Proxy proxy;
-    private byte[] ver;
     private Utils.SocketProxyType proxyType;
 
-    private byte[][] encryptionDatas;
-
-    private WeakReference<SocketThreadInterface> socketInterface;
-    private WeakReference<StreamThread.StreamThreadInterface> streamInterface;
+    private WeakReference<SocketControl.VerifyProxyType> verifyProxyType;
+    private WeakReference<SocketControl.VerifyEncryption> verifyEncryption;
+    private WeakReference<SocketControl.ResponseAddress> responseAddress;
+    private WeakReference<SocketCourse> socketOperation;
+    private WeakReference<StreamCourse> streamOperation;
 
     public SocketThread(Socket socket) {
         this.SocketThreadInit(socket, null, null);
@@ -56,6 +55,7 @@ public class SocketThread extends Thread  {
     public SocketThread(Socket socket, Proxy proxy) {
         this.SocketThreadInit(socket, proxy, null);
     }
+
     public SocketThread(Socket socket, byte[][] encryptionDatas) {
         this.SocketThreadInit(socket, null, encryptionDatas);
     }
@@ -64,118 +64,53 @@ public class SocketThread extends Thread  {
         this.SocketThreadInit(socket, proxy, encryptionDatas);
     }
 
-    private final void SocketThreadInit(Socket socket, Proxy proxy, byte[][] encryptionDatas) {
-        this.socketIn = socket;
-        this.requestDomain = socketIn.getInetAddress().getHostAddress();
-        this.requestPort = socketIn.getPort();
-        this.proxy = proxy;
-        this.proxyType = Utils.SocketProxyType.Unkown;
-        this.encryptionDatas = encryptionDatas;
-    }
-
     public void run() {
         try {
 
             boolean enableNext = true;
-            if(socketInterface != null){
+            if(this.socketOperation != null && !this.socketOperation.isEnqueued()){
                 try{
-                    enableNext = this.socketInterface.get().socketOpen(this);
+                    enableNext = this.socketOperation.get().socketOpen(this);
                 }catch (Exception e){e.printStackTrace();}
             }
             if (!enableNext) return;
 
+            byte[] buffer = new byte[1024];
+            /**
+             * handle protocol
+             */
+            //===============================================>
             InputStream isIn = socketIn.getInputStream();
             OutputStream osIn = socketIn.getOutputStream();
-            byte[] buffer = new byte[1024];
-            int len = isIn.read(buffer);
+            if(!this.doVerifyProxyType(buffer, isIn, osIn)) return;
+            if(!this.doVerifyEncryption(buffer, isIn, osIn)) return;
+            //<===============================================
 
-            if(Utils.IS_EQUES_BYTES(Utils.REQUEST_ANONYMITY, buffer)){
-                this.proxyType = Utils.SocketProxyType.Anonymity;
-            }else if(Utils.IS_EQUES_BYTES(Utils.REQUEST_ENCRYPTION, buffer)){
-                this.proxyType = Utils.SocketProxyType.Encryption;
-            }else if(Utils.IS_EQUES_BYTES(Utils.REQUEST_CUSTOM, buffer)){
-                this.proxyType = Utils.SocketProxyType.Custom;
-            }else {
-                this.proxyType = Utils.SocketProxyType.Unkown;
-                osIn.write(Utils.RESPONSE_UNKOWN);
-                osIn.flush();
-                return;
-            }
+            /**
+             * read request host and port
+             */
+            //===============================================>
+            this.doAddress(buffer, isIn, osIn);
+            //<===============================================
 
-            if(this.encryptionDatas != null && this.encryptionDatas.length == 2){
-                osIn.write(Utils.RESPONSE_ENCRYPTION);
-            }else {
-                osIn.write(Utils.RESPONSE_ANONYMITY);
-            }
-            osIn.flush();
+            /**
+             * connection data
+             */
+            //===============================================>
+            this.doConnectData(buffer, isIn, osIn);
+            //<===============================================
 
-
-            if(this.encryptionDatas != null && this.encryptionDatas.length == 2){
-                len = isIn.read(buffer);
-
-                byte nameL = Utils.getEncryptionNameLength(buffer);
-                byte[] name = Utils.getEncryptionName(buffer, nameL);
-                if(nameL < 1 || name == null || name.length != nameL) return;
-
-                byte pwdL = Utils.getEncryptionPwdLenght(buffer, nameL);
-                byte[] pwd = Utils.getEncryptionPwd(buffer, nameL, pwdL);
-                if(pwdL < 1 || pwd == null || pwd.length != pwdL) return;
-
-                if(!Utils.IS_EQUES_BYTES(this.encryptionDatas[0], name) || !Utils.IS_EQUES_BYTES(this.encryptionDatas[1], pwd)){
-                    byte[] response = Utils.ENCRYPTION_OK;
-                    response[1] = 0x01;
-                    osIn.write(response);
-                    osIn.flush();
-                    return;
-                }else {
-                    osIn.write(Utils.ENCRYPTION_OK);
-                    osIn.flush();
-                }
-            }
-
-
-            len = isIn.read(buffer);
-            this.responseDomain = Utils.getDomain(buffer, len, this.proxyType);
-            this.responsePort = Utils.getPort(buffer, len);
-            enableNext = true;
-            if(socketInterface != null){
-                try{
-                    enableNext = this.socketInterface.get().socketConnect(this);
-                }catch (Exception e){e.printStackTrace();}
-            }
-            if (!enableNext) return;
-
-
-            if(this.proxy != null){
-                socketOut = new Socket(proxy);
-                socketOut.connect(new InetSocketAddress(this.responseDomain, this.responsePort));//服务器的ip及地址
-            }else{
-                socketOut = new Socket(this.responseDomain, this.responsePort);
-            }
-            InputStream isOut = socketOut.getInputStream();
-            OutputStream osOut = socketOut.getOutputStream();
-
-            osIn.write(Utils.CONNECT_OK);
-            osIn.flush();
-            this.outStream = new StreamThread(isIn, osOut, StreamThread.StreamType.Output,
-                    this.streamInterface != null ? this.streamInterface.get() : null);
-            outStream.start();
-            this.inStream = new StreamThread(isOut, osIn, StreamThread.StreamType.Input,
-                    this.streamInterface != null ? this.streamInterface.get() : null);
-            inStream.start();
-            outStream.join();
-            inStream.join();
         } catch (Exception e) {
-            if(socketInterface != null){
+            if(this.socketOperation != null && !this.socketOperation.isEnqueued()){
                 try{
-                    this.socketInterface.get().socketException(this, e);
+                    this.socketOperation.get().socketException(this, e);
                 }catch (Exception ex){e.printStackTrace();}
             }
         } finally {
             this.close();
-            if(socketInterface != null){
+            if(this.socketOperation != null && !this.socketOperation.isEnqueued()){
                 try{
-                    this.socketInterface.get().socketClose(this);
+                    this.socketOperation.get().socketClose(this);
                 }catch (Exception e){e.printStackTrace();}
             }
         }
@@ -208,52 +143,158 @@ public class SocketThread extends Thread  {
     }
 
 
-    public void setSocketInterface(SocketThreadInterface threadInterface){
-        if(threadInterface != null) this.socketInterface = new WeakReference<>(threadInterface);
+    public void setVerifyProxyType(SocketControl.VerifyProxyType verifyProxyType){
+        if(verifyProxyType != null) this.verifyProxyType = new WeakReference<>(verifyProxyType);
+        else this.verifyProxyType = null;
     }
-    public void setStreamInterface(StreamThread.StreamThreadInterface streamInterface){
-        if(streamInterface != null) this.streamInterface = new WeakReference<>(streamInterface);
+
+    public void setVerifyEncryption(SocketControl.VerifyEncryption verifyEncryption){
+        if(verifyEncryption != null) this.verifyEncryption = new WeakReference<>(verifyEncryption);
+        else this.verifyEncryption = null;
+    }
+    public void setResponseAddress(SocketControl.ResponseAddress responseAddress){
+        if(responseAddress != null) this.responseAddress = new WeakReference<>(responseAddress);
+        else this.responseAddress = null;
+    }
+
+    public void setSocketOperation(SocketCourse socketCourse){
+        if(socketCourse != null) this.socketOperation = new WeakReference<>(socketCourse);
+        else  this.socketOperation = null;
+    }
+    public void setStreamOperation(StreamCourse streamCourse){
+        if(streamCourse != null) this.streamOperation = new WeakReference<>(streamCourse);
+        else this.streamOperation = null;
     }
 
     public  long getRecentExecuteTime(){
         return Math.max(this.inStream.getRecentExecuteTime(), this.outStream.getRecentExecuteTime());
     }
 
-//    @Override
-//    public void streamStart(SocketThreadStream stream) {
-//        if(socketInterface != null){
-//            try{
-//                this.socketInterface.get().streamStart(this, stream);
-//            }catch (Exception e){e.printStackTrace();}
-//        }
-//    }
-//
-//    @Override
-//    public void inStream(SocketThreadStream stream, byte[] buffer, int len) {
-//        if(socketInterface != null){
-//            try{
-//                this.socketInterface.get().streaming(this, stream, buffer, len);
-//            }catch (Exception e){e.printStackTrace();}
-//        }
-//    }
-//
-//    @Override
-//    public void endStream(SocketThreadStream stream) {
-//        if(socketInterface != null){
-//            try{
-//                this.socketInterface.get().streamEnd(this, stream);
-//            }catch (Exception e){e.printStackTrace();}
-//        }
-//    }
-//
-//    @Override
-//    public void erroStream(SocketThreadStream stream, Exception e) {
-//        if(socketInterface != null){
-//            try{
-//                this.socketInterface.get().streamErro(this, stream, e);
-//            }catch (Exception ex){e.printStackTrace();}
-//        }
-//
-//    }
+
+    private final void SocketThreadInit(Socket socket, Proxy proxy, byte[][] encryptionDatas) {
+        this.socketIn = socket;
+        this.proxy = proxy;
+        this.proxyType = Utils.SocketProxyType.Unkown;
+        this.encryptionDatas = encryptionDatas;
+        this.requestDomain = socketIn.getInetAddress().getHostAddress();
+        this.requestPort = socketIn.getPort();
+        this.responseDomain = null;
+        this.responsePort = 0;
+    }
+
+    private boolean doVerifyProxyType(byte[] buffer, InputStream isIn, OutputStream osIn) throws IOException {
+
+        //read handle request
+        isIn.read(buffer);
+
+        this.proxyType = Utils.SocketProxyType.Unkown;
+        //judge handle type
+        if(this.verifyProxyType != null && !this.verifyProxyType.isEnqueued()){
+            this.verifyProxyType.get().controlBefore(this, (byte) 0x00, isIn, osIn);
+            this.proxyType = this.verifyProxyType.get().verifyProxyType(this, buffer);
+        }else{
+            this.proxyType = Utils.verifyProxyType(buffer);
+        }
+        if(proxyType == Utils.SocketProxyType.Unkown){
+            osIn.write(Utils.RESPONSE_UNKOWN);
+            osIn.flush();
+            return false;
+        }
+
+        //response handle
+        if(this.encryptionDatas != null && this.encryptionDatas.length == 2){
+            osIn.write(Utils.RESPONSE_ENCRYPTION);
+        }else {
+            osIn.write(Utils.RESPONSE_ANONYMITY);
+        }
+        osIn.flush();
+
+        return true;
+    }
+
+    private boolean doVerifyEncryption(byte[] buffer, InputStream isIn, OutputStream osIn) throws IOException {
+
+
+        if(this.encryptionDatas != null && this.encryptionDatas.length == 2){
+            //read username and password
+            isIn.read(buffer);
+            //verify username and password
+            byte nameL = Utils.getEncryptionNameLength(buffer);
+            byte[] name = Utils.getEncryptionName(buffer, nameL);
+            if(nameL < 1 || name == null || name.length != nameL) return false;
+
+            byte pwdL = Utils.getEncryptionPwdLenght(buffer, nameL);
+            byte[] pwd = Utils.getEncryptionPwd(buffer, nameL, pwdL);
+            if(pwdL < 1 || pwd == null || pwd.length != pwdL) return false;
+
+            boolean flag;
+            if(this.verifyEncryption != null && !this.verifyEncryption.isEnqueued()){
+                this.verifyEncryption.get().controlBefore(this, (byte) 0x10, isIn, osIn);
+                flag = this.verifyEncryption.get().verifyEncryption(this, name, nameL, pwd, pwdL);
+            }else{
+                flag = !Utils.IS_EQUES_BYTES(this.encryptionDatas[0], name) || !Utils.IS_EQUES_BYTES(this.encryptionDatas[1], pwd);
+            }
+            if(!flag){
+                //verify missed
+                byte[] response = Utils.ENCRYPTION_OK;
+                response[1] = 0x01;
+                osIn.write(response);
+                osIn.flush();
+                return false;
+            }else {
+                //verify passed
+                osIn.write(Utils.ENCRYPTION_OK);
+                osIn.flush();
+            }
+        }
+
+        return true;
+    }
+
+    private void doAddress(byte[] buffer, InputStream isIn, OutputStream osIn) throws IOException {
+        int len = isIn.read(buffer);
+        if(this.responseAddress != null && !this.responseAddress.isEnqueued()){
+            this.responseAddress.get().controlBefore(this, (byte) 0x20, isIn, osIn);
+            this.responseDomain = this.responseAddress.get().responseDomain(this, buffer, len, this.proxyType);
+            this.responsePort = this.responseAddress.get().responsePort(this, buffer, len);
+        }else{
+            this.responseDomain = Utils.getDomain(buffer, len, this.proxyType);
+            this.responsePort = Utils.getPort(buffer, len);
+        }
+    }
+
+    private boolean doConnectData(byte[] buffer, InputStream isIn, OutputStream osIn) throws IOException, InterruptedException {
+
+        boolean enableNext = true;
+        if(this.socketOperation != null && !this.socketOperation.isEnqueued()){
+            try{
+                enableNext = this.socketOperation.get().socketConnect(this);
+            }catch (Exception e){e.printStackTrace();}
+        }
+        if (!enableNext) return false;
+
+        if(this.proxy != null){
+            //connected from proxy
+            socketOut = new Socket(proxy);
+            socketOut.connect(new InetSocketAddress(this.responseDomain, this.responsePort));//服务器的ip及地址
+        }else{
+            //connected direction
+            socketOut = new Socket(this.responseDomain, this.responsePort);
+        }
+        InputStream isOut = socketOut.getInputStream();
+        OutputStream osOut = socketOut.getOutputStream();
+
+        osIn.write(Utils.CONNECT_OK);
+        osIn.flush();
+        StreamCourse streamCourse = (this.streamOperation != null && this.streamOperation.isEnqueued()) ? this.streamOperation.get() : null;
+        this.outStream = new StreamThread(isIn, osOut, StreamThread.StreamType.Output, this.requestDomain, this.requestPort, streamCourse);
+        outStream.start();
+        this.inStream = new StreamThread(isOut, osIn, StreamThread.StreamType.Input, this.requestDomain, this.requestPort, streamCourse);
+        inStream.start();
+        outStream.join();
+        inStream.join();
+
+        return true;
+    }
 
 }

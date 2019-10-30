@@ -54,14 +54,30 @@ public class AESUtils {
 
     /**
      * @description: AES对称加密字符串，并通过Jdk自带Base64转换为ASCII
-     * @author: Administrator
      * @date: 2017年11月7日 上午9:37:48
-     * @param str
+     * @param data
      * @return
      */
-    public static String getEncryptString(String str) {
+    public static byte[] getEncrypt(byte[] data) {
         try {
-            byte[] bytes = str.getBytes(CHARSETNAME);
+            Cipher cipher = Cipher.getInstance(CIPHER_ALGORITHM);
+            cipher.init(Cipher.ENCRYPT_MODE, SECRET_KEY);
+            byte[] doFinal = cipher.doFinal(data);
+            return Base64.getEncoder().encode(doFinal);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    /**
+     * @description: AES对称加密字符串，并通过Jdk自带Base64转换为ASCII
+     * @date: 2017年11月7日 上午9:37:48
+     * @param data
+     * @return
+     */
+    public static String getEncrypt(String data) {
+        try {
+            byte[] bytes = data.getBytes(CHARSETNAME);
             Cipher cipher = Cipher.getInstance(CIPHER_ALGORITHM);
             cipher.init(Cipher.ENCRYPT_MODE, SECRET_KEY);
             byte[] doFinal = cipher.doFinal(bytes);
@@ -73,14 +89,31 @@ public class AESUtils {
 
     /**
      * @description: 对AES加密字符串进行解密
-     * @author: maojialong
      * @date: 2017年11月7日 上午10:14:00
-     * @param str
+     * @param data
      * @return
      */
-    public static String getDecryptString(String str) {
+    public static byte[] getDecrypt(byte[] data) {
         try {
-            byte[] bytes = Base64.getDecoder().decode(str);
+            byte[] bytes = Base64.getDecoder().decode(data);
+            Cipher cipher = Cipher.getInstance(CIPHER_ALGORITHM);
+            cipher.init(Cipher.DECRYPT_MODE, SECRET_KEY);
+            byte[] doFinal = cipher.doFinal(bytes);
+            return doFinal;
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    /**
+     * @description: 对AES加密字符串进行解密
+     * @date: 2017年11月7日 上午10:14:00
+     * @param data
+     * @return
+     */
+    public static String getDecrypt(String data) {
+        try {
+            byte[] bytes = Base64.getDecoder().decode(data);
             Cipher cipher = Cipher.getInstance(CIPHER_ALGORITHM);
             cipher.init(Cipher.DECRYPT_MODE, SECRET_KEY);
             byte[] doFinal = cipher.doFinal(bytes);

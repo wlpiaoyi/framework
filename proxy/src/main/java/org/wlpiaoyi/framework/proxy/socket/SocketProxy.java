@@ -1,15 +1,16 @@
 package org.wlpiaoyi.framework.proxy.socket;
 
 
+import com.google.gson.Gson;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
+import org.wlpiaoyi.framework.proxy.socket.protocol.SocketCourse;
+import org.wlpiaoyi.framework.utils.StringUtils;
+import org.wlpiaoyi.framework.utils.exception.BusinessException;
 
 import java.io.IOException;
-import java.net.InetSocketAddress;
-import java.net.Proxy;
-import java.net.ServerSocket;
-import java.net.Socket;
+import java.net.*;
 import java.util.*;
 
 //nohup java -jar proxy.socket.jar > proxy.socket.temp.log 2>&1 &
@@ -23,16 +24,18 @@ sh vpnsetup_centos.sh;
 
  */
 @Slf4j
-public class SocketProxy  implements SocketThread.SocketThreadInterface {
+public class SocketProxy implements SocketCourse {
 
+
+    public static boolean hasLog = true;
+
+    private static final Map<Integer, SocketProxy> servers = new HashMap<>();
 
     @Getter
     private final int listenPort;
 
     @Getter @Setter
     private Proxy proxy;
-
-    private static final Map<Integer, SocketProxy> servers = new HashMap<>();
 
     private final Set<SocketThread> clients = new HashSet<>();
 
@@ -56,7 +59,7 @@ public class SocketProxy  implements SocketThread.SocketThreadInterface {
     public void synStart(){
         try{
             SocketProxy.servers.put(listenPort, this);
-            log.info("server start port:{}", listenPort);
+            if(hasLog)log.info("server start port:{} encryption:{}", listenPort, this.encryptionDatas != null);
             while (this.serverSocket.isClosed() == false) {
                 try {
                     Socket socket = serverSocket.accept();
@@ -66,7 +69,7 @@ public class SocketProxy  implements SocketThread.SocketThreadInterface {
                     }else{
                         socketThread = new SocketThread(socket, this.proxy, this.encryptionDatas);
                     }
-                    socketThread.setSocketInterface(this);
+                    socketThread.setSocketOperation(this);
                     socketThread.start();
                 } catch (Exception e) {
                     e.printStackTrace();
@@ -105,14 +108,14 @@ public class SocketProxy  implements SocketThread.SocketThreadInterface {
         synchronized (this.clients){
             this.clients.add(socketThread);
         }
-        log.info("socket ip:{} port:{} come in count ======>{}", socketThread.getRequestDomain(), socketThread.getRequestPort(), this.clients.size());
+        if(hasLog)log.info("socket ip:{} port:{} come in count ======>{}", socketThread.getRequestDomain(), socketThread.getRequestPort(), this.clients.size());
         return true;
     }
 
 
     @Override
     public boolean socketConnect(SocketThread socketThread) {
-        log.info("socket ip:{} port:{} connect to domain:{} port:{} ", socketThread.getRequestDomain(), socketThread.getRequestPort(), socketThread.getResponseDomain(), socketThread.getResponsePort());
+        if(hasLog)log.info("socket ip:{} port:{} connect to domain:{} port:{} ", socketThread.getRequestDomain(), socketThread.getRequestPort(), socketThread.getResponseDomain(), socketThread.getResponsePort());
         return true;
     }
 
@@ -121,28 +124,25 @@ public class SocketProxy  implements SocketThread.SocketThreadInterface {
         synchronized (this.clients){
             this.clients.remove(socketThread);
         }
-        log.info("socket ip:{} port:{} come out count <======{}", socketThread.getRequestDomain(), socketThread.getRequestPort(), this.clients.size());
+        if(hasLog)log.info("socket ip:{} port:{} come out count <======{}", socketThread.getRequestDomain(), socketThread.getRequestPort(), this.clients.size());
     }
 
     @Override
     public void socketException(SocketThread socketThread, Exception e) {
-        log.error ("socket ip:" + socketThread.getRequestDomain() + "port:" + socketThread.getRequestDomain() + " exception domain:" + socketThread.getRequestPort() + " port:" + socketThread.getResponseDomain(), e);
+        if(hasLog)log.error ("socket ip:" + socketThread.getRequestDomain() + "port:" + socketThread.getRequestDomain() + " exception domain:" + socketThread.getRequestPort() + " port:" + socketThread.getResponseDomain(), e);
     }
 
-
     public void setProxy(String proxyIP,int proxyPort) {
+        if(!this.serverSocket.isClosed()) throw new BusinessException("can't set proxy after the socket serve was started!");
         this.proxy = new Proxy(Proxy.Type.SOCKS, new InetSocketAddress(proxyIP, proxyPort));
     }
 
     public static final Set<Map.Entry<Integer, SocketProxy>> getServers() {
         return servers.entrySet();
     }
-
-
     public static SocketProxy remove(int listenPort){
         return servers.remove(listenPort);
     }
-
     public static SocketProxy get(int listenPort){
         return servers.get(listenPort);
     }
@@ -152,13 +152,30 @@ public class SocketProxy  implements SocketThread.SocketThreadInterface {
      */
     public static void main(String[] args) throws IOException {
         byte[][] encryptionDatas = new byte[2][];
-        String name = "ikamobile";
-        String pwd = "ikamobile2416";
-        encryptionDatas[0] = name.getBytes("UTF-8");
-        encryptionDatas[1] = pwd.getBytes("UTF-8");
-        SocketProxy socketProxy1 = new SocketProxy(8011, encryptionDatas);
-        socketProxy1.asynStart();
-        SocketProxy socketProxy2 = new SocketProxy(8010);
-        socketProxy2.synStart();
+        String PATH = System.getProperty("user.dir") + "/proxy.json";
+        String jsonStr = StringUtils.readFile(PATH);
+        List<Map> configurations = new Gson().fromJson(jsonStr, List.class);
+        for(Map configuration : configurations){
+            int port = ((Double)configuration.get("port")).intValue();
+            boolean verify = configuration.containsKey("verify") ? (boolean)configuration.get("verify") : false;
+            SocketProxy socketProxy;
+            if(verify){
+                String name = (String) configuration.get("name");
+                String password = (String) configuration.get("password");
+                encryptionDatas[0] = name.getBytes("UTF-8");
+                encryptionDatas[1] = password.getBytes("UTF-8");
+                socketProxy = new SocketProxy(port, encryptionDatas);
+            }else {
+                socketProxy = new SocketProxy(port);
+            }
+            socketProxy.asynStart();
+        }
+        while (true) {
+            try {
+                Thread.sleep(600000);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        }
     }
 }

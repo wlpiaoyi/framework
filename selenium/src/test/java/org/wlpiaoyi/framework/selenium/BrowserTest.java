@@ -16,10 +16,10 @@ public class BrowserTest {
     @Before
     public void setUp() throws Exception {
         browser = new Browser().setOptionHeadless(false).setUrl("https://www.baidu.com");
-        this.browser.setOptionHeadless(true);
-        this.browser.setOptionLoadimg(false);
+//        this.browser.setOptionHeadless(true);
+        this.browser.setOptionLoadimg(true);
         this.browser.setDriverPath(System.getProperty("user.dir") +"/chromedriver");
-//        this.browser.setProxyServer("127.0.0.1:9000");
+        this.browser.setProxyServer("127.0.0.1:8010");
     }
     @Test
     public void test() {
@@ -36,7 +36,7 @@ public class BrowserTest {
         if(!WebElementUtils.setValue(browser.getDriver().findElement(By.id("index-kw")), "test02"))
             throw new BusinessException("set input value exception!!");
         else{
-            Thread.sleep(100);
+            Thread.sleep(99900);
             browser.quit();
             Thread.sleep(500);
         }

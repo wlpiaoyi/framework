@@ -2,10 +2,36 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="a877397b-93f3-422b-bee1-1317d55f59f2" name="Default Changelist" comment="">
+      <change afterPath="$PROJECT_DIR$/proxy.json" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/proxy/src/main/java/org/wlpiaoyi/framework/proxy/socket/protocol/SocketControl.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/proxy/src/main/java/org/wlpiaoyi/framework/proxy/socket/protocol/SocketCourse.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/proxy/src/main/java/org/wlpiaoyi/framework/proxy/stream/protocol/StreamCourse.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/utile/src/main/java/org/wlpiaoyi/framework/utils/websocket/client/WebSocketIntrface.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/compiler.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/compiler.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/chromedriver" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/pom.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/proxy/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/proxy/pom.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/proxy/src/main/java/org/wlpiaoyi/framework/proxy/socket/SocketProxy.java" beforeDir="false" afterPath="$PROJECT_DIR$/proxy/src/main/java/org/wlpiaoyi/framework/proxy/socket/SocketProxy.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/proxy/src/main/java/org/wlpiaoyi/framework/proxy/socket/SocketThread.java" beforeDir="false" afterPath="$PROJECT_DIR$/proxy/src/main/java/org/wlpiaoyi/framework/proxy/socket/SocketThread.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/proxy/src/main/java/org/wlpiaoyi/framework/proxy/stream/StreamThread.java" beforeDir="false" afterPath="$PROJECT_DIR$/proxy/src/main/java/org/wlpiaoyi/framework/proxy/stream/StreamThread.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/proxy/src/main/java/org/wlpiaoyi/framework/proxy/utils/Utils.java" beforeDir="false" afterPath="$PROJECT_DIR$/proxy/src/main/java/org/wlpiaoyi/framework/proxy/utils/Utils.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/selenium/geckodriver" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/selenium/operadriver" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/selenium/src/main/java/org/wlpiaoyi/framework/selenium/Browser.java" beforeDir="false" afterPath="$PROJECT_DIR$/selenium/src/main/java/org/wlpiaoyi/framework/selenium/Browser.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/selenium/src/test/java/org/wlpiaoyi/framework/selenium/BrowserTest.java" beforeDir="false" afterPath="$PROJECT_DIR$/selenium/src/test/java/org/wlpiaoyi/framework/selenium/BrowserTest.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/utile/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/utile/pom.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/utile/src/main/java/org/wlpiaoyi/framework/utils/AESUtils.java" beforeDir="false" afterPath="$PROJECT_DIR$/utile/src/main/java/org/wlpiaoyi/framework/utils/AESUtils.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/utile/src/main/java/org/wlpiaoyi/framework/utils/StringUtils.java" beforeDir="false" afterPath="$PROJECT_DIR$/utile/src/main/java/org/wlpiaoyi/framework/utils/StringUtils.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/utile/src/main/java/org/wlpiaoyi/framework/utils/httpclient/HttpClient.java" beforeDir="false" afterPath="$PROJECT_DIR$/utile/src/main/java/org/wlpiaoyi/framework/utils/httpclient/HttpClient.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/utile/src/main/java/org/wlpiaoyi/framework/utils/websocket/WebSocketListener.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/utile/src/main/java/org/wlpiaoyi/framework/utils/websocket/WsUtile.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/utile/src/main/java/org/wlpiaoyi/framework/utils/websocket/client/WebSocketClient.java" beforeDir="false" afterPath="$PROJECT_DIR$/utile/src/main/java/org/wlpiaoyi/framework/utils/websocket/client/WebSocketClient.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/utile/src/main/java/org/wlpiaoyi/framework/utils/websocket/client/WebSocketEcho.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/utile/src/main/java/org/wlpiaoyi/framework/utils/websocket/service/WsBootService.java" beforeDir="false" afterPath="$PROJECT_DIR$/utile/src/main/java/org/wlpiaoyi/framework/utils/websocket/service/WsBootService.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/utile/src/test/java/org/wlpiaoyi/framework/utils/httpclient/HttpClientTest.java" beforeDir="false" afterPath="$PROJECT_DIR$/utile/src/test/java/org/wlpiaoyi/framework/utils/httpclient/HttpClientTest.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/utile/src/test/java/org/wlpiaoyi/framework/utils/websocket/client/WebSecketClientTest.java" beforeDir="false" afterPath="$PROJECT_DIR$/utile/src/test/java/org/wlpiaoyi/framework/utils/websocket/client/WebSecketClientTest.java" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
@@ -31,6 +57,7 @@
     <option name="RECENT_TEMPLATES">
       <list>
         <option value="Class" />
+        <option value="Interface" />
       </list>
     </option>
   </component>
@@ -49,26 +76,33 @@
   <component name="PropertiesComponent">
     <property name="WebServerToolWindowFactoryState" value="false" />
     <property name="aspect.path.notification.shown" value="true" />
-    <property name="last_directory_selection" value="$PROJECT_DIR$/proxy/src/main/java/org/wlpiaoyi/framework/proxy" />
-    <property name="last_opened_file_path" value="$PROJECT_DIR$" />
+    <property name="last_directory_selection" value="$PROJECT_DIR$/client/src/main/java" />
+    <property name="last_opened_file_path" value="$PROJECT_DIR$/proxy/src/main/resources" />
     <property name="nodejs_interpreter_path.stuck_in_default_project" value="undefined stuck path" />
     <property name="nodejs_npm_path_reset_for_default_project" value="true" />
     <property name="nodejs_package_manager_path" value="npm" />
     <property name="project.structure.last.edited" value="Modules" />
     <property name="project.structure.proportion" value="0.15234375" />
     <property name="project.structure.side.proportion" value="0.2" />
-    <property name="settings.editor.selected.configurable" value="reference.projectsettings.compiler.javacompiler" />
+    <property name="settings.editor.selected.configurable" value="MavenSettings" />
   </component>
   <component name="RecentsManager">
-    <key name="MoveFile.RECENT_KEYS">
-      <recent name="Z:\Document\Developer\J2ee\framework\selenium" />
+    <key name="MoveClassesOrPackagesDialog.RECENTS_KEY">
+      <recent name="org.wlpiaoyi.framework.utils.websocket.client" />
+      <recent name="org.wlpiaoyi.framework.utils.websocket" />
+    </key>
+    <key name="CopyFile.RECENT_KEYS">
+      <recent name="$PROJECT_DIR$/proxy/src/main/resources" />
+      <recent name="$PROJECT_DIR$" />
+      <recent name="$PROJECT_DIR$/selenium" />
     </key>
     <key name="CopyClassDialog.RECENTS_KEY">
       <recent name="org.wlpiaoyi.framework.utils.websocket.service" />
     </key>
-    <key name="CopyFile.RECENT_KEYS">
+    <key name="MoveFile.RECENT_KEYS">
       <recent name="$PROJECT_DIR$" />
-      <recent name="$PROJECT_DIR$/selenium" />
+      <recent name="$PROJECT_DIR$/proxy" />
+      <recent name="Z:\Document\Developer\J2ee\framework\selenium" />
     </key>
   </component>
   <component name="RunDashboard">
@@ -83,20 +117,7 @@
       </list>
     </option>
   </component>
-  <component name="RunManager" selected="Application.SocketProxy">
-    <configuration name="Browser" type="Application" factoryName="Application" temporary="true" nameIsGenerated="true">
-      <option name="MAIN_CLASS_NAME" value="org.wlpiaoyi.framework.selenium.Browser" />
-      <module name="selenium" />
-      <extension name="coverage">
-        <pattern>
-          <option name="PATTERN" value="org.wlpiaoyi.framework.selenium.*" />
-          <option name="ENABLED" value="true" />
-        </pattern>
-      </extension>
-      <method v="2">
-        <option name="Make" enabled="true" />
-      </method>
-    </configuration>
+  <component name="RunManager" selected="JUnit.WebSecketClientTest">
     <configuration name="SocketProxy" type="Application" factoryName="Application" temporary="true" nameIsGenerated="true">
       <option name="MAIN_CLASS_NAME" value="org.wlpiaoyi.framework.proxy.socket.SocketProxy" />
       <module name="proxy" />
@@ -125,37 +146,60 @@
         <option name="Make" enabled="true" />
       </method>
     </configuration>
-    <configuration name="utile [package]" type="MavenRunConfiguration" factoryName="Maven" temporary="true">
-      <MavenSettings>
-        <option name="myGeneralSettings" />
-        <option name="myRunnerSettings" />
-        <option name="myRunnerParameters">
-          <MavenRunnerParameters>
-            <option name="profiles">
-              <set />
-            </option>
-            <option name="goals">
-              <list>
-                <option value="package" />
-              </list>
-            </option>
-            <option name="pomFileName" value="pom.xml" />
-            <option name="profilesMap">
-              <map />
-            </option>
-            <option name="resolveToWorkspace" value="false" />
-            <option name="workingDirPath" value="$PROJECT_DIR$/utile" />
-          </MavenRunnerParameters>
-        </option>
-      </MavenSettings>
-      <method v="2" />
+    <configuration name="BrowserTest.test" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
+      <module name="selenium" />
+      <extension name="coverage">
+        <pattern>
+          <option name="PATTERN" value="org.wlpiaoyi.framework.selenium.*" />
+          <option name="ENABLED" value="true" />
+        </pattern>
+      </extension>
+      <option name="PACKAGE_NAME" value="org.wlpiaoyi.framework.selenium" />
+      <option name="MAIN_CLASS_NAME" value="org.wlpiaoyi.framework.selenium.BrowserTest" />
+      <option name="METHOD_NAME" value="test" />
+      <option name="TEST_OBJECT" value="method" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="HttpClientTest.test" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
+      <module name="utile" />
+      <extension name="coverage">
+        <pattern>
+          <option name="PATTERN" value="org.wlpiaoyi.framework.utils.httpclient.*" />
+          <option name="ENABLED" value="true" />
+        </pattern>
+      </extension>
+      <option name="PACKAGE_NAME" value="org.wlpiaoyi.framework.utils.httpclient" />
+      <option name="MAIN_CLASS_NAME" value="org.wlpiaoyi.framework.utils.httpclient.HttpClientTest" />
+      <option name="METHOD_NAME" value="test" />
+      <option name="TEST_OBJECT" value="method" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="WebSecketClientTest" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
+      <module name="utile" />
+      <extension name="coverage">
+        <pattern>
+          <option name="PATTERN" value="org.wlpiaoyi.framework.utils.websocket.client.*" />
+          <option name="ENABLED" value="true" />
+        </pattern>
+      </extension>
+      <option name="PACKAGE_NAME" value="org.wlpiaoyi.framework.utils.websocket.client" />
+      <option name="MAIN_CLASS_NAME" value="org.wlpiaoyi.framework.utils.websocket.client.WebSecketClientTest" />
+      <option name="TEST_OBJECT" value="class" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
     </configuration>
     <recent_temporary>
       <list>
+        <item itemvalue="JUnit.WebSecketClientTest" />
+        <item itemvalue="JUnit.HttpClientTest.test" />
         <item itemvalue="Application.SocketProxy" />
-        <item itemvalue="Application.Browser" />
+        <item itemvalue="JUnit.BrowserTest.test" />
         <item itemvalue="JUnit.BrowserTest" />
-        <item itemvalue="Maven.utile [package]" />
       </list>
     </recent_temporary>
   </component>
@@ -182,7 +226,21 @@
       <workItem from="1570974404837" duration="2000" />
       <workItem from="1571129987354" duration="9161000" />
       <workItem from="1571231886553" duration="3354000" />
-      <workItem from="1571366534481" duration="33232000" />
+      <workItem from="1571366534481" duration="44533000" />
+      <workItem from="1571708572908" duration="5227000" />
+      <workItem from="1571795165072" duration="8451000" />
+      <workItem from="1571837214441" duration="10000" />
+      <workItem from="1571838014248" duration="2229000" />
+      <workItem from="1571876866597" duration="1665000" />
+      <workItem from="1571967680575" duration="1982000" />
+      <workItem from="1571971341688" duration="8475000" />
+      <workItem from="1572056330000" duration="12961000" />
+      <workItem from="1572230086206" duration="1791000" />
+      <workItem from="1572314806626" duration="867000" />
+      <workItem from="1572337621833" duration="1357000" />
+      <workItem from="1572355933077" duration="27742000" />
+      <workItem from="1572424706220" duration="366000" />
+      <workItem from="1572440061172" duration="6109000" />
     </task>
     <servers />
   </component>
@@ -206,5 +264,71 @@
     <ignored-roots>
       <path value="$PROJECT_DIR$/framework" />
     </ignored-roots>
+  </component>
+  <component name="XDebuggerManager">
+    <breakpoint-manager>
+      <breakpoints>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>file://$PROJECT_DIR$/selenium/src/test/java/org/wlpiaoyi/framework/selenium/BrowserTest.java</url>
+          <line>21</line>
+          <option name="timeStamp" value="5" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>file://$PROJECT_DIR$/utile/src/test/java/org/wlpiaoyi/framework/utils/websocket/client/WebSecketClientTest.java</url>
+          <line>53</line>
+          <option name="timeStamp" value="38" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>file://$PROJECT_DIR$/utile/src/test/java/org/wlpiaoyi/framework/utils/websocket/client/WebSecketClientTest.java</url>
+          <line>75</line>
+          <option name="timeStamp" value="39" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>file://$PROJECT_DIR$/utile/src/test/java/org/wlpiaoyi/framework/utils/websocket/client/WebSecketClientTest.java</url>
+          <line>70</line>
+          <option name="timeStamp" value="40" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>file://$PROJECT_DIR$/utile/src/test/java/org/wlpiaoyi/framework/utils/websocket/client/WebSecketClientTest.java</url>
+          <line>58</line>
+          <option name="timeStamp" value="42" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>file://$PROJECT_DIR$/utile/src/test/java/org/wlpiaoyi/framework/utils/websocket/client/WebSecketClientTest.java</url>
+          <line>64</line>
+          <option name="timeStamp" value="43" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>file://$PROJECT_DIR$/utile/src/test/java/org/wlpiaoyi/framework/utils/websocket/client/WebSecketClientTest.java</url>
+          <line>45</line>
+          <option name="timeStamp" value="44" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>file://$PROJECT_DIR$/utile/src/main/java/org/wlpiaoyi/framework/utils/websocket/client/WebSocketClient.java</url>
+          <line>52</line>
+          <option name="timeStamp" value="45" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>file://$PROJECT_DIR$/utile/src/main/java/org/wlpiaoyi/framework/utils/websocket/client/WebSocketClient.java</url>
+          <line>78</line>
+          <option name="timeStamp" value="47" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>file://$PROJECT_DIR$/utile/src/main/java/org/wlpiaoyi/framework/utils/websocket/client/WebSocketClient.java</url>
+          <line>66</line>
+          <option name="timeStamp" value="48" />
+        </line-breakpoint>
+      </breakpoints>
+    </breakpoint-manager>
+    <watches-manager>
+      <configuration name="Application">
+        <watch expression="this.socketOperation" language="JAVA" />
+      </configuration>
+    </watches-manager>
+  </component>
+  <component name="com.intellij.coverage.CoverageDataManagerImpl">
+    <SUITE FILE_PATH="coverage/framework$SocketProxy.ic" NAME="SocketProxy Coverage Results" MODIFIED="1571990814259" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="idea" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false">
+      <FILTER>org.wlpiaoyi.framework.proxy.socket.*</FILTER>
+    </SUITE>
   </component>
 </project>

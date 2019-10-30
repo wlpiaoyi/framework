@@ -28,7 +28,6 @@ public class Utils {
     //代理回应状态
     public static final byte[] ENCRYPTION_OK = {0x1, 0x0};
 
-
     public static final byte[] CONNECT_OK = {SOCKET_VERSION, 0x0, 0x0, 0x1, 0, 0, 0, 0, 0, 0};
 
 
@@ -44,6 +43,20 @@ public class Utils {
             if(!flag) return false;
         }
         return true;
+    }
+
+
+
+    public static SocketProxyType verifyProxyType(byte[] buffer){
+        if(IS_EQUES_BYTES(Utils.REQUEST_ANONYMITY, buffer)){
+            return SocketProxyType.Anonymity;
+        }else if(IS_EQUES_BYTES(Utils.REQUEST_ENCRYPTION, buffer)){
+            return SocketProxyType.Encryption;
+        }else if(IS_EQUES_BYTES(Utils.REQUEST_CUSTOM, buffer)){
+            return SocketProxyType.Custom;
+        }else{
+            return SocketProxyType.Unkown;
+        }
     }
 
     public static boolean REQUEST_DATA_IS_HOST(byte[] buffer){

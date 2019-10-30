@@ -2,8 +2,8 @@ package org.wlpiaoyi.framework.utils;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-import org.wlpiaoyi.framework.utils.websocket.WsUtile;
 
+import java.io.*;
 import java.security.MessageDigest;
 import java.util.UUID;
 
@@ -83,5 +83,51 @@ public class StringUtils {
     public static String getUUID32(){
         String uuid = UUID.randomUUID().toString().replace("-", "");
         return uuid;
+    }
+
+    /**
+     * 从文件读取String
+     * @param PATH
+     * @return
+     */
+    public static String readFile(String PATH){
+        BufferedReader br = null;
+        try {
+            StringBuffer sb = new StringBuffer();
+            String str;
+            br = new BufferedReader(new FileReader(PATH));
+            while((str = br.readLine()) != null) {
+                sb.append(str);
+                sb.append("\r\n");
+            }
+            return sb.toString();
+        }catch (IOException e) {
+            e.printStackTrace();
+        }finally {
+            if(br != null) {
+                try {br.close();} catch (IOException e) { e.printStackTrace();}
+            }
+        }
+        return null;
+    }
+
+    /**
+     * 从String写入文件g
+     * @param source
+     * @param PATH
+     * @return
+     */
+    public static boolean readFile(String source, String PATH){
+        File f = new File(PATH);
+        try {
+            BufferedWriter bw = new BufferedWriter(new FileWriter(f));
+            bw.write(source);
+            bw.flush();
+            bw.close();
+            return true;
+        }catch(IOException e) {
+            e.printStackTrace();
+            return false;
+        }
     }
 }
