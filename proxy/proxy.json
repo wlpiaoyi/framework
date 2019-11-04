@@ -10,9 +10,5 @@
     "verify": true,
     "name": "proxy",
     "password": "000000"
-  },
-  {
-    "port": 8012,
-    "verify": false
   }
 ]

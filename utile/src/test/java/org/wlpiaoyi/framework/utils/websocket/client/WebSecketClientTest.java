@@ -2,6 +2,7 @@ package org.wlpiaoyi.framework.utils.websocket.client;
 
 
 import com.google.gson.Gson;
+import lombok.Data;
 import org.java_websocket.handshake.ServerHandshake;
 import org.junit.After;
 import org.junit.Assert;
@@ -9,6 +10,8 @@ import org.junit.Before;
 import org.junit.Test;
 
 import java.io.IOException;
+import java.net.InetSocketAddress;
+import java.net.Proxy;
 import java.net.URISyntaxException;
 import java.util.HashMap;
 import java.util.Map;
@@ -25,7 +28,6 @@ public class WebSecketClientTest implements Runnable, WebSocketIntrface {
 
     @Test
     public void test() throws Exception {
-
         while (true){
             Thread.sleep(1000);
         }
@@ -39,11 +41,12 @@ public class WebSecketClientTest implements Runnable, WebSocketIntrface {
 
     @Override
     public void run() {
-
         try {
-            WebSocketClient wsClient = new WebSocketClient("ws://127.0.0.1:8001/wlpiaoyi/test/111", this);
+            WebSocketClient wsClient = new WebSocketClient("ws://121.40.165.18:88001", this);
+//            wsClient.setProxy(new Proxy(Proxy.Type.SOCKS, new InetSocketAddress("127.0.0.1", 8010)));
+//            WebSocketClient wsClient = new WebSocketClient("ws://127.0.0.1:8001/wlpiaoyi/test/111", this);
             wsClient.synConnect(5000, TimeUnit.MILLISECONDS);
-            wsClient.send(System.currentTimeMillis());
+//            wsClient.send(System.currentTimeMillis());
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -53,6 +56,13 @@ public class WebSecketClientTest implements Runnable, WebSocketIntrface {
     public void onOpen(WebSocketClient webSocketClient, ServerHandshake serverHandshake) {
         System.out.println("onOpen");
     }
+    @Data
+    private static class WSData{
+        private int code = 0;
+        private String message;
+    }
+
+    private WSData wsData = new WSData();
 
     @Override
     public void onMessage(WebSocketClient webSocketClient, String message) {
@@ -62,7 +72,7 @@ public class WebSecketClientTest implements Runnable, WebSocketIntrface {
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
-            webSocketClient.send(System.currentTimeMillis() + "");
+            webSocketClient.send("test:", wsData);
         }).start();
     }
 

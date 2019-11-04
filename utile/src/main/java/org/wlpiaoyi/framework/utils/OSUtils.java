@@ -1,5 +1,9 @@
 package org.wlpiaoyi.framework.utils;
 
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+
 /**
  *
  * 系统信息工具
@@ -271,5 +275,31 @@ public class OSUtils {
 
         private String description;
 
+//        /**
+//         * 杀死进程
+//         * @param processName
+//         * @throws IOException
+//         */
+//        public static void killProc(String processName) throws IOException {
+//            if (!StringUtils.isBlank(processName)) {
+//                executeCmd("taskkill /F /IM " + processName);
+//            }
+//        }
+//        /**
+//         * @desc 执行cmd命令
+//         * @author zp
+//         * @date 2018-3-29
+//         */
+//        public static String executeCmd(String command) throws IOException {
+//            Runtime runtime = Runtime.getRuntime();
+//            Process process = runtime.exec("cmd /c " + command);
+//            BufferedReader br = new BufferedReader(new InputStreamReader(process.getInputStream(), "UTF-8"));
+//            String line = null;
+//            StringBuilder build = new StringBuilder();
+//            while ((line = br.readLine()) != null) {
+//                build.append(line);
+//            }
+//            return build.toString();
+//        }
     }
 }

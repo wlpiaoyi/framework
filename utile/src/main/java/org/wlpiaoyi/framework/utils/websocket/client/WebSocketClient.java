@@ -3,6 +3,9 @@ package org.wlpiaoyi.framework.utils.websocket.client;
 import com.google.gson.Gson;
 import org.apache.http.client.utils.URIBuilder;
 import org.java_websocket.handshake.ServerHandshake;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
+import org.wlpiaoyi.framework.utils.StringUtils;
 import org.wlpiaoyi.framework.utils.exception.BusinessException;
 
 import java.lang.ref.WeakReference;
@@ -20,6 +23,7 @@ public class WebSocketClient extends org.java_websocket.client.WebSocketClient {
     private CountDownLatch downLatch;
     private Exception connectException;
 
+
     public WebSocketClient(URI serverUri, WebSocketIntrface wsInterface) {
         super(serverUri);
         this.wsInterface = wsInterface == null ? null : new WeakReference<WebSocketIntrface>(wsInterface);
@@ -35,22 +39,36 @@ public class WebSocketClient extends org.java_websocket.client.WebSocketClient {
         }
         downLatch = new CountDownLatch(1);
         super.connectBlocking(timeout, timeUnit);
-        if(!downLatch.await(timeout, timeUnit)){
+        try{
+            if(!downLatch.await(timeout, timeUnit)){
+                downLatch = null;
+                if(connectException == null) connectException = new TimeoutException("connect time out");
+                throw connectException;
+            }
+        }catch (Exception e){
+            throw e;
+        } finally {
             downLatch = null;
-            if(connectException == null) connectException = new TimeoutException("connect time out");
-            throw connectException;
         }
-        downLatch = null;
         return true;
     }
 
-    public void send(Object data) throws NotYetConnectedException{
+    public void send(@NotNull Object data) throws NotYetConnectedException{
         this.send(new Gson().toJson(data));
+    }
+
+    public void send(@Nullable String headSuffix, @NotNull Object data) throws NotYetConnectedException{
+        if(StringUtils.isBlank(headSuffix))
+            this.send(new Gson().toJson(data));
+        else
+            this.send(headSuffix + new Gson().toJson(data));
     }
 
     @Override
     public void onOpen(ServerHandshake serverHandshake) {
-        downLatch.countDown();
+        if(downLatch != null){
+            downLatch.countDown();
+        }
         if(this.wsInterface == null || this.wsInterface.isEnqueued()) return;
         this.wsInterface.get().onOpen(this, serverHandshake);
     }
@@ -67,7 +85,6 @@ public class WebSocketClient extends org.java_websocket.client.WebSocketClient {
         if(downLatch != null){
             connectException = new BusinessException(code, message);
             downLatch.countDown();
-            downLatch = null;
         }
         if(this.wsInterface == null || this.wsInterface.isEnqueued()) return;
         this.wsInterface.get().onClose(this, code, message, b);
@@ -76,14 +93,9 @@ public class WebSocketClient extends org.java_websocket.client.WebSocketClient {
 
     @Override
     public void onError(Exception e) {
-        if(downLatch != null){
-            connectException = e;
-            downLatch.countDown();
-            downLatch = null;
-        }
+        this.close();
         if(this.wsInterface == null || this.wsInterface.isEnqueued()) return;
         this.wsInterface.get().onError(this, e);
-        this.close();
 
     }
 }

@@ -4,10 +4,12 @@ package org.wlpiaoyi.framework.utils.websocket.service;
 import com.google.gson.Gson;
 import lombok.Getter;
 import lombok.NonNull;
+import org.jetbrains.annotations.Nullable;
+import org.wlpiaoyi.framework.utils.StringUtils;
+import org.wlpiaoyi.framework.utils.exception.CatchException;
 
 import javax.websocket.*;
 import java.io.IOException;
-import java.lang.ref.WeakReference;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.CopyOnWriteArraySet;
@@ -16,9 +18,6 @@ import java.util.concurrent.CopyOnWriteArraySet;
  * 异步WebSocket服务
  */
 public class WsBootService {
-
-    //超时时间
-    public static int TIME_OUT_SECONDS = 5000;
 
     // 用来记录当前在线连接数。应该把它设计成线程安全的。
     //======================================>
@@ -30,6 +29,8 @@ public class WsBootService {
     private static CopyOnWriteArraySet<WsBootService> SERVICE_SET = new CopyOnWriteArraySet<WsBootService>();
 
     private Map<String, Map<String, Object>> resultMap = new HashMap<>();
+
+    private final Gson gson = new Gson();
 
     private Object lockResult = new Object();
 
@@ -44,6 +45,19 @@ public class WsBootService {
     public void sendMessage(@NonNull String message) throws IOException {
         this.session.getBasicRemote().sendText(message);
     }
+
+    /**
+     * 实现服务器异步线程安全主动推送
+     * @param data
+     * @throws IOException
+     */
+    public void sendMessage(@Nullable String headSuffix, @NonNull Object data) throws IOException {
+        if(StringUtils.isBlank(headSuffix))
+            this.sendMessage(new Gson().toJson(data));
+        else
+            this.sendMessage(headSuffix + new Gson().toJson(data));
+    }
+
     /**
      * 实现服务器异步线程安全主动推送
      * @param data
@@ -73,9 +87,24 @@ public class WsBootService {
 //     * @param message
 //     */
 //    @OnMessage
-//    public final void onWsMessage(String message) {
-//        WsUtile.onMessage(message, this,this);
-//    }
+    public final <T> T onWsMessage(String headSuffix, String message, Class<T> clazz) throws CatchException {
+        if(!StringUtils.isBlank(headSuffix)){
+            if(!message.startsWith(headSuffix)) throw new CatchException("message had not start with \"" + headSuffix + "\"");
+            message = message.substring(headSuffix.length());
+        }
+        T obj = gson.fromJson(message, clazz);
+        return obj;
+    }
+
+    public final <T> T onWsMessage(String message, Class<T> clazz){
+        T obj = null;
+        try {
+            obj = this.onWsMessage(null, message, clazz);
+        } catch (CatchException e) {
+            e.printStackTrace();
+        }
+        return obj;
+    }
 
     /**
      * 关闭连接回调

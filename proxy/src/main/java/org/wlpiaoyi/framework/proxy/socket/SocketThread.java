@@ -16,7 +16,8 @@ import java.lang.ref.WeakReference;
 import java.net.InetSocketAddress;
 import java.net.Proxy;
 import java.net.Socket;
-
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.TimeUnit;
 
 
 public class SocketThread extends Thread{
@@ -117,29 +118,8 @@ public class SocketThread extends Thread{
     }
 
     public void close(){
-        if(this.socketIn.isClosed() == false){
-            try {
-                InputStream isIn = socketIn.getInputStream();
-                OutputStream osIn = socketIn.getOutputStream();
-                isIn.close();
-                osIn.close();
-            } catch (IOException e) {}
-            try {
-                this.socketIn.close();
-            } catch (IOException e) {}
-        }
-        if(this.socketOut != null && this.socketOut.isClosed() == false){
-            try {
-                InputStream isOut = socketOut.getInputStream();
-                OutputStream osOut = socketOut.getOutputStream();
-                isOut.close();
-                osOut.close();
-            } catch (IOException e) {}
-            try {
-                this.socketOut.close();
-            } catch (IOException e) {}
-        }
-
+        if(this.outStream != null) this.outStream.stopStream();
+        if(this.inStream != null) this.inStream.stopStream();
     }
 
 
@@ -286,15 +266,15 @@ public class SocketThread extends Thread{
 
         osIn.write(Utils.CONNECT_OK);
         osIn.flush();
+
+        CountDownLatch downLatch = new CountDownLatch(2);
         StreamCourse streamCourse = (this.streamOperation != null && this.streamOperation.isEnqueued()) ? this.streamOperation.get() : null;
         this.outStream = new StreamThread(isIn, osOut, StreamThread.StreamType.Output, this.requestDomain, this.requestPort, streamCourse);
-        outStream.start();
+        outStream.startStrem(downLatch);
         this.inStream = new StreamThread(isOut, osIn, StreamThread.StreamType.Input, this.requestDomain, this.requestPort, streamCourse);
-        inStream.start();
-        outStream.join();
-        inStream.join();
+        inStream.startStrem(downLatch);
 
-        return true;
+        return downLatch.await(4, TimeUnit.HOURS);
     }
 
 }

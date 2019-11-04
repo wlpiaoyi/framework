@@ -91,15 +91,23 @@ public class SocketProxy implements SocketCourse {
 
     public void close(){
         try {
-            synchronized (this.clients){
-                for (SocketThread socketThread : this.clients){
-                    socketThread.close();
-                }
-                this.clients.clear();
-            }
+            this.closeAllClient();
             this.serverSocket.close();
         } catch (IOException e) {
             e.printStackTrace();
+        }
+    }
+
+
+    public void closeAllClient(){
+        if(this.clients == null || this.clients.isEmpty()) return;
+        synchronized (this.clients){
+            for (SocketThread socketThread : this.clients){
+                try{
+                    socketThread.close();
+                }catch (Exception e){};
+            }
+            this.clients.clear();
         }
     }
 
@@ -133,9 +141,9 @@ public class SocketProxy implements SocketCourse {
     }
 
     public void setProxy(String proxyIP,int proxyPort) {
-        if(!this.serverSocket.isClosed()) throw new BusinessException("can't set proxy after the socket serve was started!");
         this.proxy = new Proxy(Proxy.Type.SOCKS, new InetSocketAddress(proxyIP, proxyPort));
     }
+
 
     public static final Set<Map.Entry<Integer, SocketProxy>> getServers() {
         return servers.entrySet();
@@ -147,35 +155,4 @@ public class SocketProxy implements SocketCourse {
         return servers.get(listenPort);
     }
 
-    /**
-     * @param args
-     */
-    public static void main(String[] args) throws IOException {
-        byte[][] encryptionDatas = new byte[2][];
-        String PATH = System.getProperty("user.dir") + "/proxy.json";
-        String jsonStr = StringUtils.readFile(PATH);
-        List<Map> configurations = new Gson().fromJson(jsonStr, List.class);
-        for(Map configuration : configurations){
-            int port = ((Double)configuration.get("port")).intValue();
-            boolean verify = configuration.containsKey("verify") ? (boolean)configuration.get("verify") : false;
-            SocketProxy socketProxy;
-            if(verify){
-                String name = (String) configuration.get("name");
-                String password = (String) configuration.get("password");
-                encryptionDatas[0] = name.getBytes("UTF-8");
-                encryptionDatas[1] = password.getBytes("UTF-8");
-                socketProxy = new SocketProxy(port, encryptionDatas);
-            }else {
-                socketProxy = new SocketProxy(port);
-            }
-            socketProxy.asynStart();
-        }
-        while (true) {
-            try {
-                Thread.sleep(600000);
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
-        }
-    }
 }

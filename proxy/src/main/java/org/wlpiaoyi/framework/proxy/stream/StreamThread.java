@@ -6,6 +6,7 @@ import org.wlpiaoyi.framework.proxy.stream.protocol.StreamCourse;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.lang.ref.WeakReference;
+import java.util.concurrent.CountDownLatch;
 
 //00 00 0D 0A 30 0D 0A 0D 0A
 //61 63 68 65 0D 0A 0D 0A
@@ -30,6 +31,8 @@ public class StreamThread extends Thread{
     @Getter
     private int port;
 
+    private CountDownLatch downLatch;
+
     private final WeakReference<StreamCourse> streamInterface;
 
     public StreamThread(InputStream inputStream,
@@ -47,24 +50,41 @@ public class StreamThread extends Thread{
         else this.streamInterface = null;
     }
 
+    public void startStrem(CountDownLatch downLatch){
+        this.downLatch = downLatch;
+        super.start();
+    }
+
+    public void stopStream(){
+        try{this.inputStream.close();}catch (Exception e){e.printStackTrace();}
+        try{this.outputStream.close();}catch (Exception e){e.printStackTrace();}
+    }
+
     public void run() {
         try {
             this.beginExecuteTime = System.currentTimeMillis();
-            if(this.streamInterface != null) this.streamInterface.get().streamStart(this);
+            if(this.streamInterface != null && !this.streamInterface.isEnqueued()) this.streamInterface.get().streamStart(this);
             byte[] buffer = new byte[64];
             int len;
             while ((len = inputStream.read(buffer)) != -1) {
                 if (len > 0) {
                     this.recentExecuteTime = System.currentTimeMillis();
-                    if(this.streamInterface != null) this.streamInterface.get().streaming(this, buffer, len);
-                    outputStream.write(buffer, 0, len);
+                    if(this.streamInterface != null && !this.streamInterface.isEnqueued()){
+                        byte[] rbuffer = this.streamInterface.get().streaming(this, buffer, len);
+                        if(rbuffer != null) outputStream.write(rbuffer);
+                        else outputStream.write(buffer, 0, len);
+                    }else outputStream.write(buffer, 0, len);
                     outputStream.flush();
                 }
             }
         } catch (Exception e) {
-            if(this.streamInterface != null) this.streamInterface.get().streamErro(this, e);
+            if(this.streamInterface != null && !this.streamInterface.isEnqueued()) this.streamInterface.get().streamErro(this, e);
         } finally {
-            if(this.streamInterface != null) this.streamInterface.get().streamEnd(this);
+            if(this.downLatch != null){
+                this.downLatch.countDown();
+                this.downLatch = null;
+            }
+            if(this.streamInterface != null && !this.streamInterface.isEnqueued()) this.streamInterface.get().streamEnd(this);
         }
     }
 

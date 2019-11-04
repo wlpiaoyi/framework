@@ -36,10 +36,10 @@
             <artifactId>selenium-java</artifactId>
             <version>3.141.59</version>
             <exclusions>
-                <exclusion>
-                    <groupId>com.squareup.okhttp3</groupId>
-                    <artifactId>okhttp</artifactId>
-                </exclusion>
+<!--                <exclusion>-->
+<!--                    <groupId>com.squareup.okhttp3</groupId>-->
+<!--                    <artifactId>okhttp</artifactId>-->
+<!--                </exclusion>-->
 <!--                <exclusion>-->
 <!--                    <groupId>org.apache.commons</groupId>-->
 <!--                    <artifactId>commons-exec</artifactId>-->
