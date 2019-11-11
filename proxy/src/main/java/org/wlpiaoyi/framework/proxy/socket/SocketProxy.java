@@ -141,7 +141,11 @@ public class SocketProxy implements SocketCourse {
     }
 
     public void setProxy(String proxyIP,int proxyPort) {
-        this.proxy = new Proxy(Proxy.Type.SOCKS, new InetSocketAddress(proxyIP, proxyPort));
+        if(StringUtils.isBlank(proxyIP) || proxyPort <= 0){
+            this.proxy = null;
+        }else {
+            this.proxy = new Proxy(Proxy.Type.SOCKS, new InetSocketAddress(proxyIP, proxyPort));
+        }
     }
 
 

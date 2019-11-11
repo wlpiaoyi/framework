@@ -76,7 +76,7 @@ public class SocketThread extends Thread{
             }
             if (!enableNext) return;
 
-            byte[] buffer = new byte[1024];
+            byte[] buffer = new byte[Utils.BUFFER_LEN];
             /**
              * handle protocol
              */
@@ -118,8 +118,8 @@ public class SocketThread extends Thread{
     }
 
     public void close(){
-        if(this.outStream != null) this.outStream.stopStream();
-        if(this.inStream != null) this.inStream.stopStream();
+        if(this.outStream != null) this.outStream.close();
+        if(this.inStream != null) this.inStream.close();
     }
 
 
@@ -212,19 +212,19 @@ public class SocketThread extends Thread{
                 this.verifyEncryption.get().controlBefore(this, (byte) 0x10, isIn, osIn);
                 flag = this.verifyEncryption.get().verifyEncryption(this, name, nameL, pwd, pwdL);
             }else{
-                flag = !Utils.IS_EQUES_BYTES(this.encryptionDatas[0], name) || !Utils.IS_EQUES_BYTES(this.encryptionDatas[1], pwd);
+                flag = Utils.IS_EQUES_BYTES(this.encryptionDatas[0], name) && Utils.IS_EQUES_BYTES(this.encryptionDatas[1], pwd);
             }
-            if(!flag){
+            if(flag){
+                //verify passed
+                osIn.write(Utils.ENCRYPTION_OK);
+                osIn.flush();
+            }else {
                 //verify missed
                 byte[] response = Utils.ENCRYPTION_OK;
                 response[1] = 0x01;
                 osIn.write(response);
                 osIn.flush();
                 return false;
-            }else {
-                //verify passed
-                osIn.write(Utils.ENCRYPTION_OK);
-                osIn.flush();
             }
         }
 
@@ -267,12 +267,12 @@ public class SocketThread extends Thread{
         osIn.write(Utils.CONNECT_OK);
         osIn.flush();
 
-        CountDownLatch downLatch = new CountDownLatch(2);
+        CountDownLatch downLatch = new CountDownLatch(1);
         StreamCourse streamCourse = (this.streamOperation != null && this.streamOperation.isEnqueued()) ? this.streamOperation.get() : null;
-        this.outStream = new StreamThread(isIn, osOut, StreamThread.StreamType.Output, this.requestDomain, this.requestPort, streamCourse);
-        outStream.startStrem(downLatch);
-        this.inStream = new StreamThread(isOut, osIn, StreamThread.StreamType.Input, this.requestDomain, this.requestPort, streamCourse);
-        inStream.startStrem(downLatch);
+        this.outStream = new StreamThread(isIn, osOut, StreamThread.StreamType.Output, this.requestDomain, this.requestPort, downLatch, streamCourse);
+        outStream.start();
+        this.inStream = new StreamThread(isOut, osIn, StreamThread.StreamType.Input, this.requestDomain, this.requestPort, downLatch,  streamCourse);
+        inStream.start();
 
         return downLatch.await(4, TimeUnit.HOURS);
     }

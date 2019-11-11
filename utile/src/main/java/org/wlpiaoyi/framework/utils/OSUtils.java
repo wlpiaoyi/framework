@@ -1,8 +1,5 @@
 package org.wlpiaoyi.framework.utils;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
 
 /**
  *
@@ -213,12 +210,6 @@ public class OSUtils {
     }
 
 
-
-    public static void main(String[] args) {
-
-        System.out.println(OSUtils.getOSname());
-
-    }
     public enum EPlatform {
 
         Any("any"),

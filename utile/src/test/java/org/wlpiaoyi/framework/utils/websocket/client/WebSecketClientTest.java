@@ -42,8 +42,8 @@ public class WebSecketClientTest implements Runnable, WebSocketIntrface {
     @Override
     public void run() {
         try {
-            WebSocketClient wsClient = new WebSocketClient("ws://121.40.165.18:88001", this);
-//            wsClient.setProxy(new Proxy(Proxy.Type.SOCKS, new InetSocketAddress("127.0.0.1", 8010)));
+            WebSocketClient wsClient = new WebSocketClient("ws://121.40.165.18:8800", this);
+//            wsClient.setProxy(new Proxy(Proxy.Type.SOCKS, new InetSocketAddress("172.20.170.61", 8010)));
 //            WebSocketClient wsClient = new WebSocketClient("ws://127.0.0.1:8001/wlpiaoyi/test/111", this);
             wsClient.synConnect(5000, TimeUnit.MILLISECONDS);
 //            wsClient.send(System.currentTimeMillis());

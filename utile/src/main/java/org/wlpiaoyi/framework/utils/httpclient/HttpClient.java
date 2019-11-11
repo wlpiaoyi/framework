@@ -2,12 +2,14 @@ package org.wlpiaoyi.framework.utils.httpclient;
 
 
 import com.google.gson.Gson;
+import lombok.NonNull;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpHost;
 import org.apache.http.HttpResponse;
 import org.apache.http.NameValuePair;
 import org.apache.http.client.config.AuthSchemes;
 import org.apache.http.client.config.RequestConfig;
+import org.apache.http.client.entity.UrlEncodedFormEntity;
 import org.apache.http.client.methods.*;
 import org.apache.http.client.utils.URIBuilder;
 import org.apache.http.config.Registry;
@@ -18,255 +20,111 @@ import org.apache.http.conn.socket.PlainConnectionSocketFactory;
 import org.apache.http.conn.ssl.AllowAllHostnameVerifier;
 import org.apache.http.conn.ssl.SSLConnectionSocketFactory;
 import org.apache.http.conn.ssl.X509HostnameVerifier;
+import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.http.impl.conn.PoolingHttpClientConnectionManager;
 import org.apache.http.message.BasicNameValuePair;
 import org.apache.http.util.EntityUtils;
+import org.jetbrains.annotations.Nullable;
 import org.wlpiaoyi.framework.utils.StringUtils;
 
 import javax.net.ssl.*;
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
 import java.net.*;
 import java.security.KeyManagementException;
 import java.security.NoSuchAlgorithmException;
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public class HttpClient {
 
-    private static final String SCHEME_HTTP = "http";
-    private static final String SCHEME_HTTPS = "https";
+    final static Map<String, String> HEDAER_JSON_DEFAULTS = new HashMap(){{
+        put("Content-Type", "application/json;charset=UTF-8");
+        put("Accept", "application/json");
+    }};
+
+    static final String SCHEME_HTTP = "http";
+    static final String SCHEME_HTTPS = "https";
 
     public static final int TIME_OUT_MS = 30000;
 
     private static PoolingHttpClientConnectionManager CONNECTION_MANAGER;
 
-    public static HttpResponse httpResponse(HttpRequestBase request, final HttpHost proxy) throws IOException {
-        RequestConfig.Builder config = RequestConfig.copy(RequestConfig.DEFAULT);
-        config.setProxy(proxy);
-        config.setConnectionRequestTimeout(TIME_OUT_MS);
-        config.setSocketTimeout(TIME_OUT_MS);
-        request.setConfig(config.build());
-        CloseableHttpClient httpClient = getHttpClient();
-        CloseableHttpResponse response = httpClient.execute(request);
+    static Map<String, Object> createJsonHeaderMap(@Nullable Map<String, Object> headerMap){
+        if(headerMap == null){
+            headerMap = new HashMap<>();
+        }
+        for (Map.Entry<String, String> entry : HEDAER_JSON_DEFAULTS.entrySet()){
+            if(headerMap.containsKey(entry.getKey())) continue;
+            headerMap.put(entry.getKey(), entry.getValue());
+        }
+        return headerMap;
+    }
+
+    static HttpEntity createFormEntity(@Nullable Object params) throws UnsupportedEncodingException {
+        Map<String, Object> formMap = null;
+        if(params instanceof Map){
+            formMap = new HashMap();
+            for (Map.Entry entry : (Set<Map.Entry>)((Map) params).entrySet()){
+                formMap.put(entry.getKey().toString(), entry.getValue());
+            }
+        }else if(params instanceof String){
+
+        }else {
+            Gson gson = new Gson();
+            formMap = gson.fromJson(gson.toJsonTree(params), Map.class);
+        }
+        /// 处理请求体
+        List<NameValuePair> paramsUri = new ArrayList<NameValuePair>();
+        for (Map.Entry<String, Object> map : formMap.entrySet()) {
+            paramsUri.add(new BasicNameValuePair(map.getKey(), map.getValue().toString()));
+        }
+        return new UrlEncodedFormEntity(paramsUri);
+    }
+
+    static HttpEntity createJsonEntity(@NonNull Map<String, Object> headerMap, @Nullable Object params) throws UnsupportedEncodingException {
+        Gson gson = new Gson();
+        String parameter;
+        if(params instanceof Map){
+            Map map = new HashMap();
+            for (Map.Entry entry : (Set<Map.Entry>)((Map) params).entrySet()){
+                map.put(entry.getKey(), entry.getValue());
+            }
+            params = map;
+        }
+        if(params instanceof String){
+            parameter = (String) params;
+        }else parameter = gson.toJson(params);
+
+        StringEntity entity = new StringEntity(parameter);
+        entity.setContentType((String)headerMap.get("Accept"));
+        if(headerMap.containsKey("Content-Type")){
+            String value = (String) headerMap.get("Content-Type");
+            for(String arg : value.split(";")){
+                String args[] = arg.split("=");
+                if(args.length == 2 && args[0].equals("charset")){
+                    entity.setContentEncoding(args[1]);
+                    break;
+                }
+            }
+        }
+        return entity;
+    }
+
+    public static HttpResponse getHttpResponse(HttpRequestBase request, final HttpHost proxy) throws IOException {
+        request.setConfig(createConfig(proxy).build());
+        CloseableHttpResponse response = getHttpClient().execute(request);
         return response;
     }
 
-    public static HttpResponse httpsResponse(HttpRequestBase request, final HttpHost proxy) throws IOException {
-        RequestConfig.Builder config = RequestConfig.copy(RequestConfig.DEFAULT);
-        config.setProxy(proxy);
-        config.setConnectionRequestTimeout(TIME_OUT_MS);
-        config.setSocketTimeout(TIME_OUT_MS);
-        request.setConfig(config.build());
+    public static HttpResponse getHttpsResponse(HttpRequestBase request, final HttpHost proxy) throws IOException {
+        request.setConfig(createConfig(proxy).build());
         CloseableHttpResponse response = getHttpsClient().execute(request);
         return response;
     }
-
-
-    /**
-     * GET同步请求
-     * @param url
-     * @param headerMap
-     * @param paramMap
-     * @param clazz
-     * @param <T>
-     * @return
-     * @throws URISyntaxException
-     * @throws IOException
-     */
-    public static <T> T GETData(String url, Map<String, Object> headerMap, Map<String, Object> paramMap, Class<T> clazz) throws URISyntaxException, IOException {
-        HttpResponse response = HttpClient.GETResponse(url, headerMap, paramMap, null);
-        return HttpClient.getResponseData(response, clazz);
-    }
-
-    /**
-     * GET同步请求
-     * @param url
-     * @param headerMap
-     * @param paramMap
-     * @return
-     * @throws URISyntaxException
-     * @throws IOException
-     */
-    public static HttpResponse GETResponse(String url, Map<String, Object> headerMap, Map<String, Object> paramMap) throws URISyntaxException, IOException {
-        return HttpClient.GETResponse(url, headerMap, paramMap, null);
-    }
-
-    /**
-     * GET同步请求
-     * @param url
-     * @param headerMap
-     * @param paramMap
-     * @param proxy
-     * @return
-     * @throws URISyntaxException
-     * @throws IOException
-     */
-    public static HttpResponse GETResponse(String url, Map<String, Object> headerMap, Map<String, Object> paramMap,final HttpHost proxy) throws URISyntaxException, IOException {
-        HttpGet request = new HttpGet(HttpClient.createURI(url, paramMap));
-        if(headerMap != null){
-            for (Map.Entry<String, Object> param : headerMap.entrySet()) {
-                request.addHeader(param.getKey(), String.valueOf(param.getValue()));
-            }
-        }
-        if(url.startsWith(SCHEME_HTTPS))return HttpClient.httpsResponse(request, proxy);
-        else return HttpClient.httpResponse(request, proxy);
-    }
-
-    /**
-     * DELETE同步请求
-     * @param url
-     * @param headerMap
-     * @param paramMap
-     * @param clazz
-     * @param <T>
-     * @return
-     * @throws URISyntaxException
-     * @throws IOException
-     */
-    public static <T> T DELETEData(String url, Map<String, Object> headerMap, Map<String, Object> paramMap, Class<T> clazz) throws URISyntaxException, IOException {
-        HttpResponse response = HttpClient.DELETEResponse(url, headerMap, paramMap, null);
-        return HttpClient.getResponseData(response, clazz);
-    }
-    /**
-     * DELETE同步请求
-     * @param url
-     * @param headerMap
-     * @param paramMap
-     * @return
-     * @throws URISyntaxException
-     * @throws IOException
-     */
-    public static HttpResponse DELETEResponse(String url, Map<String, Object> headerMap, Map<String, Object> paramMap) throws URISyntaxException, IOException {
-        return HttpClient.DELETEResponse(url, headerMap, paramMap, null);
-    }
-
-    /**
-     * DELETE同步请求
-     * @param url
-     * @param headerMap
-     * @param paramMap
-     * @param proxy
-     * @return
-     * @throws URISyntaxException
-     * @throws IOException
-     */
-    public static HttpResponse DELETEResponse(String url, Map<String, Object> headerMap, Map<String, Object> paramMap,final HttpHost proxy) throws URISyntaxException, IOException {
-        HttpDelete request = new HttpDelete(HttpClient.createURI(url, paramMap));
-        if(headerMap != null){
-            for (Map.Entry<String, Object> param : headerMap.entrySet()) {
-                request.addHeader(param.getKey(), String.valueOf(param.getValue()));
-            }
-        }
-        if(url.startsWith(SCHEME_HTTPS))return HttpClient.httpsResponse(request, proxy);
-        else return HttpClient.httpResponse(request, proxy);
-    }
-
-
-    /**
-     * POST同步请求
-     * @param url
-     * @param headerMap
-     * @param paramMap
-     * @param clazz
-     * @param <T>
-     * @return
-     * @throws URISyntaxException
-     * @throws IOException
-     */
-    public static <T> T POSTData(String url, Map<String, Object> headerMap, Map<String, Object> paramMap, Class<T> clazz) throws URISyntaxException, IOException {
-        HttpResponse response = HttpClient.POSTResponse(url, headerMap, paramMap, null);
-        return HttpClient.getResponseData(response, clazz);
-    }
-    /**
-     * POST同步请求
-     * @param url
-     * @param headerMap
-     * @param paramMap
-     * @return
-     * @throws URISyntaxException
-     * @throws IOException
-     */
-    public static HttpResponse POSTResponse(String url, Map<String, Object> headerMap, Map<String, Object> paramMap) throws URISyntaxException, IOException {
-        return HttpClient.POSTResponse(url, headerMap, paramMap, null);
-    }
-
-    /**
-     * POST同步请求
-     * @param url
-     * @param headerMap
-     * @param paramMap
-     * @param proxy
-     * @return
-     * @throws URISyntaxException
-     * @throws IOException
-     */
-    public static HttpResponse POSTResponse(String url, Map<String, Object> headerMap, Map<String, Object> paramMap,final HttpHost proxy) throws URISyntaxException, IOException {
-        HttpPost request = new HttpPost(HttpClient.createURI(url, paramMap));
-        if(headerMap != null){
-            for (Map.Entry<String, Object> param : headerMap.entrySet()) {
-                request.addHeader(param.getKey(), String.valueOf(param.getValue()));
-            }
-        }
-        if(url.startsWith(SCHEME_HTTPS))return HttpClient.httpsResponse(request, proxy);
-        else return HttpClient.httpResponse(request, proxy);
-    }
-
-
-    /**
-     * PUT同步请求
-     * @param url
-     * @param headerMap
-     * @param paramMap
-     * @param clazz
-     * @param <T>
-     * @return
-     * @throws URISyntaxException
-     * @throws IOException
-     */
-    public static <T> T PUTData(String url, Map<String, Object> headerMap, Map<String, Object> paramMap, Class<T> clazz) throws URISyntaxException, IOException {
-        HttpResponse response = HttpClient.PUTResponse(url, headerMap, paramMap, null);
-        return HttpClient.getResponseData(response, clazz);
-    }
-    /**
-     * PUT同步请求
-     * @param url
-     * @param headerMap
-     * @param paramMap
-     * @return
-     * @throws URISyntaxException
-     * @throws IOException
-     */
-    public static HttpResponse PUTResponse(String url, Map<String, Object> headerMap, Map<String, Object> paramMap) throws URISyntaxException, IOException {
-        return HttpClient.PUTResponse(url, headerMap, paramMap, null);
-    }
-
-    /**
-     * PUT同步请求
-     * @param url
-     * @param headerMap
-     * @param paramMap
-     * @param proxy
-     * @return
-     * @throws URISyntaxException
-     * @throws IOException
-     */
-    public static HttpResponse PUTResponse(String url, Map<String, Object> headerMap, Map<String, Object> paramMap,final HttpHost proxy) throws URISyntaxException, IOException {
-        HttpPut request = new HttpPut(HttpClient.createURI(url, paramMap));
-        if(headerMap != null){
-            for (Map.Entry<String, Object> param : headerMap.entrySet()) {
-                request.addHeader(param.getKey(), String.valueOf(param.getValue()));
-            }
-        }
-        if(url.startsWith(SCHEME_HTTPS))return HttpClient.httpsResponse(request, proxy);
-        else return HttpClient.httpResponse(request, proxy);
-    }
-
 
 
     public static String getResponseText(HttpResponse response) throws IOException {
@@ -295,7 +153,17 @@ public class HttpClient {
     }
 
 
-    public static final void initCM(){
+
+    static URI createURI(String url, Map<String, Object> paramMap) throws URISyntaxException {
+        URIBuilder ub = new URIBuilder(url);
+        if(paramMap != null){
+            List<NameValuePair> pairs = covertParams2NVPS(paramMap);
+            ub.setParameters(pairs);
+        }
+        return ub.build();
+    }
+
+    private static final void initCM(){
         if(CONNECTION_MANAGER == null){
             synchronized (HttpClient.class){
                 if (CONNECTION_MANAGER == null) {
@@ -346,6 +214,15 @@ public class HttpClient {
         }
     }
 
+
+    private static final RequestConfig.Builder createConfig(final HttpHost proxy){
+        RequestConfig.Builder config = RequestConfig.copy(RequestConfig.DEFAULT);
+        config.setProxy(proxy);
+        config.setConnectionRequestTimeout(TIME_OUT_MS);
+        config.setSocketTimeout(TIME_OUT_MS);
+        return config;
+    }
+
     /**
      * 通过连接池获取HttpClient
      *
@@ -363,15 +240,6 @@ public class HttpClient {
             pairs.add(new BasicNameValuePair(param.getKey(), String.valueOf(param.getValue())));
         }
         return pairs;
-    }
-
-    private static URI createURI(String url, Map<String, Object> paramMap) throws URISyntaxException {
-        URIBuilder ub = new URIBuilder(url);
-        if(paramMap != null){
-            List<NameValuePair> pairs = covertParams2NVPS(paramMap);
-            ub.setParameters(pairs);
-        }
-        return ub.build();
     }
 
     private static class TrustAllManager implements X509TrustManager {

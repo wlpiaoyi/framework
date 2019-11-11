@@ -2,13 +2,63 @@ package org.wlpiaoyi.framework.utils;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import sun.misc.BASE64Decoder;
+import sun.misc.BASE64Encoder;
 
 import java.io.*;
 import java.security.MessageDigest;
 import java.util.UUID;
 
 public class StringUtils {
-    public static final int UUID64_LENGHT = 64;
+
+    /**
+     * 将字符编码成base64
+     * @param encodeStr
+     * @param charseName
+     * @return
+     */
+    public static String base64Encode(String encodeStr, String charseName){
+        try {
+            return new BASE64Encoder().encode(encodeStr.getBytes(charseName));
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+    /**
+     * 将字符编码成base64
+     * @param encodeStr
+     * @return
+     */
+    public static String base64Encode(String encodeStr){
+        return StringUtils.base64Encode(encodeStr, "UTF-8");
+    }
+
+    /**
+     * 将base64字符解码
+     * @param decodeStr
+     * @param charseName
+     * @return
+     */
+    public static String base64Decode(String decodeStr, String charseName){
+        try {
+            byte[] bytes = new BASE64Decoder().decodeBuffer(decodeStr);
+            return new String(bytes, charseName);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+    /**
+     * 将base64字符解码
+     * @param decodeStr
+     * @return
+     */
+    public static String base64Decode(String decodeStr){
+        return StringUtils.base64Decode(decodeStr, "UTF-8");
+    }
 
     public static boolean isBlank(String arg){
         return arg == null || arg.length() == 0;

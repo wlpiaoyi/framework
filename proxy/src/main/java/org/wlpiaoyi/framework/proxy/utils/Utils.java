@@ -9,6 +9,8 @@ public class Utils {
         Custom
     }
 
+    public static final int BUFFER_LEN = 1024;
+
     public static final byte SOCKET_VERSION = 0x5;
     public static final byte ENCRYPTION_VERSION = 0x1;
 

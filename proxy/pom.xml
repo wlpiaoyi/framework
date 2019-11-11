@@ -36,7 +36,7 @@
                         <manifest>
                             <addClasspath>true</addClasspath>
                             <classpathPrefix>lib/</classpathPrefix>
-                            <mainClass>org.wlpiaoyi.framework.proxy.socket.SocketProxy</mainClass>
+                            <mainClass>org.wlpiaoyi.framework.proxy.ProxyLoder</mainClass>
                         </manifest>
                     </archive>
                 </configuration>

@@ -2,6 +2,7 @@ package org.wlpiaoyi.framework.proxy.stream;
 
 import lombok.Getter;
 import org.wlpiaoyi.framework.proxy.stream.protocol.StreamCourse;
+import org.wlpiaoyi.framework.proxy.utils.Utils;
 
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -46,25 +47,49 @@ public class StreamThread extends Thread{
         this.streamType = streamType;
         this.host = host;
         this.port = port;
+        this.downLatch = null;
         if(streamCourse != null)this.streamInterface = new WeakReference<>(streamCourse);
         else this.streamInterface = null;
     }
 
-    public void startStrem(CountDownLatch downLatch){
+    public StreamThread(InputStream inputStream,
+                        OutputStream outputStream,
+                        StreamType streamType,
+                        String host,
+                        int port,
+                        CountDownLatch downLatch,
+                        StreamCourse streamCourse){
+        this.inputStream = inputStream;
+        this.outputStream = outputStream;
+        this.streamType = streamType;
+        this.host = host;
+        this.port = port;
         this.downLatch = downLatch;
-        super.start();
+        if(streamCourse != null)this.streamInterface = new WeakReference<>(streamCourse);
+        else this.streamInterface = null;
     }
 
-    public void stopStream(){
-        try{this.inputStream.close();}catch (Exception e){e.printStackTrace();}
-        try{this.outputStream.close();}catch (Exception e){e.printStackTrace();}
+    public void close(){
+        if(this.inputStream != null)
+            try{this.inputStream.close(); this.inputStream = null;}catch (Exception e){e.printStackTrace();}
+        if(this.outputStream != null)
+            try{this.outputStream.close(); this.outputStream = null;}catch (Exception e){e.printStackTrace();}
+        if(this.downLatch != null){
+            try{
+                this.downLatch.countDown();
+                synchronized (this.downLatch){
+                    if(this.downLatch.getCount() > 0){
+                    }
+                }
+            }catch (Exception e){e.printStackTrace();}
+        }
     }
 
     public void run() {
         try {
             this.beginExecuteTime = System.currentTimeMillis();
             if(this.streamInterface != null && !this.streamInterface.isEnqueued()) this.streamInterface.get().streamStart(this);
-            byte[] buffer = new byte[64];
+            byte[] buffer = new byte[Utils.BUFFER_LEN];
             int len;
             while ((len = inputStream.read(buffer)) != -1) {
                 if (len > 0) {
@@ -80,10 +105,7 @@ public class StreamThread extends Thread{
         } catch (Exception e) {
             if(this.streamInterface != null && !this.streamInterface.isEnqueued()) this.streamInterface.get().streamErro(this, e);
         } finally {
-            if(this.downLatch != null){
-                this.downLatch.countDown();
-                this.downLatch = null;
-            }
+            this.close();
             if(this.streamInterface != null && !this.streamInterface.isEnqueued()) this.streamInterface.get().streamEnd(this);
         }
     }
