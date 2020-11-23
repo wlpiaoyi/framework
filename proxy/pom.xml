@@ -18,7 +18,7 @@
     <dependencies>
         <dependency>
             <groupId>org.wlpiaoyi.framework</groupId>
-            <artifactId>utile</artifactId>
+            <artifactId>utils</artifactId>
             <version>1.0-SNAPSHOT</version>
         </dependency>
     </dependencies>
@@ -61,7 +61,7 @@
             </plugin>
 
 
-            <!--maven jar 全 打包-->
+<!--            &lt;!&ndash;maven jar 全 打包&ndash;&gt;-->
 <!--            <plugin>-->
 <!--                <groupId>org.apache.maven.plugins</groupId>-->
 <!--                <artifactId>maven-assembly-plugin</artifactId>-->

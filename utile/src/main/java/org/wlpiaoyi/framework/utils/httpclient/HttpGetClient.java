@@ -12,6 +12,34 @@ import java.util.Map;
 
 public class HttpGetClient extends HttpClient{
 
+
+    /**
+     * GET同步请求
+     * @param url
+     * @param headerMap
+     * @param paramMap
+     * @return
+     * @throws URISyntaxException
+     * @throws IOException
+     */
+    public static Map Map(@NonNull String url, @Nullable Map<String, Object> headerMap, @Nullable Map<String, Object> paramMap) throws URISyntaxException, IOException {
+        return HttpGetClient.Map(url, headerMap, paramMap, null);
+    }
+    /**
+     * GET同步请求
+     * @param url
+     * @param headerMap
+     * @param paramMap
+     * @param proxy
+     * @return
+     * @throws URISyntaxException
+     * @throws IOException
+     */
+    public static Map Map(@NonNull String url, @Nullable Map<String, Object> headerMap, @Nullable Map<String, Object> paramMap, @Nullable final HttpHost proxy) throws URISyntaxException, IOException {
+        HttpResponse response = HttpGetClient.Response(url, headerMap, paramMap, proxy);
+        return HttpClient.getResponseMap(response);
+    }
+
     /**
      * GET同步请求
      * @param url

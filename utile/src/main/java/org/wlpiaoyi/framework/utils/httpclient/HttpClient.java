@@ -17,9 +17,7 @@ import org.apache.http.config.RegistryBuilder;
 import org.apache.http.config.SocketConfig;
 import org.apache.http.conn.socket.ConnectionSocketFactory;
 import org.apache.http.conn.socket.PlainConnectionSocketFactory;
-import org.apache.http.conn.ssl.AllowAllHostnameVerifier;
 import org.apache.http.conn.ssl.SSLConnectionSocketFactory;
-import org.apache.http.conn.ssl.X509HostnameVerifier;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
@@ -46,14 +44,21 @@ public class HttpClient {
         put("Accept", "application/json");
     }};
 
+//    final static Map<String, String> HEDAER_FORM_DEFAULTS = new HashMap(){{
+//        put("Content-Type", "application/x-www-form-urlencoded;charset=UTF-8");
+//        put("Accept", "application/json");
+//    }};
+
     static final String SCHEME_HTTP = "http";
     static final String SCHEME_HTTPS = "https";
+
+    static Gson GSON = new Gson();
 
     public static final int TIME_OUT_MS = 30000;
 
     private static PoolingHttpClientConnectionManager CONNECTION_MANAGER;
 
-    static Map<String, Object> createJsonHeaderMap(@Nullable Map<String, Object> headerMap){
+    static @NonNull Map<String, Object> createJsonHeaderMap(@Nullable Map<String, Object> headerMap){
         if(headerMap == null){
             headerMap = new HashMap<>();
         }
@@ -64,7 +69,8 @@ public class HttpClient {
         return headerMap;
     }
 
-    static HttpEntity createFormEntity(@Nullable Object params) throws UnsupportedEncodingException {
+    static @Nullable HttpEntity createFormEntity(@Nullable Object params) throws UnsupportedEncodingException {
+        if(params == null) return null;
         Map<String, Object> formMap = null;
         if(params instanceof Map){
             formMap = new HashMap();
@@ -73,12 +79,11 @@ public class HttpClient {
             }
         }else if(params instanceof String){
 
-        }else {
-            Gson gson = new Gson();
-            formMap = gson.fromJson(gson.toJsonTree(params), Map.class);
+        }else if(params != null){
+            formMap = GSON.fromJson(GSON.toJsonTree(params), Map.class);
         }
         /// 处理请求体
-        List<NameValuePair> paramsUri = new ArrayList<NameValuePair>();
+        List<NameValuePair> paramsUri = new ArrayList<>();
         for (Map.Entry<String, Object> map : formMap.entrySet()) {
             paramsUri.add(new BasicNameValuePair(map.getKey(), map.getValue().toString()));
         }
@@ -86,7 +91,6 @@ public class HttpClient {
     }
 
     static HttpEntity createJsonEntity(@NonNull Map<String, Object> headerMap, @Nullable Object params) throws UnsupportedEncodingException {
-        Gson gson = new Gson();
         String parameter;
         if(params instanceof Map){
             Map map = new HashMap();
@@ -95,11 +99,15 @@ public class HttpClient {
             }
             params = map;
         }
-        if(params instanceof String){
+        if(params == null){
+            parameter = null;
+        }else if(params instanceof String){
             parameter = (String) params;
-        }else parameter = gson.toJson(params);
+        }else{
+            parameter = GSON.toJson(params);
+        }
 
-        StringEntity entity = new StringEntity(parameter);
+        StringEntity entity = new StringEntity(parameter != null ? parameter : "");
         entity.setContentType((String)headerMap.get("Accept"));
         if(headerMap.containsKey("Content-Type")){
             String value = (String) headerMap.get("Content-Type");
@@ -146,10 +154,14 @@ public class HttpClient {
         if (entity == null) return null;
 
         if(entity.getContentType().getValue().contains("application/json")){
-            Gson gson = new Gson();
-            return gson.fromJson(text, clazz);
+            return GSON.fromJson(text, clazz);
         }
         return null;
+    }
+
+
+    public static Map getResponseMap(HttpResponse response) throws IOException {
+        return HttpClient.getResponseData(response, Map.class);
     }
 
 

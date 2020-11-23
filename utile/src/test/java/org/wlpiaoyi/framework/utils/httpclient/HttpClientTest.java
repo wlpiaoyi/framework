@@ -39,6 +39,10 @@ public class HttpClientTest {
             text = HttpPostClient.StringJsonParams("https://127.0.0.1:8002/wlpiaoyi/postData-json", null, params, new HttpHost("127.0.0.1", 9000));
             System.out.println(text);
 
+            text = HttpPostClient.StringJsonParams("https://127.0.0.1:8002/addShop", null, params, new HttpHost("127.0.0.1", 9000));
+            System.out.println(text);
+
+
             text = HttpPostClient.StringFormParams("https://127.0.0.1:8002/wlpiaoyi/postData-form", null, params, new HttpHost("127.0.0.1", 9000));
             System.out.println(text);
         } catch (URISyntaxException e) {

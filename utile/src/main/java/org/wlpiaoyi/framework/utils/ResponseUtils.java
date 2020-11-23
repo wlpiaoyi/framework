@@ -1,12 +1,40 @@
 package org.wlpiaoyi.framework.utils;
 
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import lombok.Data;
+import lombok.NonNull;
+import org.jetbrains.annotations.Nullable;
 import org.wlpiaoyi.framework.utils.exception.BusinessException;
+
+import javax.servlet.ServletResponse;
+import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
 
 public class ResponseUtils {
 
     @Data
-    public static class ResponseData{
+    public static class ResponseMessage{
+
+        private int code;
+
+        private String message;
+
+    }
+
+    @Data
+    public static class ResponseData<T>{
+
+        private int code;
+
+        private T data;
+
+        private String message;
+
+    }
+
+    @Data
+    public static class ResponseException{
 
         private int code;
 
@@ -14,41 +42,65 @@ public class ResponseUtils {
 
         private Exception exception;
 
-        private Object data;
-
     }
 
-    public static ResponseData getResponseSuccess(Object data){;
-        return ResponseUtils.getResponse(200,"success", null,data);
+    public static <T> ResponseData getResponseSuccess(T data){
+        return getResponseData(200, data);
     }
 
-    public static  ResponseData getResponseData(int code, Object data){
-        return ResponseUtils.getResponse(code, null, null, data);
-    }
-    public static  ResponseData getResponseMessage(int code, String message){
-        return ResponseUtils.getResponse(code, message, null, null);
-    }
-
-    public static  ResponseData getResponseException(Exception e){
-        if(e instanceof BusinessException){
-            BusinessException bEx = (BusinessException) e;
-            return ResponseUtils.getResponse(bEx.getCode(), bEx.getMessage(), null, null);
-        }else{
-            return ResponseUtils.getResponse(500, null, e, null);
-        }
-    }
-
-    public static  ResponseData getResponseException(int code, String message, Exception e){
-        return ResponseUtils.getResponse(code, message, e, null);
-    }
-
-    public static ResponseData getResponse(int code, String message, Exception e, Object data){
-        ResponseData responseData = new ResponseData();
+    public static <T> ResponseData getResponseData(int code, T data){
+        ResponseData responseData = new ResponseData<T>();
         responseData.code = code;
-        responseData.message = message;
-        responseData.exception = e;
+        responseData.message = "SUCCESS";
         responseData.data = data;
         return responseData;
+    }
+    public static ResponseMessage getResponseMessage(int code, String message){
+        ResponseMessage responseData = new ResponseMessage();
+        responseData.code = code;
+        responseData.message = message;
+        return responseData;
+    }
+
+    public static ResponseException getResponseException(Exception e){
+        if(e instanceof BusinessException){
+            BusinessException bEx = (BusinessException) e;
+            return getResponseException(bEx.getCode(), bEx.getMessage(), bEx);
+        }
+        return getResponseException(500, e.getMessage(), e);
+    }
+
+    public static ResponseException getResponseException(int code, String message, Exception e){
+        ResponseException responseData = new ResponseException();
+        responseData.exception = e;
+        responseData.code = code;
+        responseData.message = message;
+        return responseData;
+    }
+
+    public static void writeResponseJson(@Nullable Object json, int code, @NonNull HttpServletResponse response) throws IOException {
+        response.setHeader("content-type", "application/json;charset=utf-8");
+        ResponseUtils.writeResponseData(json, "application/json;charset=utf-8", code, response);
+    }
+
+    public static void writeResponseData(@Nullable Object data, @NonNull String contentType, int code, @NonNull HttpServletResponse response) throws IOException {
+        String repStr;
+        if(data != null){
+            if(data instanceof String){
+                repStr = (String) data;
+            }else if(data instanceof StringBuffer){
+                repStr = ((StringBuffer) data).toString();
+            }else if(data instanceof StringBuilder){
+                repStr = ((StringBuilder) data).toString();
+            }else {
+                repStr = new Gson().toJson(data);
+            }
+        }else{
+            repStr = "";
+        }
+        response.setStatus(200);
+        response.setContentType(contentType);
+        response.getWriter().write(repStr);
     }
 
 }

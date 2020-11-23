@@ -1,7 +1,5 @@
 package org.wlpiaoyi.framework.utils.httpclient;
 
-import com.google.gson.Gson;
-import lombok.Data;
 import lombok.NonNull;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpHost;
@@ -15,6 +13,62 @@ import java.util.Map;
 
 public class HttpPostClient extends HttpClient{
 
+
+    /**
+     * POST同步请求
+     * @param url
+     * @param headerMap
+     * @param params
+     * @return
+     * @throws URISyntaxException
+     * @throws IOException
+     */
+    public static Map MapFormParams(@NonNull String url, @Nullable Map<String, Object> headerMap, @Nullable Object params) throws URISyntaxException, IOException {
+        return HttpPostClient.MapFormParams(url, headerMap, params, null);
+    }
+
+    /**
+     * POST同步请求
+     * @param url
+     * @param headerMap
+     * @param params
+     * @param proxy
+     * @return
+     * @throws URISyntaxException
+     * @throws IOException
+     */
+    public static Map MapFormParams(@NonNull String url, @Nullable Map<String, Object> headerMap, @Nullable Object params, final HttpHost proxy) throws URISyntaxException, IOException {
+        String result = HttpPostClient.StringFormParams(url, headerMap, params, proxy);
+        return GSON.fromJson(result, Map.class);
+    }
+
+    /**
+     * POST同步请求
+     * @param url
+     * @param headerMap
+     * @param params
+     * @return
+     * @throws URISyntaxException
+     * @throws IOException
+     */
+    public static Map MapJsonParams(@NonNull String url, @Nullable Map<String, Object> headerMap, @Nullable Object params) throws URISyntaxException, IOException {
+        return HttpPostClient.MapJsonParams(url, headerMap, params, null);
+    }
+
+    /**
+     * POST同步请求
+     * @param url
+     * @param headerMap
+     * @param params
+     * @param proxy
+     * @return
+     * @throws URISyntaxException
+     * @throws IOException
+     */
+    public static Map MapJsonParams(@NonNull String url, @Nullable Map<String, Object> headerMap, @Nullable Object params, final HttpHost proxy) throws URISyntaxException, IOException {
+        String result = HttpPostClient.StringJsonParams(url, headerMap, params, proxy);
+        return GSON.fromJson(result, Map.class);
+    }
 
     /**
      * POST同步请求
@@ -46,8 +100,7 @@ public class HttpPostClient extends HttpClient{
     public static <T> T DataFormParams(@NonNull String url, @Nullable Map<String, Object> headerMap, @Nullable Object params, Class<T> clazz, final HttpHost proxy) throws URISyntaxException, IOException {
         String result = HttpPostClient.StringFormParams(url, headerMap, params, proxy);
         if(clazz == null || clazz == String.class) return (T)result;
-        Gson gson = new Gson();
-        return gson.fromJson(result, clazz);
+        return GSON.fromJson(result, clazz);
     }
 
     /**
@@ -108,8 +161,7 @@ public class HttpPostClient extends HttpClient{
     public static <T> T DataJsonParams(@NonNull String url, @Nullable Map<String, Object> headerMap, @Nullable Object params, Class<T> clazz, final HttpHost proxy) throws URISyntaxException, IOException {
         String result = HttpPostClient.StringJsonParams(url, headerMap, params, proxy);
         if(clazz == null || clazz == String.class) return (T)result;
-        Gson gson = new Gson();
-        return gson.fromJson(result, clazz);
+        return GSON.fromJson(result, clazz);
     }
 
     /**

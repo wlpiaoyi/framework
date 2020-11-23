@@ -16,6 +16,8 @@ import java.lang.ref.WeakReference;
 import java.net.InetSocketAddress;
 import java.net.Proxy;
 import java.net.Socket;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 
@@ -66,12 +68,12 @@ public class SocketThread extends Thread{
     }
 
     public void run() {
+        Map<Object, Object> userMap = new HashMap<>();
         try {
-
             boolean enableNext = true;
             if(this.socketOperation != null && !this.socketOperation.isEnqueued()){
                 try{
-                    enableNext = this.socketOperation.get().socketOpen(this);
+                    enableNext = this.socketOperation.get().socketOpen(this,userMap);
                 }catch (Exception e){e.printStackTrace();}
             }
             if (!enableNext) return;
@@ -91,27 +93,27 @@ public class SocketThread extends Thread{
              * read request host and port
              */
             //===============================================>
-            this.doAddress(buffer, isIn, osIn);
+            this.doAddress(buffer, isIn, osIn, userMap);
             //<===============================================
 
             /**
              * connection data
              */
             //===============================================>
-            this.doConnectData(buffer, isIn, osIn);
+            this.doConnectData(buffer, isIn, osIn, userMap);
             //<===============================================
 
         } catch (Exception e) {
             if(this.socketOperation != null && !this.socketOperation.isEnqueued()){
                 try{
-                    this.socketOperation.get().socketException(this, e);
+                    this.socketOperation.get().socketException(this, e, userMap);
                 }catch (Exception ex){e.printStackTrace();}
             }
         } finally {
             this.close();
             if(this.socketOperation != null && !this.socketOperation.isEnqueued()){
                 try{
-                    this.socketOperation.get().socketClose(this);
+                    this.socketOperation.get().socketClose(this, userMap);
                 }catch (Exception e){e.printStackTrace();}
             }
         }
@@ -231,8 +233,10 @@ public class SocketThread extends Thread{
         return true;
     }
 
-    private void doAddress(byte[] buffer, InputStream isIn, OutputStream osIn) throws IOException {
+    private void doAddress(byte[] buffer, InputStream isIn, OutputStream osIn, Map<Object, Object> userMap) throws IOException {
         int len = isIn.read(buffer);
+        this.responseDomain = null;
+        this.responseAddress = null;
         if(this.responseAddress != null && !this.responseAddress.isEnqueued()){
             this.responseAddress.get().controlBefore(this, (byte) 0x20, isIn, osIn);
             this.responseDomain = this.responseAddress.get().responseDomain(this, buffer, len, this.proxyType);
@@ -241,14 +245,24 @@ public class SocketThread extends Thread{
             this.responseDomain = Utils.getDomain(buffer, len, this.proxyType);
             this.responsePort = Utils.getPort(buffer, len);
         }
+        if(this.getResponseDomain().contains("baidu.com")){
+            this.requestDomain = "192.168.1.15";
+            this.requestPort = 8080;
+        }
+        userMap.remove("responseAddress");
+        userMap.remove("responseDomain");
+        userMap.remove("responsePort");
+        userMap.put("responsePort", responsePort);
+        if(responseDomain != null) userMap.put("responseDomain", responseDomain);
+        if(responseAddress != null) userMap.put("responseAddress", responseAddress);
     }
 
-    private boolean doConnectData(byte[] buffer, InputStream isIn, OutputStream osIn) throws IOException, InterruptedException {
+    private boolean doConnectData(byte[] buffer, InputStream isIn, OutputStream osIn, Map<Object, Object> userMap) throws IOException, InterruptedException {
 
         boolean enableNext = true;
         if(this.socketOperation != null && !this.socketOperation.isEnqueued()){
             try{
-                enableNext = this.socketOperation.get().socketConnect(this);
+                enableNext = this.socketOperation.get().socketConnect(this, userMap);
             }catch (Exception e){e.printStackTrace();}
         }
         if (!enableNext) return false;
@@ -268,10 +282,10 @@ public class SocketThread extends Thread{
         osIn.flush();
 
         CountDownLatch downLatch = new CountDownLatch(1);
-        StreamCourse streamCourse = (this.streamOperation != null && this.streamOperation.isEnqueued()) ? this.streamOperation.get() : null;
-        this.outStream = new StreamThread(isIn, osOut, StreamThread.StreamType.Output, this.requestDomain, this.requestPort, downLatch, streamCourse);
+        StreamCourse streamCourse = (this.streamOperation != null && !this.streamOperation.isEnqueued()) ? this.streamOperation.get() : null;
+        this.outStream = new StreamThread(isIn, osOut, StreamThread.StreamType.Output, this.requestDomain, this.requestPort, downLatch, streamCourse, userMap);
         outStream.start();
-        this.inStream = new StreamThread(isOut, osIn, StreamThread.StreamType.Input, this.requestDomain, this.requestPort, downLatch,  streamCourse);
+        this.inStream = new StreamThread(isOut, osIn, StreamThread.StreamType.Input, this.requestDomain, this.requestPort, downLatch,  streamCourse, userMap);
         inStream.start();
 
         return downLatch.await(4, TimeUnit.HOURS);

@@ -22,6 +22,34 @@ public class HttpDeleteClient extends HttpClient {
      * @throws URISyntaxException
      * @throws IOException
      */
+    public static Map Map(@NonNull String url, @Nullable Map<String, Object> headerMap, @Nullable Map<String, Object> paramMap) throws URISyntaxException, IOException {
+        return HttpDeleteClient.Map(url, headerMap, paramMap, null);
+    }
+
+    /**
+     * DELETE同步请求
+     * @param url
+     * @param headerMap
+     * @param paramMap
+     * @param proxy
+     * @return
+     * @throws URISyntaxException
+     * @throws IOException
+     */
+    public static Map Map(@NonNull String url, @Nullable Map<String, Object> headerMap, @Nullable Map<String, Object> paramMap, @Nullable final HttpHost proxy) throws URISyntaxException, IOException {
+        HttpResponse response = HttpDeleteClient.Response(url, headerMap, paramMap, proxy);
+        return HttpDeleteClient.getResponseMap(response);
+    }
+
+    /**
+     * DELETE同步请求
+     * @param url
+     * @param headerMap
+     * @param paramMap
+     * @return
+     * @throws URISyntaxException
+     * @throws IOException
+     */
     public static String String(@NonNull String url, @Nullable Map<String, Object> headerMap, @Nullable Map<String, Object> paramMap) throws URISyntaxException, IOException {
         return HttpDeleteClient.Data(url, headerMap, paramMap, String.class, null);
     }

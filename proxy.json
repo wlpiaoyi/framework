@@ -1,9 +1,7 @@
 [
   {
     "port": 8010,
-    "verify": false,
-    "name": "proxy",
-    "password": "000000"
+    "verify": false
   },
   {
     "port": 8011,

@@ -2,26 +2,24 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="a877397b-93f3-422b-bee1-1317d55f59f2" name="Default Changelist" comment="">
-      <change afterPath="$PROJECT_DIR$/proxy/src/main/java/org/wlpiaoyi/framework/proxy/ProxyLoder.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/utile/src/main/java/org/wlpiaoyi/framework/utils/httpclient/HttpDeleteClient.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/utile/src/main/java/org/wlpiaoyi/framework/utils/httpclient/HttpGetClient.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/utile/src/main/java/org/wlpiaoyi/framework/utils/httpclient/HttpPostClient.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/utile/src/main/java/org/wlpiaoyi/framework/utils/httpclient/HttpPutClient.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/compiler.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/compiler.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/pom.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/proxy.json" beforeDir="false" afterPath="$PROJECT_DIR$/proxy.json" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/proxy/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/proxy/pom.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/proxy/proxy.json" beforeDir="false" afterPath="$PROJECT_DIR$/proxy.json" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/proxy/src/main/java/org/wlpiaoyi/framework/proxy/socket/SocketProxy.java" beforeDir="false" afterPath="$PROJECT_DIR$/proxy/src/main/java/org/wlpiaoyi/framework/proxy/socket/SocketProxy.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/proxy/src/main/java/org/wlpiaoyi/framework/proxy/socket/SocketThread.java" beforeDir="false" afterPath="$PROJECT_DIR$/proxy/src/main/java/org/wlpiaoyi/framework/proxy/socket/SocketThread.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/proxy/src/main/java/org/wlpiaoyi/framework/proxy/socket/protocol/SocketCourse.java" beforeDir="false" afterPath="$PROJECT_DIR$/proxy/src/main/java/org/wlpiaoyi/framework/proxy/socket/protocol/SocketCourse.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/proxy/src/main/java/org/wlpiaoyi/framework/proxy/stream/StreamThread.java" beforeDir="false" afterPath="$PROJECT_DIR$/proxy/src/main/java/org/wlpiaoyi/framework/proxy/stream/StreamThread.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/proxy/src/main/java/org/wlpiaoyi/framework/proxy/utils/Utils.java" beforeDir="false" afterPath="$PROJECT_DIR$/proxy/src/main/java/org/wlpiaoyi/framework/proxy/utils/Utils.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/proxy/src/main/java/org/wlpiaoyi/framework/proxy/stream/protocol/StreamCourse.java" beforeDir="false" afterPath="$PROJECT_DIR$/proxy/src/main/java/org/wlpiaoyi/framework/proxy/stream/protocol/StreamCourse.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/selenium/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/selenium/pom.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/selenium/src/main/java/org/wlpiaoyi/framework/selenium/Browser.java" beforeDir="false" afterPath="$PROJECT_DIR$/selenium/src/main/java/org/wlpiaoyi/framework/selenium/Browser.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/utile/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/utile/pom.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/utile/src/main/java/org/wlpiaoyi/framework/utils/DateTimeUtils.java" beforeDir="false" afterPath="$PROJECT_DIR$/utile/src/main/java/org/wlpiaoyi/framework/utils/DateUtils.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/utile/src/main/java/org/wlpiaoyi/framework/utils/OSUtils.java" beforeDir="false" afterPath="$PROJECT_DIR$/utile/src/main/java/org/wlpiaoyi/framework/utils/OSUtils.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/utile/src/main/java/org/wlpiaoyi/framework/utils/StringUtils.java" beforeDir="false" afterPath="$PROJECT_DIR$/utile/src/main/java/org/wlpiaoyi/framework/utils/StringUtils.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/utile/src/main/java/org/wlpiaoyi/framework/utils/httpclient/HttpClient.java" beforeDir="false" afterPath="$PROJECT_DIR$/utile/src/main/java/org/wlpiaoyi/framework/utils/httpclient/HttpClient.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/utile/src/main/java/org/wlpiaoyi/framework/utils/httpclient/HttpDeleteClient.java" beforeDir="false" afterPath="$PROJECT_DIR$/utile/src/main/java/org/wlpiaoyi/framework/utils/httpclient/HttpDeleteClient.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/utile/src/main/java/org/wlpiaoyi/framework/utils/httpclient/HttpGetClient.java" beforeDir="false" afterPath="$PROJECT_DIR$/utile/src/main/java/org/wlpiaoyi/framework/utils/httpclient/HttpGetClient.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/utile/src/main/java/org/wlpiaoyi/framework/utils/httpclient/HttpPostClient.java" beforeDir="false" afterPath="$PROJECT_DIR$/utile/src/main/java/org/wlpiaoyi/framework/utils/httpclient/HttpPostClient.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/utile/src/main/java/org/wlpiaoyi/framework/utils/httpclient/HttpPutClient.java" beforeDir="false" afterPath="$PROJECT_DIR$/utile/src/main/java/org/wlpiaoyi/framework/utils/httpclient/HttpPutClient.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/utile/src/test/java/org/wlpiaoyi/framework/utils/httpclient/HttpClientTest.java" beforeDir="false" afterPath="$PROJECT_DIR$/utile/src/test/java/org/wlpiaoyi/framework/utils/httpclient/HttpClientTest.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/utile/src/test/java/org/wlpiaoyi/framework/utils/websocket/client/WebSecketClientTest.java" beforeDir="false" afterPath="$PROJECT_DIR$/utile/src/test/java/org/wlpiaoyi/framework/utils/websocket/client/WebSecketClientTest.java" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
@@ -63,6 +61,11 @@
   </component>
   <component name="ProjectId" id="1RoTzXxFzoVkj2NPqjqUQJP9DeN" />
   <component name="ProjectLevelVcsManager" settingsEditedManually="true" />
+  <component name="ProjectViewState">
+    <option name="hideEmptyMiddlePackages" value="true" />
+    <option name="showExcludedFiles" value="true" />
+    <option name="showLibraryContents" value="true" />
+  </component>
   <component name="PropertiesComponent">
     <property name="WebServerToolWindowFactoryState" value="false" />
     <property name="aspect.path.notification.shown" value="true" />
@@ -108,7 +111,7 @@
       </list>
     </option>
   </component>
-  <component name="RunManager" selected="JUnit.HttpClientTest.test">
+  <component name="RunManager" selected="Application.ProxyLoder">
     <configuration name="OSUtils" type="Application" factoryName="Application" temporary="true" nameIsGenerated="true">
       <option name="MAIN_CLASS_NAME" value="org.wlpiaoyi.framework.utils.OSUtils" />
       <module name="utile" />
@@ -184,8 +187,8 @@
     </configuration>
     <recent_temporary>
       <list>
-        <item itemvalue="JUnit.HttpClientTest.test" />
         <item itemvalue="Application.ProxyLoder" />
+        <item itemvalue="JUnit.HttpClientTest.test" />
         <item itemvalue="Application.OSUtils" />
         <item itemvalue="JUnit.HttpClientTest" />
         <item itemvalue="JUnit.SocketProxyTest.test" />
@@ -244,7 +247,37 @@
       <workItem from="1572958737100" duration="1542000" />
       <workItem from="1573009438798" duration="3224000" />
       <workItem from="1573091266372" duration="14044000" />
-      <workItem from="1573438609674" duration="8165000" />
+      <workItem from="1573438609674" duration="8994000" />
+      <workItem from="1573523205864" duration="212000" />
+      <workItem from="1573524302740" duration="15000" />
+      <workItem from="1573528137416" duration="3077000" />
+      <workItem from="1573552226378" duration="1556000" />
+      <workItem from="1573609808756" duration="584000" />
+      <workItem from="1573697745404" duration="6338000" />
+      <workItem from="1573782711688" duration="879000" />
+      <workItem from="1573978822458" duration="1614000" />
+      <workItem from="1574048231251" duration="4444000" />
+      <workItem from="1574128858185" duration="1982000" />
+      <workItem from="1574240075125" duration="605000" />
+      <workItem from="1574255052881" duration="139000" />
+      <workItem from="1574410952735" duration="10085000" />
+      <workItem from="1574647566840" duration="6815000" />
+      <workItem from="1575254293485" duration="614000" />
+      <workItem from="1575365118153" duration="32000" />
+      <workItem from="1575596877581" duration="805000" />
+      <workItem from="1576553154056" duration="522000" />
+      <workItem from="1576655381497" duration="11000" />
+      <workItem from="1577096521557" duration="519000" />
+      <workItem from="1577945354236" duration="1718000" />
+      <workItem from="1577959944483" duration="3088000" />
+      <workItem from="1578029369741" duration="9000" />
+      <workItem from="1578036485899" duration="5176000" />
+      <workItem from="1578279470970" duration="365000" />
+      <workItem from="1578280108122" duration="7863000" />
+      <workItem from="1578448248989" duration="485000" />
+      <workItem from="1578546229389" duration="58000" />
+      <workItem from="1578641246212" duration="2925000" />
+      <workItem from="1578880815687" duration="2233000" />
     </task>
     <servers />
   </component>
@@ -268,6 +301,28 @@
     <ignored-roots>
       <path value="$PROJECT_DIR$/framework" />
     </ignored-roots>
+  </component>
+  <component name="WindowStateProjectService">
+    <state x="533" y="141" key="#com.intellij.ide.util.MemberChooser" timestamp="1578365138894">
+      <screen x="0" y="0" width="1440" height="900" />
+    </state>
+    <state x="533" y="141" key="#com.intellij.ide.util.MemberChooser/0.0.1440.900@0.0.1440.900" timestamp="1578365138894" />
+    <state width="1398" height="230" key="GridCell.Tab.0.bottom" timestamp="1578904450982">
+      <screen x="0" y="0" width="1440" height="900" />
+    </state>
+    <state width="1398" height="230" key="GridCell.Tab.0.bottom/0.0.1440.900@0.0.1440.900" timestamp="1578904450982" />
+    <state width="1398" height="230" key="GridCell.Tab.0.center" timestamp="1578904450980">
+      <screen x="0" y="0" width="1440" height="900" />
+    </state>
+    <state width="1398" height="230" key="GridCell.Tab.0.center/0.0.1440.900@0.0.1440.900" timestamp="1578904450980" />
+    <state width="1398" height="230" key="GridCell.Tab.0.left" timestamp="1578904450978">
+      <screen x="0" y="0" width="1440" height="900" />
+    </state>
+    <state width="1398" height="230" key="GridCell.Tab.0.left/0.0.1440.900@0.0.1440.900" timestamp="1578904450978" />
+    <state width="1398" height="230" key="GridCell.Tab.0.right" timestamp="1578904450981">
+      <screen x="0" y="0" width="1440" height="900" />
+    </state>
+    <state width="1398" height="230" key="GridCell.Tab.0.right/0.0.1440.900@0.0.1440.900" timestamp="1578904450981" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
@@ -299,13 +354,6 @@
         </line-breakpoint>
       </breakpoints>
     </breakpoint-manager>
-    <watches-manager>
-      <configuration name="Application">
-        <watch expression="this.socketOperation" language="JAVA" />
-        <watch expression="Utils.IS_EQUES_BYTES(this.encryptionDatas[0], name)" language="JAVA" />
-        <watch expression="Utils.IS_EQUES_BYTES(this.encryptionDatas[1], pwd)" language="JAVA" />
-      </configuration>
-    </watches-manager>
   </component>
   <component name="com.intellij.coverage.CoverageDataManagerImpl">
     <SUITE FILE_PATH="coverage/framework$SocketProxy.ic" NAME="SocketProxy Coverage Results" MODIFIED="1571990814259" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="idea" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false">

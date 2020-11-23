@@ -1,6 +1,5 @@
 package org.wlpiaoyi.framework.utils.httpclient;
 
-import com.google.gson.Gson;
 import lombok.NonNull;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpHost;
@@ -15,7 +14,63 @@ import java.util.Map;
 public class HttpPutClient extends HttpClient{
 
     /**
-     * POST同步请求
+     * PUT同步请求
+     * @param url
+     * @param headerMap
+     * @param params
+     * @return
+     * @throws URISyntaxException
+     * @throws IOException
+     */
+    public static Map MapFormParams(@NonNull String url, @Nullable Map<String, Object> headerMap, @Nullable Object params) throws URISyntaxException, IOException {
+        return HttpPutClient.MapFormParams(url, headerMap, params, null);
+    }
+
+    /**
+     * PUT同步请求
+     * @param url
+     * @param headerMap
+     * @param params
+     * @param proxy
+     * @return
+     * @throws URISyntaxException
+     * @throws IOException
+     */
+    public static Map MapFormParams(@NonNull String url, @Nullable Map<String, Object> headerMap, @Nullable Object params, final HttpHost proxy) throws URISyntaxException, IOException {
+        String result = HttpPutClient.StringFormParams(url, headerMap, params, proxy);
+        return GSON.fromJson(result, Map.class);
+    }
+
+    /**
+     * PUT同步请求
+     * @param url
+     * @param headerMap
+     * @param params
+     * @return
+     * @throws URISyntaxException
+     * @throws IOException
+     */
+    public static Map MapJsonParams(@NonNull String url, @Nullable Map<String, Object> headerMap, @Nullable Object params) throws URISyntaxException, IOException {
+        return HttpPutClient.MapJsonParams(url, headerMap, params, null);
+    }
+
+    /**
+     * PUT同步请求
+     * @param url
+     * @param headerMap
+     * @param params
+     * @param proxy
+     * @return
+     * @throws URISyntaxException
+     * @throws IOException
+     */
+    public static Map MapJsonParams(@NonNull String url, @Nullable Map<String, Object> headerMap, @Nullable Object params, final HttpHost proxy) throws URISyntaxException, IOException {
+        String result = HttpPutClient.StringJsonParams(url, headerMap, params, proxy);
+        return GSON.fromJson(result, Map.class);
+    }
+
+    /**
+     * PUT同步请求
      * @param url
      * @param headerMap
      * @param params
@@ -30,7 +85,7 @@ public class HttpPutClient extends HttpClient{
     }
 
     /**
-     * POST同步请求
+     * PUT同步请求
      * @param url
      * @param headerMap
      * @param params
@@ -44,12 +99,11 @@ public class HttpPutClient extends HttpClient{
     public static <T> T DataFormParams(@NonNull String url, @Nullable Map<String, Object> headerMap, @Nullable Object params, Class<T> clazz, final HttpHost proxy) throws URISyntaxException, IOException {
         String result = HttpPutClient.StringFormParams(url, headerMap, params, proxy);
         if(clazz == null || clazz == String.class) return (T)result;
-        Gson gson = new Gson();
-        return gson.fromJson(result, clazz);
+        return GSON.fromJson(result, clazz);
     }
 
     /**
-     * POST同步请求
+     * PUT同步请求
      * @param url
      * @param headerMap
      * @param params
@@ -62,7 +116,7 @@ public class HttpPutClient extends HttpClient{
     }
 
     /**
-     * POST同步请求
+     * PUT同步请求
      * @param url
      * @param headerMap
      * @param params
@@ -77,7 +131,7 @@ public class HttpPutClient extends HttpClient{
     }
 
     /**
-     * POST同步请求
+     * PUT同步请求
      * @param url
      * @param headerMap
      * @param params
@@ -92,7 +146,7 @@ public class HttpPutClient extends HttpClient{
     }
 
     /**
-     * POST同步请求
+     * PUT同步请求
      * @param url
      * @param headerMap
      * @param params
@@ -106,12 +160,11 @@ public class HttpPutClient extends HttpClient{
     public static <T> T DataJsonParams(@NonNull String url, @Nullable Map<String, Object> headerMap, @Nullable Object params, Class<T> clazz, final HttpHost proxy) throws URISyntaxException, IOException {
         String result = HttpPutClient.StringJsonParams(url, headerMap, params, proxy);
         if(clazz == null || clazz == String.class) return (T)result;
-        Gson gson = new Gson();
-        return gson.fromJson(result, clazz);
+        return GSON.fromJson(result, clazz);
     }
 
     /**
-     * POST同步请求
+     * PUT同步请求
      * @param url
      * @param headerMap
      * @param params
@@ -127,7 +180,7 @@ public class HttpPutClient extends HttpClient{
     }
 
     /**
-     * POST同步请求
+     * PUT同步请求
      * @param url
      * @param headerMap
      * @param params
@@ -163,7 +216,7 @@ public class HttpPutClient extends HttpClient{
     }
 
     /**
-     * POST同步请求
+     * PUT同步请求
      * @param url
      * @param headerMap
      * @return
