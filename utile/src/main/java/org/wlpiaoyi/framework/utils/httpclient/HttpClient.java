@@ -107,18 +107,25 @@ public class HttpClient {
             parameter = GSON.toJson(params);
         }
 
-        StringEntity entity = new StringEntity(parameter != null ? parameter : "");
-        entity.setContentType((String)headerMap.get("Accept"));
-        if(headerMap.containsKey("Content-Type")){
+        String charset = null;
+        if(headerMap.containsKey("Content-Encoding")){
+            charset = (String) headerMap.get("Content-Encoding");
+        }else if(headerMap.containsKey("Content-Type")){
             String value = (String) headerMap.get("Content-Type");
             for(String arg : value.split(";")){
                 String args[] = arg.split("=");
                 if(args.length == 2 && args[0].equals("charset")){
-                    entity.setContentEncoding(args[1]);
+                    charset = args[1];
                     break;
                 }
             }
         }
+        if(StringUtils.isBlank(charset)){
+            charset = "UTF-8";
+        }
+        StringEntity entity = new StringEntity(parameter != null ? parameter : "", charset);
+        entity.setContentEncoding(charset);
+        entity.setContentType((String)headerMap.get("Accept"));
         return entity;
     }
 

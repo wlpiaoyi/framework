@@ -1,27 +1,54 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
+  <component name="AutoImportSettings">
+    <option name="autoReloadType" value="SELECTIVE" />
+  </component>
+  <component name="BranchesTreeState">
+    <expand>
+      <path>
+        <item name="ROOT" type="e8cecc67:BranchNodeDescriptor" />
+        <item name="LOCAL_ROOT" type="e8cecc67:BranchNodeDescriptor" />
+      </path>
+      <path>
+        <item name="ROOT" type="e8cecc67:BranchNodeDescriptor" />
+        <item name="REMOTE_ROOT" type="e8cecc67:BranchNodeDescriptor" />
+      </path>
+      <path>
+        <item name="ROOT" type="e8cecc67:BranchNodeDescriptor" />
+        <item name="REMOTE_ROOT" type="e8cecc67:BranchNodeDescriptor" />
+        <item name="GROUP_NODE:origin" type="e8cecc67:BranchNodeDescriptor" />
+      </path>
+      <path>
+        <item name="ROOT" type="e8cecc67:BranchNodeDescriptor" />
+        <item name="REMOTE_ROOT" type="e8cecc67:BranchNodeDescriptor" />
+        <item name="GROUP_NODE:origin" type="e8cecc67:BranchNodeDescriptor" />
+        <item name="GROUP_NODE:dependabot" type="e8cecc67:BranchNodeDescriptor" />
+      </path>
+      <path>
+        <item name="ROOT" type="e8cecc67:BranchNodeDescriptor" />
+        <item name="REMOTE_ROOT" type="e8cecc67:BranchNodeDescriptor" />
+        <item name="GROUP_NODE:origin" type="e8cecc67:BranchNodeDescriptor" />
+        <item name="GROUP_NODE:dependabot" type="e8cecc67:BranchNodeDescriptor" />
+        <item name="GROUP_NODE:maven" type="e8cecc67:BranchNodeDescriptor" />
+      </path>
+      <path>
+        <item name="ROOT" type="e8cecc67:BranchNodeDescriptor" />
+        <item name="REMOTE_ROOT" type="e8cecc67:BranchNodeDescriptor" />
+        <item name="GROUP_NODE:origin" type="e8cecc67:BranchNodeDescriptor" />
+        <item name="GROUP_NODE:dependabot" type="e8cecc67:BranchNodeDescriptor" />
+        <item name="GROUP_NODE:maven" type="e8cecc67:BranchNodeDescriptor" />
+        <item name="GROUP_NODE:utile" type="e8cecc67:BranchNodeDescriptor" />
+      </path>
+    </expand>
+    <select />
+  </component>
   <component name="ChangeListManager">
     <list default="true" id="a877397b-93f3-422b-bee1-1317d55f59f2" name="Default Changelist" comment="">
+      <change afterPath="$PROJECT_DIR$/.idea/jarRepositories.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/compiler.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/compiler.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/proxy.json" beforeDir="false" afterPath="$PROJECT_DIR$/proxy.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/proxy/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/proxy/pom.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/proxy/src/main/java/org/wlpiaoyi/framework/proxy/socket/SocketProxy.java" beforeDir="false" afterPath="$PROJECT_DIR$/proxy/src/main/java/org/wlpiaoyi/framework/proxy/socket/SocketProxy.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/proxy/src/main/java/org/wlpiaoyi/framework/proxy/socket/SocketThread.java" beforeDir="false" afterPath="$PROJECT_DIR$/proxy/src/main/java/org/wlpiaoyi/framework/proxy/socket/SocketThread.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/proxy/src/main/java/org/wlpiaoyi/framework/proxy/socket/protocol/SocketCourse.java" beforeDir="false" afterPath="$PROJECT_DIR$/proxy/src/main/java/org/wlpiaoyi/framework/proxy/socket/protocol/SocketCourse.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/proxy/src/main/java/org/wlpiaoyi/framework/proxy/stream/StreamThread.java" beforeDir="false" afterPath="$PROJECT_DIR$/proxy/src/main/java/org/wlpiaoyi/framework/proxy/stream/StreamThread.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/proxy/src/main/java/org/wlpiaoyi/framework/proxy/stream/protocol/StreamCourse.java" beforeDir="false" afterPath="$PROJECT_DIR$/proxy/src/main/java/org/wlpiaoyi/framework/proxy/stream/protocol/StreamCourse.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/selenium/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/selenium/pom.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/selenium/src/main/java/org/wlpiaoyi/framework/selenium/Browser.java" beforeDir="false" afterPath="$PROJECT_DIR$/selenium/src/main/java/org/wlpiaoyi/framework/selenium/Browser.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/utile/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/utile/pom.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/utile/src/main/java/org/wlpiaoyi/framework/utils/httpclient/HttpClient.java" beforeDir="false" afterPath="$PROJECT_DIR$/utile/src/main/java/org/wlpiaoyi/framework/utils/httpclient/HttpClient.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/utile/src/main/java/org/wlpiaoyi/framework/utils/httpclient/HttpDeleteClient.java" beforeDir="false" afterPath="$PROJECT_DIR$/utile/src/main/java/org/wlpiaoyi/framework/utils/httpclient/HttpDeleteClient.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/utile/src/main/java/org/wlpiaoyi/framework/utils/httpclient/HttpGetClient.java" beforeDir="false" afterPath="$PROJECT_DIR$/utile/src/main/java/org/wlpiaoyi/framework/utils/httpclient/HttpGetClient.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/utile/src/main/java/org/wlpiaoyi/framework/utils/httpclient/HttpPostClient.java" beforeDir="false" afterPath="$PROJECT_DIR$/utile/src/main/java/org/wlpiaoyi/framework/utils/httpclient/HttpPostClient.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/utile/src/main/java/org/wlpiaoyi/framework/utils/httpclient/HttpPutClient.java" beforeDir="false" afterPath="$PROJECT_DIR$/utile/src/main/java/org/wlpiaoyi/framework/utils/httpclient/HttpPutClient.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/utile/src/test/java/org/wlpiaoyi/framework/utils/httpclient/HttpClientTest.java" beforeDir="false" afterPath="$PROJECT_DIR$/utile/src/test/java/org/wlpiaoyi/framework/utils/httpclient/HttpClientTest.java" afterDir="false" />
     </list>
-    <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -55,7 +82,7 @@
   <component name="MavenImportPreferences">
     <option name="generalSettings">
       <MavenGeneralSettings>
-        <option name="mavenHome" value="$PROJECT_DIR$/../../../apache-maven-3.6.1" />
+        <option name="mavenHome" value="$PROJECT_DIR$/../../../../Config/apache-maven-3.6.3" />
       </MavenGeneralSettings>
     </option>
   </component>
@@ -63,18 +90,19 @@
   <component name="ProjectLevelVcsManager" settingsEditedManually="true" />
   <component name="ProjectViewState">
     <option name="hideEmptyMiddlePackages" value="true" />
-    <option name="showExcludedFiles" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
   <component name="PropertiesComponent">
+    <property name="RunOnceActivity.OpenProjectViewOnStart" value="true" />
+    <property name="SHARE_PROJECT_CONFIGURATION_FILES" value="true" />
     <property name="WebServerToolWindowFactoryState" value="false" />
     <property name="aspect.path.notification.shown" value="true" />
     <property name="last_directory_selection" value="$PROJECT_DIR$/proxy/src/test/java" />
-    <property name="last_opened_file_path" value="$PROJECT_DIR$/proxy/src/main/resources" />
+    <property name="last_opened_file_path" value="$PROJECT_DIR$" />
     <property name="nodejs_interpreter_path.stuck_in_default_project" value="undefined stuck path" />
     <property name="nodejs_npm_path_reset_for_default_project" value="true" />
     <property name="nodejs_package_manager_path" value="npm" />
-    <property name="project.structure.last.edited" value="Modules" />
+    <property name="project.structure.last.edited" value="SDKs" />
     <property name="project.structure.proportion" value="0.15234375" />
     <property name="project.structure.side.proportion" value="0.2" />
     <property name="settings.editor.selected.configurable" value="MavenSettings" />
@@ -99,102 +127,7 @@
       <recent name="$PROJECT_DIR$/selenium" />
     </key>
   </component>
-  <component name="RunDashboard">
-    <option name="ruleStates">
-      <list>
-        <RuleState>
-          <option name="name" value="ConfigurationTypeDashboardGroupingRule" />
-        </RuleState>
-        <RuleState>
-          <option name="name" value="StatusDashboardGroupingRule" />
-        </RuleState>
-      </list>
-    </option>
-  </component>
-  <component name="RunManager" selected="Application.ProxyLoder">
-    <configuration name="OSUtils" type="Application" factoryName="Application" temporary="true" nameIsGenerated="true">
-      <option name="MAIN_CLASS_NAME" value="org.wlpiaoyi.framework.utils.OSUtils" />
-      <module name="utile" />
-      <extension name="coverage">
-        <pattern>
-          <option name="PATTERN" value="org.wlpiaoyi.framework.utils.*" />
-          <option name="ENABLED" value="true" />
-        </pattern>
-      </extension>
-      <method v="2">
-        <option name="Make" enabled="true" />
-      </method>
-    </configuration>
-    <configuration name="ProxyLoder" type="Application" factoryName="Application" temporary="true" nameIsGenerated="true">
-      <option name="MAIN_CLASS_NAME" value="org.wlpiaoyi.framework.proxy.ProxyLoder" />
-      <module name="proxy" />
-      <extension name="coverage">
-        <pattern>
-          <option name="PATTERN" value="org.wlpiaoyi.framework.proxy.*" />
-          <option name="ENABLED" value="true" />
-        </pattern>
-      </extension>
-      <method v="2">
-        <option name="Make" enabled="true" />
-      </method>
-    </configuration>
-    <configuration name="HttpClientTest" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
-      <module name="utile" />
-      <extension name="coverage">
-        <pattern>
-          <option name="PATTERN" value="org.wlpiaoyi.framework.utils.httpclient.*" />
-          <option name="ENABLED" value="true" />
-        </pattern>
-      </extension>
-      <option name="PACKAGE_NAME" value="org.wlpiaoyi.framework.utils.httpclient" />
-      <option name="MAIN_CLASS_NAME" value="org.wlpiaoyi.framework.utils.httpclient.HttpClientTest" />
-      <option name="TEST_OBJECT" value="class" />
-      <method v="2">
-        <option name="Make" enabled="true" />
-      </method>
-    </configuration>
-    <configuration name="HttpClientTest.test" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
-      <module name="utile" />
-      <extension name="coverage">
-        <pattern>
-          <option name="PATTERN" value="org.wlpiaoyi.framework.utils.httpclient.*" />
-          <option name="ENABLED" value="true" />
-        </pattern>
-      </extension>
-      <option name="PACKAGE_NAME" value="org.wlpiaoyi.framework.utils.httpclient" />
-      <option name="MAIN_CLASS_NAME" value="org.wlpiaoyi.framework.utils.httpclient.HttpClientTest" />
-      <option name="METHOD_NAME" value="test" />
-      <option name="TEST_OBJECT" value="method" />
-      <method v="2">
-        <option name="Make" enabled="true" />
-      </method>
-    </configuration>
-    <configuration name="SocketProxyTest.test" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
-      <module name="proxy" />
-      <extension name="coverage">
-        <pattern>
-          <option name="PATTERN" value="org.wlpiaoyi.framework.proxy.socket.*" />
-          <option name="ENABLED" value="true" />
-        </pattern>
-      </extension>
-      <option name="PACKAGE_NAME" value="org.wlpiaoyi.framework.proxy.socket" />
-      <option name="MAIN_CLASS_NAME" value="org.wlpiaoyi.framework.proxy.socket.SocketProxyTest" />
-      <option name="METHOD_NAME" value="test" />
-      <option name="TEST_OBJECT" value="method" />
-      <method v="2">
-        <option name="Make" enabled="true" />
-      </method>
-    </configuration>
-    <recent_temporary>
-      <list>
-        <item itemvalue="Application.ProxyLoder" />
-        <item itemvalue="JUnit.HttpClientTest.test" />
-        <item itemvalue="Application.OSUtils" />
-        <item itemvalue="JUnit.HttpClientTest" />
-        <item itemvalue="JUnit.SocketProxyTest.test" />
-      </list>
-    </recent_temporary>
-  </component>
+  <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />
   <component name="SvnConfiguration">
     <configuration />
   </component>
@@ -289,13 +222,12 @@
       <map>
         <entry key="MAIN">
           <value>
-            <State>
-              <option name="COLUMN_ORDER" />
-            </State>
+            <State />
           </value>
         </entry>
       </map>
     </option>
+    <option name="oldMeFiltersMigrated" value="true" />
   </component>
   <component name="VcsManagerConfiguration">
     <ignored-roots>
@@ -303,26 +235,38 @@
     </ignored-roots>
   </component>
   <component name="WindowStateProjectService">
-    <state x="533" y="141" key="#com.intellij.ide.util.MemberChooser" timestamp="1578365138894">
-      <screen x="0" y="0" width="1440" height="900" />
+    <state x="304" y="187" width="1071" height="796" key="#com.intellij.execution.impl.EditConfigurationsDialog" timestamp="1607763951859">
+      <screen x="0" y="0" width="1680" height="1050" />
     </state>
-    <state x="533" y="141" key="#com.intellij.ide.util.MemberChooser/0.0.1440.900@0.0.1440.900" timestamp="1578365138894" />
-    <state width="1398" height="230" key="GridCell.Tab.0.bottom" timestamp="1578904450982">
-      <screen x="0" y="0" width="1440" height="900" />
+    <state x="304" y="187" width="1071" height="796" key="#com.intellij.execution.impl.EditConfigurationsDialog/0.0.1680.1050@0.0.1680.1050" timestamp="1607763951859" />
+    <state width="1638" height="91" key="GridCell.Tab.0.bottom" timestamp="1607857627461">
+      <screen x="0" y="23" width="1680" height="947" />
     </state>
-    <state width="1398" height="230" key="GridCell.Tab.0.bottom/0.0.1440.900@0.0.1440.900" timestamp="1578904450982" />
-    <state width="1398" height="230" key="GridCell.Tab.0.center" timestamp="1578904450980">
-      <screen x="0" y="0" width="1440" height="900" />
+    <state width="1638" height="91" key="GridCell.Tab.0.bottom/0.0.1680.1050@0.0.1680.1050" timestamp="1607765346983" />
+    <state width="1638" height="91" key="GridCell.Tab.0.bottom/0.23.1680.947@0.23.1680.947" timestamp="1607857627461" />
+    <state width="1638" height="91" key="GridCell.Tab.0.center" timestamp="1607857627459">
+      <screen x="0" y="23" width="1680" height="947" />
     </state>
-    <state width="1398" height="230" key="GridCell.Tab.0.center/0.0.1440.900@0.0.1440.900" timestamp="1578904450980" />
-    <state width="1398" height="230" key="GridCell.Tab.0.left" timestamp="1578904450978">
-      <screen x="0" y="0" width="1440" height="900" />
+    <state width="1638" height="91" key="GridCell.Tab.0.center/0.0.1680.1050@0.0.1680.1050" timestamp="1607765346981" />
+    <state width="1638" height="91" key="GridCell.Tab.0.center/0.23.1680.947@0.23.1680.947" timestamp="1607857627459" />
+    <state width="1638" height="91" key="GridCell.Tab.0.left" timestamp="1607857627458">
+      <screen x="0" y="23" width="1680" height="947" />
     </state>
-    <state width="1398" height="230" key="GridCell.Tab.0.left/0.0.1440.900@0.0.1440.900" timestamp="1578904450978" />
-    <state width="1398" height="230" key="GridCell.Tab.0.right" timestamp="1578904450981">
-      <screen x="0" y="0" width="1440" height="900" />
+    <state width="1638" height="91" key="GridCell.Tab.0.left/0.0.1680.1050@0.0.1680.1050" timestamp="1607765346980" />
+    <state width="1638" height="91" key="GridCell.Tab.0.left/0.23.1680.947@0.23.1680.947" timestamp="1607857627458" />
+    <state width="1638" height="91" key="GridCell.Tab.0.right" timestamp="1607857627460">
+      <screen x="0" y="23" width="1680" height="947" />
     </state>
-    <state width="1398" height="230" key="GridCell.Tab.0.right/0.0.1440.900@0.0.1440.900" timestamp="1578904450981" />
+    <state width="1638" height="91" key="GridCell.Tab.0.right/0.0.1680.1050@0.0.1680.1050" timestamp="1607765346982" />
+    <state width="1638" height="91" key="GridCell.Tab.0.right/0.23.1680.947@0.23.1680.947" timestamp="1607857627460" />
+    <state x="341" y="164" key="SettingsEditor" timestamp="1607763908426">
+      <screen x="0" y="0" width="1680" height="1050" />
+    </state>
+    <state x="341" y="164" key="SettingsEditor/0.0.1680.1050@0.0.1680.1050" timestamp="1607763908426" />
+    <state x="538" y="280" width="604" height="490" key="find.popup" timestamp="1607847794729">
+      <screen x="0" y="0" width="1680" height="1050" />
+    </state>
+    <state x="538" y="280" width="604" height="490" key="find.popup/0.0.1680.1050@0.0.1680.1050" timestamp="1607847794729" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
