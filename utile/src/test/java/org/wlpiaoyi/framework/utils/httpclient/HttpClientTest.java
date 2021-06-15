@@ -32,8 +32,20 @@ public class HttpClientTest {
     public void test() throws IOException {
 
         try {
-            String text = HttpGetClient.String("https://www.baidu.com", null, null);
-//            text = HttpClient.GETData("https://127.0.0.1:8002/wlpiaoyi/getData", null, new HashMap(){{put("var",1);}}, String.class);
+            String text = HttpGetClient.String("http://sms.webchinese.cn/web_api/SMS", null, new HashMap(){{
+                put("Action","UP");
+                put("Uid","wlpiaoyi");
+                put("Key","d41d8cd98f00b204e980");
+                put("Prompt","0");
+            }});
+            System.out.println(text);
+            HttpHost proxy = new HttpHost("192.168.1.85", 8888);
+            text = HttpGetClient.String("http://utf8.api.smschinese.cn", null, new HashMap(){{
+                put("Uid","wlpiaoyi");
+                put("Key","d41d8cd98f00b204e980");
+                put("smsMob","18382471299");
+                put("smsText","【学府嘉苑业委会】邻居朋友你好:请问你同意小区绿化的改造吗? 同意回复1 不同意回复2");
+            }}, proxy);
             System.out.println(text);
             Map params = new HashMap(){{put("intVar",1);}};
             text = HttpPostClient.StringJsonParams("https://127.0.0.1:8002/wlpiaoyi/postData-json", null, params, new HttpHost("127.0.0.1", 9000));

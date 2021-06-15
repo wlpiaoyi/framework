@@ -49,6 +49,7 @@
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/utile/src/main/java/org/wlpiaoyi/framework/utils/httpclient/HttpClient.java" beforeDir="false" afterPath="$PROJECT_DIR$/utile/src/main/java/org/wlpiaoyi/framework/utils/httpclient/HttpClient.java" afterDir="false" />
     </list>
+    <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -82,7 +83,7 @@
   <component name="MavenImportPreferences">
     <option name="generalSettings">
       <MavenGeneralSettings>
-        <option name="mavenHome" value="$PROJECT_DIR$/../../../../Config/apache-maven-3.6.3" />
+        <option name="mavenHome" value="$PROJECT_DIR$/../../../apache-maven-3.6.1" />
       </MavenGeneralSettings>
     </option>
   </component>
@@ -127,7 +128,70 @@
       <recent name="$PROJECT_DIR$/selenium" />
     </key>
   </component>
-  <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />
+  <component name="RunDashboard">
+    <option name="ruleStates">
+      <list>
+        <RuleState>
+          <option name="name" value="ConfigurationTypeDashboardGroupingRule" />
+        </RuleState>
+        <RuleState>
+          <option name="name" value="StatusDashboardGroupingRule" />
+        </RuleState>
+      </list>
+    </option>
+  </component>
+  <component name="RunManager" selected="Application.ProxyLoder">
+    <configuration name="ProxyLoder" type="Application" factoryName="Application" temporary="true" nameIsGenerated="true">
+      <option name="MAIN_CLASS_NAME" value="org.wlpiaoyi.framework.proxy.ProxyLoder" />
+      <module name="proxy" />
+      <extension name="coverage">
+        <pattern>
+          <option name="PATTERN" value="org.wlpiaoyi.framework.proxy.*" />
+          <option name="ENABLED" value="true" />
+        </pattern>
+      </extension>
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="Rsa" type="Application" factoryName="Application" temporary="true" nameIsGenerated="true">
+      <option name="MAIN_CLASS_NAME" value="org.wlpiaoyi.framework.utils.rsa.Rsa" />
+      <module name="utils" />
+      <extension name="coverage">
+        <pattern>
+          <option name="PATTERN" value="org.wlpiaoyi.framework.utils.rsa.*" />
+          <option name="ENABLED" value="true" />
+        </pattern>
+      </extension>
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="HttpClientTest.test" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
+      <module name="utils" />
+      <extension name="coverage">
+        <pattern>
+          <option name="PATTERN" value="org.wlpiaoyi.framework.utils.httpclient.*" />
+          <option name="ENABLED" value="true" />
+        </pattern>
+      </extension>
+      <option name="PACKAGE_NAME" value="org.wlpiaoyi.framework.utils.httpclient" />
+      <option name="MAIN_CLASS_NAME" value="org.wlpiaoyi.framework.utils.httpclient.HttpClientTest" />
+      <option name="METHOD_NAME" value="test" />
+      <option name="TEST_OBJECT" value="method" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <recent_temporary>
+      <list>
+        <item itemvalue="Application.Rsa" />
+        <item itemvalue="JUnit.HttpClientTest.test" />
+        <item itemvalue="Application.ProxyLoder" />
+      </list>
+    </recent_temporary>
+  </component>
+  <component name="SpellCheckerSettings" BundledDictionaries="0" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" Dictionaries="0" CorrectionsLimit="5" DefaultDictionary="application-level" UseSingleDictionary="true" />
   <component name="SvnConfiguration">
     <configuration />
   </component>
@@ -222,12 +286,13 @@
       <map>
         <entry key="MAIN">
           <value>
-            <State />
+            <State>
+              <option name="COLUMN_ORDER" />
+            </State>
           </value>
         </entry>
       </map>
     </option>
-    <option name="oldMeFiltersMigrated" value="true" />
   </component>
   <component name="VcsManagerConfiguration">
     <ignored-roots>
@@ -295,6 +360,16 @@
           <url>file://$PROJECT_DIR$/utile/src/main/java/org/wlpiaoyi/framework/utils/OSUtils.java</url>
           <line>33</line>
           <option name="timeStamp" value="101" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>file://$PROJECT_DIR$/utile/src/test/java/org/wlpiaoyi/framework/utils/httpclient/HttpClientTest.java</url>
+          <line>48</line>
+          <option name="timeStamp" value="102" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>file://$PROJECT_DIR$/utile/src/main/java/org/wlpiaoyi/framework/utils/rsa/Rsa.java</url>
+          <line>255</line>
+          <option name="timeStamp" value="103" />
         </line-breakpoint>
       </breakpoints>
     </breakpoint-manager>

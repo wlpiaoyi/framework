@@ -69,7 +69,7 @@ public class HttpClient {
         return headerMap;
     }
 
-    static @Nullable HttpEntity createFormEntity(@Nullable Object params) throws UnsupportedEncodingException {
+    public static @Nullable HttpEntity createFormEntity(@Nullable Object params) throws UnsupportedEncodingException {
         if(params == null) return null;
         Map<String, Object> formMap = null;
         if(params instanceof Map){
@@ -90,7 +90,7 @@ public class HttpClient {
         return new UrlEncodedFormEntity(paramsUri);
     }
 
-    static HttpEntity createJsonEntity(@NonNull Map<String, Object> headerMap, @Nullable Object params) throws UnsupportedEncodingException {
+    public static @Nullable HttpEntity createJsonEntity(@NonNull Map<String, Object> headerMap, @Nullable Object params){
         String parameter;
         if(params instanceof Map){
             Map map = new HashMap();
@@ -120,12 +120,19 @@ public class HttpClient {
                 }
             }
         }
+        return createBodyEntity(charset, null, parameter);
+    }
+
+    public static @Nullable HttpEntity createBodyEntity(@NonNull String charset, @NonNull String accept, @Nullable String parameter){
         if(StringUtils.isBlank(charset)){
             charset = "UTF-8";
         }
+        if(StringUtils.isBlank(accept)){
+            accept = "application/json";
+        }
         StringEntity entity = new StringEntity(parameter != null ? parameter : "", charset);
         entity.setContentEncoding(charset);
-        entity.setContentType((String)headerMap.get("Accept"));
+        entity.setContentType(accept);
         return entity;
     }
 

@@ -245,10 +245,10 @@ public class SocketThread extends Thread{
             this.responseDomain = Utils.getDomain(buffer, len, this.proxyType);
             this.responsePort = Utils.getPort(buffer, len);
         }
-        if(this.getResponseDomain().contains("baidu.com")){
-            this.requestDomain = "192.168.1.15";
-            this.requestPort = 8080;
-        }
+//        if(this.getResponseDomain().contains("baidu.com")){
+//            this.requestDomain = "192.168.1.15";
+//            this.requestPort = 8080;
+//        }
         userMap.remove("responseAddress");
         userMap.remove("responseDomain");
         userMap.remove("responsePort");
