@@ -2,11 +2,16 @@ package org.wlpiaoyi.framework.utils;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import lombok.SneakyThrows;
+import org.apache.commons.codec.binary.Hex;
 import sun.misc.BASE64Decoder;
 import sun.misc.BASE64Encoder;
 
 import java.io.*;
+import java.nio.ByteBuffer;
+import java.security.DigestInputStream;
 import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.util.UUID;
 
 public class StringUtils {
@@ -69,7 +74,7 @@ public class StringUtils {
         return gson.toJson(obj);
     }
 
-    public static String MD5(String data) throws Exception {
+    public static String MD5(String data) throws NoSuchAlgorithmException {
         MessageDigest md = MessageDigest.getInstance("MD5");
         md.update(data.getBytes());
         byte[] b = md.digest();
@@ -80,6 +85,32 @@ public class StringUtils {
             sb.append(hex);
         }
         return sb.toString();
+    }
+
+    /**
+     * 对一个文件获取md5值
+     * @return md5串
+     */
+    @SneakyThrows
+    public static String MD5(File file) {
+        FileInputStream fileInputStream = null;
+        try {
+            MessageDigest md = MessageDigest.getInstance("MD5");
+            fileInputStream = new FileInputStream(file);
+            byte[] buffer = new byte[8192];
+            int length;
+            while ((length = fileInputStream.read(buffer)) != -1) {
+                md.update(buffer, 0, length);
+            }
+            return new String(Hex.encodeHex(md.digest()));
+        } finally {
+            try {
+                if (fileInputStream != null)
+                    fileInputStream.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
     }
 
     /**
