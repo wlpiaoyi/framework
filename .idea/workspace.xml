@@ -43,13 +43,15 @@
     <select />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="a877397b-93f3-422b-bee1-1317d55f59f2" name="Default Changelist" comment="">
-      <change afterPath="$PROJECT_DIR$/generator-plugin/src/main/java/org/wlpiaoyi/framework/plugin/ReturnAutoIdPlugin.java" afterDir="false" />
+    <list default="true" id="a877397b-93f3-422b-bee1-1317d55f59f2" name="Default Changelist" comment="generator plugin">
+      <change afterPath="$PROJECT_DIR$/generator-plugin/src/main/java/org/wlpiaoyi/framework/plugin/ExcludeColumnsPlugin.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/generator-plugin/src/main/java/org/wlpiaoyi/framework/typeresolver/JavaTypeResolverDefaultImpl.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/generator-plugin/src/main/java/org/wlpiaoyi/framework/generator/CommentGenerator.java" beforeDir="false" afterPath="$PROJECT_DIR$/generator-plugin/src/main/java/org/wlpiaoyi/framework/generator/CommentGenerator.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/generator-plugin/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/generator-plugin/pom.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/generator-plugin/src/main/java/org/wlpiaoyi/framework/plugin/LombokPlugin.java" beforeDir="false" afterPath="$PROJECT_DIR$/generator-plugin/src/main/java/org/wlpiaoyi/framework/plugin/LombokPlugin.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/generator-plugin/src/main/java/org/wlpiaoyi/framework/plugin/PagePlugin.java" beforeDir="false" afterPath="$PROJECT_DIR$/generator-plugin/src/main/java/org/wlpiaoyi/framework/plugin/PagePlugin.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/generator-plugin/src/main/java/org/wlpiaoyi/framework/plugin/ReturnAutoIdPlugin.java" beforeDir="false" afterPath="$PROJECT_DIR$/generator-plugin/src/main/java/org/wlpiaoyi/framework/plugin/ReturnAutoIdPlugin.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/generator-plugin/target/maven-status/maven-compiler-plugin/compile/default-compile/createdFiles.lst" beforeDir="false" afterPath="$PROJECT_DIR$/generator-plugin/target/maven-status/maven-compiler-plugin/compile/default-compile/createdFiles.lst" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/generator-plugin/target/maven-status/maven-compiler-plugin/compile/default-compile/inputFiles.lst" beforeDir="false" afterPath="$PROJECT_DIR$/generator-plugin/target/maven-status/maven-compiler-plugin/compile/default-compile/inputFiles.lst" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -266,6 +268,14 @@
       <workItem from="1578641246212" duration="2925000" />
       <workItem from="1578880815687" duration="2233000" />
     </task>
+    <task id="LOCAL-00001" summary="generator plugin">
+      <created>1624528043310</created>
+      <option name="number" value="00001" />
+      <option name="presentableId" value="LOCAL-00001" />
+      <option name="project" value="LOCAL" />
+      <updated>1624528043310</updated>
+    </task>
+    <option name="localTasksCounter" value="2" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -287,40 +297,47 @@
     <ignored-roots>
       <path value="$PROJECT_DIR$/framework" />
     </ignored-roots>
+    <MESSAGE value="generator plugin" />
+    <option name="LAST_COMMIT_MESSAGE" value="generator plugin" />
   </component>
   <component name="WindowStateProjectService">
     <state x="653" y="248" key="#com.intellij.ide.util.MemberChooser" timestamp="1624525416733">
       <screen x="0" y="0" width="1680" height="1050" />
     </state>
     <state x="653" y="248" key="#com.intellij.ide.util.MemberChooser/0.0.1680.1050@0.0.1680.1050" timestamp="1624525416733" />
-    <state width="1638" height="276" key="GridCell.Tab.0.bottom" timestamp="1624526502476">
+    <state x="100" y="100" width="1480" height="850" key="DiffContextDialog" timestamp="1624528089458">
+      <screen x="0" y="23" width="1680" height="963" />
+    </state>
+    <state x="100" y="100" width="1480" height="850" key="DiffContextDialog/0.0.1680.1050@0.0.1680.1050" timestamp="1624528016130" />
+    <state x="100" y="100" width="1480" height="850" key="DiffContextDialog/0.23.1680.963@0.23.1680.963" timestamp="1624528089458" />
+    <state width="1638" height="172" key="GridCell.Tab.0.bottom" timestamp="1624545955479">
       <screen x="0" y="0" width="1680" height="1050" />
     </state>
-    <state width="1638" height="276" key="GridCell.Tab.0.bottom/0.0.1680.1050@0.0.1680.1050" timestamp="1624526502476" />
+    <state width="1638" height="172" key="GridCell.Tab.0.bottom/0.0.1680.1050@0.0.1680.1050" timestamp="1624545955479" />
     <state width="1638" height="204" key="GridCell.Tab.0.bottom/0.23.1680.965@0.23.1680.965" timestamp="1624451596841" />
-    <state width="1638" height="276" key="GridCell.Tab.0.center" timestamp="1624526502474">
+    <state width="1638" height="172" key="GridCell.Tab.0.center" timestamp="1624545955477">
       <screen x="0" y="0" width="1680" height="1050" />
     </state>
-    <state width="1638" height="276" key="GridCell.Tab.0.center/0.0.1680.1050@0.0.1680.1050" timestamp="1624526502474" />
+    <state width="1638" height="172" key="GridCell.Tab.0.center/0.0.1680.1050@0.0.1680.1050" timestamp="1624545955477" />
     <state width="1638" height="204" key="GridCell.Tab.0.center/0.23.1680.965@0.23.1680.965" timestamp="1624451596840" />
-    <state width="1638" height="276" key="GridCell.Tab.0.left" timestamp="1624526502474">
+    <state width="1638" height="172" key="GridCell.Tab.0.left" timestamp="1624545955475">
       <screen x="0" y="0" width="1680" height="1050" />
     </state>
-    <state width="1638" height="276" key="GridCell.Tab.0.left/0.0.1680.1050@0.0.1680.1050" timestamp="1624526502474" />
+    <state width="1638" height="172" key="GridCell.Tab.0.left/0.0.1680.1050@0.0.1680.1050" timestamp="1624545955475" />
     <state width="1638" height="204" key="GridCell.Tab.0.left/0.23.1680.965@0.23.1680.965" timestamp="1624451596839" />
-    <state width="1638" height="276" key="GridCell.Tab.0.right" timestamp="1624526502475">
+    <state width="1638" height="172" key="GridCell.Tab.0.right" timestamp="1624545955478">
       <screen x="0" y="0" width="1680" height="1050" />
     </state>
-    <state width="1638" height="276" key="GridCell.Tab.0.right/0.0.1680.1050@0.0.1680.1050" timestamp="1624526502475" />
+    <state width="1638" height="172" key="GridCell.Tab.0.right/0.0.1680.1050@0.0.1680.1050" timestamp="1624545955478" />
     <state width="1638" height="204" key="GridCell.Tab.0.right/0.23.1680.965@0.23.1680.965" timestamp="1624451596840" />
     <state x="341" y="164" key="SettingsEditor" timestamp="1623834863940">
       <screen x="0" y="0" width="1680" height="1050" />
     </state>
     <state x="341" y="164" key="SettingsEditor/0.0.1680.1050@0.0.1680.1050" timestamp="1623834863940" />
-    <state x="627" y="310" key="chooseDestDirectoryDialog" timestamp="1624440215064">
+    <state x="627" y="310" key="chooseDestDirectoryDialog" timestamp="1624535601473">
       <screen x="0" y="0" width="1680" height="1050" />
     </state>
-    <state x="627" y="310" key="chooseDestDirectoryDialog/0.0.1680.1050@0.0.1680.1050" timestamp="1624440215064" />
+    <state x="627" y="310" key="chooseDestDirectoryDialog/0.0.1680.1050@0.0.1680.1050" timestamp="1624535601473" />
     <state x="538" y="280" width="604" height="490" key="find.popup" timestamp="1624525505599">
       <screen x="0" y="0" width="1680" height="1050" />
     </state>
