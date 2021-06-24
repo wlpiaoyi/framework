@@ -44,38 +44,12 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="a877397b-93f3-422b-bee1-1317d55f59f2" name="Default Changelist" comment="">
-      <change afterPath="$PROJECT_DIR$/generator-plugin/generator-plugin.iml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/generator-plugin/pom.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/generator-plugin/src/main/java/org/wlpiaoyi/framework/generator/CommentGenerator.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/generator-plugin/src/main/java/org/wlpiaoyi/framework/plugin/LombokPlugin.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/generator-plugin/src/main/java/org/wlpiaoyi/framework/plugin/PagePlugin.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/generator-plugin/src/main/java/org/wlpiaoyi/framework/plugin/UnmergeableXmlMappersPlugin.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/compiler.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/compiler.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/jarRepositories.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/jarRepositories.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/generator-plugin/src/main/java/org/wlpiaoyi/framework/plugin/ReturnAutoIdPlugin.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/pom.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/utile/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/utils/pom.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/utile/src/main/java/org/wlpiaoyi/framework/utils/AESUtils.java" beforeDir="false" afterPath="$PROJECT_DIR$/utils/src/main/java/org/wlpiaoyi/framework/utils/AESUtils.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/utile/src/main/java/org/wlpiaoyi/framework/utils/CodeUtils.java" beforeDir="false" afterPath="$PROJECT_DIR$/utils/src/main/java/org/wlpiaoyi/framework/utils/CodeUtils.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/utile/src/main/java/org/wlpiaoyi/framework/utils/DateUtils.java" beforeDir="false" afterPath="$PROJECT_DIR$/utils/src/main/java/org/wlpiaoyi/framework/utils/DateUtils.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/utile/src/main/java/org/wlpiaoyi/framework/utils/OSUtils.java" beforeDir="false" afterPath="$PROJECT_DIR$/utils/src/main/java/org/wlpiaoyi/framework/utils/OSUtils.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/utile/src/main/java/org/wlpiaoyi/framework/utils/PackageUtils.java" beforeDir="false" afterPath="$PROJECT_DIR$/utils/src/main/java/org/wlpiaoyi/framework/utils/PackageUtils.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/utile/src/main/java/org/wlpiaoyi/framework/utils/ResponseUtils.java" beforeDir="false" afterPath="$PROJECT_DIR$/utils/src/main/java/org/wlpiaoyi/framework/utils/ResponseUtils.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/utile/src/main/java/org/wlpiaoyi/framework/utils/StringUtils.java" beforeDir="false" afterPath="$PROJECT_DIR$/utils/src/main/java/org/wlpiaoyi/framework/utils/StringUtils.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/utile/src/main/java/org/wlpiaoyi/framework/utils/exception/BusinessException.java" beforeDir="false" afterPath="$PROJECT_DIR$/utils/src/main/java/org/wlpiaoyi/framework/utils/exception/BusinessException.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/utile/src/main/java/org/wlpiaoyi/framework/utils/exception/CatchException.java" beforeDir="false" afterPath="$PROJECT_DIR$/utils/src/main/java/org/wlpiaoyi/framework/utils/exception/CatchException.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/utile/src/main/java/org/wlpiaoyi/framework/utils/httpclient/HttpClient.java" beforeDir="false" afterPath="$PROJECT_DIR$/utils/src/main/java/org/wlpiaoyi/framework/utils/httpclient/HttpClient.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/utile/src/main/java/org/wlpiaoyi/framework/utils/httpclient/HttpDeleteClient.java" beforeDir="false" afterPath="$PROJECT_DIR$/utils/src/main/java/org/wlpiaoyi/framework/utils/httpclient/HttpDeleteClient.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/utile/src/main/java/org/wlpiaoyi/framework/utils/httpclient/HttpGetClient.java" beforeDir="false" afterPath="$PROJECT_DIR$/utils/src/main/java/org/wlpiaoyi/framework/utils/httpclient/HttpGetClient.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/utile/src/main/java/org/wlpiaoyi/framework/utils/httpclient/HttpPostClient.java" beforeDir="false" afterPath="$PROJECT_DIR$/utils/src/main/java/org/wlpiaoyi/framework/utils/httpclient/HttpPostClient.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/utile/src/main/java/org/wlpiaoyi/framework/utils/httpclient/HttpPutClient.java" beforeDir="false" afterPath="$PROJECT_DIR$/utils/src/main/java/org/wlpiaoyi/framework/utils/httpclient/HttpPutClient.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/utile/src/main/java/org/wlpiaoyi/framework/utils/rsa/Coder.java" beforeDir="false" afterPath="$PROJECT_DIR$/utils/src/main/java/org/wlpiaoyi/framework/utils/rsa/Coder.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/utile/src/main/java/org/wlpiaoyi/framework/utils/rsa/Rsa.java" beforeDir="false" afterPath="$PROJECT_DIR$/utils/src/main/java/org/wlpiaoyi/framework/utils/rsa/Rsa.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/utile/src/main/java/org/wlpiaoyi/framework/utils/websocket/client/WebSocketClient.java" beforeDir="false" afterPath="$PROJECT_DIR$/utils/src/main/java/org/wlpiaoyi/framework/utils/websocket/client/WebSocketClient.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/utile/src/main/java/org/wlpiaoyi/framework/utils/websocket/client/WebSocketIntrface.java" beforeDir="false" afterPath="$PROJECT_DIR$/utils/src/main/java/org/wlpiaoyi/framework/utils/websocket/client/WebSocketIntrface.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/utile/src/main/java/org/wlpiaoyi/framework/utils/websocket/service/WsBootService.java" beforeDir="false" afterPath="$PROJECT_DIR$/utils/src/main/java/org/wlpiaoyi/framework/utils/websocket/service/WsBootService.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/utile/src/test/java/org/wlpiaoyi/framework/utils/httpclient/HttpClientTest.java" beforeDir="false" afterPath="$PROJECT_DIR$/utils/src/test/java/org/wlpiaoyi/framework/utils/httpclient/HttpClientTest.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/utile/src/test/java/org/wlpiaoyi/framework/utils/websocket/client/WebSecketClientTest.java" beforeDir="false" afterPath="$PROJECT_DIR$/utils/src/test/java/org/wlpiaoyi/framework/utils/websocket/client/WebSecketClientTest.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/generator-plugin/src/main/java/org/wlpiaoyi/framework/generator/CommentGenerator.java" beforeDir="false" afterPath="$PROJECT_DIR$/generator-plugin/src/main/java/org/wlpiaoyi/framework/generator/CommentGenerator.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/generator-plugin/src/main/java/org/wlpiaoyi/framework/plugin/LombokPlugin.java" beforeDir="false" afterPath="$PROJECT_DIR$/generator-plugin/src/main/java/org/wlpiaoyi/framework/plugin/LombokPlugin.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/generator-plugin/src/main/java/org/wlpiaoyi/framework/plugin/PagePlugin.java" beforeDir="false" afterPath="$PROJECT_DIR$/generator-plugin/src/main/java/org/wlpiaoyi/framework/plugin/PagePlugin.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/generator-plugin/target/maven-status/maven-compiler-plugin/compile/default-compile/createdFiles.lst" beforeDir="false" afterPath="$PROJECT_DIR$/generator-plugin/target/maven-status/maven-compiler-plugin/compile/default-compile/createdFiles.lst" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -315,29 +289,29 @@
     </ignored-roots>
   </component>
   <component name="WindowStateProjectService">
-    <state x="653" y="248" key="#com.intellij.ide.util.MemberChooser" timestamp="1624455509802">
+    <state x="653" y="248" key="#com.intellij.ide.util.MemberChooser" timestamp="1624525416733">
       <screen x="0" y="0" width="1680" height="1050" />
     </state>
-    <state x="653" y="248" key="#com.intellij.ide.util.MemberChooser/0.0.1680.1050@0.0.1680.1050" timestamp="1624455509802" />
-    <state width="1638" height="134" key="GridCell.Tab.0.bottom" timestamp="1624455800541">
+    <state x="653" y="248" key="#com.intellij.ide.util.MemberChooser/0.0.1680.1050@0.0.1680.1050" timestamp="1624525416733" />
+    <state width="1638" height="276" key="GridCell.Tab.0.bottom" timestamp="1624526502476">
       <screen x="0" y="0" width="1680" height="1050" />
     </state>
-    <state width="1638" height="134" key="GridCell.Tab.0.bottom/0.0.1680.1050@0.0.1680.1050" timestamp="1624455800541" />
+    <state width="1638" height="276" key="GridCell.Tab.0.bottom/0.0.1680.1050@0.0.1680.1050" timestamp="1624526502476" />
     <state width="1638" height="204" key="GridCell.Tab.0.bottom/0.23.1680.965@0.23.1680.965" timestamp="1624451596841" />
-    <state width="1638" height="134" key="GridCell.Tab.0.center" timestamp="1624455800539">
+    <state width="1638" height="276" key="GridCell.Tab.0.center" timestamp="1624526502474">
       <screen x="0" y="0" width="1680" height="1050" />
     </state>
-    <state width="1638" height="134" key="GridCell.Tab.0.center/0.0.1680.1050@0.0.1680.1050" timestamp="1624455800539" />
+    <state width="1638" height="276" key="GridCell.Tab.0.center/0.0.1680.1050@0.0.1680.1050" timestamp="1624526502474" />
     <state width="1638" height="204" key="GridCell.Tab.0.center/0.23.1680.965@0.23.1680.965" timestamp="1624451596840" />
-    <state width="1638" height="134" key="GridCell.Tab.0.left" timestamp="1624455800538">
+    <state width="1638" height="276" key="GridCell.Tab.0.left" timestamp="1624526502474">
       <screen x="0" y="0" width="1680" height="1050" />
     </state>
-    <state width="1638" height="134" key="GridCell.Tab.0.left/0.0.1680.1050@0.0.1680.1050" timestamp="1624455800538" />
+    <state width="1638" height="276" key="GridCell.Tab.0.left/0.0.1680.1050@0.0.1680.1050" timestamp="1624526502474" />
     <state width="1638" height="204" key="GridCell.Tab.0.left/0.23.1680.965@0.23.1680.965" timestamp="1624451596839" />
-    <state width="1638" height="134" key="GridCell.Tab.0.right" timestamp="1624455800540">
+    <state width="1638" height="276" key="GridCell.Tab.0.right" timestamp="1624526502475">
       <screen x="0" y="0" width="1680" height="1050" />
     </state>
-    <state width="1638" height="134" key="GridCell.Tab.0.right/0.0.1680.1050@0.0.1680.1050" timestamp="1624455800540" />
+    <state width="1638" height="276" key="GridCell.Tab.0.right/0.0.1680.1050@0.0.1680.1050" timestamp="1624526502475" />
     <state width="1638" height="204" key="GridCell.Tab.0.right/0.23.1680.965@0.23.1680.965" timestamp="1624451596840" />
     <state x="341" y="164" key="SettingsEditor" timestamp="1623834863940">
       <screen x="0" y="0" width="1680" height="1050" />
@@ -347,10 +321,10 @@
       <screen x="0" y="0" width="1680" height="1050" />
     </state>
     <state x="627" y="310" key="chooseDestDirectoryDialog/0.0.1680.1050@0.0.1680.1050" timestamp="1624440215064" />
-    <state x="538" y="280" width="604" height="490" key="find.popup" timestamp="1623835051325">
+    <state x="538" y="280" width="604" height="490" key="find.popup" timestamp="1624525505599">
       <screen x="0" y="0" width="1680" height="1050" />
     </state>
-    <state x="538" y="280" width="604" height="490" key="find.popup/0.0.1680.1050@0.0.1680.1050" timestamp="1623835051325" />
+    <state x="538" y="280" width="604" height="490" key="find.popup/0.0.1680.1050@0.0.1680.1050" timestamp="1624525505599" />
     <state x="208" y="188" key="new project wizard" timestamp="1624438378899">
       <screen x="0" y="0" width="1680" height="1050" />
     </state>

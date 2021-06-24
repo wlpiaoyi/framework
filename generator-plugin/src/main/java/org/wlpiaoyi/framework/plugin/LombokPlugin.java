@@ -46,6 +46,11 @@ public class LombokPlugin extends PluginAdapter {
         topLevelClass.addJavaDocLine(sb.toString().replace("\n", " "));
 
         sb = new StringBuilder();
+        sb.append(" * @describe ");
+        sb.append(introspectedTable.getRemarks());
+        topLevelClass.addJavaDocLine(sb.toString().replace("\n", " "));
+
+        sb = new StringBuilder();
         sb.append(" * ");
         sb.append("@date ");
         sb.append(this.dateStr(new Date()));

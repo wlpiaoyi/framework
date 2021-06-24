@@ -43,7 +43,7 @@ public class CommentGenerator extends DefaultCommentGenerator {
         }
         StringBuilder sb = new StringBuilder();
         field.addJavaDocLine("/**");
-        sb.append(" * ");
+        sb.append(" * @describe ");
         sb.append(introspectedColumn.getRemarks());
         field.addJavaDocLine(sb.toString().replace("\n", " "));
         field.addJavaDocLine(" */");
@@ -56,7 +56,7 @@ public class CommentGenerator extends DefaultCommentGenerator {
 
         method.addJavaDocLine("/**");
         StringBuilder sb = new StringBuilder();
-        sb.append(" * ");
+        sb.append(" * @describe ");
         if(method.getName().startsWith("count")){
             sb.append("统计");
         }else if(method.getName().startsWith("delete")){

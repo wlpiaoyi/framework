@@ -11,6 +11,7 @@ import org.mybatis.generator.api.dom.xml.XmlElement;
 import java.util.List;
 
 public class PagePlugin extends PluginAdapter {
+
     public boolean validate(List<String> list) {
         return true;
     }
