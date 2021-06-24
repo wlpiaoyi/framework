@@ -24,3 +24,4 @@ hs_err_pid*
 proxy/target/*
 selenium/target/*
 utile/target/*
+generator-plugin/target/*
