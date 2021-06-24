@@ -44,12 +44,39 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="a877397b-93f3-422b-bee1-1317d55f59f2" name="Default Changelist" comment="">
-      <change afterPath="$PROJECT_DIR$/.idea/jarRepositories.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/generator-plugin/generator-plugin.iml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/generator-plugin/pom.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/generator-plugin/src/main/java/org/wlpiaoyi/framework/generator/CommentGenerator.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/generator-plugin/src/main/java/org/wlpiaoyi/framework/plugin/LombokPlugin.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/generator-plugin/src/main/java/org/wlpiaoyi/framework/plugin/PagePlugin.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/generator-plugin/src/main/java/org/wlpiaoyi/framework/plugin/UnmergeableXmlMappersPlugin.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/compiler.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/compiler.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/jarRepositories.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/jarRepositories.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/utile/src/main/java/org/wlpiaoyi/framework/utils/httpclient/HttpClient.java" beforeDir="false" afterPath="$PROJECT_DIR$/utile/src/main/java/org/wlpiaoyi/framework/utils/httpclient/HttpClient.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/pom.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/utile/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/utils/pom.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/utile/src/main/java/org/wlpiaoyi/framework/utils/AESUtils.java" beforeDir="false" afterPath="$PROJECT_DIR$/utils/src/main/java/org/wlpiaoyi/framework/utils/AESUtils.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/utile/src/main/java/org/wlpiaoyi/framework/utils/CodeUtils.java" beforeDir="false" afterPath="$PROJECT_DIR$/utils/src/main/java/org/wlpiaoyi/framework/utils/CodeUtils.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/utile/src/main/java/org/wlpiaoyi/framework/utils/DateUtils.java" beforeDir="false" afterPath="$PROJECT_DIR$/utils/src/main/java/org/wlpiaoyi/framework/utils/DateUtils.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/utile/src/main/java/org/wlpiaoyi/framework/utils/OSUtils.java" beforeDir="false" afterPath="$PROJECT_DIR$/utils/src/main/java/org/wlpiaoyi/framework/utils/OSUtils.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/utile/src/main/java/org/wlpiaoyi/framework/utils/PackageUtils.java" beforeDir="false" afterPath="$PROJECT_DIR$/utils/src/main/java/org/wlpiaoyi/framework/utils/PackageUtils.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/utile/src/main/java/org/wlpiaoyi/framework/utils/ResponseUtils.java" beforeDir="false" afterPath="$PROJECT_DIR$/utils/src/main/java/org/wlpiaoyi/framework/utils/ResponseUtils.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/utile/src/main/java/org/wlpiaoyi/framework/utils/StringUtils.java" beforeDir="false" afterPath="$PROJECT_DIR$/utils/src/main/java/org/wlpiaoyi/framework/utils/StringUtils.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/utile/src/main/java/org/wlpiaoyi/framework/utils/exception/BusinessException.java" beforeDir="false" afterPath="$PROJECT_DIR$/utils/src/main/java/org/wlpiaoyi/framework/utils/exception/BusinessException.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/utile/src/main/java/org/wlpiaoyi/framework/utils/exception/CatchException.java" beforeDir="false" afterPath="$PROJECT_DIR$/utils/src/main/java/org/wlpiaoyi/framework/utils/exception/CatchException.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/utile/src/main/java/org/wlpiaoyi/framework/utils/httpclient/HttpClient.java" beforeDir="false" afterPath="$PROJECT_DIR$/utils/src/main/java/org/wlpiaoyi/framework/utils/httpclient/HttpClient.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/utile/src/main/java/org/wlpiaoyi/framework/utils/httpclient/HttpDeleteClient.java" beforeDir="false" afterPath="$PROJECT_DIR$/utils/src/main/java/org/wlpiaoyi/framework/utils/httpclient/HttpDeleteClient.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/utile/src/main/java/org/wlpiaoyi/framework/utils/httpclient/HttpGetClient.java" beforeDir="false" afterPath="$PROJECT_DIR$/utils/src/main/java/org/wlpiaoyi/framework/utils/httpclient/HttpGetClient.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/utile/src/main/java/org/wlpiaoyi/framework/utils/httpclient/HttpPostClient.java" beforeDir="false" afterPath="$PROJECT_DIR$/utils/src/main/java/org/wlpiaoyi/framework/utils/httpclient/HttpPostClient.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/utile/src/main/java/org/wlpiaoyi/framework/utils/httpclient/HttpPutClient.java" beforeDir="false" afterPath="$PROJECT_DIR$/utils/src/main/java/org/wlpiaoyi/framework/utils/httpclient/HttpPutClient.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/utile/src/main/java/org/wlpiaoyi/framework/utils/rsa/Coder.java" beforeDir="false" afterPath="$PROJECT_DIR$/utils/src/main/java/org/wlpiaoyi/framework/utils/rsa/Coder.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/utile/src/main/java/org/wlpiaoyi/framework/utils/rsa/Rsa.java" beforeDir="false" afterPath="$PROJECT_DIR$/utils/src/main/java/org/wlpiaoyi/framework/utils/rsa/Rsa.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/utile/src/main/java/org/wlpiaoyi/framework/utils/websocket/client/WebSocketClient.java" beforeDir="false" afterPath="$PROJECT_DIR$/utils/src/main/java/org/wlpiaoyi/framework/utils/websocket/client/WebSocketClient.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/utile/src/main/java/org/wlpiaoyi/framework/utils/websocket/client/WebSocketIntrface.java" beforeDir="false" afterPath="$PROJECT_DIR$/utils/src/main/java/org/wlpiaoyi/framework/utils/websocket/client/WebSocketIntrface.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/utile/src/main/java/org/wlpiaoyi/framework/utils/websocket/service/WsBootService.java" beforeDir="false" afterPath="$PROJECT_DIR$/utils/src/main/java/org/wlpiaoyi/framework/utils/websocket/service/WsBootService.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/utile/src/test/java/org/wlpiaoyi/framework/utils/httpclient/HttpClientTest.java" beforeDir="false" afterPath="$PROJECT_DIR$/utils/src/test/java/org/wlpiaoyi/framework/utils/httpclient/HttpClientTest.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/utile/src/test/java/org/wlpiaoyi/framework/utils/websocket/client/WebSecketClientTest.java" beforeDir="false" afterPath="$PROJECT_DIR$/utils/src/test/java/org/wlpiaoyi/framework/utils/websocket/client/WebSecketClientTest.java" afterDir="false" />
     </list>
-    <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -83,7 +110,7 @@
   <component name="MavenImportPreferences">
     <option name="generalSettings">
       <MavenGeneralSettings>
-        <option name="mavenHome" value="$PROJECT_DIR$/../../../apache-maven-3.6.1" />
+        <option name="mavenHome" value="$PROJECT_DIR$/../../../../Config/apache-maven-3.6.3" />
       </MavenGeneralSettings>
     </option>
   </component>
@@ -94,11 +121,12 @@
     <option name="showLibraryContents" value="true" />
   </component>
   <component name="PropertiesComponent">
+    <property name="ASKED_ADD_EXTERNAL_FILES" value="true" />
     <property name="RunOnceActivity.OpenProjectViewOnStart" value="true" />
     <property name="SHARE_PROJECT_CONFIGURATION_FILES" value="true" />
     <property name="WebServerToolWindowFactoryState" value="false" />
     <property name="aspect.path.notification.shown" value="true" />
-    <property name="last_directory_selection" value="$PROJECT_DIR$/proxy/src/test/java" />
+    <property name="last_directory_selection" value="$PROJECT_DIR$/generator-plugin/src/main/java/org/wlpiaoyi/framework" />
     <property name="last_opened_file_path" value="$PROJECT_DIR$" />
     <property name="nodejs_interpreter_path.stuck_in_default_project" value="undefined stuck path" />
     <property name="nodejs_npm_path_reset_for_default_project" value="true" />
@@ -127,18 +155,6 @@
       <recent name="$PROJECT_DIR$" />
       <recent name="$PROJECT_DIR$/selenium" />
     </key>
-  </component>
-  <component name="RunDashboard">
-    <option name="ruleStates">
-      <list>
-        <RuleState>
-          <option name="name" value="ConfigurationTypeDashboardGroupingRule" />
-        </RuleState>
-        <RuleState>
-          <option name="name" value="StatusDashboardGroupingRule" />
-        </RuleState>
-      </list>
-    </option>
   </component>
   <component name="RunManager" selected="Application.ProxyLoder">
     <configuration name="ProxyLoder" type="Application" factoryName="Application" temporary="true" nameIsGenerated="true">
@@ -185,13 +201,13 @@
     </configuration>
     <recent_temporary>
       <list>
+        <item itemvalue="Application.ProxyLoder" />
         <item itemvalue="Application.Rsa" />
         <item itemvalue="JUnit.HttpClientTest.test" />
-        <item itemvalue="Application.ProxyLoder" />
       </list>
     </recent_temporary>
   </component>
-  <component name="SpellCheckerSettings" BundledDictionaries="0" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" Dictionaries="0" CorrectionsLimit="5" DefaultDictionary="application-level" UseSingleDictionary="true" />
+  <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />
   <component name="SvnConfiguration">
     <configuration />
   </component>
@@ -286,13 +302,12 @@
       <map>
         <entry key="MAIN">
           <value>
-            <State>
-              <option name="COLUMN_ORDER" />
-            </State>
+            <State />
           </value>
         </entry>
       </map>
     </option>
+    <option name="oldMeFiltersMigrated" value="true" />
   </component>
   <component name="VcsManagerConfiguration">
     <ignored-roots>
@@ -300,38 +315,46 @@
     </ignored-roots>
   </component>
   <component name="WindowStateProjectService">
-    <state x="304" y="187" width="1071" height="796" key="#com.intellij.execution.impl.EditConfigurationsDialog" timestamp="1607763951859">
+    <state x="653" y="248" key="#com.intellij.ide.util.MemberChooser" timestamp="1624455509802">
       <screen x="0" y="0" width="1680" height="1050" />
     </state>
-    <state x="304" y="187" width="1071" height="796" key="#com.intellij.execution.impl.EditConfigurationsDialog/0.0.1680.1050@0.0.1680.1050" timestamp="1607763951859" />
-    <state width="1638" height="91" key="GridCell.Tab.0.bottom" timestamp="1607857627461">
-      <screen x="0" y="23" width="1680" height="947" />
-    </state>
-    <state width="1638" height="91" key="GridCell.Tab.0.bottom/0.0.1680.1050@0.0.1680.1050" timestamp="1607765346983" />
-    <state width="1638" height="91" key="GridCell.Tab.0.bottom/0.23.1680.947@0.23.1680.947" timestamp="1607857627461" />
-    <state width="1638" height="91" key="GridCell.Tab.0.center" timestamp="1607857627459">
-      <screen x="0" y="23" width="1680" height="947" />
-    </state>
-    <state width="1638" height="91" key="GridCell.Tab.0.center/0.0.1680.1050@0.0.1680.1050" timestamp="1607765346981" />
-    <state width="1638" height="91" key="GridCell.Tab.0.center/0.23.1680.947@0.23.1680.947" timestamp="1607857627459" />
-    <state width="1638" height="91" key="GridCell.Tab.0.left" timestamp="1607857627458">
-      <screen x="0" y="23" width="1680" height="947" />
-    </state>
-    <state width="1638" height="91" key="GridCell.Tab.0.left/0.0.1680.1050@0.0.1680.1050" timestamp="1607765346980" />
-    <state width="1638" height="91" key="GridCell.Tab.0.left/0.23.1680.947@0.23.1680.947" timestamp="1607857627458" />
-    <state width="1638" height="91" key="GridCell.Tab.0.right" timestamp="1607857627460">
-      <screen x="0" y="23" width="1680" height="947" />
-    </state>
-    <state width="1638" height="91" key="GridCell.Tab.0.right/0.0.1680.1050@0.0.1680.1050" timestamp="1607765346982" />
-    <state width="1638" height="91" key="GridCell.Tab.0.right/0.23.1680.947@0.23.1680.947" timestamp="1607857627460" />
-    <state x="341" y="164" key="SettingsEditor" timestamp="1607763908426">
+    <state x="653" y="248" key="#com.intellij.ide.util.MemberChooser/0.0.1680.1050@0.0.1680.1050" timestamp="1624455509802" />
+    <state width="1638" height="134" key="GridCell.Tab.0.bottom" timestamp="1624455800541">
       <screen x="0" y="0" width="1680" height="1050" />
     </state>
-    <state x="341" y="164" key="SettingsEditor/0.0.1680.1050@0.0.1680.1050" timestamp="1607763908426" />
-    <state x="538" y="280" width="604" height="490" key="find.popup" timestamp="1607847794729">
+    <state width="1638" height="134" key="GridCell.Tab.0.bottom/0.0.1680.1050@0.0.1680.1050" timestamp="1624455800541" />
+    <state width="1638" height="204" key="GridCell.Tab.0.bottom/0.23.1680.965@0.23.1680.965" timestamp="1624451596841" />
+    <state width="1638" height="134" key="GridCell.Tab.0.center" timestamp="1624455800539">
       <screen x="0" y="0" width="1680" height="1050" />
     </state>
-    <state x="538" y="280" width="604" height="490" key="find.popup/0.0.1680.1050@0.0.1680.1050" timestamp="1607847794729" />
+    <state width="1638" height="134" key="GridCell.Tab.0.center/0.0.1680.1050@0.0.1680.1050" timestamp="1624455800539" />
+    <state width="1638" height="204" key="GridCell.Tab.0.center/0.23.1680.965@0.23.1680.965" timestamp="1624451596840" />
+    <state width="1638" height="134" key="GridCell.Tab.0.left" timestamp="1624455800538">
+      <screen x="0" y="0" width="1680" height="1050" />
+    </state>
+    <state width="1638" height="134" key="GridCell.Tab.0.left/0.0.1680.1050@0.0.1680.1050" timestamp="1624455800538" />
+    <state width="1638" height="204" key="GridCell.Tab.0.left/0.23.1680.965@0.23.1680.965" timestamp="1624451596839" />
+    <state width="1638" height="134" key="GridCell.Tab.0.right" timestamp="1624455800540">
+      <screen x="0" y="0" width="1680" height="1050" />
+    </state>
+    <state width="1638" height="134" key="GridCell.Tab.0.right/0.0.1680.1050@0.0.1680.1050" timestamp="1624455800540" />
+    <state width="1638" height="204" key="GridCell.Tab.0.right/0.23.1680.965@0.23.1680.965" timestamp="1624451596840" />
+    <state x="341" y="164" key="SettingsEditor" timestamp="1623834863940">
+      <screen x="0" y="0" width="1680" height="1050" />
+    </state>
+    <state x="341" y="164" key="SettingsEditor/0.0.1680.1050@0.0.1680.1050" timestamp="1623834863940" />
+    <state x="627" y="310" key="chooseDestDirectoryDialog" timestamp="1624440215064">
+      <screen x="0" y="0" width="1680" height="1050" />
+    </state>
+    <state x="627" y="310" key="chooseDestDirectoryDialog/0.0.1680.1050@0.0.1680.1050" timestamp="1624440215064" />
+    <state x="538" y="280" width="604" height="490" key="find.popup" timestamp="1623835051325">
+      <screen x="0" y="0" width="1680" height="1050" />
+    </state>
+    <state x="538" y="280" width="604" height="490" key="find.popup/0.0.1680.1050@0.0.1680.1050" timestamp="1623835051325" />
+    <state x="208" y="188" key="new project wizard" timestamp="1624438378899">
+      <screen x="0" y="0" width="1680" height="1050" />
+    </state>
+    <state x="208" y="188" key="new project wizard/0.0.1680.1050@0.0.1680.1050" timestamp="1624438378899" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
@@ -342,32 +365,32 @@
           <option name="timeStamp" value="5" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
-          <url>file://$PROJECT_DIR$/utile/src/test/java/org/wlpiaoyi/framework/utils/websocket/client/WebSecketClientTest.java</url>
+          <url>file://$PROJECT_DIR$/utils/src/test/java/org/wlpiaoyi/framework/utils/websocket/client/WebSecketClientTest.java</url>
           <line>70</line>
           <option name="timeStamp" value="55" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
-          <url>file://$PROJECT_DIR$/utile/src/test/java/org/wlpiaoyi/framework/utils/websocket/client/WebSecketClientTest.java</url>
+          <url>file://$PROJECT_DIR$/utils/src/test/java/org/wlpiaoyi/framework/utils/websocket/client/WebSecketClientTest.java</url>
           <line>44</line>
           <option name="timeStamp" value="95" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
-          <url>file://$PROJECT_DIR$/utile/src/main/java/org/wlpiaoyi/framework/utils/OSUtils.java</url>
+          <url>file://$PROJECT_DIR$/utils/src/main/java/org/wlpiaoyi/framework/utils/OSUtils.java</url>
           <line>27</line>
           <option name="timeStamp" value="100" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
-          <url>file://$PROJECT_DIR$/utile/src/main/java/org/wlpiaoyi/framework/utils/OSUtils.java</url>
+          <url>file://$PROJECT_DIR$/utils/src/main/java/org/wlpiaoyi/framework/utils/OSUtils.java</url>
           <line>33</line>
           <option name="timeStamp" value="101" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
-          <url>file://$PROJECT_DIR$/utile/src/test/java/org/wlpiaoyi/framework/utils/httpclient/HttpClientTest.java</url>
+          <url>file://$PROJECT_DIR$/utils/src/test/java/org/wlpiaoyi/framework/utils/httpclient/HttpClientTest.java</url>
           <line>48</line>
           <option name="timeStamp" value="102" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
-          <url>file://$PROJECT_DIR$/utile/src/main/java/org/wlpiaoyi/framework/utils/rsa/Rsa.java</url>
+          <url>file://$PROJECT_DIR$/utils/src/main/java/org/wlpiaoyi/framework/utils/rsa/Rsa.java</url>
           <line>255</line>
           <option name="timeStamp" value="103" />
         </line-breakpoint>

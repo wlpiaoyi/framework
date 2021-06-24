@@ -123,7 +123,7 @@ public class HttpClient {
         return createBodyEntity(charset, null, parameter);
     }
 
-    public static @Nullable HttpEntity createBodyEntity(@NonNull String charset, @NonNull String accept, @Nullable String parameter){
+    public static @Nullable HttpEntity createBodyEntity(@Nullable String charset, @Nullable String accept, @Nullable String parameter){
         if(StringUtils.isBlank(charset)){
             charset = "UTF-8";
         }

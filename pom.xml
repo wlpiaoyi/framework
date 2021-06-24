@@ -10,9 +10,10 @@
     <packaging>pom</packaging>
 
     <modules>
-        <module>utile</module>
+        <module>utils</module>
         <module>proxy</module>
         <module>selenium</module>
+        <module>generator-plugin</module>
     </modules>
 
     <properties>
