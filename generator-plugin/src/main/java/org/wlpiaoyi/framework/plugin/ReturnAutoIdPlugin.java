@@ -1,5 +1,6 @@
 package org.wlpiaoyi.framework.plugin;
 
+import org.mybatis.generator.api.IntrospectedColumn;
 import org.mybatis.generator.api.IntrospectedTable;
 import org.mybatis.generator.api.PluginAdapter;
 import org.mybatis.generator.api.dom.xml.Attribute;
@@ -13,21 +14,31 @@ public class ReturnAutoIdPlugin extends PluginAdapter {
         return true;
     }
 
+    private void execute(XmlElement element,
+                         IntrospectedTable introspectedTable){
+
+        List<IntrospectedColumn> primaryKeyColumns = introspectedTable.getPrimaryKeyColumns();
+        if(primaryKeyColumns.isEmpty()) return;
+
+        IntrospectedColumn primaryKeyColumn = primaryKeyColumns.get(0);
+
+        element.addAttribute(new Attribute("keyColumn", primaryKeyColumn.getActualColumnName()));
+        element.addAttribute(new Attribute("useGeneratedKeys", "false"));
+        element.addAttribute(new Attribute("keyProperty", primaryKeyColumn.getJavaProperty()));
+
+    }
+
     @Override
     public boolean sqlMapInsertSelectiveElementGenerated(XmlElement element,
                                                          IntrospectedTable introspectedTable){
-        element.addAttribute(new Attribute("keyColumn", "id"));
-        element.addAttribute(new Attribute("useGeneratedKeys", "true"));
-        element.addAttribute(new Attribute("keyProperty", "id"));
+        this.execute(element, introspectedTable);
         return super.sqlMapInsertSelectiveElementGenerated(element, introspectedTable);
     }
 
     @Override
     public boolean sqlMapInsertElementGenerated(XmlElement element,
                                                          IntrospectedTable introspectedTable){
-        element.addAttribute(new Attribute("keyColumn", "id"));
-        element.addAttribute(new Attribute("useGeneratedKeys", "true"));
-        element.addAttribute(new Attribute("keyProperty", "id"));
+        this.execute(element, introspectedTable);
         return super.sqlMapInsertSelectiveElementGenerated(element, introspectedTable);
     }
 

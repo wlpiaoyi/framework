@@ -44,14 +44,13 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="a877397b-93f3-422b-bee1-1317d55f59f2" name="Default Changelist" comment="generator plugin">
-      <change afterPath="$PROJECT_DIR$/generator-plugin/src/main/java/org/wlpiaoyi/framework/plugin/ExcludeColumnsPlugin.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/generator-plugin/src/main/java/org/wlpiaoyi/framework/typeresolver/JavaTypeResolverDefaultImpl.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/generator-plugin/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/generator-plugin/pom.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/generator-plugin/src/main/java/org/wlpiaoyi/framework/plugin/LombokPlugin.java" beforeDir="false" afterPath="$PROJECT_DIR$/generator-plugin/src/main/java/org/wlpiaoyi/framework/plugin/LombokPlugin.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/generator-plugin/src/main/java/org/wlpiaoyi/framework/plugin/ReturnAutoIdPlugin.java" beforeDir="false" afterPath="$PROJECT_DIR$/generator-plugin/src/main/java/org/wlpiaoyi/framework/plugin/ReturnAutoIdPlugin.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/generator-plugin/target/maven-status/maven-compiler-plugin/compile/default-compile/createdFiles.lst" beforeDir="false" afterPath="$PROJECT_DIR$/generator-plugin/target/maven-status/maven-compiler-plugin/compile/default-compile/createdFiles.lst" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/generator-plugin/target/maven-status/maven-compiler-plugin/compile/default-compile/inputFiles.lst" beforeDir="false" afterPath="$PROJECT_DIR$/generator-plugin/target/maven-status/maven-compiler-plugin/compile/default-compile/inputFiles.lst" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/generator-plugin/target/maven-archiver/pom.properties" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/generator-plugin/target/maven-status/maven-compiler-plugin/compile/default-compile/createdFiles.lst" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/generator-plugin/target/maven-status/maven-compiler-plugin/compile/default-compile/inputFiles.lst" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/generator-plugin/target/maven-status/maven-compiler-plugin/testCompile/default-testCompile/inputFiles.lst" beforeDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />

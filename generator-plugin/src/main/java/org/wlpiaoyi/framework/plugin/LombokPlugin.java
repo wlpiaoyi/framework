@@ -11,13 +11,22 @@ import org.mybatis.generator.api.dom.xml.TextElement;
 import org.mybatis.generator.api.dom.xml.XmlElement;
 
 import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public class LombokPlugin extends PluginAdapter {
 
-    public LombokPlugin() {
+    private String version = "1.0";
+    private String userName = null;
+
+    @Override
+    public void setProperties(Properties properties) {
+        super.setProperties(properties);
+        if(properties.getProperty("version") != null){
+            this.version = String.valueOf(properties.getProperty("version")); //$NON-NLS-1$
+        }
+        if(properties.getProperty("userName") != null){
+            this.userName = String.valueOf(properties.getProperty("userName")); //$NON-NLS-1$
+        }
     }
 
     public boolean validate(List<String> list) {
@@ -35,7 +44,7 @@ public class LombokPlugin extends PluginAdapter {
         //topLevelClass.addAnnotation("@ToString");
 
         Map<String, String> map = System.getenv();
-        String userName = map.get("USER");// 获取// 用户名
+        String userName = this.userName == null ? map.get("USER") : this.userName;// 获取// 用户名
 
         topLevelClass.addJavaDocLine("/**");
         StringBuilder sb = new StringBuilder();
@@ -58,7 +67,7 @@ public class LombokPlugin extends PluginAdapter {
 
         sb = new StringBuilder();
         sb.append(" * ");
-        sb.append("@version 1.0");
+        sb.append("@version " + this.version);
         topLevelClass.addJavaDocLine(sb.toString().replace("\n", " "));
 
         topLevelClass.addJavaDocLine(" */");
