@@ -23,7 +23,7 @@ public class ReturnAutoIdPlugin extends PluginAdapter {
         IntrospectedColumn primaryKeyColumn = primaryKeyColumns.get(0);
 
         element.addAttribute(new Attribute("keyColumn", primaryKeyColumn.getActualColumnName()));
-        element.addAttribute(new Attribute("useGeneratedKeys", "false"));
+        element.addAttribute(new Attribute("useGeneratedKeys", "true"));
         element.addAttribute(new Attribute("keyProperty", primaryKeyColumn.getJavaProperty()));
 
     }

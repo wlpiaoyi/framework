@@ -75,7 +75,7 @@ public class ExcludeColumnsPlugin extends PluginAdapter {
             if(tag == null) tag = ", ";
             else sb.append(tag);
             sb.append("#{");
-            sb.append(column.getActualColumnName());
+            sb.append(column.getJavaProperty());
             sb.append(",jdbcType=");
             sb.append(column.getJdbcTypeName());
             sb.append("}");
@@ -85,7 +85,7 @@ public class ExcludeColumnsPlugin extends PluginAdapter {
             if(tag == null) tag = ", ";
             else sb.append(tag);
             sb.append("#{");
-            sb.append(column.getActualColumnName());
+            sb.append(column.getJavaProperty());
             sb.append(",jdbcType=");
             sb.append(column.getJdbcTypeName());
             sb.append("}");
@@ -124,7 +124,7 @@ public class ExcludeColumnsPlugin extends PluginAdapter {
             sb.append(column.getActualColumnName());
             sb.append(" = ");
             sb.append("#{");
-            sb.append(column.getActualColumnName());
+            sb.append(column.getJavaProperty());
             sb.append(",jdbcType=");
             sb.append(column.getJdbcTypeName());
             sb.append("}");
@@ -142,7 +142,7 @@ public class ExcludeColumnsPlugin extends PluginAdapter {
             sb.append(column.getActualColumnName());
             sb.append(" = ");
             sb.append("#{");
-            sb.append(column.getActualColumnName());
+            sb.append(column.getJavaProperty());
             sb.append(",jdbcType=");
             sb.append(column.getJdbcTypeName());
             sb.append("}");
