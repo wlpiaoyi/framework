@@ -8,10 +8,12 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.wlpiaoyi.framework.utils.StringUtils;
+import org.wlpiaoyi.framework.utils.ValueUtils;
 
 //import org.apache.http.client.fluent.*;
 
 import java.io.IOException;
+import java.math.BigDecimal;
 import java.net.URISyntaxException;
 import java.util.HashMap;
 import java.util.Map;
@@ -30,7 +32,6 @@ public class HttpClientTest {
 
     @Test
     public void test() throws IOException {
-
         try {
             String text = HttpGetClient.String("http://sms.webchinese.cn/web_api/SMS", null, new HashMap(){{
                 put("Action","UP");

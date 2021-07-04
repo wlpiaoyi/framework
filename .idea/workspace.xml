@@ -44,8 +44,12 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="a877397b-93f3-422b-bee1-1317d55f59f2" name="Default Changelist" comment="generator plugin">
+      <change afterPath="$PROJECT_DIR$/utils/src/main/java/org/wlpiaoyi/framework/utils/ValueUtils.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/compiler.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/compiler.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/generator-plugin/src/main/java/org/wlpiaoyi/framework/plugin/ExcludeColumnsPlugin.java" beforeDir="false" afterPath="$PROJECT_DIR$/generator-plugin/src/main/java/org/wlpiaoyi/framework/plugin/ExcludeColumnsPlugin.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/generator-plugin/src/main/java/org/wlpiaoyi/framework/typeresolver/JavaTypeResolverDefaultImpl.java" beforeDir="false" afterPath="$PROJECT_DIR$/generator-plugin/src/main/java/org/wlpiaoyi/framework/typeresolver/JavaTypeResolverDefaultImpl.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/utils/src/main/java/org/wlpiaoyi/framework/utils/StringUtils.java" beforeDir="false" afterPath="$PROJECT_DIR$/utils/src/main/java/org/wlpiaoyi/framework/utils/StringUtils.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/utils/src/test/java/org/wlpiaoyi/framework/utils/httpclient/HttpClientTest.java" beforeDir="false" afterPath="$PROJECT_DIR$/utils/src/test/java/org/wlpiaoyi/framework/utils/httpclient/HttpClientTest.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -101,7 +105,7 @@
     <property name="nodejs_interpreter_path.stuck_in_default_project" value="undefined stuck path" />
     <property name="nodejs_npm_path_reset_for_default_project" value="true" />
     <property name="nodejs_package_manager_path" value="npm" />
-    <property name="project.structure.last.edited" value="SDKs" />
+    <property name="project.structure.last.edited" value="Modules" />
     <property name="project.structure.proportion" value="0.15234375" />
     <property name="project.structure.side.proportion" value="0.2" />
     <property name="settings.editor.selected.configurable" value="MavenSettings" />
@@ -126,7 +130,7 @@
       <recent name="$PROJECT_DIR$/selenium" />
     </key>
   </component>
-  <component name="RunManager" selected="Application.ProxyLoder">
+  <component name="RunManager" selected="JUnit.HttpClientTest.test">
     <configuration name="ProxyLoder" type="Application" factoryName="Application" temporary="true" nameIsGenerated="true">
       <option name="MAIN_CLASS_NAME" value="org.wlpiaoyi.framework.proxy.ProxyLoder" />
       <module name="proxy" />
@@ -171,9 +175,9 @@
     </configuration>
     <recent_temporary>
       <list>
+        <item itemvalue="JUnit.HttpClientTest.test" />
         <item itemvalue="Application.ProxyLoder" />
         <item itemvalue="Application.Rsa" />
-        <item itemvalue="JUnit.HttpClientTest.test" />
       </list>
     </recent_temporary>
   </component>
@@ -304,30 +308,59 @@
     </state>
     <state x="100" y="100" width="1480" height="850" key="DiffContextDialog/0.0.1680.1050@0.0.1680.1050" timestamp="1624528016130" />
     <state x="100" y="100" width="1480" height="850" key="DiffContextDialog/0.23.1680.963@0.23.1680.963" timestamp="1624528089458" />
-    <state width="1638" height="317" key="GridCell.Tab.0.bottom" timestamp="1624634629319">
+    <state width="1638" height="317" key="GridCell.Tab.0.bottom" timestamp="1624848091239">
       <screen x="0" y="0" width="1680" height="1050" />
     </state>
-    <state width="1638" height="317" key="GridCell.Tab.0.bottom/0.0.1680.1050@0.0.1680.1050" timestamp="1624634629319" />
+    <state width="1638" height="317" key="GridCell.Tab.0.bottom/0.0.1680.1050@0.0.1680.1050" timestamp="1624848091239" />
+    <state width="1638" height="283" key="GridCell.Tab.0.bottom/0.23.1680.957@0.23.1680.957" timestamp="1624845512775" />
+    <state width="1638" height="317" key="GridCell.Tab.0.bottom/0.23.1680.960@0.23.1680.960" timestamp="1624636638726" />
     <state width="1638" height="204" key="GridCell.Tab.0.bottom/0.23.1680.965@0.23.1680.965" timestamp="1624451596841" />
-    <state width="1638" height="317" key="GridCell.Tab.0.center" timestamp="1624634629318">
+    <state width="1638" height="317" key="GridCell.Tab.0.center" timestamp="1624848091237">
       <screen x="0" y="0" width="1680" height="1050" />
     </state>
-    <state width="1638" height="317" key="GridCell.Tab.0.center/0.0.1680.1050@0.0.1680.1050" timestamp="1624634629318" />
+    <state width="1638" height="317" key="GridCell.Tab.0.center/0.0.1680.1050@0.0.1680.1050" timestamp="1624848091237" />
+    <state width="1638" height="283" key="GridCell.Tab.0.center/0.23.1680.957@0.23.1680.957" timestamp="1624845512774" />
+    <state width="1638" height="317" key="GridCell.Tab.0.center/0.23.1680.960@0.23.1680.960" timestamp="1624636638726" />
     <state width="1638" height="204" key="GridCell.Tab.0.center/0.23.1680.965@0.23.1680.965" timestamp="1624451596840" />
-    <state width="1638" height="317" key="GridCell.Tab.0.left" timestamp="1624634629317">
+    <state width="1638" height="317" key="GridCell.Tab.0.left" timestamp="1624848091237">
       <screen x="0" y="0" width="1680" height="1050" />
     </state>
-    <state width="1638" height="317" key="GridCell.Tab.0.left/0.0.1680.1050@0.0.1680.1050" timestamp="1624634629317" />
+    <state width="1638" height="317" key="GridCell.Tab.0.left/0.0.1680.1050@0.0.1680.1050" timestamp="1624848091237" />
+    <state width="1638" height="283" key="GridCell.Tab.0.left/0.23.1680.957@0.23.1680.957" timestamp="1624845512773" />
+    <state width="1638" height="317" key="GridCell.Tab.0.left/0.23.1680.960@0.23.1680.960" timestamp="1624636638725" />
     <state width="1638" height="204" key="GridCell.Tab.0.left/0.23.1680.965@0.23.1680.965" timestamp="1624451596839" />
-    <state width="1638" height="317" key="GridCell.Tab.0.right" timestamp="1624634629318">
+    <state width="1638" height="317" key="GridCell.Tab.0.right" timestamp="1624848091238">
       <screen x="0" y="0" width="1680" height="1050" />
     </state>
-    <state width="1638" height="317" key="GridCell.Tab.0.right/0.0.1680.1050@0.0.1680.1050" timestamp="1624634629318" />
+    <state width="1638" height="317" key="GridCell.Tab.0.right/0.0.1680.1050@0.0.1680.1050" timestamp="1624848091238" />
+    <state width="1638" height="283" key="GridCell.Tab.0.right/0.23.1680.957@0.23.1680.957" timestamp="1624845512774" />
+    <state width="1638" height="317" key="GridCell.Tab.0.right/0.23.1680.960@0.23.1680.960" timestamp="1624636638726" />
     <state width="1638" height="204" key="GridCell.Tab.0.right/0.23.1680.965@0.23.1680.965" timestamp="1624451596840" />
-    <state x="341" y="164" key="SettingsEditor" timestamp="1623834863940">
-      <screen x="0" y="0" width="1680" height="1050" />
+    <state width="1638" height="283" key="GridCell.Tab.1.bottom" timestamp="1624845512776">
+      <screen x="0" y="23" width="1680" height="957" />
+    </state>
+    <state width="1638" height="283" key="GridCell.Tab.1.bottom/0.0.1680.1050@0.0.1680.1050" timestamp="1624845477206" />
+    <state width="1638" height="283" key="GridCell.Tab.1.bottom/0.23.1680.957@0.23.1680.957" timestamp="1624845512776" />
+    <state width="1638" height="283" key="GridCell.Tab.1.center" timestamp="1624845512776">
+      <screen x="0" y="23" width="1680" height="957" />
+    </state>
+    <state width="1638" height="283" key="GridCell.Tab.1.center/0.0.1680.1050@0.0.1680.1050" timestamp="1624845477204" />
+    <state width="1638" height="283" key="GridCell.Tab.1.center/0.23.1680.957@0.23.1680.957" timestamp="1624845512776" />
+    <state width="1638" height="283" key="GridCell.Tab.1.left" timestamp="1624845512775">
+      <screen x="0" y="23" width="1680" height="957" />
+    </state>
+    <state width="1638" height="283" key="GridCell.Tab.1.left/0.0.1680.1050@0.0.1680.1050" timestamp="1624845477204" />
+    <state width="1638" height="283" key="GridCell.Tab.1.left/0.23.1680.957@0.23.1680.957" timestamp="1624845512775" />
+    <state width="1638" height="283" key="GridCell.Tab.1.right" timestamp="1624845512776">
+      <screen x="0" y="23" width="1680" height="957" />
+    </state>
+    <state width="1638" height="283" key="GridCell.Tab.1.right/0.0.1680.1050@0.0.1680.1050" timestamp="1624845477205" />
+    <state width="1638" height="283" key="GridCell.Tab.1.right/0.23.1680.957@0.23.1680.957" timestamp="1624845512776" />
+    <state x="341" y="143" key="SettingsEditor" timestamp="1624847728468">
+      <screen x="0" y="23" width="1680" height="957" />
     </state>
     <state x="341" y="164" key="SettingsEditor/0.0.1680.1050@0.0.1680.1050" timestamp="1623834863940" />
+    <state x="341" y="143" key="SettingsEditor/0.23.1680.957@0.23.1680.957" timestamp="1624847728468" />
     <state x="627" y="310" key="chooseDestDirectoryDialog" timestamp="1624535601473">
       <screen x="0" y="0" width="1680" height="1050" />
     </state>
@@ -371,7 +404,7 @@
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
           <url>file://$PROJECT_DIR$/utils/src/test/java/org/wlpiaoyi/framework/utils/httpclient/HttpClientTest.java</url>
-          <line>48</line>
+          <line>49</line>
           <option name="timeStamp" value="102" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
@@ -383,6 +416,11 @@
           <url>file://$PROJECT_DIR$/generator-plugin/src/main/java/org/wlpiaoyi/framework/plugin/ExcludeColumnsPlugin.java</url>
           <line>189</line>
           <option name="timeStamp" value="108" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>file://$PROJECT_DIR$/utils/src/test/java/org/wlpiaoyi/framework/utils/httpclient/HttpClientTest.java</url>
+          <line>35</line>
+          <option name="timeStamp" value="109" />
         </line-breakpoint>
       </breakpoints>
     </breakpoint-manager>

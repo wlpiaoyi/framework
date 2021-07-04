@@ -65,6 +65,12 @@ public class StringUtils {
         return StringUtils.base64Decode(decodeStr, "UTF-8");
     }
 
+    /**
+     * 已废弃请使用org.wlpiaoyi.framework.utils.ValueUtils.isBlank
+     * @param arg
+     * @return
+     */
+    @Deprecated
     public static boolean isBlank(String arg){
         return arg == null || arg.length() == 0;
     }

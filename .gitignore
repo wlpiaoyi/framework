@@ -25,3 +25,4 @@ proxy/target/*
 selenium/target/*
 generator-plugin/target/*
 utils/target/*
+.idea/*
