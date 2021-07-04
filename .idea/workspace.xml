@@ -44,12 +44,7 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="a877397b-93f3-422b-bee1-1317d55f59f2" name="Default Changelist" comment="generator plugin">
-      <change afterPath="$PROJECT_DIR$/utils/src/main/java/org/wlpiaoyi/framework/utils/ValueUtils.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/compiler.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/compiler.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/generator-plugin/src/main/java/org/wlpiaoyi/framework/typeresolver/JavaTypeResolverDefaultImpl.java" beforeDir="false" afterPath="$PROJECT_DIR$/generator-plugin/src/main/java/org/wlpiaoyi/framework/typeresolver/JavaTypeResolverDefaultImpl.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/utils/src/main/java/org/wlpiaoyi/framework/utils/StringUtils.java" beforeDir="false" afterPath="$PROJECT_DIR$/utils/src/main/java/org/wlpiaoyi/framework/utils/StringUtils.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/utils/src/test/java/org/wlpiaoyi/framework/utils/httpclient/HttpClientTest.java" beforeDir="false" afterPath="$PROJECT_DIR$/utils/src/test/java/org/wlpiaoyi/framework/utils/httpclient/HttpClientTest.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -84,9 +79,12 @@
   <component name="MavenImportPreferences">
     <option name="generalSettings">
       <MavenGeneralSettings>
-        <option name="mavenHome" value="$PROJECT_DIR$/../../../../Config/apache-maven-3.6.3" />
+        <option name="mavenHome" value="$PROJECT_DIR$/../../../apache-maven-3.6.1" />
       </MavenGeneralSettings>
     </option>
+  </component>
+  <component name="ProblemsViewState">
+    <option name="selectedIndex" value="1" />
   </component>
   <component name="ProjectId" id="1RoTzXxFzoVkj2NPqjqUQJP9DeN" />
   <component name="ProjectLevelVcsManager" settingsEditedManually="true" />
@@ -282,6 +280,11 @@
   <component name="Vcs.Log.Tabs.Properties">
     <option name="TAB_STATES">
       <map>
+        <entry key="8d19d720-7526-402b-a363-e06730887428">
+          <value>
+            <State />
+          </value>
+        </entry>
         <entry key="MAIN">
           <value>
             <State />
@@ -297,82 +300,6 @@
     </ignored-roots>
     <MESSAGE value="generator plugin" />
     <option name="LAST_COMMIT_MESSAGE" value="generator plugin" />
-  </component>
-  <component name="WindowStateProjectService">
-    <state x="653" y="248" key="#com.intellij.ide.util.MemberChooser" timestamp="1624525416733">
-      <screen x="0" y="0" width="1680" height="1050" />
-    </state>
-    <state x="653" y="248" key="#com.intellij.ide.util.MemberChooser/0.0.1680.1050@0.0.1680.1050" timestamp="1624525416733" />
-    <state x="100" y="100" width="1480" height="850" key="DiffContextDialog" timestamp="1624528089458">
-      <screen x="0" y="23" width="1680" height="963" />
-    </state>
-    <state x="100" y="100" width="1480" height="850" key="DiffContextDialog/0.0.1680.1050@0.0.1680.1050" timestamp="1624528016130" />
-    <state x="100" y="100" width="1480" height="850" key="DiffContextDialog/0.23.1680.963@0.23.1680.963" timestamp="1624528089458" />
-    <state width="1638" height="317" key="GridCell.Tab.0.bottom" timestamp="1624848091239">
-      <screen x="0" y="0" width="1680" height="1050" />
-    </state>
-    <state width="1638" height="317" key="GridCell.Tab.0.bottom/0.0.1680.1050@0.0.1680.1050" timestamp="1624848091239" />
-    <state width="1638" height="283" key="GridCell.Tab.0.bottom/0.23.1680.957@0.23.1680.957" timestamp="1624845512775" />
-    <state width="1638" height="317" key="GridCell.Tab.0.bottom/0.23.1680.960@0.23.1680.960" timestamp="1624636638726" />
-    <state width="1638" height="204" key="GridCell.Tab.0.bottom/0.23.1680.965@0.23.1680.965" timestamp="1624451596841" />
-    <state width="1638" height="317" key="GridCell.Tab.0.center" timestamp="1624848091237">
-      <screen x="0" y="0" width="1680" height="1050" />
-    </state>
-    <state width="1638" height="317" key="GridCell.Tab.0.center/0.0.1680.1050@0.0.1680.1050" timestamp="1624848091237" />
-    <state width="1638" height="283" key="GridCell.Tab.0.center/0.23.1680.957@0.23.1680.957" timestamp="1624845512774" />
-    <state width="1638" height="317" key="GridCell.Tab.0.center/0.23.1680.960@0.23.1680.960" timestamp="1624636638726" />
-    <state width="1638" height="204" key="GridCell.Tab.0.center/0.23.1680.965@0.23.1680.965" timestamp="1624451596840" />
-    <state width="1638" height="317" key="GridCell.Tab.0.left" timestamp="1624848091237">
-      <screen x="0" y="0" width="1680" height="1050" />
-    </state>
-    <state width="1638" height="317" key="GridCell.Tab.0.left/0.0.1680.1050@0.0.1680.1050" timestamp="1624848091237" />
-    <state width="1638" height="283" key="GridCell.Tab.0.left/0.23.1680.957@0.23.1680.957" timestamp="1624845512773" />
-    <state width="1638" height="317" key="GridCell.Tab.0.left/0.23.1680.960@0.23.1680.960" timestamp="1624636638725" />
-    <state width="1638" height="204" key="GridCell.Tab.0.left/0.23.1680.965@0.23.1680.965" timestamp="1624451596839" />
-    <state width="1638" height="317" key="GridCell.Tab.0.right" timestamp="1624848091238">
-      <screen x="0" y="0" width="1680" height="1050" />
-    </state>
-    <state width="1638" height="317" key="GridCell.Tab.0.right/0.0.1680.1050@0.0.1680.1050" timestamp="1624848091238" />
-    <state width="1638" height="283" key="GridCell.Tab.0.right/0.23.1680.957@0.23.1680.957" timestamp="1624845512774" />
-    <state width="1638" height="317" key="GridCell.Tab.0.right/0.23.1680.960@0.23.1680.960" timestamp="1624636638726" />
-    <state width="1638" height="204" key="GridCell.Tab.0.right/0.23.1680.965@0.23.1680.965" timestamp="1624451596840" />
-    <state width="1638" height="283" key="GridCell.Tab.1.bottom" timestamp="1624845512776">
-      <screen x="0" y="23" width="1680" height="957" />
-    </state>
-    <state width="1638" height="283" key="GridCell.Tab.1.bottom/0.0.1680.1050@0.0.1680.1050" timestamp="1624845477206" />
-    <state width="1638" height="283" key="GridCell.Tab.1.bottom/0.23.1680.957@0.23.1680.957" timestamp="1624845512776" />
-    <state width="1638" height="283" key="GridCell.Tab.1.center" timestamp="1624845512776">
-      <screen x="0" y="23" width="1680" height="957" />
-    </state>
-    <state width="1638" height="283" key="GridCell.Tab.1.center/0.0.1680.1050@0.0.1680.1050" timestamp="1624845477204" />
-    <state width="1638" height="283" key="GridCell.Tab.1.center/0.23.1680.957@0.23.1680.957" timestamp="1624845512776" />
-    <state width="1638" height="283" key="GridCell.Tab.1.left" timestamp="1624845512775">
-      <screen x="0" y="23" width="1680" height="957" />
-    </state>
-    <state width="1638" height="283" key="GridCell.Tab.1.left/0.0.1680.1050@0.0.1680.1050" timestamp="1624845477204" />
-    <state width="1638" height="283" key="GridCell.Tab.1.left/0.23.1680.957@0.23.1680.957" timestamp="1624845512775" />
-    <state width="1638" height="283" key="GridCell.Tab.1.right" timestamp="1624845512776">
-      <screen x="0" y="23" width="1680" height="957" />
-    </state>
-    <state width="1638" height="283" key="GridCell.Tab.1.right/0.0.1680.1050@0.0.1680.1050" timestamp="1624845477205" />
-    <state width="1638" height="283" key="GridCell.Tab.1.right/0.23.1680.957@0.23.1680.957" timestamp="1624845512776" />
-    <state x="341" y="143" key="SettingsEditor" timestamp="1624847728468">
-      <screen x="0" y="23" width="1680" height="957" />
-    </state>
-    <state x="341" y="164" key="SettingsEditor/0.0.1680.1050@0.0.1680.1050" timestamp="1623834863940" />
-    <state x="341" y="143" key="SettingsEditor/0.23.1680.957@0.23.1680.957" timestamp="1624847728468" />
-    <state x="627" y="310" key="chooseDestDirectoryDialog" timestamp="1624535601473">
-      <screen x="0" y="0" width="1680" height="1050" />
-    </state>
-    <state x="627" y="310" key="chooseDestDirectoryDialog/0.0.1680.1050@0.0.1680.1050" timestamp="1624535601473" />
-    <state x="538" y="280" width="604" height="490" key="find.popup" timestamp="1624525505599">
-      <screen x="0" y="0" width="1680" height="1050" />
-    </state>
-    <state x="538" y="280" width="604" height="490" key="find.popup/0.0.1680.1050@0.0.1680.1050" timestamp="1624525505599" />
-    <state x="208" y="188" key="new project wizard" timestamp="1624438378899">
-      <screen x="0" y="0" width="1680" height="1050" />
-    </state>
-    <state x="208" y="188" key="new project wizard/0.0.1680.1050@0.0.1680.1050" timestamp="1624438378899" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
