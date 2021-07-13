@@ -33,7 +33,17 @@ public class DateUtils {
      * @return
      */
     public static LocalDateTime getLocalDateTime(long timestamp) {
-        return LocalDateTime.ofInstant(Instant.ofEpochMilli(timestamp), ZoneId.systemDefault());
+        return DateUtils.getLocalDateTime(timestamp, ZoneId.systemDefault());
+    }
+
+    /**
+     * Timestamp get to LocalDateTime
+     * @param timestamp
+     * @param zone
+     * @return
+     */
+    public static LocalDateTime getLocalDateTime(long timestamp, ZoneId zone) {
+        return LocalDateTime.ofInstant(Instant.ofEpochMilli(timestamp), zone);
     }
 
     /**
@@ -46,16 +56,26 @@ public class DateUtils {
     }
 
     /**
+     * LocalDate parse to Date
+     * @param localDate
+     * @param zone
+     * @return
+     */
+    public static Date parsetoDate(LocalDate localDate, ZoneId zone) {
+        return Date.from(localDate.atStartOfDay(zone).toInstant());
+    }
+
+    /**
      * LocalDateTime parse to Date
      * @param localDateTime
      * @return
      */
     public static Date parsetoDate(LocalDateTime localDateTime) {
-        return Date.from(localDateTime.atZone( ZoneId.systemDefault()).toInstant());
+        return Date.from(localDateTime.atZone(ZoneId.systemDefault()).toInstant());
     }
 
     /**
-     * Date parse to LocalDatevbv
+     * Date parse to LocalDate
      * @param date
      * @return
      */
@@ -64,6 +84,19 @@ public class DateUtils {
             throw new IllegalArgumentException("参数不能为空");
         }
         return date.toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
+    }
+
+    /**
+     * Date parse to LocalDate
+     * @param date
+     * @param zone
+     * @return
+     */
+    public static LocalDate parsetoLocalDate(Date date, ZoneId zone) {
+        if (date == null) {
+            throw new IllegalArgumentException("参数不能为空");
+        }
+        return date.toInstant().atZone(zone).toLocalDate();
     }
 
     /**
@@ -79,18 +112,49 @@ public class DateUtils {
     }
 
     /**
+     * Date parse to LocalDateTime
+     * @param date
+     * @param zone
+     * @return
+     */
+    public static LocalDateTime parsetoLocalDateTime(Date date, ZoneId zone) {
+        if (date == null) {
+            throw new IllegalArgumentException("参数不能为空");
+        }
+        return date.toInstant().atZone(zone).toLocalDateTime();
+    }
+
+    /**
      * String parse to LocalDateTime with pattern
      * @param localDateTime
      * @param pattern
      * @return
      */
     public static LocalDateTime parsetoLocalDateTime(String localDateTime, String pattern) {
-        if (StringUtils.isBlank(localDateTime)) {
+        if (ValueUtils.isBlank(localDateTime)) {
             throw new IllegalArgumentException("参数不能为空");
         }
         DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern(pattern);
         return LocalDateTime.parse(localDateTime, dateTimeFormatter);
     }
+
+
+    /**
+     * String parse to LocalDateTime with pattern
+     * @param localDateTime
+     * @param pattern
+     * @return
+     */
+    public static LocalDateTime parsetoLocalDateTime(String localDateTime, String pattern, ZoneId zone) {
+        if (ValueUtils.isBlank(localDateTime)) {
+            throw new IllegalArgumentException("参数不能为空");
+        }
+        DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern(pattern);
+        LocalDateTime dateTime = LocalDateTime.parse(localDateTime, dateTimeFormatter);
+
+        return LocalDateTime.ofInstant(dateTime.toInstant(ZoneOffset.ofTotalSeconds(0)), zone);
+    }
+
 
     /**
      * String parse to LocalDateTime
@@ -161,7 +225,7 @@ public class DateUtils {
      * @param localDate
      * @return
      */
-    public static String formatLocalDateTime(LocalDate localDate) {
+    public static String formatLocalDate(LocalDate localDate) {
         return formatLocalDate(localDate, YYYYMMDD);
     }
 

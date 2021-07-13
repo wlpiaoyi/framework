@@ -7,6 +7,7 @@ import org.apache.http.HttpResponse;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
+import org.wlpiaoyi.framework.utils.DateUtils;
 import org.wlpiaoyi.framework.utils.StringUtils;
 import org.wlpiaoyi.framework.utils.ValueUtils;
 
@@ -15,6 +16,9 @@ import org.wlpiaoyi.framework.utils.ValueUtils;
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.net.URISyntaxException;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -33,6 +37,10 @@ public class HttpClientTest {
     @Test
     public void test() throws IOException {
         try {
+            Date date = new Date();
+            String dateTimeArgs = DateUtils.formatLocalDateTime(DateUtils.parsetoLocalDateTime(date));
+            String[] zoneIds = ZoneId.getAvailableZoneIds().toArray(new String[]{});
+            LocalDateTime dt = DateUtils.parsetoLocalDateTime(dateTimeArgs, DateUtils.YYYYMMDDHHMMSS, ZoneId.of(zoneIds[0]));
             String text = HttpGetClient.String("http://sms.webchinese.cn/web_api/SMS", null, new HashMap(){{
                 put("Action","UP");
                 put("Uid","wlpiaoyi");

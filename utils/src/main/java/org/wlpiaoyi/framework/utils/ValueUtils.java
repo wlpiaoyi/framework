@@ -3,12 +3,16 @@ package org.wlpiaoyi.framework.utils;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
+import java.util.Collection;
+import java.util.Map;
 
 public class ValueUtils {
 
     /**
      * value是否为空或者无效
-     * String 长度为0,基础类型等于0
+     * 1.String 长度为0
+     * 2.基础类型等于0
+     * 3.集合、数组等类型空
      * 其他情况除非value是null否则都返回true
      * @param value
      * @param <T>
@@ -17,20 +21,19 @@ public class ValueUtils {
     public static <T> boolean isBlank(T value){
         if(value == null) return true;
         if(value instanceof String) {
-            String arg = (String) value;
-            return arg.length() == 0;
+            return ((String) value).length() == 0;
         }
         if(value instanceof Long){
             return (Long)value == 0;
         }
+        if(value instanceof Integer){
+            return (Integer)value == 0;
+        }
         if(value instanceof Boolean){
-            return (Boolean) value == false;
+            return (Boolean)value == false;
         }
         if(value instanceof Double){
             return (Double)value == 0;
-        }
-        if(value instanceof Integer){
-            return (Integer)value == 0;
         }
         if(value instanceof Float){
             return (Float)value == 0;
@@ -43,6 +46,16 @@ public class ValueUtils {
         }
         if(value instanceof BigInteger){
             return ((BigInteger) value).intValue() == 0;
+        }
+        if(value instanceof Collection){
+            return ((Collection) value).isEmpty();
+        }
+        if(value instanceof Map){
+            return ((Map) value).isEmpty();
+        }
+        if(value.getClass().isArray()) {
+            T[] values = (T[]) value;
+            return values.length == 0;
         }
         return false;
     }
