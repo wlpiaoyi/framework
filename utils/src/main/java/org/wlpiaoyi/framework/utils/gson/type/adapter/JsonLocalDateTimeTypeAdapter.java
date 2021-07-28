@@ -9,11 +9,9 @@ import org.wlpiaoyi.framework.utils.ValueUtils;
 import org.wlpiaoyi.framework.utils.gson.GsonBuilder;
 
 import java.lang.reflect.Type;
-import java.time.LocalDateTime;
-import java.time.ZoneId;
-import java.time.ZoneOffset;
+import java.time.*;
 
-public class JsonLocalTypeAdapter  implements GsonBuilder.JsonSerializer<LocalDateTime>, JsonDeserializer<LocalDateTime> {
+public class JsonLocalDateTimeTypeAdapter implements GsonBuilder.JsonSerializer<LocalDateTime>, JsonDeserializer<LocalDateTime> {
 
     @Getter
     @NonNull
@@ -23,7 +21,7 @@ public class JsonLocalTypeAdapter  implements GsonBuilder.JsonSerializer<LocalDa
         return LocalDateTime.class;
     }
 
-    public JsonLocalTypeAdapter(@Nullable ZoneId zoneId){
+    public JsonLocalDateTimeTypeAdapter(@Nullable ZoneId zoneId){
         if(ValueUtils.isBlank(zoneId)){
             zoneId = ZoneId.systemDefault();
         }
@@ -31,19 +29,19 @@ public class JsonLocalTypeAdapter  implements GsonBuilder.JsonSerializer<LocalDa
     }
 
     @Override
-    public JsonElement serialize(LocalDateTime dateTime, Type typeOfSrc, JsonSerializationContext context) {
-        return new JsonPrimitive(DateUtils.toTimestamp(dateTime));
-    }
-
-    @Override
     public LocalDateTime deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context) throws JsonParseException {
-
         if (!(json instanceof JsonPrimitive)) {
             throw new JsonParseException("The date should be a string value");
         }
 
         Long time = json.getAsLong();
-        LocalDateTime dateTime = DateUtils.getLocalDateTime(time, this.zoneId);
+        LocalDateTime dateTime = DateUtils.toLocalDateTime(time, this.zoneId);
         return dateTime;
     }
+
+    @Override
+    public JsonElement serialize(LocalDateTime dateTime, Type typeOfSrc, JsonSerializationContext context) {
+        return new JsonPrimitive(DateUtils.toTimestamp(dateTime));
+    }
+
 }

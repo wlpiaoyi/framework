@@ -15,6 +15,8 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 
 public class GsonBuilderTest {
 
@@ -43,6 +45,11 @@ public class GsonBuilderTest {
         to.lTime = LocalTime.of(12,02);
         String json = GsonBuilder.gsonDefault().toJson(to);
         TestObj to2 = GsonBuilder.gsonDefault().fromJson(json, TestObj.class);
+        Map map = GsonBuilder.gsonDefault().fromJson(json, Map.class);
+        map.put("map", new HashMap(){{
+            put("1","1");
+        }});
+        json = GsonBuilder.gsonDefault().toJson(map);
         System.out.println(json);
     }
 

@@ -62,12 +62,30 @@ public class DateUtils {
     }
 
     /**
+     * nanoOfDay to LocalTime
+     * @param nanoOfDay
+     * @return
+     */
+    public static LocalTime toLocalTime(long nanoOfDay) {
+        return LocalTime.ofNanoOfDay(nanoOfDay);
+    }
+
+    /**
+     * epochDay to LocalDate
+     * @param epochDay
+     * @return
+     */
+    public static LocalDate toLocalDate(long epochDay) {
+        return LocalDate.ofEpochDay(epochDay);
+    }
+
+    /**
      * Timestamp get to LocalDateTime
      * @param timestamp
      * @return
      */
-    public static LocalDateTime getLocalDateTime(long timestamp) {
-        return DateUtils.getLocalDateTime(timestamp, ZoneId.systemDefault());
+    public static LocalDateTime toLocalDateTime(long timestamp) {
+        return DateUtils.toLocalDateTime(timestamp, ZoneId.systemDefault());
     }
 
     /**
@@ -76,7 +94,7 @@ public class DateUtils {
      * @param zoneId
      * @return
      */
-    public static LocalDateTime getLocalDateTime(long timestamp, ZoneId zoneId) {
+    public static LocalDateTime toLocalDateTime(long timestamp, ZoneId zoneId) {
         if(zoneId == null){
             zoneId = ZoneId.systemDefault();
         }
@@ -88,9 +106,9 @@ public class DateUtils {
      * @param localDate
      * @return
      */
-    public static Date getLocalDateToDate(LocalDate localDate) {
+    public static Date localDateToDate(LocalDate localDate) {
         ZoneId zoneId = ZoneId.systemDefault();
-        return DateUtils.getLocalDateToDate(localDate, zoneId);
+        return DateUtils.localDateToDate(localDate, zoneId);
     }
 
     /**
@@ -99,7 +117,7 @@ public class DateUtils {
      * @param zoneId
      * @return
      */
-    public static Date getLocalDateToDate(LocalDate localDate, ZoneId zoneId) {
+    public static Date localDateToDate(LocalDate localDate, ZoneId zoneId) {
         if(zoneId == null){
             zoneId = ZoneId.systemDefault();
         }
@@ -111,9 +129,9 @@ public class DateUtils {
      * @param localDateTime
      * @return
      */
-    public static Date getLocalDateTimeToDate(LocalDateTime localDateTime) {
+    public static Date localDateTimeToDate(LocalDateTime localDateTime) {
         ZoneId zoneId = ZoneId.systemDefault();
-        return DateUtils.getLocalDateTimeToDate(localDateTime, zoneId);
+        return DateUtils.localDateTimeToDate(localDateTime, zoneId);
     }
 
     /**
@@ -122,7 +140,7 @@ public class DateUtils {
      * @param zoneId
      * @return
      */
-    public static Date getLocalDateTimeToDate(LocalDateTime localDateTime, ZoneId zoneId) {
+    public static Date localDateTimeToDate(LocalDateTime localDateTime, ZoneId zoneId) {
         if(zoneId == null){
             zoneId = ZoneId.systemDefault();
         }
@@ -134,9 +152,9 @@ public class DateUtils {
      * @param date
      * @return
      */
-    public static LocalDate getDateToLocalDate(Date date) {
+    public static LocalDate dateToLocalDate(Date date) {
         ZoneId zoneId = ZoneId.systemDefault();
-        return DateUtils.getDateToLocalDate(date, zoneId);
+        return DateUtils.dateToLocalDate(date, zoneId);
     }
 
     /**
@@ -145,7 +163,7 @@ public class DateUtils {
      * @param zoneId
      * @return
      */
-    public static LocalDate getDateToLocalDate(@NonNull Date date, ZoneId zoneId) {
+    public static LocalDate dateToLocalDate(@NonNull Date date, ZoneId zoneId) {
         if (date == null) {
             throw new IllegalArgumentException("参数不能为空");
         }
@@ -160,12 +178,12 @@ public class DateUtils {
      * @param date
      * @return
      */
-    public static LocalDateTime getDateToLocalDateTime(Date date) {
+    public static LocalDateTime dateToLocalDateTime(Date date) {
         if (date == null) {
             throw new IllegalArgumentException("参数不能为空");
         }
         ZoneId zoneId = ZoneId.systemDefault();
-        return DateUtils.getDateToLocalDateTime(date, zoneId);
+        return DateUtils.dateToLocalDateTime(date, zoneId);
     }
 
     /**
@@ -174,7 +192,7 @@ public class DateUtils {
      * @param zoneId
      * @return
      */
-    public static LocalDateTime getDateToLocalDateTime(Date date, ZoneId zoneId) {
+    public static LocalDateTime dateToLocalDateTime(Date date, ZoneId zoneId) {
         if (date == null) {
             throw new IllegalArgumentException("参数不能为空");
         }

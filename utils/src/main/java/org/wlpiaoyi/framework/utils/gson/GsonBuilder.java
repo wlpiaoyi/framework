@@ -30,16 +30,17 @@ public class GsonBuilder  {
     @NonNull
     private List<TypeAdapterFactory> factories;
 
-    private JsonDateTypeAdapter dateTypeAdapter;
-    private JsonLocalTypeAdapter localTypeAdapter;
+    protected static GsonBuilder xGsonBuilder;
 
-    private static GsonBuilder xGsonBuilder;
-
-    public static GsonBuilder instance(){
+    public static final GsonBuilder instance(){
         return new GsonBuilder();
     }
 
-    private static GsonBuilder singleInstance(){
+    public static final Gson gsonDefault(){
+        return GsonBuilder.singleInstance().gson;
+    }
+
+    protected static final GsonBuilder singleInstance(){
         if(xGsonBuilder != null) return xGsonBuilder;
         synchronized (GsonBuilder.class){
             if(xGsonBuilder == null){
@@ -50,39 +51,48 @@ public class GsonBuilder  {
     }
 
     private GsonBuilder(){
-        this.dateTypeAdapter = new JsonDateTypeAdapter();
-        this.localTypeAdapter = new JsonLocalTypeAdapter(ZoneId.systemDefault());
-        this.resetDefault()
-                .addJsonSerializer(this.dateTypeAdapter)
-                .addJsonSerializer(this.localTypeAdapter);
-        this.gson = this.gson();
-    }
-
-    public static Gson gsonDefault(){
-        return GsonBuilder.singleInstance().gson;
-    }
-
-    protected GsonBuilder resetDefault(){
         this.factories = new ArrayList<>();
         this.jsonSerializers = new ArrayList<>();
-        this.gson = this.gson();
+        this.resetDefault();
+    }
+
+
+    protected GsonBuilder resetDefault(){
+        this.clearJsonSerializers()
+                .clearFactories()
+                .addJsonSerializer(new JsonDateTypeAdapter())
+                .addJsonSerializer(new JsonLocalTimeTypeAdapter())
+                .addJsonSerializer(new JsonLocalDateTypeAdapter())
+                .addJsonSerializer(new JsonLocalDateTimeTypeAdapter(ZoneId.systemDefault()));
+        this.gson = this.createGson();
         return this;
     }
 
-    public GsonBuilder addJsonSerializer(JsonSerializer jsonSerializer){
+    public final GsonBuilder clearJsonSerializers(){
+        this.jsonSerializers.clear();
+        return this;
+    }
+
+    public final GsonBuilder clearFactories(){
+        this.factories.clear();
+        return this;
+    }
+
+    public final GsonBuilder addJsonSerializer(JsonSerializer jsonSerializer){
+        if(jsonSerializer == null) return this;
         if(this.jsonSerializers.contains(jsonSerializer)) return this;
         this.jsonSerializers.add(jsonSerializer);
         return this;
     }
 
-    public GsonBuilder addFactories(TypeAdapterFactory factory){
+    public final GsonBuilder addFactories(TypeAdapterFactory factory){
         if(this.factories.contains(factory)) return this;
         this.factories.add(factory);
         return this;
     }
 
     @SneakyThrows
-    protected Gson gson(){
+    protected final Gson createGson(){
         ExclusionStrategy myExclusionStrategy = new ExclusionStrategy() {
             @Override
             public boolean shouldSkipField(FieldAttributes fieldAttributes) {
