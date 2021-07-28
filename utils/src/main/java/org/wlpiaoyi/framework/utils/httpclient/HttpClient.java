@@ -37,6 +37,11 @@ import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
 import java.util.*;
 
+/**
+ * 已废弃
+ * @author wlpiaoyi
+ */
+@Deprecated
 public class HttpClient {
 
     final static Map<String, String> HEDAER_JSON_DEFAULTS = new HashMap(){{
@@ -57,6 +62,7 @@ public class HttpClient {
     public static final int TIME_OUT_MS = 30000;
 
     private static PoolingHttpClientConnectionManager CONNECTION_MANAGER;
+
 
     static @NonNull Map<String, Object> createJsonHeaderMap(@Nullable Map<String, Object> headerMap){
         if(headerMap == null){

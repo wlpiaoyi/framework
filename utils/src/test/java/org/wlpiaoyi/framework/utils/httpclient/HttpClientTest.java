@@ -38,9 +38,9 @@ public class HttpClientTest {
     public void test() throws IOException {
         try {
             Date date = new Date();
-            String dateTimeArgs = DateUtils.formatLocalDateTime(DateUtils.parsetoLocalDateTime(date));
+            String dateTimeArgs = DateUtils.formatLocalDateTime(DateUtils.getDateToLocalDateTime(date));
             String[] zoneIds = ZoneId.getAvailableZoneIds().toArray(new String[]{});
-            LocalDateTime dt = DateUtils.parsetoLocalDateTime(dateTimeArgs, DateUtils.YYYYMMDDHHMMSS, ZoneId.of(zoneIds[0]));
+            LocalDateTime dt = DateUtils.parseLocalDateTime(dateTimeArgs, DateUtils.YYYYMMDDHHMMSS, ZoneId.of(zoneIds[0]));
             String text = HttpGetClient.String("http://sms.webchinese.cn/web_api/SMS", null, new HashMap(){{
                 put("Action","UP");
                 put("Uid","wlpiaoyi");

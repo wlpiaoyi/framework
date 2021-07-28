@@ -11,6 +11,12 @@ import java.io.IOException;
 import java.net.URISyntaxException;
 import java.util.Map;
 
+
+/**
+ * 已废弃
+ * @author wlpiaoyi
+ */
+@Deprecated
 public class HttpPostClient extends HttpClient{
 
 
