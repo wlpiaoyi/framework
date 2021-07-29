@@ -1,17 +1,22 @@
 package org.wlpiaoyi.framework.utils.http.factory;
 
+import com.sun.xml.internal.ws.wsdl.writer.document.soap.Body;
 import lombok.NonNull;
 import org.apache.http.*;
 import org.apache.http.client.methods.*;
+import org.apache.http.cookie.Cookie;
 import org.apache.http.util.EntityUtils;
 import org.wlpiaoyi.framework.utils.ValueUtils;
+import org.wlpiaoyi.framework.utils.exception.BusinessException;
 import org.wlpiaoyi.framework.utils.http.request.Request;
 import org.wlpiaoyi.framework.utils.http.response.Response;
 
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 
 
 public class ResponseFactory {
@@ -29,6 +34,7 @@ public class ResponseFactory {
         HttpGet hr = new HttpGet(request.URI());
         if(request.getHeaders() != null){
             for (Map.Entry<String, Object> param : request.getHeaders().entrySet()) {
+                hr.removeHeaders(param.getKey());
                 hr.addHeader(param.getKey(), String.valueOf(param.getValue()));
             }
         }
@@ -53,6 +59,7 @@ public class ResponseFactory {
         HttpPost hr = new HttpPost(request.URI());
         if(request.getHeaders() != null){
             for (Map.Entry<String, Object> param : request.getHeaders().entrySet()) {
+                hr.removeHeaders(param.getKey());
                 hr.addHeader(param.getKey(), String.valueOf(param.getValue()));
             }
         }
@@ -78,6 +85,7 @@ public class ResponseFactory {
         HttpDelete hr = new HttpDelete(request.URI());
         if(request.getHeaders() != null){
             for (Map.Entry<String, Object> param : request.getHeaders().entrySet()) {
+                hr.removeHeaders(param.getKey());
                 hr.addHeader(param.getKey(), String.valueOf(param.getValue()));
             }
         }
@@ -101,6 +109,7 @@ public class ResponseFactory {
         HttpPut hr = new HttpPut(request.URI());
         if(request.getHeaders() != null){
             for (Map.Entry<String, Object> param : request.getHeaders().entrySet()) {
+                hr.removeHeaders(param.getKey());
                 hr.addHeader(param.getKey(), String.valueOf(param.getValue()));
             }
         }
@@ -127,7 +136,20 @@ public class ResponseFactory {
         rq.setConfig(HttpFactory.createConfig(request.getProxy()).build());
         for (Object obj : request.getHeaders().entrySet()){
             Map.Entry<String, String> entry= (Map.Entry<String, String>) obj;
+            rq.removeHeaders(entry.getKey());
             rq.addHeader(entry.getKey(), entry.getValue());
+        }
+        StringBuilder cookies = new StringBuilder();
+        for (Cookie cookie :
+                request.getCookieStore().getCookies()) {
+            cookies.append(cookie.getName());
+            cookies.append("=");
+            cookies.append(cookie.getValue());
+            cookies.append(";");
+        }
+        if(cookies.length() > 0){
+            rq.removeHeaders("cookie");
+            rq.addHeader("cookie", cookies.substring(0, cookies.length() - 1));
         }
         CloseableHttpResponse response = HttpFactory.getHttpClient().execute(rq, request.getContext());
         return response;
@@ -145,9 +167,21 @@ public class ResponseFactory {
         rq.setConfig(HttpFactory.createConfig(request.getProxy()).build());
         for (Object obj : request.getHeaders().entrySet()){
             Map.Entry<String, String> entry= (Map.Entry<String, String>) obj;
+            rq.removeHeaders(entry.getKey());
             rq.addHeader(entry.getKey(), entry.getValue());
         }
-
+        StringBuilder cookies = new StringBuilder();
+        for (Cookie cookie :
+                request.getCookieStore().getCookies()) {
+            cookies.append(cookie.getName());
+            cookies.append("=");
+            cookies.append(cookie.getValue());
+            cookies.append(";");
+        }
+        if(cookies.length() > 0){
+            rq.removeHeaders("cookie");
+            rq.addHeader("cookie", cookies.substring(0, cookies.length() - 1));
+        }
         CloseableHttpResponse response = HttpFactory.getHttpsClient().execute(rq, request.getContext());
         return response;
     }
@@ -156,22 +190,18 @@ public class ResponseFactory {
 
     public static <T> Response<T> ResponseData(HttpResponse rp, Class<T> clazz) throws IOException {
         if(rp == null) return null;
+
         Response<String> responseText = ResponseFactory.ResponseText(rp);
-
-        Response response = new Response<T>().setCookies(responseText.getCookies()).setHeaders(responseText.getHeaders());
-        if(ValueUtils.isBlank(responseText.getBody())){
-            return response;
+        if(ValueUtils.isBlank(responseText.getBody()) || clazz == String.class){
+            return (Response<T>) responseText;
         }
 
-        if(clazz == String.class){
-            return response.setBody(responseText.getBody());
-        }
-        HttpEntity entity = rp.getEntity();
-        if (entity == null) return response;
+        T body = null;
+        if(rp.getEntity().getContentType().getValue().contains("application/json")){
+            body = HttpFactory.GSON.fromJson(responseText.getBody(), clazz);
+        }else throw new BusinessException("不支持的ContentType");
 
-        if(entity.getContentType().getValue().contains("application/json")){
-            return response.setBody(HttpFactory.GSON.fromJson(responseText.getBody(), clazz));
-        }
+        Response<T> response = ResponseFactory.Response(rp, body);
         return response;
     }
 
@@ -179,11 +209,21 @@ public class ResponseFactory {
         if(rp == null) return null;
         HttpEntity entity = rp.getEntity();
         if (entity == null) return null;
-        Map<String, String> headers = new HashMap<>();
+        String body = EntityUtils.toString(entity);
+        return ResponseFactory.Response(rp, body);
+    }
+
+    public static <T> Response<T> Response(HttpResponse rp, T body){
+        if(rp == null) return null;
+        HttpEntity entity = rp.getEntity();
+        if (entity == null) return null;
+        Set<Header> headers = new HashSet<>();
         for (Header header : rp.getAllHeaders()) {
-            headers.put(header.getName(), header.getValue());
+            headers.add(header);
         }
-        return new Response<>().setBody(EntityUtils.toString(entity)).setHeaders(headers);
+        return new Response<T>().setBody(body)
+                .setHeaders(headers)
+                .setStatusCode(rp.getStatusLine().getStatusCode());
     }
 
 

@@ -2,10 +2,10 @@ package org.wlpiaoyi.framework.utils.http.response;
 
 import lombok.Data;
 import lombok.Getter;
+import org.apache.http.Header;
+import org.apache.http.cookie.Cookie;
 
-import javax.servlet.http.Cookie;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public class Response <T> {
 
@@ -13,23 +13,47 @@ public class Response <T> {
     private T body;
 
     @Getter
-    private Map<String, String> headers;
+    private Set<Header> headers;
 
     @Getter
-    private List<Cookie> cookies;
+    private Set<Cookie> cookies;
+
+    @Getter
+    private int statusCode;
 
     public Response setBody(T body){
         this.body = body;
         return this;
     }
 
-    public Response setHeaders(Map<String, String> headers){
-        this.headers = headers;
-        return this;
-    }
-    public Response setCookies(List<Cookie> cookies){
-        this.cookies = cookies;
+    public Response setHeaders(Collection<Header> headers){
+        if(this.headers == null) this.headers = new HashSet<>();
+        this.headers.addAll(headers);
         return this;
     }
 
+    public Response removeHeaders(String name){
+        Set<Header> removes = new HashSet<>();
+        for (Header header :
+                this.headers) {
+            if (header.getName().equals(name))
+                removes.add(header);
+        }
+        this.headers.removeAll(removes);
+        return this;
+    }
+    public Response removeHeader(Header header){
+        this.headers.remove(header);
+        return this;
+    }
+
+    public Response setStatusCode(int statusCode){
+        this.statusCode = statusCode;
+        return this;
+    }
+
+    public Response setCookies(Set<Cookie> cookies){
+        this.cookies = cookies;
+        return this;
+    }
 }

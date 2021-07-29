@@ -4,14 +4,14 @@ import lombok.Getter;
 import org.apache.http.HttpHost;
 import org.apache.http.NameValuePair;
 import org.apache.http.client.CookieStore;
-import org.apache.http.client.protocol.HttpClientContext;
 import org.apache.http.client.utils.URIBuilder;
 import org.apache.http.cookie.Cookie;
-import org.apache.http.impl.client.BasicCookieStore;
+import org.apache.http.impl.cookie.BasicClientCookie;
 import org.apache.http.message.BasicNameValuePair;
-import org.apache.http.protocol.BasicHttpContext;
 import org.apache.http.protocol.HttpContext;
 import org.wlpiaoyi.framework.utils.ValueUtils;
+import org.wlpiaoyi.framework.utils.http.factory.CookieFactory;
+import org.wlpiaoyi.framework.utils.http.factory.HttpFactory;
 
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -46,11 +46,9 @@ public class Request<T> {
     private final Map<String, Object> headers;
 
     @Getter
-    private final List<Cookie> cookies;
-
-    @Getter
     private T body;
 
+    @Getter
     private Map<String, String> params;
 
     @Getter
@@ -66,10 +64,7 @@ public class Request<T> {
 
     public String getHost(){
         if(this.host == null){
-            String host = this.url.substring(this.url.indexOf(':'));
-            int index = host.indexOf('/');
-            if(index < 0) return host;
-            host = host.substring(index);
+            String host = this.url.split("//")[1].split("/")[0].split(":")[0];
             this.host = host;
         }
         return host;
@@ -97,7 +92,6 @@ public class Request<T> {
 
     private Request(String url){
         this.headers = new HashMap<>();
-        this.cookies = new ArrayList<>();
         this.method = Method.Get;
         this.url = url;
     }
@@ -111,28 +105,14 @@ public class Request<T> {
         return this;
     }
 
-    public Request addCookie(Cookie cookie){
-        this.cookies.add(cookie);
-        this.getCookieStore().addCookie(cookie);
+    public Request setCookie(String key, String value){
+        CookieFactory.setCookie(this.getCookieStore(), new BasicClientCookie(key, value));
         return this;
     }
 
     public Request removeCookie(String name){
-        CookieStore cookieStore = this.getCookieStore();
-        for (Cookie cookie : cookieStore.getCookies()){
-            if(cookie.getName().equals(name)){
-                this.getCookies().remove(cookie);
-                break;
-            }
-        }
-        for (Cookie cookie : this.getCookies()){
-            if(cookie.getName().equals(name)){
-                this.getCookies().remove(cookie);
-                break;
-            }
-        }
-
-
+        CookieFactory.removeCookie(this.getCookieStore(),
+                CookieFactory.getCookie(this.getCookieStore(), name));
         return this;
     }
 
@@ -196,29 +176,12 @@ public class Request<T> {
         return charset;
     }
 
-    static Map<String, HttpContext> xHttpContextMap = new HashMap<>();
-    public static HttpContext getLocationContext(String host) {
-        HttpContext xHttpContext = xHttpContextMap.get(host);
-        if(xHttpContext != null) return xHttpContext;
-        synchronized (Request.class){
-            if(xHttpContext == null){
-                CookieStore cookieStore = new BasicCookieStore();
-                HttpContext localContext = new BasicHttpContext();
-                localContext.setAttribute(HttpClientContext.COOKIE_STORE, cookieStore);
-                xHttpContext = localContext;
-                xHttpContextMap.put(host, xHttpContext);
-            }
-        }
-        return xHttpContext;
-    }
-
     public HttpContext getContext() {
-        return Request.getLocationContext(this.getHost());
+        return CookieFactory.getLocationContext(this.getHost());
     }
 
     public CookieStore getCookieStore() {
-        CookieStore cookieStore = (CookieStore) this.getContext().getAttribute(HttpClientContext.COOKIE_STORE);
-        return cookieStore;
+        return CookieFactory.getLocationCookieStore(this.getHost());
     }
 
     public URI URI() throws URISyntaxException {

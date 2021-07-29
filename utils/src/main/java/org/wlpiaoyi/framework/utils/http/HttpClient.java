@@ -2,14 +2,19 @@ package org.wlpiaoyi.framework.utils.http;
 
 import lombok.Getter;
 import lombok.SneakyThrows;
+import org.apache.http.Header;
 import org.apache.http.HttpResponse;
+import org.apache.http.cookie.Cookie;
 import org.wlpiaoyi.framework.utils.exception.BusinessException;
+import org.wlpiaoyi.framework.utils.http.factory.CookieFactory;
 import org.wlpiaoyi.framework.utils.http.factory.ResponseFactory;
 import org.wlpiaoyi.framework.utils.http.request.Request;
 import org.wlpiaoyi.framework.utils.http.response.Response;
 
 import java.io.IOException;
 import java.net.URISyntaxException;
+import java.util.HashSet;
+import java.util.Set;
 
 public class HttpClient<T> {
 
@@ -46,16 +51,35 @@ public class HttpClient<T> {
 
     @SneakyThrows
     public Response<T> response(){
+        Response<T> rp;
         switch (this.request.getMethod()){
             case Post:
-                return this.PostResponse();
+                rp = this.PostResponse();
+                break;
             case Delete:
-                return this.DeleteResponse();
+                rp = this.DeleteResponse();
+                break;
             case Put:
-                return this.PutResponse();
+                rp = this.PutResponse();
+                break;
             default:
-                return this.GetResponse();
+                rp = this.GetResponse();
+                break;
         }
+        Set<Cookie> cookies = new HashSet<>();
+        for (Header header :
+                rp.getHeaders()) {
+            if(!header.getName().equals("Set-Cookie")) continue;
+            String[] keyValues =  header.getValue().split(";");
+            for (String keyValue :
+                    keyValues) {
+                String name = keyValue.split("=")[0];
+                Cookie cookie = CookieFactory.getCookie(request.getCookieStore(), name);
+                if(cookie != null) cookies.add(cookie);
+            }
+        }
+        rp.setCookies(cookies);
+        return rp;
     }
 
     public Response<T> GetResponse() throws IOException, URISyntaxException {
@@ -89,11 +113,5 @@ public class HttpClient<T> {
         Response<T> response = ResponseFactory.ResponseData(rp, this.rpClazz);
         return response;
     }
-
-
-
-
-
-
 
 }
