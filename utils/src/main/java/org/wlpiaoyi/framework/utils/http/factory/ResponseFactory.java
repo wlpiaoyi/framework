@@ -1,6 +1,5 @@
 package org.wlpiaoyi.framework.utils.http.factory;
 
-import com.sun.xml.internal.ws.wsdl.writer.document.soap.Body;
 import lombok.NonNull;
 import org.apache.http.*;
 import org.apache.http.client.methods.*;
@@ -13,7 +12,6 @@ import org.wlpiaoyi.framework.utils.http.response.Response;
 
 import java.io.IOException;
 import java.net.URISyntaxException;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;

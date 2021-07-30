@@ -56,4 +56,13 @@ public class Response <T> {
         this.cookies = cookies;
         return this;
     }
+
+    public Cookie getCookie(String name) {
+        for (Cookie cooke :
+                this.cookies) {
+            if(cooke.getName().equals(name))
+                return cooke;
+        }
+        return null;
+    }
 }

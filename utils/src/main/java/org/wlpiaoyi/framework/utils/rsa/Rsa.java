@@ -72,9 +72,6 @@ public class Rsa extends Coder {
         return encryptBASE64(key.getEncoded());
     }
 
-
-
-
     //两种加密形式
     //方法一
     /*
@@ -123,8 +120,6 @@ public class Rsa extends Coder {
 
 
     //方式二
-
-
     /**
      * 用公钥加密
      * @param data  加密数据
