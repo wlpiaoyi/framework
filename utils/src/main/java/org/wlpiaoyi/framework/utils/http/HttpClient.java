@@ -7,6 +7,7 @@ import org.apache.http.HttpResponse;
 import org.apache.http.cookie.Cookie;
 import org.wlpiaoyi.framework.utils.exception.BusinessException;
 import org.wlpiaoyi.framework.utils.http.factory.CookieFactory;
+import org.wlpiaoyi.framework.utils.http.factory.HttpFactory;
 import org.wlpiaoyi.framework.utils.http.factory.ResponseFactory;
 import org.wlpiaoyi.framework.utils.http.request.Request;
 import org.wlpiaoyi.framework.utils.http.response.Response;
@@ -18,7 +19,6 @@ import java.util.Set;
 
 public class HttpClient<T> {
 
-
     @Getter
     private Request<T> request;
 
@@ -29,7 +29,7 @@ public class HttpClient<T> {
     public String rpAccept;
 
     private HttpClient(Request request){
-        this.rpAccept = "application/json";
+        this.rpAccept = HttpFactory.HEADER_APPLICATION_JSON;
         this.request = request;
     }
 
@@ -67,9 +67,10 @@ public class HttpClient<T> {
                 break;
         }
         Set<Cookie> cookies = new HashSet<>();
+        String setCookieKey = HttpFactory.HEADER_KEY3.toUpperCase();
         for (Header header :
                 rp.getHeaders()) {
-            if(!header.getName().equals("Set-Cookie")) continue;
+            if(!header.getName().toLowerCase().equals(setCookieKey)) continue;
             String[] keyValues =  header.getValue().split(";");
             for (String keyValue :
                     keyValues) {

@@ -4,11 +4,9 @@ import com.google.gson.Gson;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpHost;
 import org.apache.http.NameValuePair;
-import org.apache.http.client.CookieStore;
 import org.apache.http.client.config.AuthSchemes;
 import org.apache.http.client.config.RequestConfig;
 import org.apache.http.client.entity.UrlEncodedFormEntity;
-import org.apache.http.client.protocol.HttpClientContext;
 import org.apache.http.config.Registry;
 import org.apache.http.config.RegistryBuilder;
 import org.apache.http.config.SocketConfig;
@@ -16,13 +14,10 @@ import org.apache.http.conn.socket.ConnectionSocketFactory;
 import org.apache.http.conn.socket.PlainConnectionSocketFactory;
 import org.apache.http.conn.ssl.SSLConnectionSocketFactory;
 import org.apache.http.entity.StringEntity;
-import org.apache.http.impl.client.BasicCookieStore;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.http.impl.conn.PoolingHttpClientConnectionManager;
 import org.apache.http.message.BasicNameValuePair;
-import org.apache.http.protocol.BasicHttpContext;
-import org.apache.http.protocol.HttpContext;
 import org.jetbrains.annotations.Nullable;
 import org.wlpiaoyi.framework.utils.ValueUtils;
 import org.wlpiaoyi.framework.utils.gson.GsonBuilder;
@@ -39,6 +34,17 @@ import java.security.cert.X509Certificate;
 import java.util.*;
 
 public class HttpFactory {
+
+    public static final String HEADER_CHARSET = "utf-8";
+    public static final String HEADER_APPLICATION_JSON = "application/json";
+    public static final String HEADER_APPLICATION_FORM = "application/x-www-form-urlencoded";
+    public static final String HEADER_KEY0 = "content-encoding";
+    public static final String HEADER_KEY1 = "content-type";
+    public static final String HEADER_KEY2 = "accept";
+    public static final String HEADER_KEY3 = "set-cookie";
+    public static final String HEADER_VALUE1_1 = HEADER_APPLICATION_JSON + ";charset=" + HEADER_CHARSET;
+    public static final String HEADER_VALUE1_2 = HEADER_APPLICATION_FORM + ";charset=" + HEADER_CHARSET;
+    public static final String HEADER_VALUE2 = HttpFactory.HEADER_APPLICATION_JSON;
 
     public static Gson GSON = GsonBuilder.gsonDefault();
 
@@ -177,7 +183,7 @@ public class HttpFactory {
             charset = "UTF-8";
         }
         if(ValueUtils.isBlank(accept)){
-            accept = "application/json";
+            accept = HttpFactory.HEADER_APPLICATION_JSON;
         }
 
         entity.setContentType(accept);
@@ -209,7 +215,7 @@ public class HttpFactory {
             charset = "UTF-8";
         }
         if(ValueUtils.isBlank(accept)){
-            accept = "application/json";
+            accept = HttpFactory.HEADER_APPLICATION_JSON;
         }
         if(ValueUtils.isBlank(parameter)){
             parameter = "";

@@ -26,6 +26,8 @@ import org.apache.http.message.BasicNameValuePair;
 import org.apache.http.util.EntityUtils;
 import org.jetbrains.annotations.Nullable;
 import org.wlpiaoyi.framework.utils.StringUtils;
+import org.wlpiaoyi.framework.utils.http.factory.HttpFactory;
+import org.wlpiaoyi.framework.utils.http.request.Request;
 
 import javax.net.ssl.*;
 import java.io.IOException;
@@ -43,15 +45,15 @@ import java.util.*;
  */
 @Deprecated
 public class HttpClient {
-
-    final static Map<String, String> HEDAER_JSON_DEFAULTS = new HashMap(){{
-        put("Content-Type", "application/json;charset=UTF-8");
-        put("Accept", "application/json");
-    }};
+//
+//    final static Map<String, String> HEDAER_JSON_DEFAULTS = new HashMap(){{
+//        put("Content-Type", "application/json;charset=UTF-8");
+//        put("Accept", HttpFactory.HEADER_APPLICATION_JSON);
+//    }};
 
 //    final static Map<String, String> HEDAER_FORM_DEFAULTS = new HashMap(){{
 //        put("Content-Type", "application/x-www-form-urlencoded;charset=UTF-8");
-//        put("Accept", "application/json");
+//        put("Accept", HttpFactory.HEADER_APPLICATION_JSON);
 //    }};
 
     static final String SCHEME_HTTP = "http";
@@ -68,7 +70,7 @@ public class HttpClient {
         if(headerMap == null){
             headerMap = new HashMap<>();
         }
-        for (Map.Entry<String, String> entry : HEDAER_JSON_DEFAULTS.entrySet()){
+        for (Map.Entry<String, String> entry : Request.HEADER_JSON_DEFAULTS.entrySet()){
             if(headerMap.containsKey(entry.getKey())) continue;
             headerMap.put(entry.getKey(), entry.getValue());
         }
@@ -114,8 +116,8 @@ public class HttpClient {
         }
 
         String charset = null;
-        if(headerMap.containsKey("Content-Encoding")){
-            charset = (String) headerMap.get("Content-Encoding");
+        if(headerMap.containsKey(HttpFactory.HEADER_KEY0)){
+            charset = (String) headerMap.get(HttpFactory.HEADER_KEY0);
         }else if(headerMap.containsKey("Content-Type")){
             String value = (String) headerMap.get("Content-Type");
             for(String arg : value.split(";")){
@@ -134,7 +136,7 @@ public class HttpClient {
             charset = "UTF-8";
         }
         if(StringUtils.isBlank(accept)){
-            accept = "application/json";
+            accept = HttpFactory.HEADER_APPLICATION_JSON;
         }
         StringEntity entity = new StringEntity(parameter != null ? parameter : "", charset);
         entity.setContentEncoding(charset);
@@ -173,7 +175,7 @@ public class HttpClient {
         HttpEntity entity = response.getEntity();
         if (entity == null) return null;
 
-        if(entity.getContentType().getValue().contains("application/json")){
+        if(entity.getContentType().getValue().contains(HttpFactory.HEADER_APPLICATION_JSON)){
             return GSON.fromJson(text, clazz);
         }
         return null;

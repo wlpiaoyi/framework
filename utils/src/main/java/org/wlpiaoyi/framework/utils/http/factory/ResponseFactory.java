@@ -179,7 +179,7 @@ public class ResponseFactory {
         if(cookies.length() > 0){
             rq.removeHeaders("cookie");
             rq.addHeader("cookie", cookies.substring(0, cookies.length() - 1));
-        }
+        };
         CloseableHttpResponse response = HttpFactory.getHttpsClient().execute(rq, request.getContext());
         return response;
     }
@@ -195,7 +195,7 @@ public class ResponseFactory {
         }
 
         T body = null;
-        if(rp.getEntity().getContentType().getValue().contains("application/json")){
+        if(rp.getEntity().getContentType().getValue().contains(HttpFactory.HEADER_APPLICATION_JSON)){
             body = HttpFactory.GSON.fromJson(responseText.getBody(), clazz);
         }else throw new BusinessException("不支持的ContentType");
 

@@ -5,7 +5,6 @@ import org.apache.http.HttpHost;
 import org.apache.http.NameValuePair;
 import org.apache.http.client.CookieStore;
 import org.apache.http.client.utils.URIBuilder;
-import org.apache.http.cookie.Cookie;
 import org.apache.http.impl.cookie.BasicClientCookie;
 import org.apache.http.message.BasicNameValuePair;
 import org.apache.http.protocol.HttpContext;
@@ -27,14 +26,15 @@ import java.util.Map;
  */
 public class Request<T> {
 
-    private final static Map<String, String> HEDAER_JSON_DEFAULTS = new HashMap(){{
-        put("Content-Type", "application/json;charset=UTF-8");
-        put("Accept", "application/json");
+
+    public final static Map<String, String> HEADER_JSON_DEFAULTS = new HashMap(){{
+        put(HttpFactory.HEADER_KEY1, HttpFactory.HEADER_VALUE1_1);
+        put(HttpFactory.HEADER_KEY2, HttpFactory.HEADER_VALUE2);
     }};
 
-    private static Map<String, String> HEDAER_FORM_DEFAULTS = new HashMap(){{
-        put("Content-Type", "application/x-www-form-urlencoded;charset=UTF-8");
-        put("Accept", "application/json");
+    public static Map<String, String> HEADER_FORM_DEFAULTS = new HashMap(){{
+        put(HttpFactory.HEADER_KEY1, HttpFactory.HEADER_VALUE1_2);
+        put(HttpFactory.HEADER_KEY2, HttpFactory.HEADER_VALUE2);
     }};
 
 
@@ -72,7 +72,7 @@ public class Request<T> {
 
     public static Request initForm(String url){
         Request request = new Request(url);
-        for (Map.Entry<String, String> entry : HEDAER_FORM_DEFAULTS.entrySet()){
+        for (Map.Entry<String, String> entry : HEADER_FORM_DEFAULTS.entrySet()){
             if(request.getHeaders().containsKey(entry.getKey())) continue;
             request.getHeaders().put(entry.getKey(), entry.getValue());
         }
@@ -83,18 +83,20 @@ public class Request<T> {
 
     public static Request initJson(String url){
         Request request = new Request(url);
-        for (Map.Entry<String, String> entry : HEDAER_JSON_DEFAULTS.entrySet()){
+        for (Map.Entry<String, String> entry : HEADER_JSON_DEFAULTS.entrySet()){
             if(request.getHeaders().containsKey(entry.getKey())) continue;
             request.getHeaders().put(entry.getKey(), entry.getValue());
         }
         return request;
     }
 
+
     private Request(String url){
         this.headers = new HashMap<>();
         this.method = Method.Get;
         this.url = url;
     }
+
 
     public Request setMethod(Method method){
         this.method = method;
@@ -150,8 +152,8 @@ public class Request<T> {
 
     public String getContentType(){
         if(this.getHeaders() == null || this.getHeaders().isEmpty()) return null;
-        if(this.getHeaders().containsKey("Content-Type")){
-            String value = (String) this.getHeaders().get("Content-Type");
+        if(this.getHeaders().containsKey(HttpFactory.HEADER_KEY1)){
+            String value = (String) this.getHeaders().get(HttpFactory.HEADER_KEY1);
             String args[] = value.split(";");
             if(args.length > 0) return args[0];
         }
@@ -161,10 +163,10 @@ public class Request<T> {
     public String getCharset(){
         if(this.getHeaders() == null || this.getHeaders().isEmpty()) return null;
         String charset = null;
-        if(this.getHeaders().containsKey("Content-Encoding")){
-            charset = (String) this.getHeaders().get("Content-Encoding");
-        }else if(this.getHeaders().containsKey("Content-Type")){
-            String value = (String) this.getHeaders().get("Content-Type");
+        if(this.getHeaders().containsKey(HttpFactory.HEADER_KEY0)){
+            charset = (String) this.getHeaders().get(HttpFactory.HEADER_KEY0);
+        }else if(this.getHeaders().containsKey(HttpFactory.HEADER_KEY1)){
+            String value = (String) this.getHeaders().get(HttpFactory.HEADER_KEY1);
             for(String arg : value.split(";")){
                 String args[] = arg.split("=");
                 if(args.length == 2 && args[0].equals("charset")){
