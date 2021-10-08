@@ -1,8 +1,6 @@
 package org.wlpiaoyi.framework.typeresolver;
 
 import org.mybatis.generator.api.dom.java.FullyQualifiedJavaType;
-import org.mybatis.generator.config.PropertyRegistry;
-import org.mybatis.generator.internal.util.StringUtility;
 
 import java.sql.Types;
 import java.time.LocalDate;
