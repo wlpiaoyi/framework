@@ -6,6 +6,7 @@ import lombok.Data;
 import lombok.NonNull;
 import org.jetbrains.annotations.Nullable;
 import org.wlpiaoyi.framework.utils.exception.BusinessException;
+import org.wlpiaoyi.framework.utils.exception.CatchException;
 
 import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletResponse;
@@ -67,6 +68,10 @@ public class ResponseUtils {
             BusinessException bEx = (BusinessException) e;
             return getResponseException(bEx.getCode(), bEx.getMessage(), bEx);
         }
+        if(e instanceof CatchException){
+            CatchException cEx = (CatchException) e;
+            return getResponseException(cEx.getCode(), cEx.getMessage(), cEx);
+        }
         return getResponseException(500, e.getMessage(), e);
     }
 
@@ -98,7 +103,7 @@ public class ResponseUtils {
         }else{
             repStr = "";
         }
-        response.setStatus(200);
+        response.setStatus(code);
         response.setContentType(contentType);
         response.getWriter().write(repStr);
     }

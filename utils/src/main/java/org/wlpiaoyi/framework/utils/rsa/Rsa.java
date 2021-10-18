@@ -181,6 +181,7 @@ public class Rsa extends ProtectedRsa {
 
 
 
+
     /**
      * 私钥签名
      * 用私钥对信息生成数字签名
@@ -190,7 +191,7 @@ public class Rsa extends ProtectedRsa {
      */
     public String sign(byte[] data)throws Exception{
         //解密私钥
-        byte[] keyBytes = decryptBASE64(this.publicKey);
+        byte[] keyBytes = decryptBASE64(this.privateKey);
         //构造PKCS8EncodedKeySpec对象
         PKCS8EncodedKeySpec pkcs8EncodedKeySpec = new PKCS8EncodedKeySpec(keyBytes);
         //指定加密算法
@@ -229,54 +230,7 @@ public class Rsa extends ProtectedRsa {
         signature.update(data);
         //验证签名是否正常
         return signature.verify(decryptBASE64(sign));
-
     }
-
-
-
-//    public static void main(String[] args) {
-//        try {
-//            test();
-////            testSign();
-//        } catch (Exception e) {
-//            // TODO Auto-generated catch block
-//            e.printStackTrace();
-//        }
-//    }
-//
-//    private static void test() throws Exception {
-//        Rsa rsa = Rsa.create().loadKey();
-//        System.err.println("公钥加密——私钥解密");
-//        String source = "这是一行没有任何意义的文字，你看完了等于没看，不是吗？";
-//        System.out.println("\r加密前文字：\r\n" + source);
-//        byte[] data = source.getBytes();
-//        byte[] encodedData = rsa.encryptByPublicKey(data);
-//        System.out.println("加密后文字：\r\n" + new String(encodedData));
-//        byte[] decodedData = rsa.decryptByPrivateKey(encodedData);
-//        String target = new String(decodedData);
-//        System.out.println("解密后文字: \r\n" + target);
-//    }
-//
-//    private static void testSign() throws Exception {
-//        Map<String, Object> keyMap = initKey();
-//        String publicKey = getPublicKey(keyMap);
-//        System.out.println(publicKey+"===================================");
-//        String privateKey = getPrivateKey(keyMap);
-//        System.err.println("私钥加密——公钥解密");
-//        String source = "这是一行测试RSA数字签名的无意义文字";
-//        System.out.println("原文字：\r\n" + source);
-//        byte[] data = source.getBytes();
-//        byte[] encodedData = encryptByPrivateKey(data, privateKey);
-//        System.out.println("加密后：\r\n" + new String(encodedData));
-//        byte[] decodedData = decryptByPublicKey(encodedData, publicKey);
-//        String target = new String(decodedData);
-//        System.out.println("解密后: \r\n" + target);
-//        System.err.println("私钥签名——公钥验证签名");
-//        String sign = sign(encodedData, privateKey);
-//        System.err.println("签名:\r" + sign);
-//        boolean status = verify(encodedData, publicKey, sign);
-//        System.err.println("验证结果:\r" + status);
-//    }
 
 
 }

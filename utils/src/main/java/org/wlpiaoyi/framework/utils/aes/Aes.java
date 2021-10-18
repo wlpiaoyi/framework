@@ -11,8 +11,6 @@ import java.security.SecureRandom;
 import java.util.Base64;
 
 public class Aes {
-    //    //实例化密钥
-//    private static Key SECRET_KEY;
     /*
      * 秘钥算法
      * */

@@ -1,5 +1,8 @@
 package org.wlpiaoyi.framework.utils.exception;
 
+import lombok.Getter;
+
+@Getter
 public class CatchException extends Exception{
 
     private int code;

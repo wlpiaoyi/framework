@@ -33,6 +33,10 @@ abstract class ProtectedRsa extends Coder {
 
     abstract ProtectedRsa setKeyAlgorithm(String keyAlgorithm);
 
+    abstract Rsa loadKey() throws Exception;
+
+    abstract Rsa loadKey(int keyPairSize) throws Exception;
+
     /**
      * String类型公钥，转化为对象
      * @return
