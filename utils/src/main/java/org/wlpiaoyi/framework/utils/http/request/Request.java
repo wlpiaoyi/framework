@@ -138,9 +138,7 @@ public class Request<T> {
 
 
     public Request setProxy(HttpHost host){
-        if(ValueUtils.isBlank(host)){
-            this.proxy = null;
-        }else this.proxy = host;
+        this.proxy = host;
         return this;
     }
     public Request setProxy(String host, int port){

@@ -22,7 +22,7 @@ public class JsonLocalDateTimeTypeAdapter implements GsonBuilder.JsonSerializer<
     }
 
     public JsonLocalDateTimeTypeAdapter(@Nullable ZoneId zoneId){
-        if(ValueUtils.isBlank(zoneId)){
+        if(zoneId == null){
             zoneId = ZoneId.systemDefault();
         }
         this.zoneId = zoneId;

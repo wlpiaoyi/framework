@@ -15,7 +15,7 @@ package org.wlpiaoyi.framework.utils.snowflake;
 public class IdWorker {
 // ==============================Fields===========================================
     /** 开始时间截 (2021-10-01) */
-    private final long twepoch = 1633017600000L;
+    protected long twepoch = 1633017600000L;
 
     /** 机器id所占的位数 */
     private final long workerIdBits = 5L;

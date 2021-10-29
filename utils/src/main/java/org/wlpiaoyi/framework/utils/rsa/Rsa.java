@@ -13,7 +13,12 @@ import java.security.spec.X509EncodedKeySpec;
 import javax.crypto.Cipher;
 
 
-
+/**
+ * RSA加密算法是一种非对称加密算法，公钥加密私钥解密。
+ * RSA是1977年由罗纳德·李维斯特（Ron Rivest）、阿迪·萨莫尔（Adi Shamir）和伦纳德·阿德曼（Leonard Adleman）一起提出的。
+ * 当时他们三人都在麻省理工学院工作。RSA就是他们三人姓氏开头字母拼在一起组成的。
+ * RSA非对称加密解密内容长度是有限制的，加密长度不超过117Byte，解密长度不超过128Byte
+ */
 public class Rsa extends ProtectedRsa {
 
     /*
@@ -64,8 +69,8 @@ public class Rsa extends ProtectedRsa {
         return this;
     }
 
-    private Rsa(){
-        this.signatureAlgorithm = Rsa.SIGNATURE_ALGORITHM_SHA256withRSA;//签名算法
+    protected Rsa(){
+        this.signatureAlgorithm = Rsa.SIGNATURE_ALGORITHM_SHA1withRSA;//签名算法
         this.keyAlgorithm = Rsa.KEY_ALGORTHM_RSA;//秘钥算法
     }
 
@@ -155,8 +160,6 @@ public class Rsa extends ProtectedRsa {
 
         return cipher.doFinal(data);
     }
-
-
 
 
     /**

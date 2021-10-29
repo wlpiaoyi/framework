@@ -11,6 +11,7 @@ import org.wlpiaoyi.framework.utils.exception.CatchException;
 import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.io.InputStream;
 
 public class ResponseUtils {
 
@@ -88,7 +89,8 @@ public class ResponseUtils {
         ResponseUtils.writeResponseData(json, "application/json;charset=utf-8", code, response);
     }
 
-    public static void writeResponseData(@Nullable Object data, @NonNull String contentType, int code, @NonNull HttpServletResponse response) throws IOException {
+    public static void writeResponseData(@Nullable Object data, @NonNull String contentType, int code,
+                                         @NonNull HttpServletResponse response) throws IOException {
         String repStr;
         if(data != null){
             if(data instanceof String){

@@ -5,9 +5,9 @@ import lombok.Getter;
 @Getter
 public class CatchException extends Exception{
 
-    private int code;
+    protected int code;
 
-    private String message;
+    protected String message;
 
     public CatchException(String message) {
         super(message);

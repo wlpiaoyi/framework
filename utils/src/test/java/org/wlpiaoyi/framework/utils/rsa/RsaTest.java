@@ -54,8 +54,9 @@ public class RsaTest {
         System.out.println("\r加密前文字：\r\n" + source);
         byte[] data = source.getBytes();
         byte[] encodedData = rsa.encryptByPrivateKey(data);
-        System.out.println("加密后文字：\r\n" + new String(encodedData));
-        byte[] decodedData = rsa.decryptByPublicKey(encodedData);
+        String pstr = new String(encodedData);
+        System.out.println("加密后文字：\r\n" + pstr);
+        byte[] decodedData = rsa.decryptByPublicKey(pstr.getBytes());
         String target = new String(decodedData);
         System.out.println("解密后文字: \r\n" + target);
 
