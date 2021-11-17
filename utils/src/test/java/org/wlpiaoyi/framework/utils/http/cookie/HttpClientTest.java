@@ -1,6 +1,5 @@
 package org.wlpiaoyi.framework.utils.http.cookie;
 
-import org.apache.http.message.BasicHeader;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -9,7 +8,6 @@ import org.wlpiaoyi.framework.utils.http.request.Request;
 import org.wlpiaoyi.framework.utils.http.response.Response;
 
 import java.io.IOException;
-import java.util.Map;
 
 public class HttpClientTest {
 
@@ -30,6 +28,21 @@ public class HttpClientTest {
 
 
 
+    public Response<String> emartet() throws IOException {
+
+        Response<String> response =  HttpClient.instance(
+                Request.initJson("http://127.0.0.1:9081/e-market/sys/device/register")
+                        .setHeader("platform", "1")
+                        .setHeader("deviceNo","yue98278sjey28")
+                        .setHeader("version","1.0.1")
+                        .setProxy("127.0.0.1", 8888)
+                        .setMethod(Request.Method.Get)
+        )
+                .setRpClazz(String.class)
+                .response();
+
+        return response;
+    }
 
 
     public Response<String> index(String classId) throws IOException {
@@ -40,13 +53,13 @@ public class HttpClientTest {
                         .setCookie("think_language", this.think_language)
                         .setHeader("x-version-release", "1.5.1")
                         .setHeader("user-agent","1.5.1 rv:51 (iPhone; iOS 13.7; zh_CN)")
-                        .setParams("mo", "v2")
-                        .setParams("a", "getPurchaseList" )
-                        .setParams("uuid", this.uuid)
-                        .setParams("class_id", classId)
-                        .setParams("pageSiz", "20")
-                        .setParams("page", "1")
-                        .setParams("token", this.token)
+                        .setParam("mo", "v2")
+                        .setParam("a", "getPurchaseList" )
+                        .setParam("uuid", this.uuid)
+                        .setParam("class_id", classId)
+                        .setParam("pageSiz", "20")
+                        .setParam("page", "1")
+                        .setParam("token", this.token)
                         .setProxy("127.0.0.1", 8888)
         )
                 .setRpClazz(String.class)

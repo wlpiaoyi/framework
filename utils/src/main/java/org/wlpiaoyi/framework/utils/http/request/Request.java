@@ -128,7 +128,7 @@ public class Request<T> {
         return this;
     }
 
-    public Request setParams(String name, String value){
+    public Request setParam(String name, String value){
         if(this.params == null){
             this.params = new HashMap<>();
         }

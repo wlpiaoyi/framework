@@ -16,12 +16,25 @@ import java.util.UUID;
 
 public class StringUtils {
 
+    static {
+
+    }
+
     /**
-     * 将字符编码成base64
-     * @param encodeStr
-     * @param charseName
+     * 将bytes编码成base64
+     * @param bytes
      * @return
      */
+    public static String base64Encode(byte[] bytes) {
+        return new BASE64Encoder().encode(bytes);
+    }
+
+        /**
+         * 将字符编码成base64
+         * @param encodeStr
+         * @param charseName
+         * @return
+         */
     public static String base64Encode(String encodeStr, String charseName){
         try {
             return new BASE64Encoder().encode(encodeStr.getBytes(charseName));
@@ -48,12 +61,27 @@ public class StringUtils {
      */
     public static String base64Decode(String decodeStr, String charseName){
         try {
-            byte[] bytes = new BASE64Decoder().decodeBuffer(decodeStr);
+            byte[] bytes = StringUtils.base64DecodeToBytes(decodeStr);
             return new String(bytes, charseName);
         } catch (IOException e) {
             e.printStackTrace();
         }
         return null;
+    }
+
+    /**
+     * 将base64字符解码
+     * @param decodeStr
+     * @return
+     */
+    public static byte[] base64DecodeToBytes(String decodeStr){
+
+        try {
+            return new BASE64Decoder().decodeBuffer(decodeStr);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return new byte[]{};
     }
 
     /**

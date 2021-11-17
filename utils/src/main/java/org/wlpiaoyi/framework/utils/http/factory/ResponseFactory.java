@@ -197,7 +197,7 @@ public class ResponseFactory {
         T body = null;
         if(rp.getEntity().getContentType().getValue().contains(HttpFactory.HEADER_APPLICATION_JSON)){
             body = HttpFactory.GSON.fromJson(responseText.getBody(), clazz);
-        }else throw new BusinessException("不支持的ContentType");
+        }else body = (T) responseText.getBody();
 
         Response<T> response = ResponseFactory.Response(rp, body);
         return response;

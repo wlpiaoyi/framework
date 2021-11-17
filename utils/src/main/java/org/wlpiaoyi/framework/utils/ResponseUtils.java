@@ -105,7 +105,11 @@ public class ResponseUtils {
         }else{
             repStr = "";
         }
-        response.setStatus(code);
+        if(code > 0 && code < 1000){
+            response.setStatus(code);
+        }else{
+            response.setStatus(500);
+        }
         response.setContentType(contentType);
         response.getWriter().write(repStr);
     }

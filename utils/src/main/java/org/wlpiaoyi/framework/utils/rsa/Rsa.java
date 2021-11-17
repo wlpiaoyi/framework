@@ -1,5 +1,8 @@
 package org.wlpiaoyi.framework.utils.rsa;
 
+import org.wlpiaoyi.framework.utils.ValueUtils;
+
+import java.io.Serializable;
 import java.security.Key;
 import java.security.KeyFactory;
 import java.security.KeyPair;
@@ -19,7 +22,7 @@ import javax.crypto.Cipher;
  * 当时他们三人都在麻省理工学院工作。RSA就是他们三人姓氏开头字母拼在一起组成的。
  * RSA非对称加密解密内容长度是有限制的，加密长度不超过117Byte，解密长度不超过128Byte
  */
-public class Rsa extends ProtectedRsa {
+public class Rsa extends ProtectedRsa  implements Serializable {
 
     /*
     * 秘钥算法
@@ -46,13 +49,13 @@ public class Rsa extends ProtectedRsa {
     //<============================================
 
     @Override
-    ProtectedRsa setPublicKey(String publicKey) {
+    public Rsa setPublicKey(String publicKey) {
         this.publicKey = publicKey;
         return this;
     }
 
     @Override
-    ProtectedRsa setPrivateKey(String privateKey) {
+    public Rsa setPrivateKey(String privateKey) {
         this.privateKey = privateKey;
         return this;
     }
@@ -64,7 +67,7 @@ public class Rsa extends ProtectedRsa {
     }
 
     @Override
-    ProtectedRsa setKeyAlgorithm(String keyAlgorithm) {
+    public Rsa setKeyAlgorithm(String keyAlgorithm) {
         this.keyAlgorithm = keyAlgorithm;
         return this;
     }
@@ -91,9 +94,13 @@ public class Rsa extends ProtectedRsa {
         KeyPairGenerator keyPairGenerator = KeyPairGenerator.getInstance(this.keyAlgorithm);
         keyPairGenerator.initialize(keyPairSize);
         KeyPair keyPair = keyPairGenerator.generateKeyPair();
-        //公钥
-        this.setPublicKey(this.getPublicKey(keyPair.getPublic()))
-                .setPrivateKey( this.getPrivateKey(keyPair.getPrivate()));
+
+        if(ValueUtils.isBlank(this.publicKey)){
+            this.setPublicKey(this.getPublicKey(keyPair.getPublic()));
+        }
+        if( ValueUtils.isBlank(this.privateKey)){
+            this.setPrivateKey(this.getPrivateKey(keyPair.getPrivate()));
+        }
 
         return this;
     }

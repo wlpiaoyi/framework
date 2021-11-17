@@ -6,6 +6,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
+import org.wlpiaoyi.framework.utils.StringUtils;
 
 @Slf4j
 public class RsaTest {
@@ -18,15 +19,25 @@ public class RsaTest {
     @Test
     public void test() throws Exception {
         Rsa rsa = Rsa.create().loadKey();
-        System.out.println("公钥加密——私钥解密");
-        String source = "这是一行没有任何意义的文字，你看完了等于没看，不是吗？";
-        System.out.println("\r加密前文字：\r\n" + source);
-        byte[] data = source.getBytes();
-        byte[] encodedData = rsa.encryptByPublicKey(data);
-        System.out.println("加密后文字：\r\n" + new String(encodedData));
-        byte[] decodedData = rsa.decryptByPrivateKey(encodedData);
-        String target = new String(decodedData);
-        System.out.println("解密后文字: \r\n" + target);
+        String publicKey = rsa.publicKey;
+        String privateKey = rsa.privateKey;
+        String aesKey = StringUtils.getUUID32();
+        String aesIV = StringUtils.getUUID32().substring(0, 16);
+        System.out.println("publicKey:" + publicKey);
+        System.out.println("privateKey:" + privateKey);
+        System.out.println("aesKey:" + aesKey);
+        System.out.println("aesIV:" + aesIV);
+
+
+//        System.out.println("公钥加密——私钥解密");
+//        String source = "这是一行没有任何意义的文字，你看完了等于没看，不是吗？";
+//        System.out.println("\r加密前文字：\r\n" + source);
+//        byte[] data = source.getBytes();
+//        byte[] encodedData = rsa.encryptByPublicKey(data);
+//        System.out.println("加密后文字：\r\n" + new String(encodedData));
+//        byte[] decodedData = rsa.decryptByPrivateKey(encodedData);
+//        String target = new String(decodedData);
+//        System.out.println("解密后文字: \r\n" + target);
 
     }
 
@@ -47,17 +58,33 @@ public class RsaTest {
                 "NRR2uBFJ+Y1T85ssSlELybXJUUzijnhddn20xe6SdLfbDuqrGzH0Pn59TXAaM4USCND5SIxlEQJB\n" +
                 "AL6bAL0IMU48aE9RxX7EbHq+rsvkkbB9JV6f19fbLG/+nwrE+NwegpI+fN0P4LldsQqd37+QFCtt\n" +
                 "p62rKrIvwGw=";
+        System.out.println(StringUtils.base64Decode(publicKey));
+
         Rsa rsa = Rsa.create().setPublicKey(publicKey).setPrivateKey(privateKey).loadKey();
+        long timer = 1;//System.currentTimeMillis();
+        String source = timer + "";;
+        byte[] data = source.getBytes();
+        byte[] encodedData = rsa.encryptByPublicKey(data);
+        String base64Str = StringUtils.base64Encode(encodedData);
+        System.out.println("加密后文字：\r\n" + base64Str);
+
+
+
+        byte[] bytes = StringUtils.base64DecodeToBytes(base64Str);
+        byte[] decodedData = rsa.decryptByPrivateKey(bytes);
+        String target = new String(decodedData);
+        System.out.println("解密后文字: \r\n" + target);
+
 
         System.out.println("私人钥加密——公钥解密");
-        String source = "这是一行没有任何意义的文字，你看完了等于没看，不是吗？";
+        source = "这是一行没有任何意义的文字，你看完了等于没看，不是吗这是一行没有任何意义的文字，你看完了等于没看，不是吗这是一行没有任何意义的文字，你看完了等于没看，不是吗这是一行没有任何意义的文字，你看完了等于没看，不是吗";
         System.out.println("\r加密前文字：\r\n" + source);
-        byte[] data = source.getBytes();
-        byte[] encodedData = rsa.encryptByPrivateKey(data);
+        data = source.getBytes();
+        encodedData = rsa.encryptByPrivateKey(data);
         String pstr = new String(encodedData);
         System.out.println("加密后文字：\r\n" + pstr);
-        byte[] decodedData = rsa.decryptByPublicKey(pstr.getBytes());
-        String target = new String(decodedData);
+        decodedData = rsa.decryptByPublicKey(pstr.getBytes());
+        target = new String(decodedData);
         System.out.println("解密后文字: \r\n" + target);
 
         System.out.println("私钥签名——公钥验证签名");
