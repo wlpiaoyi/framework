@@ -24,6 +24,7 @@ public class GsonBuilderTest {
     @Data
     static class TestObj{
 
+        private Long id = 22364643896987648L;
         private String a1;
         private Date date;
 
@@ -38,6 +39,7 @@ public class GsonBuilderTest {
     @Before
     public void setUp() throws Exception {}
 
+
     @Test
     public void test() throws IOException {
         TestObj to = new TestObj();
@@ -45,25 +47,7 @@ public class GsonBuilderTest {
         to.lDateTime = LocalDateTime.of(2021,01,01,12,01);
         to.lDate = LocalDate.of(2021,01,02);
         to.lTime = LocalTime.of(12,02);
-        String json = "{\"a1\":\"[0xe4][0xba][0x91][0xe6][0xb5][0xae][0xe5][0xb8][0x82][0xe5][0xb7][0xa5][0xe5]" +
-                "[0x95][0x86][0xe8][0xa1][0x8c][0xe6][0x94][0xbf][0xe7][0xae][0xa1][0xe7][0x90]" +
-                "[0x86][0xe5][0xb1][0x80][0xe4][0xba][0x91][0xe5][0x9f][0x8e][0xe5][0x88][0x86][0xe5][0xb1][0x80]\"}";
-        //GsonBuilder.gsonDefault().toJson(to);
-        byte[] bs = new byte[4];
-        bs[0] = (byte) 0xe4;
-        bs[1] = (byte) 0xba;
-        bs[3] = (byte) 0x91;
-        bs[3] = (byte) 0xe6;
-        new String(bs, 0, 4, "Unicode");
-//        g(byte bytes[], int offset, int length, String charsetName)
-        TestObj to2 = GsonBuilder.gsonDefault().fromJson(json, TestObj.class);
-        Map map = GsonBuilder.gsonDefault().fromJson(json, Map.class);
-        map.put("map", new HashMap(){{
-            put("a1","[0xe4][0xba][0x91][0xe6][0xb5][0xae][0xe5][0xb8][0x82][0xe5][0xb7][0xa5][0xe5]" +
-                    "[0x95][0x86][0xe8][0xa1][0x8c][0xe6][0x94][0xbf][0xe7][0xae][0xa1][0xe7][0x90]" +
-                    "[0x86][0xe5][0xb1][0x80][0xe4][0xba][0x91][0xe5][0x9f][0x8e][0xe5][0x88][0x86][0xe5][0xb1][0x80]");
-        }});
-        json = GsonBuilder.gsonDefault().toJson(map);
+        String json =  GsonBuilder.gsonDefault().toJson(to);
         System.out.println(json);
     }
 

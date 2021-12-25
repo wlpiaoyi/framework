@@ -60,6 +60,7 @@ public class GsonBuilder  {
     protected GsonBuilder resetDefault(){
         this.clearJsonSerializers()
                 .clearFactories()
+                .addJsonSerializer(new JsonLongTypeAdapter())
                 .addJsonSerializer(new JsonDateTypeAdapter())
                 .addJsonSerializer(new JsonLocalTimeTypeAdapter())
                 .addJsonSerializer(new JsonLocalDateTypeAdapter())

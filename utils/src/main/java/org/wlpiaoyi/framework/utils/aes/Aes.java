@@ -51,6 +51,9 @@ public class Aes {
 //    static final String CIPHER_ALGORITHM = "AES/CBC/NoPadding";
 
     @Getter
+    private String typeEncoding = "UTF-8";
+
+    @Getter
     private String signatureAlgorithm;//签名算法
 
     @Getter
@@ -64,6 +67,11 @@ public class Aes {
 
     private Cipher dCipher;
     private Cipher eCipher;
+
+    public Aes setTypeEncoding(String typeEncoding){
+        this.typeEncoding = typeEncoding;
+        return this;
+    }
 
     public Aes setSignatureAlgorithm(String signatureAlgorithm) {
         this.signatureAlgorithm = signatureAlgorithm;
@@ -93,8 +101,8 @@ public class Aes {
             eCipher.init(Cipher.ENCRYPT_MODE, this.key);
             dCipher.init(Cipher.DECRYPT_MODE, this.key);
         }else{
-            dCipher.init(Cipher.DECRYPT_MODE, this.key, new IvParameterSpec(this.getIV().getBytes("UTF-8")));
-            eCipher.init(Cipher.ENCRYPT_MODE, this.key, new IvParameterSpec(this.getIV().getBytes("UTF-8")));
+            dCipher.init(Cipher.DECRYPT_MODE, this.key, new IvParameterSpec(this.getIV().getBytes(this.typeEncoding)));
+            eCipher.init(Cipher.ENCRYPT_MODE, this.key, new IvParameterSpec(this.getIV().getBytes(this.typeEncoding)));
         }
         return this;
     }
@@ -110,13 +118,26 @@ public class Aes {
      * @return
      * @throws NoSuchAlgorithmException
      */
-    public Aes setKey(String key) throws NoSuchAlgorithmException, UnsupportedEncodingException {
-//        SecureRandom random = SecureRandom.getInstance(this.signatureAlgorithm);
-//        random.setSeed(key.getBytes("UTF-8"));
-//        KeyGenerator kgen = KeyGenerator.getInstance(this.keyAlgorithm);
-//        kgen.init(256, random);
-//        this.key = kgen.generateKey();
-        this.key =  new SecretKeySpec(key.getBytes("UTF-8"), this.keyAlgorithm);
+    public Aes setKey(String key) throws UnsupportedEncodingException {
+        this.key =  new SecretKeySpec(key.getBytes(this.typeEncoding), this.keyAlgorithm);
+        return this;
+    }
+
+    /**
+     * 设置秘钥
+     * @param key
+     * @param size 默认256
+     * @return
+     * @throws UnsupportedEncodingException
+     * @throws NoSuchAlgorithmException
+     */
+    public Aes setKey(String key, int size) throws UnsupportedEncodingException, NoSuchAlgorithmException {
+        if(size <= 0) size = 256;
+        SecureRandom random = SecureRandom.getInstance(this.signatureAlgorithm);
+        random.setSeed(key.getBytes(this.typeEncoding));
+        KeyGenerator kgen = KeyGenerator.getInstance(this.keyAlgorithm);
+        kgen.init(size, random);
+        this.key = kgen.generateKey();
         return this;
     }
 

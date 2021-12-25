@@ -227,12 +227,12 @@ public class StringUtils {
     }
 
     /**
-     * 从String写入文件g
+     * 从String写入文件
      * @param source
      * @param PATH
      * @return
      */
-    public static boolean readFile(String source, String PATH){
+    public static boolean writeFile(String source, String PATH){
         File f = new File(PATH);
         try {
             BufferedWriter bw = new BufferedWriter(new FileWriter(f));
