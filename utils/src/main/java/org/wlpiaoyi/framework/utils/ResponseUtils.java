@@ -1,17 +1,14 @@
 package org.wlpiaoyi.framework.utils;
 
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
 import lombok.Data;
 import lombok.NonNull;
 import org.jetbrains.annotations.Nullable;
 import org.wlpiaoyi.framework.utils.exception.BusinessException;
 import org.wlpiaoyi.framework.utils.exception.CatchException;
+import org.wlpiaoyi.framework.utils.gson.GsonBuilder;
 
-import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
-import java.io.InputStream;
 
 public class ResponseUtils {
 
@@ -99,8 +96,8 @@ public class ResponseUtils {
                 repStr = ((StringBuffer) data).toString();
             }else if(data instanceof StringBuilder){
                 repStr = ((StringBuilder) data).toString();
-            }else {
-                repStr = new Gson().toJson(data);
+            }else{
+                repStr = GsonBuilder.gsonDefault().toJson(data);
             }
         }else{
             repStr = "";

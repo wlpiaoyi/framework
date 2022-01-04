@@ -1,5 +1,9 @@
 package org.wlpiaoyi.framework.utils.snowflake;
 
+import org.wlpiaoyi.framework.utils.DateUtils;
+
+import java.util.Date;
+
 /**
  * Twitter_Snowflake<br>
  * SnowFlake的结构如下(每部分用-分开):<br>
@@ -132,14 +136,35 @@ public class IdWorker {
         return System.currentTimeMillis();
     }
 
-//    //==============================Test=============================================
-//    /** 测试 */
-//    public static void main(String[] args) {
-//        IdWorker idWorker = new IdWorker(0, 0);
+    //==============================Test=============================================
+    /** 测试 */
+    public static void main(String[] args) {
+        IdWorker idWorker = new IdWorker(0, 0);
+        idWorker.twepoch = DateUtils.toTimestamp(DateUtils.parseLocalDateTime("2021-01-01 08:00:00"));
+        long id = idWorker.nextId();
+        System.out.println(Long.toBinaryString(id));
+        System.out.println(id);
+        idWorker.twepoch = DateUtils.toTimestamp(DateUtils.parseLocalDateTime("2010-01-01 08:00:00"));
+        id = idWorker.nextId();
+        System.out.println(Long.toBinaryString(id));
+        System.out.println(id);
+        idWorker.twepoch = DateUtils.toTimestamp(DateUtils.parseLocalDateTime("2000-01-01 08:00:00"));
+        id = idWorker.nextId();
+        System.out.println(Long.toBinaryString(id));
+        System.out.println(id);
+        idWorker.twepoch = DateUtils.toTimestamp(DateUtils.parseLocalDateTime("1970-01-01 08:00:00"));
+        id = idWorker.nextId();
+        System.out.println(Long.toBinaryString(id));
+        System.out.println(id);
+        idWorker.twepoch = DateUtils.toTimestamp(DateUtils.parseLocalDateTime("1960-01-01 08:00:00"));
+        id = idWorker.nextId();
+        System.out.println(Long.toBinaryString(id));
+        System.out.println(id);
+
 //        for (int i = 0; i < 100; i++) {
 //            long id = idWorker.nextId();
 //            System.out.println(Long.toBinaryString(id));
 //            System.out.println(id);
 //        }
-//    }
+    }
 }
