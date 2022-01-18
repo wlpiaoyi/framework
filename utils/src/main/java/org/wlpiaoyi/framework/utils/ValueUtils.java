@@ -44,6 +44,11 @@ public final class ValueUtils {
         return value == 0;
     }
 
+    public static boolean isBlank(Boolean value){
+        if(value == null) return true;
+        return !value;
+    }
+
     public static boolean isBlank(BigDecimal value){
         if(value == null) return true;
         return value.doubleValue() == 0;
