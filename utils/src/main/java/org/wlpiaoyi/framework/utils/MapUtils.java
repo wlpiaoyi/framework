@@ -1,5 +1,6 @@
 package org.wlpiaoyi.framework.utils;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.Map;
@@ -77,26 +78,35 @@ public class MapUtils {
         Object value = map.get(key);
         if(value instanceof Integer){
             return (Integer) value;
-        }else if (value instanceof String){
-            return new Integer((String) value);
         }else if(value instanceof LocalDate){
             return new Integer((int) DateUtils.toEpochDay(((LocalDate) value)));
+        }else if(value instanceof Long){
+            return ((Long) value).intValue();
+        }else if(value instanceof Double){
+            return ((Double) value).intValue();
+        }else if(value instanceof Float){
+            return ((Float) value).intValue();
         }
-        return new Integer(value.toString());
+        return new Double(value.toString()).intValue();
     }
+
 
     public static final Long getLong(Map map, Object key){
         Object value = map.get(key);
         if(value instanceof Long){
             return (Long) value;
-        }else if (value instanceof String){
-            return new Long((String) value);
         }else if(value instanceof LocalDateTime){
             return DateUtils.toTimestamp(((LocalDateTime) value));
         }else if(value instanceof LocalDate){
             return DateUtils.toEpochDay(((LocalDate) value)) * 24 * 3600;
+        }else if(value instanceof Integer){
+            return ((Integer) value).longValue();
+        }else if(value instanceof Double){
+            return ((Double) value).longValue();
+        }else if(value instanceof Float){
+            return ((Float) value).longValue();
         }
-        return new Long(value.toString());
+        return new Double(value.toString()).longValue();
     }
 
     public static final LocalDateTime getDateTime(Map map, Object key){
