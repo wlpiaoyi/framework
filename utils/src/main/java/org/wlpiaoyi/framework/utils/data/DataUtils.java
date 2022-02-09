@@ -35,12 +35,31 @@ public class DataUtils {
     /**
      * 确保目录存在，不存在则创建
      * @param dirPath
+     * @return true:目录不存在 已创建 false:目录已存在 不创建
      */
-    public static void makeDir(String dirPath) {
+    public static boolean makeDir(String dirPath) {
         File dir = new File(dirPath);
         if (!dir.exists()) {
             dir.mkdirs();
+            return true;
         }
+        return false;
+    }
+
+    /**
+     * 获取文件大小
+     * @param filePath
+     * @return -1:没有找到文件 -2:是个文件夹
+     */
+    public static long getSize(String filePath){
+        File file = new File(filePath);
+        if (!file.exists()) {
+            return -1;
+        }
+        if (!file.isFile()) {
+            return -2;
+        }
+        return file.length();
     }
 
     /**
