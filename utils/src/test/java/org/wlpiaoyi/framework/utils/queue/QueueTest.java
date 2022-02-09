@@ -15,55 +15,52 @@ public class QueueTest {
 
     @Test
     public void test() throws Exception {
-        new Thread(new Runnable() {
+
+        Queue.singleInstance().addTask(new Task() {
             @Override
             public void run() {
-                Queue.singleInstance().addTask(new Task() {
-                    @Override
-                    public void run() {
-                        System.out.println("1  " + System.currentTimeMillis());
-                    }
-                });
-                Queue.singleInstance().addTask(new Task() {
-                    @Override
-                    public void run() {
-                        System.out.println("2  " + System.currentTimeMillis());
-                    }
-                });
-                Queue.singleInstance().addTask(new Task() {
-                    @Override
-                    public void run() {
-                        System.out.println("3  " + System.currentTimeMillis());
-                    }
-                });
-                System.out.println("---  " + System.currentTimeMillis());
-
-                try {
-                    Thread.sleep(2000);
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
-
-                Queue.singleInstance().addTask(new Task() {
-                    @Override
-                    public void run() {
-                        System.out.println("4  " + System.currentTimeMillis());
-                    }
-                });
-
-                Queue.singleInstance().addTask(new Task() {
-                    @Override
-                    public void run() {
-                        System.out.println("5  " + System.currentTimeMillis());
-                    }
-                });
-
-                System.out.println("---  " + System.currentTimeMillis());
-
+                System.out.println("1  " + System.currentTimeMillis());
             }
-        }).start();
+        });
+        Queue.singleInstance().addTask(new Task() {
+            @Override
+            public void run() {
+                System.out.println("2  " + System.currentTimeMillis());
+            }
+        });
+        Queue.singleInstance().addTask(new Task() {
+            @Override
+            public void run() {
+                System.out.println("3  " + System.currentTimeMillis());
+            }
+        });
+        System.out.println("---  " + System.currentTimeMillis());
 
-        Thread.sleep(1000 * 999);
+        try {
+            Thread.sleep(2000);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+
+        Queue.singleInstance().addTask(new Task() {
+            @Override
+            public void run() {
+                System.out.println("4  " + System.currentTimeMillis());
+            }
+        });
+
+        Queue.singleInstance().addTask(new Task() {
+            @Override
+            public void run() {
+                System.out.println("5  " + System.currentTimeMillis());
+            }
+        });
+
+        System.out.println("---  " + System.currentTimeMillis());
+
+        Thread.sleep(100);
+        Queue.singleInstance().waitForComplete();
+        System.out.println("end  " + System.currentTimeMillis());
     }
 
 

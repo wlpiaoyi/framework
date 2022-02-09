@@ -1,5 +1,6 @@
 package org.wlpiaoyi.framework.utils.queue;
 
+import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -11,10 +12,38 @@ import java.util.List;
  */
 public class Queue{
 
+    private class QueueRunnable implements Runnable {
+
+        private WeakReference<Queue> queueWeakReference;
+
+        QueueRunnable(Queue queue){
+            this.queueWeakReference = new WeakReference(queue);
+        }
+
+        @Override
+        public void run() {
+            while (this.queueWeakReference.get().tasks.isEmpty() == false){
+                try{
+                    this.queueWeakReference.get().executeNext();
+                    try {
+                        Thread.sleep(heartbeatTimer <= 0 ? DEFAULT_HEARTBEAT_TIMER : heartbeatTimer);
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+                    System.out.println("QueueRunnable");
+                }finally {
+                    synchronized (this.queueWeakReference.get().isInTaskSynTag){
+                        this.queueWeakReference.get().isInTask = false;
+                    }
+                }
+            }
+        }
+    }
+
     private static Queue xQueueSync;
 
+    /**队列心跳默认50毫秒**/
     public final static int DEFAULT_HEARTBEAT_TIMER = 50;
-    //队列心跳默认50毫秒
     public static int heartbeatTimer = DEFAULT_HEARTBEAT_TIMER;
 
     //任务数组
@@ -61,24 +90,7 @@ public class Queue{
             if(this.isInTask) return;
             this.isInTask = true;
         }
-        new Thread(() -> {
-            System.out.println("start execute");
-            while (this.tasks.isEmpty() == false){
-                try{
-                    Queue.singleInstance().executeNext();
-                    try {
-                        Thread.sleep(heartbeatTimer <= 0 ? DEFAULT_HEARTBEAT_TIMER : heartbeatTimer);
-                    } catch (InterruptedException e) {
-                        e.printStackTrace();
-                    }
-                    System.out.println("executing");
-                }finally {
-                    synchronized (this.isInTaskSynTag){
-                        this.isInTask = false;
-                    }
-                }
-            }
-        }).start();
+        new Thread(new QueueRunnable(this)).start();
     }
 
     /**
@@ -99,6 +111,19 @@ public class Queue{
         synchronized (this.tasks){
             this.tasks.add(task);
             this.executeImmediate();
+        }
+    }
+
+    /**
+     * 等待完成
+     */
+    public synchronized void waitForComplete(){
+        while (!this.tasks.isEmpty() && this.isInTask){
+            try {
+                Thread.sleep(heartbeatTimer <= 0 ? DEFAULT_HEARTBEAT_TIMER : heartbeatTimer);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
         }
     }
 
