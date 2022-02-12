@@ -12,34 +12,6 @@ import java.util.List;
  */
 public class Queue{
 
-    private class QueueRunnable implements Runnable {
-
-        private WeakReference<Queue> queueWeakReference;
-
-        QueueRunnable(Queue queue){
-            this.queueWeakReference = new WeakReference(queue);
-        }
-
-        @Override
-        public void run() {
-            while (this.queueWeakReference.get().tasks.isEmpty() == false){
-                try{
-                    this.queueWeakReference.get().executeNext();
-                    try {
-                        Thread.sleep(heartbeatTimer <= 0 ? DEFAULT_HEARTBEAT_TIMER : heartbeatTimer);
-                    } catch (InterruptedException e) {
-                        e.printStackTrace();
-                    }
-                    System.out.println("QueueRunnable");
-                }finally {
-                    synchronized (this.queueWeakReference.get().isInTaskSynTag){
-                        this.queueWeakReference.get().isInTask = false;
-                    }
-                }
-            }
-        }
-    }
-
     private static Queue xQueueSync;
 
     /**队列心跳默认50毫秒**/
@@ -123,6 +95,34 @@ public class Queue{
                 Thread.sleep(heartbeatTimer <= 0 ? DEFAULT_HEARTBEAT_TIMER : heartbeatTimer);
             } catch (InterruptedException e) {
                 e.printStackTrace();
+            }
+        }
+    }
+
+    /**队列容器**/
+    private class QueueRunnable implements Runnable {
+
+        private WeakReference<Queue> queueWeakReference;
+
+        QueueRunnable(Queue queue){
+            this.queueWeakReference = new WeakReference(queue);
+        }
+
+        @Override
+        public void run() {
+            while (this.queueWeakReference.get().tasks.isEmpty() == false){
+                try{
+                    this.queueWeakReference.get().executeNext();
+                    try {
+                        Thread.sleep(heartbeatTimer <= 0 ? DEFAULT_HEARTBEAT_TIMER : heartbeatTimer);
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+                }finally {
+                    synchronized (this.queueWeakReference.get().isInTaskSynTag){
+                        this.queueWeakReference.get().isInTask = false;
+                    }
+                }
             }
         }
     }
