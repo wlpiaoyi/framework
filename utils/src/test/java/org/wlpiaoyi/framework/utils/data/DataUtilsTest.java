@@ -14,8 +14,13 @@ public class DataUtilsTest {
     public void setUp() throws Exception {}
 
 
+
+
     @Test
     public void write1() throws IOException {
+
+        int a = 1, b = 2, c = 3;
+
         String path = DataUtils.basePath + "/test1/test1-1/data.txt";
         String text = "123456我";
         WriterUtils.overwrite(new File(path), text.getBytes(StandardCharsets.UTF_8));
