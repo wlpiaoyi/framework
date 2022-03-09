@@ -14,6 +14,7 @@ public class MapUtils {
 
     public static final <T> T get(Map map, Object key){
         Object value = map.get(key);
+        if(value == null) return null;
         return (T) value;
     }
 
@@ -24,6 +25,7 @@ public class MapUtils {
 
     public static final String getString(Map map, Object key){
         Object value = map.get(key);
+        if(value == null) return null;
         if(value instanceof String){
             return (String) value;
         }else if(value instanceof LocalDateTime){
@@ -36,6 +38,7 @@ public class MapUtils {
 
     public static final Float getFloat(Map map, Object key){
         Object value = map.get(key);
+        if(value == null) return null;
         if(value instanceof Float){
             return (Float) value;
         }else if (value instanceof String){
@@ -46,6 +49,7 @@ public class MapUtils {
 
     public static final Double getDouble(Map map, Object key){
         Object value = map.get(key);
+        if(value == null) return null;
         if(value instanceof Double){
             return (Double) value;
         }else if (value instanceof String){
@@ -56,6 +60,7 @@ public class MapUtils {
 
     public static final Boolean getBoolean(Map map, Object key){
         Object value = map.get(key);
+        if(value == null) return null;
         if(value instanceof Boolean){
             return (Boolean) value;
         }else if (value instanceof String){
@@ -66,6 +71,7 @@ public class MapUtils {
 
     public static final Byte getByte(Map map, Object key){
         Object value = map.get(key);
+        if(value == null) return null;
         if(value instanceof Byte){
             return (Byte) value;
         }else if (value instanceof String){
@@ -76,6 +82,7 @@ public class MapUtils {
 
     public static final Integer getInteger(Map map, Object key){
         Object value = map.get(key);
+        if(value == null) return null;
         if(value instanceof Integer){
             return (Integer) value;
         }else if(value instanceof LocalDate){
@@ -93,6 +100,7 @@ public class MapUtils {
 
     public static final Long getLong(Map map, Object key){
         Object value = map.get(key);
+        if(value == null) return null;
         if(value instanceof Long){
             return (Long) value;
         }else if(value instanceof LocalDateTime){
@@ -111,6 +119,7 @@ public class MapUtils {
 
     public static final LocalDateTime getDateTime(Map map, Object key){
         Object value = map.get(key);
+        if(value == null) return null;
         if(value instanceof LocalDateTime){
             return (LocalDateTime) value;
         }else if (value instanceof Long){
@@ -128,6 +137,7 @@ public class MapUtils {
 
     public static final LocalDate getDate(Map map, Object key){
         Object value = map.get(key);
+        if(value == null) return null;
         if(value instanceof LocalDate){
             return (LocalDate) value;
         }else if (value instanceof Long){

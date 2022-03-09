@@ -5,16 +5,14 @@ import org.wlpiaoyi.framework.utils.exception.BusinessException;
 ;
 import java.io.File;
 
+/**
+ * collection of data tools
+ */
 public class DataUtils {
 
-    public static final String basePath = System.getProperty("user.dir");
+    public static final String USER_DIR = System.getProperty("user.dir");
 
-//加载文件=====================================================================>
-    /**
-     * 加载文件
-     * @param path
-     * @return
-     */
+//load file=====================================================================>
     public static File loadPath(@NonNull String path){
         File file = new File(path);
         if(!file.exists()) return null;
@@ -30,12 +28,12 @@ public class DataUtils {
         if(!file.isDirectory()) return null;
         return file;
     }
-//加载文件<=====================================================================
+//load file<=====================================================================
 
     /**
-     * 确保目录存在，不存在则创建
+     * make sure the dictionary is exists, create it if it doesn't exist
      * @param dirPath
-     * @return true:目录不存在 已创建 false:目录已存在 不创建
+     * @return true:dictionary does not exist, created. false:dictionary already exist, do not create
      */
     public static boolean makeDir(String dirPath) {
         File dir = new File(dirPath);
@@ -47,9 +45,9 @@ public class DataUtils {
     }
 
     /**
-     * 获取文件大小
+     * get file size
      * @param filePath
-     * @return -1:没有找到文件 -2:是个文件夹
+     * @return -1:file not found -2:is a folder
      */
     public static long getSize(String filePath){
         File file = new File(filePath);
@@ -63,9 +61,9 @@ public class DataUtils {
     }
 
     /**
-     * 移动文件夹
+     * move file
      * @param move
-     * @param to 目标文件夹如果不存在则自动创建
+     * @param to the destination folder automatically created if it does not exist
      * @return
      */
     public static boolean moveFile(File move, File to) {
