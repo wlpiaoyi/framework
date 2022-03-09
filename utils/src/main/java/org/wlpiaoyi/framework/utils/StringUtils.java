@@ -12,6 +12,7 @@ import java.nio.ByteBuffer;
 import java.security.DigestInputStream;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.util.Locale;
 import java.util.UUID;
 
 public class StringUtils {
@@ -244,5 +245,18 @@ public class StringUtils {
             e.printStackTrace();
             return false;
         }
+    }
+
+    public static String toHump(String name){
+        String[] args = name.split("_");
+        StringBuffer sb = new StringBuffer();
+        for (String arg : args){
+            if(ValueUtils.isBlank(arg)) continue;
+            sb.append(arg.substring(0, 1).toUpperCase());
+            if(arg.length() == 1) continue;
+            sb.append(arg.substring(1).toLowerCase());
+        }
+        if(sb.length() == 0) return name;
+        return sb.toString();
     }
 }
