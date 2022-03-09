@@ -58,7 +58,7 @@ public class MethodPlugin extends PluginAdapter {
         sb.append("\n\t\t}");
 
 
-        sb.append("\n\t\treturn this.getId().equals(((Rule) obj).getId());");
+        sb.append("\n\t\treturn this.getId().equals(((" + topLevelClass.getType().getShortName() + ") obj).getId());");
         method.addBodyLine(sb.toString());
         topLevelClass.addMethod(method);
     }
