@@ -34,7 +34,7 @@ public class JavaExamplePlugin extends PluginAdapter {
     public void initialized(IntrospectedTable introspectedTable) {
         String oldType = introspectedTable.getExampleType();
         String packagePath = oldType.substring(0, oldType.lastIndexOf(".") + 1);
-        String name = introspectedTable.getTableConfiguration().getTableName();
+        String name = introspectedTable.getFullyQualifiedTable().getIntrospectedTableName();
         if(this.delPrefix){
             name = name.substring(name.indexOf("_") + 1);
         }
@@ -44,7 +44,7 @@ public class JavaExamplePlugin extends PluginAdapter {
 
         oldType = introspectedTable.getBaseRecordType();
         packagePath = oldType.substring(0, oldType.lastIndexOf(".") + 1);
-        name = introspectedTable.getTableConfiguration().getTableName();
+        name = introspectedTable.getFullyQualifiedTable().getIntrospectedTableName();
         if(this.delPrefix){
             name = name.substring(name.indexOf("_") + 1);
         }

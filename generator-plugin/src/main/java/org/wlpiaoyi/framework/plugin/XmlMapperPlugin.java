@@ -32,7 +32,7 @@ public class XmlMapperPlugin  extends PluginAdapter {
 
     @Override
     public void initialized(IntrospectedTable introspectedTable) {
-        String name = introspectedTable.getTableConfiguration().getTableName();
+        String name = introspectedTable.getFullyQualifiedTable().getIntrospectedTableName();
         if(this.delPrefix){
             name = name.substring(name.indexOf("_") + 1);
         }

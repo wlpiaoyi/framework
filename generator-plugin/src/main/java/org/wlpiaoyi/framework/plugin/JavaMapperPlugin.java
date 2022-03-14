@@ -34,7 +34,7 @@ public class JavaMapperPlugin extends PluginAdapter{
     public void initialized(IntrospectedTable introspectedTable) {
         String oldType = introspectedTable.getMyBatis3JavaMapperType();
         String packagePath = oldType.substring(0, oldType.lastIndexOf(".") + 1);
-        String name = introspectedTable.getTableConfiguration().getTableName();
+        String name = introspectedTable.getFullyQualifiedTable().getIntrospectedTableName();
         if(this.delPrefix){
             name = name.substring(name.indexOf("_") + 1);
         }
