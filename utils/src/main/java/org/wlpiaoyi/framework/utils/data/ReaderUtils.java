@@ -29,6 +29,16 @@ public class ReaderUtils {
     public static Properties loadProperties(@NonNull String path) throws IOException {
         File file = DataUtils.loadFile(path);
         if(file == null) throw new IOException("没有找到文件");
+        return ReaderUtils.loadProperties(file);
+    }
+
+    /**
+     * read file convert to properties
+     * @param file
+     * @return
+     * @throws IOException
+     */
+    public static Properties loadProperties(@NonNull File file) throws IOException {
         FileInputStream fileInputStream = new FileInputStream(file);
         Properties properties = new Properties();
         properties.load(fileInputStream);

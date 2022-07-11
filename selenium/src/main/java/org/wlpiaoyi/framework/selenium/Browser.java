@@ -119,7 +119,6 @@ public class Browser {
             options.addArguments("--disable-gpu");
         }
 
-
         if(!StringUtils.isBlank(this.binaryPath))options.setBinary(this.binaryPath);
         if(this.isOptionHeadless()){
             options.addArguments("--headless");

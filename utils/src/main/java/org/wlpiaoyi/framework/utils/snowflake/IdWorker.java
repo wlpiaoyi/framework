@@ -1,8 +1,10 @@
 package org.wlpiaoyi.framework.utils.snowflake;
 
+import lombok.Getter;
+import lombok.Setter;
 import org.wlpiaoyi.framework.utils.DateUtils;
 
-import java.util.Date;
+import java.util.*;
 
 /**
  * Twitter_Snowflake<br>
@@ -19,7 +21,7 @@ import java.util.Date;
 public class IdWorker {
 // ==============================Fields===========================================
     /** 开始时间截 (2021-10-01) */
-    protected long twepoch = 1633017600000L;
+    protected static long twepoch = 1633017600000L;
 
     /** 机器id所占的位数 */
     private final long workerIdBits = 5L;
@@ -78,6 +80,7 @@ public class IdWorker {
     }
 
     // ==============================Methods==========================================
+
     /**
      * 获得下一个ID (该方法是线程安全的)
      * @return SnowflakeId
@@ -139,7 +142,14 @@ public class IdWorker {
     //==============================Test=============================================
     /** 测试 */
     public static void main(String[] args) {
+
         IdWorker idWorker = new IdWorker(0, 0);
+        for (int i = 0; i < 100; i++) {
+            long id = idWorker.nextId();
+            System.out.println(Long.toBinaryString(id));
+            System.out.println(id);
+        }
+
         idWorker.twepoch = DateUtils.toTimestamp(DateUtils.parseLocalDateTime("2021-01-01 08:00:00"));
         long id = idWorker.nextId();
         System.out.println(Long.toBinaryString(id));
@@ -161,10 +171,6 @@ public class IdWorker {
         System.out.println(Long.toBinaryString(id));
         System.out.println(id);
 
-//        for (int i = 0; i < 100; i++) {
-//            long id = idWorker.nextId();
-//            System.out.println(Long.toBinaryString(id));
-//            System.out.println(id);
-//        }
+
     }
 }

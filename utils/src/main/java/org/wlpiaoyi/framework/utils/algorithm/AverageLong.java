@@ -1,6 +1,5 @@
-package org.wlpiaoyi.framework.utils.algorithm.average;
+package org.wlpiaoyi.framework.utils.algorithm;
 
-import org.wlpiaoyi.framework.utils.algorithm.Algorithm;
 import org.wlpiaoyi.framework.utils.exception.BusinessException;
 
 import java.util.ArrayList;
@@ -12,7 +11,7 @@ import java.util.List;
  * @Date 2022/2/17 5:29 PM
  * @Version 1.0
  */
-public class AverageLong implements Algorithm<Long> {
+class AverageLong implements AlgorithmInterface<Long> {
 
     private static AverageLong xAverage;
 
@@ -33,15 +32,16 @@ public class AverageLong implements Algorithm<Long> {
         for (int i = 0; i < values.size(); i++) {
             Long v1 = values.get(i);
             Long v2 = values.get(++i);
-            long r = Utils.toLong(v1, v2);
+            long r = Function.getLong(v1, v2);
             rs.add(r);
         }
         return rs;
     }
 
     private long doneExecute(List<Long> values) {
+
         int size = values.size();
-        Long last = Utils.doneOne(values);
+        Long last = Function.doneOne(values);
         if (last != null) {
             values.remove(values.get(values.size() - 1));
         }
@@ -51,10 +51,10 @@ public class AverageLong implements Algorithm<Long> {
             if (temps.size() > 2) {
                 r1 = this.doneExecute(temps);
             } else {
-                r1 = Utils.toLong(temps.get(0), temps.get(1));
+                r1 = Function.getLong(temps.get(0), temps.get(1));
             }
         } else if (values.size() == 2) {
-            r1 = Utils.toLong(values.get(0), values.get(1));
+            r1 = Function.getLong(values.get(0), values.get(1));
         } else if (values.size() == 1) {
             throw new BusinessException("error average for size 1");
         } else {
@@ -79,25 +79,21 @@ public class AverageLong implements Algorithm<Long> {
 
 
     public static void main(String[] args) {
-        long v = 2;
-        ArrayList<Long> values = new ArrayList() {{
-            add(Long.MAX_VALUE);
-            add(Long.MAX_VALUE - v);
-            add(Long.MAX_VALUE);
-            add(Long.MAX_VALUE - v);
-            add(Long.MAX_VALUE);
-            add(Long.MAX_VALUE - v);
-            add(Long.MAX_VALUE);
-            add(Long.MAX_VALUE - v);
-            add(Long.MAX_VALUE);
-            add(Long.MAX_VALUE - v);
-        }};
-        long r1 = AverageLong.singleInstance().execute(values).longValue();
-//        double r2 = 0.0;
-//        for (double v : values){
-//            r2 = r2 + v;
-//        }
-//        r2 = r2/values.size();
-        System.out.println();
+
+        int size = 201;
+        ArrayList<Long> values = new ArrayList();
+        long suffix = 100;
+        long value = 0;
+        for (int i = 0; i < size; i++){
+            value += suffix;
+            values.add(value);
+        }
+        long r1 = AverageLong.singleInstance().execute(values);
+        long r2 = 0;
+        for (long v : values){
+            r2 = r2 + v;
+        }
+        r2 = r2/values.size();
+        System.out.println(r1 + "---" + r2);
     }
 }

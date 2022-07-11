@@ -1,9 +1,12 @@
 package org.wlpiaoyi.framework.utils;
 
+import com.google.gson.Gson;
+import org.wlpiaoyi.framework.utils.gson.GsonBuilder;
+
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.Map;
+import java.util.*;
 import java.util.regex.Pattern;
 
 /**
@@ -151,6 +154,34 @@ public class MapUtils {
             }
         }
         return null;
+    }
+
+    public static final <T> List<T> getList(Map map, Object key, Class<T> clazz){
+        List datas = MapUtils.get(map, key);
+        if(datas == null) return null;
+        if(!(datas instanceof List)) return null;
+        if(ValueUtils.isBlank(datas)) return null;
+        Gson gson = GsonBuilder.gsonDefault();
+        List<T> items = new ArrayList<>();
+        for (Object data : datas){
+            T item = gson.fromJson(gson.toJson(data), clazz);
+            items.add(item);
+        }
+        return items;
+    }
+
+    public static final <T> Set<T> getSet(Map map, Object key, Class<T> clazz){
+        Set datas = MapUtils.get(map, key);
+        if(datas == null) return null;
+        if(!(datas instanceof Set)) return null;
+        if(ValueUtils.isBlank(datas)) return null;
+        Gson gson = GsonBuilder.gsonDefault();
+        Set<T> items = new HashSet<>();
+        for (Object data : datas){
+            T item = gson.fromJson(gson.toJson(data), clazz);
+            items.add(item);
+        }
+        return items;
     }
 
 //    public static void main(String[] args) {

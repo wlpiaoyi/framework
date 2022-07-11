@@ -1,6 +1,5 @@
-package org.wlpiaoyi.framework.utils.algorithm.average;
+package org.wlpiaoyi.framework.utils.algorithm;
 
-import org.wlpiaoyi.framework.utils.algorithm.Algorithm;
 import org.wlpiaoyi.framework.utils.exception.BusinessException;
 
 import java.util.ArrayList;
@@ -12,7 +11,7 @@ import java.util.List;
  * @Date 2022/2/17 10:32 AM
  * @Version 1.0
  */
-public class AverageDouble implements Algorithm<Double> {
+class AverageDouble implements AlgorithmInterface<Double> {
 
     private static AverageDouble xAverage;
 
@@ -32,7 +31,7 @@ public class AverageDouble implements Algorithm<Double> {
         for (int i = 0; i < values.size(); i++) {
             Double v1 = values.get(i);
             Double v2 = values.get(++i);
-            double r = Utils.toDouble(v1, v2);
+            double r = Function.getDouble(v1, v2);
             rs.add(r);
         }
         return rs;
@@ -40,7 +39,7 @@ public class AverageDouble implements Algorithm<Double> {
 
     private double doneExecute(List<Double> values) {
         int size = values.size();
-        Double last = Utils.doneOne(values);
+        Double last = Function.doneOne(values);
         if(last != null){
             values.remove(values.get(values.size() - 1));
         }
@@ -50,10 +49,10 @@ public class AverageDouble implements Algorithm<Double> {
             if(temps.size() > 2){
                 r1 = this.doneExecute(temps);
             }else{
-                r1 = Utils.toDouble(temps.get(0), temps.get(1));
+                r1 = Function.getDouble(temps.get(0), temps.get(1));
             }
         }else if(values.size()  == 2){
-            r1 = Utils.toDouble(values.get(0), values.get(1));
+            r1 = Function.getDouble(values.get(0), values.get(1));
         }else if(values.size() == 1){
             throw new BusinessException("error average for size 1");
         }else{
@@ -76,20 +75,4 @@ public class AverageDouble implements Algorithm<Double> {
         return this.doneExecute(values);
     }
 
-
-    public static void main(String[] args) {
-        long v = 200;
-        ArrayList<Double> values = new ArrayList(){{
-            add(2.0);
-            add(2.1);
-            add(2.2);
-        }};
-        double r1 = AverageDouble.singleInstance().execute(values);
-//        double r2 = 0.0;
-//        for (double v : values){
-//            r2 = r2 + v;
-//        }
-//        r2 = r2/values.size();
-        System.out.println();
-    }
 }

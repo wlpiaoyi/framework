@@ -25,7 +25,7 @@ public class WriterUtils {
 
         @Override
         public int getSize() {
-            return 2;
+            return 1;
         }
 
         @Override
@@ -104,7 +104,6 @@ public class WriterUtils {
         WriterImpl writer = new WriterImpl(bytes);
         overwrite(file, writer);
     }
-
 
     public static void overwrite(@NonNull File file,
                                  @NonNull WriterInterface.WriterStringInterface writerInterface,
