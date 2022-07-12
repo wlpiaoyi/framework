@@ -251,9 +251,9 @@ class QueueDefault implements Queue, RunnableDefault.Progress, Runnable {
     public void beginQueueRunnable(Task task) {
         synchronized (this.taskSynTag){
             this.taskingCount ++;
+            if(this.queueProgress != null)
+                this.queueProgress.beginTask(task);
         }
-        if(this.queueProgress != null)
-            this.queueProgress.beginTask(task);
     }
 
     @Override
