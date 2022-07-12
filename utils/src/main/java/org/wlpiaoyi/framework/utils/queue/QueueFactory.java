@@ -9,8 +9,12 @@ import static java.lang.Thread.sleep;
  */
 public class QueueFactory {
 
-    public static Queue createDefault(){
-        Queue queue = new QueueDefault();
+    public static Queue createSequence(){
+        Queue queue = new QueueSequence();
+        return queue;
+    }
+    public static Queue createUnordered(){
+        Queue queue = new QueueUnordered();
         return queue;
     }
 

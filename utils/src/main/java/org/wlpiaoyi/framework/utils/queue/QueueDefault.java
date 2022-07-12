@@ -2,6 +2,7 @@ package org.wlpiaoyi.framework.utils.queue;
 
 import lombok.Getter;
 import lombok.SneakyThrows;
+import lombok.extern.slf4j.Slf4j;
 
 import java.util.*;
 import java.util.concurrent.CountDownLatch;
@@ -11,43 +12,26 @@ import java.util.concurrent.CountDownLatch;
  * @Date 2022/7/11 16:09
  * @Version 1.0
  */
-class QueueDefault implements Queue, RunnableDefault.Progress {
+@Slf4j
+class QueueDefault implements Queue, RunnableDefault.Progress, Runnable {
 
     //任务数组
     private final List<Task> waitingTasks = new ArrayList<>();
     private final Map<Task, RunnableDefault> waitingRunnable = new HashMap<>();
     private final List<Task> doingTasks = new ArrayList<>();
     private final Map<Task, RunnableDefault> doingRunnable = new HashMap<>();
+
     private Object taskSynTag = new Object();
 
-
-    @Getter
-    private volatile boolean isInQueue = false;
-
-    public boolean inQueue(){
-        synchronized (this.waitingTasks){
-            return this.isInQueue;
-        }
-    }
-
-    public void beginQueue(){
-        synchronized (this.waitingTasks){
-            this.isInQueue = true;
-        }
-    }
-    private void endQueue(){
-        synchronized (this.waitingTasks) {
-            this.isInQueue = false;
-            this.doingTasks.clear();
-            this.doingRunnable.clear();
-            this.waitingTasks.clear();
-            this.waitingRunnable.clear();
-        }
+    private QueueProgress queueProgress;
+    @Override
+    public void setQueueProgress(QueueProgress queueProgress) {
+        this.queueProgress = queueProgress;
     }
 
     @Override
     public List<Task> getWaitingTasks() {
-        synchronized (this.waitingTasks){
+        synchronized (this.taskSynTag){
             List<Task> list = this.waitingTasks;
             return new ArrayList(){{
                 addAll(list);
@@ -57,7 +41,7 @@ class QueueDefault implements Queue, RunnableDefault.Progress {
 
     @Override
     public List<Task> getDoingTasks() {
-        synchronized (this.waitingTasks){
+        synchronized (this.taskSynTag){
             List<Task> list = this.doingTasks;
             return new ArrayList(){{
                 addAll(list);
@@ -65,72 +49,122 @@ class QueueDefault implements Queue, RunnableDefault.Progress {
         }
     }
 
+    @Getter
+    private volatile int taskingCount = 0;
+
+    public int getUndoTaskCount(){
+        int count;
+        synchronized (this.taskSynTag){
+            count = this.waitingTasks.size();
+        }
+        return count;
+    }
+
     public Thread runTask(Task task) {
         RunnableDefault run = this.nextQueueRunnable(task);
-        this.remove(task);
-        Thread thread = new Thread(run);
-        synchronized (this.taskSynTag){
-            thread.start();
+        if(run == null) throw new RuntimeException("Runnable Object is null");
+        if(this.waitingTasks.contains(task) || !this.doingTasks.contains(task)){
+            synchronized (this.taskSynTag){
+                this.remove(task);
+                if(!this.doingTasks.contains(task)){
+                    this.doingTasks.add(task);
+                }
+            }
         }
+        return this.execRun(run);
+    }
+
+    @Override
+    public void safeOption(Task task) {
+        synchronized (this.taskSynTag){
+            task.run();
+        }
+    }
+
+    private Thread execRun(RunnableDefault run) {
+        Thread thread = new Thread(run);
+        thread.start();
         return thread;
     }
 
-
-    @Override
-    public int start() {
-        synchronized (this.waitingTasks){
-
-            if(this.inQueue()) return this.waitingTasks.size();
-
-            this.beginQueue();
-            if(this.waitingTasks.isEmpty()){
-                this.endQueue();
-                return 0;
+    private Thread threadStart = null;
+    private volatile boolean isLoadQueue = false;
+    public Thread start() {
+        synchronized (this.taskSynTag){
+            if(this.isNullTask()){
+                log.info("The task is null, not need to start");
+                return null;
             }
+            if(this.isLoadQueue){
+                log.info("The task is loading, not need to start");
+                return threadStart;
+            }
+            this.beginQueue();
+            Thread thread = new Thread(this);
+            thread.start();
+            threadStart = thread;
+            return threadStart;
+        }
+    }
 
-            QueueDefault queue = this;
-            new Thread(() -> {
-                Task task = queue.nextTask();
-                if(task == null) return;
-                do{
-                    queue.runTask(task);
-//                    try {
-//                        queue.runTask(task).join();
-//                    } catch (InterruptedException e) {
-//                        e.printStackTrace();
-//                    }
-                    task = queue.nextTask();
-                }while (task != null);
-                this.endQueue();
-            }).start();
+    protected boolean isSyncForRun(){
+        throw new RuntimeException("error");
+    }
+    public void run() {
 
-            return this.waitingTasks.size();
+        try{
+            Task task;
+            RunnableDefault run;
+            synchronized (this.taskSynTag){
+                task = this.nextTask();
+                if(task == null){
+                    log.info("No task for run");
+                    return;
+                }
+                run = this.nextQueueRunnable(task);
+                if(run == null){
+                    new RuntimeException("task(" + task + ") not fund QueueRunnable").printStackTrace();
+                }
+            }
+            do{
+                Thread thread = this.execRun(run);
+                if(this.isSyncForRun())
+                    try {thread.join();} catch (InterruptedException e) {e.printStackTrace();}
+
+                synchronized (this.taskSynTag){
+                    task = this.nextTask();
+                    if(task == null) return;
+                    run = this.nextQueueRunnable(task);
+                    if(run == null){
+                        new RuntimeException("task(" + task + ") not fund QueueRunnable").printStackTrace();
+                    }
+                }
+            }while (task != null);
+        }finally {
+            synchronized (this.taskSynTag){
+                this.isLoadQueue = false;
+            }
         }
     }
 
 
 
     private Task nextTask(){
-
-        synchronized (this.waitingTasks){
+        synchronized (this.taskSynTag){
             if(this.waitingTasks.isEmpty()) return null;
             Task task = this.waitingTasks.get(0);
-            synchronized (this.waitingTasks){
-                this.waitingTasks.remove(task);
-            }
+            this.waitingTasks.remove(task);
             this.doingTasks.add(task);
             return task;
         }
     }
 
     private RunnableDefault nextQueueRunnable(Task task){
-        synchronized (this.waitingTasks){
+        synchronized (this.taskSynTag){
             if(this.waitingRunnable.isEmpty()) return null;
             RunnableDefault run = this.waitingRunnable.get(task);
-            synchronized (this.waitingTasks){
-                this.waitingRunnable.remove(task);
-                this.doingRunnable.put(task, run);
-            }
+            this.waitingRunnable.remove(task);
+            this.doingRunnable.put(task, run);
             return run;
         }
     }
@@ -140,7 +174,7 @@ class QueueDefault implements Queue, RunnableDefault.Progress {
      * @param task
      */
     public void remove(Task task){
-        synchronized (this.waitingTasks){
+        synchronized (this.taskSynTag){
             this.waitingTasks.remove(task);
             this.waitingRunnable.remove(task);
         }
@@ -151,53 +185,109 @@ class QueueDefault implements Queue, RunnableDefault.Progress {
      * @param task
      */
     public void addTask(Task task){
-        synchronized (this.waitingTasks){
+        synchronized (this.taskSynTag){
             this.waitingTasks.add(task);
-            RunnableDefault queueRunnable = new RunnableDefault(task, this.taskSynTag, this);
+            RunnableDefault queueRunnable = new RunnableDefault(task, this);
             this.waitingRunnable.put(task, queueRunnable);
         }
     }
 
 
+    private CountDownLatch getCountDownLatch(){
+
+        synchronized (this.taskSynTag){
+            boolean isEmpty = this.doingTasks.isEmpty() && this.waitingTasks.isEmpty();
+            if(isEmpty) return null;
+
+            CountDownLatch countDownLatch = null;
+            if(!this.doingTasks.isEmpty()){
+                Task task = this.doingTasks.get(0);
+                RunnableDefault queueRunnable = this.doingRunnable.get(task);
+                if(queueRunnable == null){
+                    log.warn("There has task object in doing task list but the runnable object is null");
+                    return null;
+                }
+                countDownLatch = queueRunnable.getCountDownLatch();
+            }
+            if(countDownLatch != null) return countDownLatch;
+
+
+            if(!this.waitingTasks.isEmpty()){
+                Task task = this.waitingTasks.get(0);
+                RunnableDefault queueRunnable = this.waitingRunnable.get(task);
+                if(queueRunnable == null){
+                    log.warn("There has task object in waiting task list but the runnable object is null");
+                    return null;
+                }
+                countDownLatch = queueRunnable.getCountDownLatch();
+            }
+
+            if(countDownLatch != null) return countDownLatch;
+        }
+        return null;
+    }
+
     @SneakyThrows
     @Override
     public void await() {
-        if(this.isInQueue == false) return;
-        while (!this.doingTasks.isEmpty()){
-            CountDownLatch countDownLatch;
-            synchronized (this.waitingTasks){
-                if(this.doingTasks.isEmpty()){
-                    return;
-                }
-                Task task = this.doingTasks.get(0);
-                RunnableDefault queueRunnable = this.doingRunnable.get(task);
-                countDownLatch = queueRunnable.getCountDownLatch();
-            }
+        if(this.isNullTask()){
+            log.info("Has no await, because it's not in queue");
+            return;
+        }
+        CountDownLatch countDownLatch = this.getCountDownLatch();
+        if(countDownLatch == null){
+            log.info("Has no await, because it is null for CountDownLatch");
+            return;
+        }
+        do{
             if(countDownLatch.getCount() > 0){
                 countDownLatch.await();
             }
-        }
-        while (!this.waitingTasks.isEmpty()){
-            CountDownLatch countDownLatch;
-            synchronized (this.waitingTasks){
-                if(this.waitingTasks.isEmpty()){
-                    return;
-                }
-                Task task = this.waitingTasks.get(0);
-                RunnableDefault queueRunnable = this.waitingRunnable.get(task);
-                countDownLatch = queueRunnable.getCountDownLatch();
-            }
-            if(countDownLatch.getCount() > 0){
-                countDownLatch.await();
-            }
-        }
+            countDownLatch = this.getCountDownLatch();
+        }while (countDownLatch != null);
     }
 
     @Override
-    public void queueRunnableEnd(Task task) {
-        synchronized (this.waitingTasks){
+    public void beginQueueRunnable(Task task) {
+        synchronized (this.taskSynTag){
+            this.taskingCount ++;
+        }
+        if(this.queueProgress != null)
+            this.queueProgress.beginTask(task);
+    }
+
+    @Override
+    public void endQueueRunnable(Task task) {
+        synchronized (this.taskSynTag){
             this.doingTasks.remove(task);
             this.doingRunnable.remove(task);
+            this.taskingCount --;
+            if(this.queueProgress != null)
+                this.queueProgress.endTask(task);
+            if(this.isNullTask()){
+                this.endQueue();
+            }
+        }
+
+    }
+
+    private boolean isNullTask(){
+        synchronized (this.taskSynTag){
+            return this.waitingTasks.isEmpty() && this.doingTasks.isEmpty();
+        }
+    }
+
+    public void beginQueue(){
+        synchronized (this.taskSynTag){
+            this.taskingCount = 0;
+            if(this.queueProgress != null)
+                this.queueProgress.beginQueue(this);
+        }
+    }
+    private void endQueue(){
+        synchronized (this.taskSynTag){
+            if(this.queueProgress != null)
+                this.queueProgress.endQueue(this);
         }
     }
 }

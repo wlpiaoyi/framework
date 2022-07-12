@@ -9,6 +9,11 @@ import java.util.List;
  */
 public interface Queue {
 
+    /**
+     * 任务回调
+     * @param queueProgress
+     */
+    void setQueueProgress(QueueProgress queueProgress);
 
     /**
      * 未执行的任务
@@ -23,22 +28,34 @@ public interface Queue {
     List<Task> getDoingTasks();
 
     /**
-     * 是否正在执行任务队列
+     * 未执行的任务数量
      * @return
      */
-    boolean inQueue();
+    int getUndoTaskCount();
+
+    /**
+     * 执行中的任务数量
+     * @return
+     */
+    int getTaskingCount();
 
     /**
      * 执行任务
      * @return
      */
-    Thread runTask(Task task) ;
+    Thread runTask(Task task);
+
+    /**
+     * 在安全状态下进行操作
+     * @param task
+     */
+    void safeOption(Task task);
 
     /**
      * 立即启动执行队列
      * 如果已启动则忽略
      */
-    int start();
+    Thread start();
 
     /**
      * 删除任务

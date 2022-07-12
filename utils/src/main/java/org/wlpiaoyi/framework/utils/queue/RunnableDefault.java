@@ -15,21 +15,18 @@ import java.util.concurrent.CountDownLatch;
 class RunnableDefault implements Runnable {
 
     interface Progress{
-        void  queueRunnableEnd(Task task);
+        void beginQueueRunnable(Task task);
+        void endQueueRunnable(Task task);
     }
 
-    private WeakReference<Queue> queueWeakReference;
-
     private final Task task;
-    private final Object taskSynTag;
     @Getter
     private final CountDownLatch countDownLatch;
 
     private WeakReference<Progress> progressWeakReference;
 
-    RunnableDefault(final Task task, final Object taskSynTag, Progress progress){
+    RunnableDefault(final Task task, Progress progress){
         this.task = task;
-        this.taskSynTag = taskSynTag;
         this.countDownLatch = new CountDownLatch(1);
         this.progressWeakReference = new WeakReference<>(progress);
     }
@@ -37,13 +34,15 @@ class RunnableDefault implements Runnable {
     @SneakyThrows
     @Override
     public void run() {
+
+        if(this.progressWeakReference != null && this.progressWeakReference.get() != null){
+            this.progressWeakReference.get().beginQueueRunnable(this.task);
+        }
         this.task.run();
         if(this.progressWeakReference != null && this.progressWeakReference.get() != null){
-            this.progressWeakReference.get().queueRunnableEnd(this.task);
+            this.progressWeakReference.get().endQueueRunnable(this.task);
         }
-        synchronized (taskSynTag){
-            this.taskSynTag.notify();
-        }
+
         this.countDownLatch.countDown();
     }
 }
