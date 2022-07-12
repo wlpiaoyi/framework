@@ -42,7 +42,6 @@ class RunnableDefault implements Runnable {
         if(this.progressWeakReference != null && this.progressWeakReference.get() != null){
             this.progressWeakReference.get().endQueueRunnable(this.task);
         }
-
         this.countDownLatch.countDown();
     }
 }
