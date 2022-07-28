@@ -1,4 +1,4 @@
-package org.wlpiaoyi.framework.utils.websocket.client;
+package org.wlpiaoyi.framework.utils.web.websocket.client;
 
 import com.google.gson.Gson;
 import org.apache.http.client.utils.URIBuilder;

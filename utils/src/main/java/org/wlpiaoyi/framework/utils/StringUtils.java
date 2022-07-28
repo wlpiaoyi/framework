@@ -14,6 +14,7 @@ import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.Locale;
 import java.util.UUID;
+import java.util.regex.Pattern;
 
 public class StringUtils {
 
@@ -103,7 +104,7 @@ public class StringUtils {
     public static boolean isBlank(String arg){
         return arg == null || arg.length() == 0;
     }
-
+    @Deprecated
     public static String toJson(Object obj){
         Gson gson = new GsonBuilder().disableHtmlEscaping().create();
         return gson.toJson(obj);

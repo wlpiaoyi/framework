@@ -40,7 +40,6 @@ public class ProxyTest implements ObjectInterceptorProgress, ClassInterceptorPro
     public void test2(){
         ClassInterceptorProxy methodInterceptor = new ClassInterceptorProxy(this);
         IDao dao = methodInterceptor.getProxy(IDaoImpl.class);
-        IServiceImpl temp = new IServiceImpl();
         IService service = methodInterceptor.getProxy(IServiceImpl.class);
         ((IServiceImpl)service).setDao(dao);
         int value = service.save(10);

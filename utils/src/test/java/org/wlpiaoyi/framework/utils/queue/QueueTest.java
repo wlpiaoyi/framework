@@ -7,6 +7,7 @@ import org.junit.Test;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
 import static java.lang.Thread.sleep;
@@ -21,6 +22,7 @@ public class QueueTest implements QueueProgress{
 
     private final Object synTag = new Object();
     private volatile boolean isSyn = false;
+
 
     @Test
     public void test1() throws Exception {
@@ -276,6 +278,58 @@ public class QueueTest implements QueueProgress{
         System.out.println("queue await");
         queue2.await();
         System.out.println("queue end");
+    }
+
+
+    @Test
+    public void test4() throws Exception {
+        Lock lock = new ReentrantLock();
+        Queue queue = QueueFactory.createUnordered();
+        queue.addTask(() -> {
+            try {Thread.sleep(20);
+            } catch (Exception e) {}
+            lock.lock();
+            System.out.println("lock1");
+            int timer = 0;
+            while (timer < 100){
+                try {Thread.sleep(10);
+                } catch (Exception e) {}
+                timer += 10;
+                System.out.println("lock1:" + timer);
+            }
+            lock.unlock();
+        });
+        queue.addTask(() -> {
+            boolean flag = lock.tryLock();
+            System.out.println("lock2:" + flag);
+            int timer = 0;
+            boolean flag1 = lock.tryLock();
+            System.out.println("lock2-1:" + flag);
+            if(flag1) lock.unlock();
+            while (timer < 100){
+                try {Thread.sleep(10);
+                } catch (Exception e) {}
+                timer += 10;
+                System.out.println("lock2:" + timer);
+            }
+            if(flag) lock.unlock();
+        });
+//        queue.addTask(() -> {
+//            try {Thread.sleep(30);
+//            } catch (Exception e) {}
+//            boolean flag = lock.tryLock();
+//            System.out.println("lock2:" + flag);
+//            int timer = 0;
+//            while (timer < 50){
+//                try {Thread.sleep(10);
+//                } catch (Exception e) {}
+//                timer += 10;
+//                System.out.println("lock2:" + timer);
+//            }
+//            if(flag) lock.unlock();
+//        });
+        queue.start();
+        queue.await();
     }
 
 

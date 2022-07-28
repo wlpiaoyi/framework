@@ -16,6 +16,7 @@ public class JavaExamplePlugin extends PluginAdapter {
 
     private boolean delPrefix = true;
     private String suffix = "example";
+    private String packagePath = null;
 
     @Override
     public boolean validate(List<String> warnings) {
@@ -27,28 +28,36 @@ public class JavaExamplePlugin extends PluginAdapter {
         if(!ValueUtils.isBlank(suffix)){
             this.suffix = properties.getProperty("suffix");
         }
+
+        String packagePath = properties.getProperty("packagePath");
+        if(!ValueUtils.isBlank(packagePath)){
+            this.packagePath = properties.getProperty("packagePath");
+        }
         return true;
     }
 
     @Override
     public void initialized(IntrospectedTable introspectedTable) {
         String oldType = introspectedTable.getExampleType();
-        String packagePath = oldType.substring(0, oldType.lastIndexOf(".") + 1);
+        String packagePath = this.packagePath;
+        if(ValueUtils.isBlank(packagePath)){
+            packagePath = oldType.substring(0, oldType.lastIndexOf("."));
+        }
         String name = introspectedTable.getFullyQualifiedTable().getIntrospectedTableName();
         if(this.delPrefix){
             name = name.substring(name.indexOf("_") + 1);
         }
         name = StringUtils.toHump(name + "_" + this.suffix);
-        introspectedTable.setExampleType(packagePath + name);
+        introspectedTable.setExampleType(packagePath + "." + name);
 
 
         oldType = introspectedTable.getBaseRecordType();
-        packagePath = oldType.substring(0, oldType.lastIndexOf(".") + 1);
+        packagePath = oldType.substring(0, oldType.lastIndexOf("."));
         name = introspectedTable.getFullyQualifiedTable().getIntrospectedTableName();
         if(this.delPrefix){
             name = name.substring(name.indexOf("_") + 1);
         }
         name = StringUtils.toHump(name);
-        introspectedTable.setBaseRecordType(packagePath + name);
+        introspectedTable.setBaseRecordType(packagePath + "." + name);
     }
 }

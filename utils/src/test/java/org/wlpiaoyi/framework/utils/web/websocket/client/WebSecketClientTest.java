@@ -1,20 +1,12 @@
-package org.wlpiaoyi.framework.utils.websocket.client;
+package org.wlpiaoyi.framework.utils.web.websocket.client;
 
 
-import com.google.gson.Gson;
 import lombok.Data;
 import org.java_websocket.handshake.ServerHandshake;
 import org.junit.After;
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
-import java.io.IOException;
-import java.net.InetSocketAddress;
-import java.net.Proxy;
-import java.net.URISyntaxException;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
 public class WebSecketClientTest implements Runnable, WebSocketIntrface {

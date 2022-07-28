@@ -27,3 +27,4 @@ generator-plugin/target/*
 utils/target/*
 .idea/*
 *.iml
+_resources/*

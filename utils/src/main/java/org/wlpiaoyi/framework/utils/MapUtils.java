@@ -16,17 +16,20 @@ import java.util.regex.Pattern;
 public class MapUtils {
 
     public static final <T> T get(Map map, Object key){
+        if(map == null || map.isEmpty()) return  null;
         Object value = map.get(key);
         if(value == null) return null;
         return (T) value;
     }
 
     public static final Object getObject(Map map, Object key){
+        if(map == null || map.isEmpty()) return  null;
         Object value = map.get(key);
         return value;
     }
 
     public static final String getString(Map map, Object key){
+        if(map == null || map.isEmpty()) return  null;
         Object value = map.get(key);
         if(value == null) return null;
         if(value instanceof String){
@@ -40,6 +43,7 @@ public class MapUtils {
     }
 
     public static final Float getFloat(Map map, Object key){
+        if(map == null || map.isEmpty()) return  null;
         Object value = map.get(key);
         if(value == null) return null;
         if(value instanceof Float){
@@ -51,6 +55,7 @@ public class MapUtils {
     }
 
     public static final Double getDouble(Map map, Object key){
+        if(map == null || map.isEmpty()) return  null;
         Object value = map.get(key);
         if(value == null) return null;
         if(value instanceof Double){
@@ -62,6 +67,7 @@ public class MapUtils {
     }
 
     public static final Boolean getBoolean(Map map, Object key){
+        if(map == null || map.isEmpty()) return  null;
         Object value = map.get(key);
         if(value == null) return null;
         if(value instanceof Boolean){
@@ -73,6 +79,7 @@ public class MapUtils {
     }
 
     public static final Byte getByte(Map map, Object key){
+        if(map == null || map.isEmpty()) return  null;
         Object value = map.get(key);
         if(value == null) return null;
         if(value instanceof Byte){
@@ -84,6 +91,7 @@ public class MapUtils {
     }
 
     public static final Integer getInteger(Map map, Object key){
+        if(map == null || map.isEmpty()) return  null;
         Object value = map.get(key);
         if(value == null) return null;
         if(value instanceof Integer){
@@ -102,6 +110,7 @@ public class MapUtils {
 
 
     public static final Long getLong(Map map, Object key){
+        if(map == null || map.isEmpty()) return  null;
         Object value = map.get(key);
         if(value == null) return null;
         if(value instanceof Long){
@@ -121,6 +130,7 @@ public class MapUtils {
     }
 
     public static final LocalDateTime getDateTime(Map map, Object key){
+        if(map == null || map.isEmpty()) return  null;
         Object value = map.get(key);
         if(value == null) return null;
         if(value instanceof LocalDateTime){
@@ -139,6 +149,7 @@ public class MapUtils {
     }
 
     public static final LocalDate getDate(Map map, Object key){
+        if(map == null || map.isEmpty()) return  null;
         Object value = map.get(key);
         if(value == null) return null;
         if(value instanceof LocalDate){
@@ -157,6 +168,7 @@ public class MapUtils {
     }
 
     public static final <T> List<T> getList(Map map, Object key, Class<T> clazz){
+        if(map == null || map.isEmpty()) return  null;
         List datas = MapUtils.get(map, key);
         if(datas == null) return null;
         if(!(datas instanceof List)) return null;
@@ -171,6 +183,7 @@ public class MapUtils {
     }
 
     public static final <T> Set<T> getSet(Map map, Object key, Class<T> clazz){
+        if(map == null || map.isEmpty()) return  null;
         Set datas = MapUtils.get(map, key);
         if(datas == null) return null;
         if(!(datas instanceof Set)) return null;

@@ -21,22 +21,19 @@ public class HttpClientTest {
 
     @Test
     public void test() throws IOException {
-        Response response = this.index("322");
+        Response response = this.emartet();
         System.out.println();
     }
 
 
 
-
-    public Response<String> emartet() throws IOException {
+    public Response<String> emartet() {
+        String url = "https://api.smsbao.com/sms?u=yes_boy&p=9d7fb24aa17944029d87d506b044c9c2&m=" +
+                18228088049L
+                + "&c=" + "【短信宝】您的验证码是3572,十分钟内有效";
 
         Response<String> response =  HttpClient.instance(
-                Request.initJson("http://127.0.0.1:9081/e-market/sys/device/register")
-                        .setHeader("platform", "1")
-                        .setHeader("deviceNo","yue98278sjey28")
-                        .setHeader("version","1.0.1")
-                        .setProxy("127.0.0.1", 8888)
-                        .setMethod(Request.Method.Get)
+                Request.initJson(url).setMethod(Request.Method.Get)
         )
                 .setRpClazz(String.class)
                 .response();

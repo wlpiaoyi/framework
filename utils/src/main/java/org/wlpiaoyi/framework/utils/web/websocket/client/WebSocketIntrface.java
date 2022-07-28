@@ -1,4 +1,4 @@
-package org.wlpiaoyi.framework.utils.websocket.client;
+package org.wlpiaoyi.framework.utils.web.websocket.client;
 
 import org.java_websocket.handshake.ServerHandshake;
 

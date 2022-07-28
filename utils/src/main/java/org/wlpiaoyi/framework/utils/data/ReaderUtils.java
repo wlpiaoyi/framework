@@ -18,7 +18,7 @@ import java.util.Properties;
 /**
  * file reading tools
  */
-public class ReaderUtils {
+public class ReaderUtils extends DataUtils{
 
     /**
      * read file convert to properties

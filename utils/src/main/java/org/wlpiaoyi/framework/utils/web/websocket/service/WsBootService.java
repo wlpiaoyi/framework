@@ -1,20 +1,16 @@
-package org.wlpiaoyi.framework.utils.websocket.service;
+package org.wlpiaoyi.framework.utils.web.websocket.service;
 
 
 import com.google.gson.Gson;
 import lombok.Getter;
 import lombok.NonNull;
-import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.Nullable;
-import org.wlpiaoyi.framework.utils.StringUtils;
 import org.wlpiaoyi.framework.utils.ValueUtils;
 import org.wlpiaoyi.framework.utils.exception.CatchException;
 import org.wlpiaoyi.framework.utils.gson.GsonBuilder;
 
 import javax.websocket.*;
 import java.io.IOException;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.concurrent.CopyOnWriteArraySet;
 
 /**

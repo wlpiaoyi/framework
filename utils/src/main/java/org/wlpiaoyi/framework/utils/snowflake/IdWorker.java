@@ -1,10 +1,6 @@
 package org.wlpiaoyi.framework.utils.snowflake;
 
-import lombok.Getter;
-import lombok.Setter;
 import org.wlpiaoyi.framework.utils.DateUtils;
-
-import java.util.*;
 
 /**
  * Twitter_Snowflake<br>
