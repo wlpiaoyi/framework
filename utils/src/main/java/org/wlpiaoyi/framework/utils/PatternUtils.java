@@ -36,21 +36,21 @@ public class PatternUtils {
     }
 
     //身份证
-    public static boolean isID(String text){
+    private static final char SZ_VER_CODE[] = "10X98765432".toCharArray();
+    public static boolean isID2V(String text){
         if(ValueUtils.isBlank(text)) return false;
         if(text.length() != 18) return false;
 
         char pszSrc[] = text.toUpperCase(Locale.ROOT).toCharArray();
         int iS = 0;
         int iW[]={7, 9, 10, 5, 8, 4, 2, 1, 6, 3, 7, 9, 10, 5, 8, 4, 2};
-        char szVerCode[] = "10X98765432".toCharArray();
         int i;
         for(i=0;i<17;i++)
         {
             iS += (pszSrc[i]-'0') * iW[i];
         }
         int iY = iS%11;
-        return pszSrc[17] == szVerCode[iY];
+        return pszSrc[17] == SZ_VER_CODE[iY];
     }
 
 //

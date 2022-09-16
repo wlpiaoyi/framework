@@ -4,6 +4,7 @@ import com.google.gson.Gson;
 import org.wlpiaoyi.framework.utils.gson.GsonBuilder;
 
 import java.math.BigDecimal;
+import java.math.BigInteger;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.*;
@@ -167,6 +168,10 @@ public class MapUtils {
         return null;
     }
 
+    public static final List getList(Map map, Object key){
+        return getList(map, key, null);
+    }
+
     public static final <T> List<T> getList(Map map, Object key, Class<T> clazz){
         if(map == null || map.isEmpty()) return  null;
         List datas = MapUtils.get(map, key);
@@ -176,7 +181,30 @@ public class MapUtils {
         Gson gson = GsonBuilder.gsonDefault();
         List<T> items = new ArrayList<>();
         for (Object data : datas){
-            T item = gson.fromJson(gson.toJson(data), clazz);
+            T item;
+            if(clazz == null){
+                item = (T) data;
+            }else if(data.getClass() == clazz){
+                item = (T) data;
+            }else if(clazz == String.class){
+                item = (T) data.toString();
+            }else if(clazz == Integer.class){
+                item = (T) new Integer(data.toString());
+            }else if(clazz == Long.class){
+                item = (T) new Long(data.toString());
+            }else if(clazz == Float.class){
+                item = (T) new Float(data.toString());
+            }else if(clazz == Double.class){
+                item = (T) new Double(data.toString());
+            }else if(clazz == Character[].class){
+                item = (T) data.toString().toCharArray();
+            }else if(clazz == BigDecimal.class){
+                item = (T) new BigDecimal(data.toString());
+            }else if(clazz == BigInteger.class){
+                item = (T) new BigInteger(data.toString());
+            }else {
+                item = gson.fromJson(gson.toJson(data), clazz);
+            }
             items.add(item);
         }
         return items;
@@ -191,7 +219,28 @@ public class MapUtils {
         Gson gson = GsonBuilder.gsonDefault();
         Set<T> items = new HashSet<>();
         for (Object data : datas){
-            T item = gson.fromJson(gson.toJson(data), clazz);
+            T item;
+            if(data.getClass() == clazz){
+                item = (T) data;
+            }else if(clazz == String.class){
+                item = (T) data.toString();
+            }else if(clazz == Integer.class){
+                item = (T) new Integer(data.toString());
+            }else if(clazz == Long.class){
+                item = (T) new Long(data.toString());
+            }else if(clazz == Float.class){
+                item = (T) new Float(data.toString());
+            }else if(clazz == Double.class){
+                item = (T) new Double(data.toString());
+            }else if(clazz == Character[].class){
+                item = (T) data.toString().toCharArray();
+            }else if(clazz == BigDecimal.class){
+                item = (T) new BigDecimal(data.toString());
+            }else if(clazz == BigInteger.class){
+                item = (T) new BigInteger(data.toString());
+            }else {
+                item = gson.fromJson(gson.toJson(data), clazz);
+            }
             items.add(item);
         }
         return items;

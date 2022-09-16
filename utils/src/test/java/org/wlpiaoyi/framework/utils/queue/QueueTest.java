@@ -1,6 +1,7 @@
 package org.wlpiaoyi.framework.utils.queue;
 
 import lombok.extern.slf4j.Slf4j;
+import org.apache.log4j.helpers.ThreadLocalMap;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -23,6 +24,12 @@ public class QueueTest implements QueueProgress{
     private final Object synTag = new Object();
     private volatile boolean isSyn = false;
 
+    @Test
+    public void test0() throws Exception {
+
+
+
+    }
 
     @Test
     public void test1() throws Exception {
@@ -335,6 +342,10 @@ public class QueueTest implements QueueProgress{
 
     @After
     public void tearDown() throws Exception {
+
+        ThreadLocal fooThreadLocal = ThreadLocal.withInitial(QueueTest::new);
+        fooThreadLocal.set("");
+        Thread t = Thread.currentThread();
 
     }
 

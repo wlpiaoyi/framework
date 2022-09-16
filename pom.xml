@@ -16,6 +16,7 @@
         <module>generator-plugin</module>
         <module>nps</module>
         <module>example</module>
+        <module>demo</module>
     </modules>
 
     <properties>

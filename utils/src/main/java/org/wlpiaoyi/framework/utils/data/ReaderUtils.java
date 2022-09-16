@@ -3,12 +3,14 @@ package org.wlpiaoyi.framework.utils.data;
 import com.google.gson.Gson;
 import com.google.gson.JsonElement;
 import lombok.NonNull;
+import lombok.Setter;
 import org.wlpiaoyi.framework.utils.ValueUtils;
 import org.wlpiaoyi.framework.utils.gson.GsonBuilder;
 
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.net.URL;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
@@ -19,6 +21,17 @@ import java.util.Properties;
  * file reading tools
  */
 public class ReaderUtils extends DataUtils{
+
+    @Setter
+    private static Class resourceClass;
+
+    public static URL getResource(Class resourceClass, String name){
+        return resourceClass.getClassLoader().getResource(name);
+    }
+
+    public static URL getResource(String name){
+        return ReaderUtils.resourceClass.getClassLoader().getResource(name);
+    }
 
     /**
      * read file convert to properties
@@ -113,6 +126,11 @@ public class ReaderUtils extends DataUtils{
         if(json == null) return null;
         Gson gson = GsonBuilder.gsonDefault();
         return gson.fromJson(json, clazz);
+    }
+
+    public static void main(String[] args) {
+
+        System.out.println();
     }
 
 }

@@ -7,6 +7,10 @@ package org.wlpiaoyi.framework.utils.aop;
  */
 public class IDaoImpl implements IDao{
 
+    IDaoImpl(){
+        System.out.println("IDaoImpl creator");
+    }
+
     @Override
     public void save() {
         System.out.println("IDaoImpl.save()");

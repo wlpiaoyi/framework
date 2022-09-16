@@ -21,7 +21,7 @@ class QueueDefault implements Queue, RunnableDefault.Progress, Runnable {
     private final List<Task> doingTasks = new ArrayList<>();
     private final Map<Task, RunnableDefault> doingRunnable = new HashMap<>();
 
-    private Object taskSynTag = new Object();
+    private final Object taskSynTag = new Object();
 
     private QueueProgress queueProgress;
     @Override
@@ -193,13 +193,13 @@ class QueueDefault implements Queue, RunnableDefault.Progress, Runnable {
     }
 
 
-    private CountDownLatch getCountDownLatch(){
+    private RunnableDefault getRunObj(){
 
         synchronized (this.taskSynTag){
             boolean isEmpty = this.doingTasks.isEmpty() && this.waitingTasks.isEmpty();
             if(isEmpty) return null;
 
-            CountDownLatch countDownLatch = null;
+            RunnableDefault runObj  = null;
             if(!this.doingTasks.isEmpty()){
                 Task task = this.doingTasks.get(0);
                 RunnableDefault queueRunnable = this.doingRunnable.get(task);
@@ -207,9 +207,9 @@ class QueueDefault implements Queue, RunnableDefault.Progress, Runnable {
                     log.warn("There has task object in doing task list but the runnable object is null");
                     return null;
                 }
-                countDownLatch = queueRunnable.getCountDownLatch();
+                runObj = queueRunnable;
             }
-            if(countDownLatch != null) return countDownLatch;
+            if(runObj != null) return runObj;
 
 
             if(!this.waitingTasks.isEmpty()){
@@ -219,10 +219,10 @@ class QueueDefault implements Queue, RunnableDefault.Progress, Runnable {
                     log.warn("There has task object in waiting task list but the runnable object is null");
                     return null;
                 }
-                countDownLatch = queueRunnable.getCountDownLatch();
+                runObj = queueRunnable;
             }
 
-            if(countDownLatch != null) return countDownLatch;
+            if(runObj != null) return runObj;
         }
         return null;
     }
@@ -234,17 +234,17 @@ class QueueDefault implements Queue, RunnableDefault.Progress, Runnable {
             log.info("Has no await, because it's not in queue");
             return;
         }
-        CountDownLatch countDownLatch = this.getCountDownLatch();
-        if(countDownLatch == null){
+        RunnableDefault runObj = this.getRunObj();
+        if(runObj == null){
             log.info("Has no await, because it is null for CountDownLatch");
             return;
         }
         do{
-            if(countDownLatch.getCount() > 0){
-                countDownLatch.await();
+            if(runObj.getRunStatus() >= 0){
+                runObj.await();
             }
-            countDownLatch = this.getCountDownLatch();
-        }while (countDownLatch != null);
+            runObj = this.getRunObj();
+        }while (runObj != null);
     }
 
     @Override
