@@ -1,6 +1,5 @@
 package org.wlpiaoyi.framework.utils.reflect;
-
-public class ClassModel {
+ class ClassModel {
 
     ClassModel(){
 
