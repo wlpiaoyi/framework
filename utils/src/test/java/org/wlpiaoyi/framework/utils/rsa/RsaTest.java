@@ -8,6 +8,11 @@ import org.junit.Before;
 import org.junit.Test;
 import org.wlpiaoyi.framework.utils.StringUtils;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
 @Slf4j
 public class RsaTest {
 
@@ -18,6 +23,21 @@ public class RsaTest {
 
     @Test
     public void test() throws Exception {
+        String a = "我的名字是 {{name}}，我永远是 {{age}}。";
+
+        //String reg = "[1-9]\\d{4,14}";
+
+        String reg = "\\{\\{([a-zA-Z0-9\\-])+\\}\\}";//\b表示的是单词的边界 找三个字母的单词
+        Pattern p = Pattern.compile(reg);
+        Matcher m = p.matcher(a);
+        List<Integer[]> indexs = new ArrayList<>();
+        while (m.find()){
+            String name = m.group();
+            System.out.println(m.group()); //用于获取匹配过的结果
+            System.out.println(m.start()+"..."+m.end());//返回字串的索引位置
+        }
+
+        String b = a.replace("{{name}}", "11").replace("{{age}}", "121");
         Rsa rsa = Rsa.create().loadKey();
         String publicKey = rsa.publicKey;
         String privateKey = rsa.privateKey;

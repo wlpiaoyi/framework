@@ -35,28 +35,47 @@ public class PatternUtils {
         return Pattern.matches(EMAIL_PATTERN, text);
     }
 
+    //统一社会信用代码
+    private static final String USCC_18_PATTERN = "^[0-9A-HJ-NPQRTUWXY]{2}\\d{6}[0-9A-HJ-NPQRTUWXY]{10}$";
+    private static final String USCC_15_PATTERN = "^[1-9]\\d{15}$";
+    private static final String USCC_PATTERN = "^([0-9A-HJ-NPQRTUWXY]{2}\\d{6}[0-9A-HJ-NPQRTUWXY]{10}|[1-9]\\d{14})$";
+    public static boolean isUSCC18(String text){
+        return Pattern.matches(USCC_18_PATTERN, text);
+    }
+    public static boolean isUSCC15(String text){
+        return Pattern.matches(USCC_15_PATTERN, text);
+    }
+    public static boolean isUSCC(String text){
+        return Pattern.matches(USCC_PATTERN, text);
+    }
+
     //身份证
     private static final char SZ_VER_CODE[] = "10X98765432".toCharArray();
+    private static final int IW[]={7, 9, 10, 5, 8, 4, 2, 1, 6, 3, 7, 9, 10, 5, 8, 4, 2};
     public static boolean isID2V(String text){
         if(ValueUtils.isBlank(text)) return false;
         if(text.length() != 18) return false;
 
         char pszSrc[] = text.toUpperCase(Locale.ROOT).toCharArray();
         int iS = 0;
-        int iW[]={7, 9, 10, 5, 8, 4, 2, 1, 6, 3, 7, 9, 10, 5, 8, 4, 2};
         int i;
         for(i=0;i<17;i++)
         {
-            iS += (pszSrc[i]-'0') * iW[i];
+            iS += (pszSrc[i]-'0') * IW[i];
         }
         int iY = iS%11;
         return pszSrc[17] == SZ_VER_CODE[iY];
     }
 
-//
+    //中文匹配
+    private static final String  CHINESE_PATTERN = "^[\\u4e00-\\u9fa5]+$";
+    public static boolean isChinese(String text){
+        return Pattern.matches(CHINESE_PATTERN, text);
+    }
+
 //    public static void main(String[] args) {
 //        PatternUtils.isNumber("222");
-//        PatternUtils.isID("510622198906184510");
+//        PatternUtils.isUSCC18("91510100MA6CW8CM15");
 //
 //    }
 }
