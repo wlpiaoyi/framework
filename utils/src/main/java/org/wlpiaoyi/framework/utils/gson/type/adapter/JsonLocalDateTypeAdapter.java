@@ -2,7 +2,7 @@ package org.wlpiaoyi.framework.utils.gson.type.adapter;
 
 import com.google.gson.*;
 import org.wlpiaoyi.framework.utils.DateUtils;
-import org.wlpiaoyi.framework.mybatis.utils.gson.GsonBuilder;
+import org.wlpiaoyi.framework.utils.gson.GsonBuilder;
 
 import java.lang.reflect.Type;
 import java.time.LocalDate;

@@ -5,7 +5,7 @@ import lombok.Getter;
 import lombok.NonNull;
 import org.jetbrains.annotations.Nullable;
 import org.wlpiaoyi.framework.utils.DateUtils;
-import org.wlpiaoyi.framework.mybatis.utils.gson.GsonBuilder;
+import org.wlpiaoyi.framework.utils.gson.GsonBuilder;
 
 import java.lang.reflect.Type;
 import java.time.*;
