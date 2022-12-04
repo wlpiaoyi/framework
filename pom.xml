@@ -15,8 +15,9 @@
         <module>selenium</module>
         <module>generator-plugin</module>
         <module>nps</module>
-        <module>example</module>
+<!--        <module>example</module>-->
         <module>demo</module>
+        <module>generator</module>
     </modules>
 
     <properties>

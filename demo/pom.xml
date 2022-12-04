@@ -20,6 +20,11 @@
 
     <dependencies>
         <dependency>
+            <groupId>mysql</groupId>
+            <artifactId>mysql-connector-java</artifactId>
+            <version>8.0.31</version>
+        </dependency>
+        <dependency>
             <groupId>org.wlpiaoyi.framework</groupId>
             <artifactId>utils</artifactId>
             <version>1.0-SNAPSHOT</version>

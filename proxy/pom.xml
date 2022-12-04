@@ -36,7 +36,7 @@
                         <manifest>
                             <addClasspath>true</addClasspath>
                             <classpathPrefix>lib/</classpathPrefix>
-                            <mainClass>org.wlpiaoyi.framework.proxy.ProxyLoder</mainClass>
+                            <mainClass>org.wlpiaoyi.framework.mybatis.proxy.ProxyLoder</mainClass>
                         </manifest>
                     </archive>
                 </configuration>
@@ -69,7 +69,7 @@
 <!--                <configuration>-->
 <!--                    <archive>-->
 <!--                        <manifest>-->
-<!--                            <mainClass>org.wlpiaoyi.framework.proxy.socket.SocketProxy</mainClass>-->
+<!--                            <mainClass>socket.proxy.org.wlpiaoyi.framework.mybatis.SocketProxy</mainClass>-->
 <!--                        </manifest>-->
 <!--                    </archive>-->
 <!--                    <descriptorRefs>-->

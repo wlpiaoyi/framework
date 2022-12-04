@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!--@author wlpia-->
+<!--@since 2022-12-02 18:00:07-->
+<mapper namespace="org.springblade.online.mapper.OutLinkFiledRelaMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="OutLinkFiledRelaResultMap" type="org.springblade.online.entity.OutLinkFiledRelaEntity">
+		<id column="id" property="id"/>
+		<result column="rela_id" property="relaId"/>
+		<result column="field_id" property="fieldId"/>
+    </resultMap>
+
+
+    <select id="selectOutLinkFiledRelaPage" resultMap="OutLinkFiledRelaResultMap">
+        select * from dym_out_link_filed_rela where is_deleted = 0
+    </select>
+
+</mapper>

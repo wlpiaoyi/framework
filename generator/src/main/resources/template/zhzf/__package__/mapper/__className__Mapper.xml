@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!--@author __author__-->
+<!--@since __createTime__-->
+<mapper namespace="__package__.mapper.__className__Mapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="__className__ResultMap" type="__package__.entity.__className__Entity"><!--<result/>-->
+    </resultMap>
+
+
+    <select id="select__className__Page" resultMap="__className__ResultMap">
+        select * from __tableName__ where is_deleted = 0
+    </select>
+
+</mapper>
