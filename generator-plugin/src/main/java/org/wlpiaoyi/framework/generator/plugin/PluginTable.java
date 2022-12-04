@@ -40,11 +40,11 @@ public class PluginTable {
                 new String[]{"TABLE"});
         List<Map<String, String>> res = new ArrayList<>();
         while (tableRet.next()) {
-            String tableName = tableRet.getString("TABLE_NAME");
-            String suffixName = tableName.substring(this.tablePrefix.length() + 1);
-            String className = parseStringToHump(suffixName, true);
-            String classVarName = parseStringToHump(suffixName, false);
-            String tableComment = tableRet.getString("REMARKS");
+            final String tableName = tableRet.getString("TABLE_NAME");
+            final String suffixName = tableName.substring(this.tablePrefix.length() + 1);
+            final String className = parseStringToHump(suffixName, true);
+            final String classVarName = parseStringToHump(suffixName, false);
+            final String tableComment = tableRet.getString("REMARKS");
             res.add(new HashMap(){{
                 put("suffixName", suffixName);
                 put("tableName", tableName);
@@ -73,13 +73,13 @@ public class PluginTable {
 
         List<Map<String, String>> res = new ArrayList<>();
         while (columnRet.next()) {
-            String columnName = columnRet.getString("COLUMN_NAME");
-            String propertyName = parseStringToHump(columnName, false);
-            String columnType = columnRet.getString("TYPE_NAME");
-            String columnComment = columnRet.getString("REMARKS");
-            int columnSize = columnRet.getInt("COLUMN_SIZE");
-            int nullable = columnRet.getInt("NULLABLE");
-            int precision = columnRet.getInt("DECIMAL_DIGITS");
+            final String columnName = columnRet.getString("COLUMN_NAME");
+            final String propertyName = parseStringToHump(columnName, false);
+            final String columnType = columnRet.getString("TYPE_NAME");
+            final String columnComment = columnRet.getString("REMARKS");
+            final int columnSize = columnRet.getInt("COLUMN_SIZE");
+            final int nullable = columnRet.getInt("NULLABLE");
+            final int precision = columnRet.getInt("DECIMAL_DIGITS");
             res.add(new HashMap(){{
                 put("columnName", columnName);
                 put("propertyName", propertyName);

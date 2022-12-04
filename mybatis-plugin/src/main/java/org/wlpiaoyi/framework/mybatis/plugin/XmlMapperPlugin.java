@@ -36,7 +36,7 @@ public class XmlMapperPlugin  extends PluginAdapter {
         if(this.delPrefix){
             name = name.substring(name.indexOf("_") + 1);
         }
-        name = StringUtils.toHump(name);
+        name = StringUtils.parseUnderlineToHump(name);
         introspectedTable.setMyBatis3XmlMapperFileName(name + this.suffix);
     }
 }

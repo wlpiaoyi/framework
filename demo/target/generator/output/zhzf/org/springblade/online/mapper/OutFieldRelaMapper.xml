@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!--@author wlpia-->
+<!--@since 2022-12-04 19:38:11-->
+<mapper namespace="org.springblade.online.mapper.OutFieldRelaMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="OutFieldRelaResultMap" type="org.springblade.online.entity.OutFieldRelaEntity">
+		<id column="id" property="id"/>
+		<result column="name" property="name"/>
+		<result column="field_name" property="fieldName"/>
+		<result column="table_name" property="tableName"/>
+		<result column="field_id" property="fieldId"/>
+		<result column="table_type" property="tableType"/>
+		<result column="use_type" property="useType"/>
+		<result column="status" property="status"/>
+		<result column="create_user" property="createUser"/>
+		<result column="create_time" property="createTime"/>
+		<result column="create_dept" property="createDept"/>
+		<result column="update_user" property="updateUser"/>
+		<result column="update_time" property="updateTime"/>
+		<result column="is_deleted" property="isDeleted"/>
+    </resultMap>
+
+
+    <select id="selectOutFieldRelaPage" resultMap="OutFieldRelaResultMap">
+        select * from dym_out_field_rela where is_deleted = 0
+    </select>
+
+</mapper>

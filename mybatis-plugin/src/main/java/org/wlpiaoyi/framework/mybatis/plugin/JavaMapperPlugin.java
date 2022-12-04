@@ -38,7 +38,7 @@ public class JavaMapperPlugin extends PluginAdapter{
         if(this.delPrefix){
             name = name.substring(name.indexOf("_") + 1);
         }
-        name = StringUtils.toHump(name + "_" + this.suffix);
+        name = StringUtils.parseUnderlineToHump(name + "_" + this.suffix);
         introspectedTable.setMyBatis3JavaMapperType(packagePath + name);
     }
 }

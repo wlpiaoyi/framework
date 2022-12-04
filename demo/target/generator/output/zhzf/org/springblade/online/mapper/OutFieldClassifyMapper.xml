@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!--@author wlpia-->
+<!--@since 2022-12-04 19:38:11-->
+<mapper namespace="org.springblade.online.mapper.OutFieldClassifyMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="OutFieldClassifyResultMap" type="org.springblade.online.entity.OutFieldClassifyEntity">
+		<id column="id" property="id"/>
+		<result column="name" property="name"/>
+		<result column="info" property="info"/>
+		<result column="code" property="code"/>
+		<result column="status" property="status"/>
+		<result column="sort" property="sort"/>
+		<result column="is_deleted" property="isDeleted"/>
+		<result column="create_user" property="createUser"/>
+		<result column="create_time" property="createTime"/>
+		<result column="create_dept" property="createDept"/>
+		<result column="update_user" property="updateUser"/>
+		<result column="update_time" property="updateTime"/>
+    </resultMap>
+
+
+    <select id="selectOutFieldClassifyPage" resultMap="OutFieldClassifyResultMap">
+        select * from dym_out_field_classify where is_deleted = 0
+    </select>
+
+</mapper>

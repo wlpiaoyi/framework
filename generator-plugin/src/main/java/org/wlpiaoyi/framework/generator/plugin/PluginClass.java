@@ -254,9 +254,6 @@ public class PluginClass {
         }
     }
 
-
-
-
     public static void main(String[] args) throws SQLException {
 
         final String url = "jdbc:mysql://36.138.30.68:3306/bladex?characterEncoding=utf8&&useInformationSchema=true";

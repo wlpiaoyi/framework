@@ -47,7 +47,7 @@ public class JavaExamplePlugin extends PluginAdapter {
         if(this.delPrefix){
             name = name.substring(name.indexOf("_") + 1);
         }
-        name = StringUtils.toHump(name + "_" + this.suffix);
+        name = StringUtils.parseUnderlineToHump(name + "_" + this.suffix);
         introspectedTable.setExampleType(packagePath + "." + name);
 
 
@@ -57,7 +57,7 @@ public class JavaExamplePlugin extends PluginAdapter {
         if(this.delPrefix){
             name = name.substring(name.indexOf("_") + 1);
         }
-        name = StringUtils.toHump(name);
+        name = StringUtils.parseUnderlineToHump(name);
         introspectedTable.setBaseRecordType(packagePath + "." + name);
     }
 }
