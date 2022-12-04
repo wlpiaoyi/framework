@@ -3,7 +3,7 @@ package org.wlpiaoyi.framework.mybatis.plugin;
 import org.mybatis.generator.api.IntrospectedTable;
 import org.mybatis.generator.api.PluginAdapter;
 import org.mybatis.generator.api.dom.java.TopLevelClass;
-import org.wlpiaoyi.framework.mybatis.utils.DateUtils;
+import org.wlpiaoyi.framework.utils.DateUtils;
 
 import java.text.SimpleDateFormat;
 import java.time.LocalDate;

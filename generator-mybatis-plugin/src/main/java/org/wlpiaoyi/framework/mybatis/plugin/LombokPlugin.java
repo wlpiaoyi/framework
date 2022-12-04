@@ -7,10 +7,10 @@ import org.mybatis.generator.api.IntrospectedTable;
 import org.mybatis.generator.api.Plugin;
 import org.mybatis.generator.api.PluginAdapter;
 import org.mybatis.generator.api.dom.java.*;
-import org.wlpiaoyi.framework.mybatis.utils.MapUtils;
-import org.wlpiaoyi.framework.mybatis.utils.ValueUtils;
-import org.wlpiaoyi.framework.mybatis.utils.data.DataUtils;
-import org.wlpiaoyi.framework.mybatis.utils.data.ReaderUtils;
+import org.wlpiaoyi.framework.utils.MapUtils;
+import org.wlpiaoyi.framework.utils.ValueUtils;
+import org.wlpiaoyi.framework.utils.data.DataUtils;
+import org.wlpiaoyi.framework.utils.data.ReaderUtils;
 
 
 import java.nio.charset.StandardCharsets;

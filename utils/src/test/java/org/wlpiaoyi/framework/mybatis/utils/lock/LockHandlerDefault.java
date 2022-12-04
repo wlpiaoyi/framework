@@ -1,7 +1,7 @@
 package org.wlpiaoyi.framework.mybatis.utils.lock;
 
-import org.wlpiaoyi.framework.mybatis.utils.web.lock.Lock;
-import org.wlpiaoyi.framework.mybatis.utils.web.lock.LockHandler;
+import org.wlpiaoyi.framework.utils.web.lock.Lock;
+import org.wlpiaoyi.framework.utils.web.lock.LockHandler;
 
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;

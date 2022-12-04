@@ -6,8 +6,8 @@ import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.chrome.ChromeDriverService;
 import org.openqa.selenium.chrome.ChromeOptions;
 import org.openqa.selenium.firefox.*;
-import org.wlpiaoyi.framework.mybatis.utils.StringUtils;
-import org.wlpiaoyi.framework.mybatis.utils.exception.BusinessException;
+import org.wlpiaoyi.framework.utils.StringUtils;
+import org.wlpiaoyi.framework.utils.exception.BusinessException;
 
 import java.io.File;
 import java.util.HashMap;

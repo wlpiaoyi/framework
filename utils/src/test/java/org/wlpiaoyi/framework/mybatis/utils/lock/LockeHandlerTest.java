@@ -4,9 +4,9 @@ import lombok.extern.slf4j.Slf4j;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
-import org.wlpiaoyi.framework.mybatis.utils.queue.Queue;
-import org.wlpiaoyi.framework.mybatis.utils.queue.QueueFactory;
-import org.wlpiaoyi.framework.mybatis.utils.web.lock.Lock;
+import org.wlpiaoyi.framework.utils.queue.Queue;
+import org.wlpiaoyi.framework.utils.queue.QueueFactory;
+import org.wlpiaoyi.framework.utils.web.lock.Lock;
 
 @Slf4j
 public class LockeHandlerTest {

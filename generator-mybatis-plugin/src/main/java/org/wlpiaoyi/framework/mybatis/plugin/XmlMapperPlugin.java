@@ -2,8 +2,8 @@ package org.wlpiaoyi.framework.mybatis.plugin;
 
 import org.mybatis.generator.api.IntrospectedTable;
 import org.mybatis.generator.api.PluginAdapter;
-import org.wlpiaoyi.framework.mybatis.utils.StringUtils;
-import org.wlpiaoyi.framework.mybatis.utils.ValueUtils;
+import org.wlpiaoyi.framework.utils.StringUtils;
+import org.wlpiaoyi.framework.utils.ValueUtils;
 
 import java.util.List;
 

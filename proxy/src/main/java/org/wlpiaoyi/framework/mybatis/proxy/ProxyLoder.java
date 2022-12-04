@@ -2,8 +2,8 @@ package org.wlpiaoyi.framework.mybatis.proxy;
 
 import com.google.gson.Gson;
 import org.wlpiaoyi.framework.mybatis.proxy.socket.SocketProxy;
-import org.wlpiaoyi.framework.mybatis.utils.StringUtils;
-import org.wlpiaoyi.framework.mybatis.utils.data.DataUtils;
+import org.wlpiaoyi.framework.utils.StringUtils;
+import org.wlpiaoyi.framework.utils.data.DataUtils;
 
 import java.util.List;
 import java.util.Map;

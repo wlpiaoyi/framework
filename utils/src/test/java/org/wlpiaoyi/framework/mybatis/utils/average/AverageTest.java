@@ -3,7 +3,7 @@ package org.wlpiaoyi.framework.mybatis.utils.average;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
-import org.wlpiaoyi.framework.mybatis.utils.algorithm.AverageUtils;
+import org.wlpiaoyi.framework.utils.algorithm.AverageUtils;
 
 import java.io.IOException;
 import java.math.BigDecimal;

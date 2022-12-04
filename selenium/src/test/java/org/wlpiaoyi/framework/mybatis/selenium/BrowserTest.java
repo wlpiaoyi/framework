@@ -5,7 +5,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.openqa.selenium.By;
 import org.wlpiaoyi.framework.mybatis.selenium.utils.WebElementUtils;
-import org.wlpiaoyi.framework.mybatis.utils.exception.BusinessException;
+import org.wlpiaoyi.framework.utils.exception.BusinessException;
 
 public class BrowserTest {
 

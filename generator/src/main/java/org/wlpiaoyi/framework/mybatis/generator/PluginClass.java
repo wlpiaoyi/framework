@@ -1,8 +1,8 @@
 package org.wlpiaoyi.framework.mybatis.generator;
 
-import org.wlpiaoyi.framework.mybatis.utils.DateUtils;
-import org.wlpiaoyi.framework.mybatis.utils.ValueUtils;
-import org.wlpiaoyi.framework.mybatis.utils.data.DataUtils;
+import org.wlpiaoyi.framework.utils.DateUtils;
+import org.wlpiaoyi.framework.utils.ValueUtils;
+import org.wlpiaoyi.framework.utils.data.DataUtils;
 
 import java.io.File;
 import java.sql.SQLException;
