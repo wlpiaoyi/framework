@@ -20,7 +20,7 @@ import org.apache.http.impl.conn.PoolingHttpClientConnectionManager;
 import org.apache.http.message.BasicNameValuePair;
 import org.jetbrains.annotations.Nullable;
 import org.wlpiaoyi.framework.utils.ValueUtils;
-import org.wlpiaoyi.framework.mybatis.utils.gson.GsonBuilder;
+import org.wlpiaoyi.framework.utils.gson.GsonBuilder;
 import org.wlpiaoyi.framework.utils.http.request.Request;
 
 import javax.net.ssl.SSLContext;

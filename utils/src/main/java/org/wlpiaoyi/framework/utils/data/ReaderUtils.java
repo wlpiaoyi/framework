@@ -5,7 +5,7 @@ import com.google.gson.JsonElement;
 import lombok.NonNull;
 import lombok.Setter;
 import org.wlpiaoyi.framework.utils.ValueUtils;
-import org.wlpiaoyi.framework.mybatis.utils.gson.GsonBuilder;
+import org.wlpiaoyi.framework.utils.gson.GsonBuilder;
 
 import java.io.File;
 import java.io.FileInputStream;

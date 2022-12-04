@@ -5,7 +5,7 @@ import lombok.NonNull;
 import org.jetbrains.annotations.Nullable;
 import org.wlpiaoyi.framework.utils.exception.BusinessException;
 import org.wlpiaoyi.framework.utils.exception.CatchException;
-import org.wlpiaoyi.framework.mybatis.utils.gson.GsonBuilder;
+import org.wlpiaoyi.framework.utils.gson.GsonBuilder;
 
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;

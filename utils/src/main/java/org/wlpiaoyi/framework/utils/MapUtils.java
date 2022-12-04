@@ -1,7 +1,7 @@
 package org.wlpiaoyi.framework.utils;
 
 import com.google.gson.Gson;
-import org.wlpiaoyi.framework.mybatis.utils.gson.GsonBuilder;
+import org.wlpiaoyi.framework.utils.gson.GsonBuilder;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;

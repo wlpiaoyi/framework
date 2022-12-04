@@ -13,11 +13,9 @@
         <module>utils</module>
         <module>proxy</module>
         <module>selenium</module>
+        <module>mybatis-plugin</module>
         <module>generator-plugin</module>
-        <module>nps</module>
-<!--        <module>example</module>-->
         <module>demo</module>
-        <module>generator</module>
     </modules>
 
     <properties>
