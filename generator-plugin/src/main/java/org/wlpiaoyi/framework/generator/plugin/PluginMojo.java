@@ -26,10 +26,15 @@ public class PluginMojo extends AbstractMojo {
     @Parameter(name = "templateDir", defaultValue = "\\src\\main\\resources\\template")
     private String templateDir;
 
+    @Parameter(name = "basePath", defaultValue = "")
+    private String basePath;
+
     @SneakyThrows
     @Override
     public void execute() throws MojoExecutionException, MojoFailureException {
-        Properties properties = ReaderUtils.loadProperties(DataUtils.USER_DIR + this.configDir);
+        if(ValueUtils.isBlank(this.basePath))
+            this.basePath = DataUtils.USER_DIR;
+        Properties properties = ReaderUtils.loadProperties(this.basePath + this.configDir);
         String url = properties.getProperty("url");
         String userName = properties.getProperty("userName");
         String password = properties.getProperty("password");
@@ -39,7 +44,7 @@ public class PluginMojo extends AbstractMojo {
         String projectName = properties.getProperty("projectName");
         String excludeColumns = properties.getProperty("excludeColumns");
         log.info("mojo execute:" +
-                        "\n\tuserDir:" + DataUtils.USER_DIR +
+                        "\n\tuserDir:" + this.basePath +
                         "\n\tconfigDir:" + this.configDir +
                         "\n\ttemplateDir:" + this.templateDir +
                         "\n\turl:" + url +
@@ -51,11 +56,18 @@ public class PluginMojo extends AbstractMojo {
                         "\n\tprojectName:" + projectName +
                         "\n\texcludeColumns:" + excludeColumns);
         PluginTable plugin = new PluginTable(url, userName, password, tablePrefix, tableNamePattern);
-        String templatePath = DataUtils.USER_DIR + templateDir;
+        String templatePath = this.basePath + templateDir;
         List<String> excludeColumn = ValueUtils.toStringList(excludeColumns);
         PluginClass pluginClass = new PluginClass(plugin, templatePath, projectName, packagePath, excludeColumn);
         pluginClass.run();
 
     }
 
+    public static void main(String[] args) throws MojoExecutionException, MojoFailureException {
+        PluginMojo mogo = new PluginMojo();
+        mogo.configDir = "\\src\\main\\resources\\config.properties";
+        mogo.templateDir = "\\src\\main\\resources\\template";
+        mogo.basePath = DataUtils.USER_DIR + "\\generator-plugin";
+        mogo.execute();
+    }
 }

@@ -12,6 +12,7 @@ import org.wlpiaoyi.framework.utils.gson.type.adapter.*;
 import java.lang.reflect.Method;
 import java.time.ZoneId;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 public class GsonBuilder  {
@@ -121,5 +122,12 @@ public class GsonBuilder  {
         Gson gson = gsonBuilder.create();
         return gson;
     }
+
+//    public static void main(String[] args) {
+//        HashMap map = new HashMap();
+//        map.put("1",1);
+//        new HashMap(){{put("1", 1.0);}};
+//        GsonBuilder.singleInstance().gson.toJson(map);
+//    }
 
 }

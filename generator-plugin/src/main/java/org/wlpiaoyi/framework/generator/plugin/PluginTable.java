@@ -55,16 +55,20 @@ public class PluginTable {
         }
         return res;
     }
-    private static final String parseStringToHump(String value, boolean isUpFirst){
-        String res = isUpFirst ? "" : null;
+    private static String parseStringToHump(String value, boolean isUpFirst){
+        StringBuilder res = new StringBuilder();
+        int index = 0;
         for (String arg : value.split("_")) {
-            if(res == null){
-                res = arg;
-            }else{
-                res += arg.substring(0, 1).toUpperCase(Locale.ROOT) + arg.substring(1);
-            }
+            String first = arg.substring(0, 1);
+            if(!isUpFirst && index == 0)
+                res.append(first);
+            else
+                res.append(first.toUpperCase(Locale.ROOT));
+            String end = arg.substring(1);
+            res.append(end);
+            index ++;
         }
-        return res;
+        return res.toString();
     }
 
     public List<Map<String, String>> iteratorColumn(Map<String, String> tableDict) throws SQLException {
@@ -72,8 +76,11 @@ public class PluginTable {
         ResultSet columnRet = metaData.getColumns(null, "%", tableName, "%");
 
         List<Map<String, String>> res = new ArrayList<>();
+        Set<String> keySet = new HashSet<>();
         while (columnRet.next()) {
             final String columnName = columnRet.getString("COLUMN_NAME");
+            if(keySet.contains(columnName)) continue;
+            keySet.add(columnName);
             final String propertyName = parseStringToHump(columnName, false);
             final String columnType = columnRet.getString("TYPE_NAME");
             final String columnComment = columnRet.getString("REMARKS");
@@ -124,3 +131,5 @@ public class PluginTable {
 //    }
 
 }
+
+

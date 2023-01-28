@@ -3,6 +3,7 @@ package org.wlpiaoyi.framework.generator.plugin;
 import org.wlpiaoyi.framework.utils.DateUtils;
 import org.wlpiaoyi.framework.utils.ValueUtils;
 import org.wlpiaoyi.framework.utils.data.DataUtils;
+import org.wlpiaoyi.framework.utils.exception.BusinessException;
 
 import java.io.File;
 import java.sql.SQLException;
@@ -13,8 +14,13 @@ public class PluginClass {
 
     private static final Map<String, String> columnTypeDict = new HashMap(){{
         put("BIGINT", "Long");
+        put("BIGINT UNSIGNED", "Long");
         put("VARCHAR", "String");
+        put("LONGTEXT", "String");
         put("INT", "Integer");
+        put("INT UNSIGNED", "Integer");
+        put("TINYINT", "Integer");
+        put("TINYINT UNSIGNED", "Integer");
         put("DATETIME", "Date");
     }};
 
@@ -29,25 +35,38 @@ public class PluginClass {
     private static final Map<String, String> implDecorateDict = new HashMap(){{
         put("BIGINT", "com.fasterxml.jackson.databind.annotation.JsonSerialize," +
                 "com.fasterxml.jackson.databind.ser.std.ToStringSerializer");
+        put("BIGINT UNSIGNED", "com.fasterxml.jackson.databind.annotation.JsonSerialize," +
+                "com.fasterxml.jackson.databind.ser.std.ToStringSerializer");
         put("DATETIME", "com.fasterxml.jackson.annotation.JsonFormat," +
                 "org.springframework.format.annotation.DateTimeFormat");
     }};
     private static final Map<String, String> fieldDecorateDict = new HashMap(){{
         put("BIGINT", "@JsonSerialize(using = ToStringSerializer.class)");
+        put("BIGINT UNSIGNED", "@JsonSerialize(using = ToStringSerializer.class)");
         put("DATETIME", "@DateTimeFormat(pattern = \"yyyy-MM-dd HH:mm:ss\")\n" +
                 "\t@JsonFormat(pattern = \"yyyy-MM-dd HH:mm:ss\")");
     }};
 
     private static final Map<String, String> implValidDict = new HashMap(){{
         put("BIGINT", "javax.validation.constraints.NotNull");
+        put("BIGINT UNSIGNED", "javax.validation.constraints.NotNull");
         put("VARCHAR", "javax.validation.constraints.NotBlank");
+        put("LONGTEXT", "javax.validation.constraints.NotBlank");
         put("INT", "javax.validation.constraints.NotNull");
+        put("INT UNSIGNED", "javax.validation.constraints.NotNull");
+        put("TINYINT", "javax.validation.constraints.NotNull");
+        put("TINYINT UNSIGNED", "javax.validation.constraints.NotNull");
         put("DATETIME", "javax.validation.constraints.NotNull");
     }};
     private static final Map<String, String> msgValidDict = new HashMap(){{
         put("BIGINT", "@NotNull(message = \"__comment__不能为空\")");
+        put("BIGINT UNSIGNED", "@NotNull(message = \"__comment__不能为空\")");
         put("VARCHAR", "@NotBlank(message = \"__comment__不能为空\")");
+        put("LONGTEXT", "@NotBlank(message = \"__comment__不能为空\")");
         put("INT", "@NotNull(message = \"__comment__不能为空\")");
+        put("INT UNSIGNED", "@NotNull(message = \"__comment__不能为空\")");
+        put("TINYINT", "@NotNull(message = \"__comment__不能为空\")");
+        put("TINYINT UNSIGNED", "@NotNull(message = \"__comment__不能为空\")");
         put("DATETIME", "@NotNull(message = \"__comment__不能为空\")");
     }};
 
@@ -58,8 +77,10 @@ public class PluginClass {
     private final List<String> excludeColumn;
     private final List<Map<String, String>> templateList;
 
+    private static final String SLASH_ARG = "\\";
+
     public PluginClass(PluginTable pluginTable, String templatePath, String name, String packagePath, List<String> excludeColumn){
-        this.templatePath = templatePath + "\\__package__";
+        this.templatePath = templatePath + SLASH_ARG + "__package__";
         this.packagePath = packagePath;
         this.name = name;
         this.pluginTable = pluginTable;
@@ -89,7 +110,7 @@ public class PluginClass {
                 if(ValueUtils.isBlank(subDirName))
                     subDirName = subFile.getName();
                 else{
-                    subDirName += "\\" + subFile.getName();
+                    subDirName += SLASH_ARG + subFile.getName();
                 }
                 this.iteratorInitTemplateList(templateList, subFile_subs, subDirName);
             }else{
@@ -124,12 +145,11 @@ public class PluginClass {
             String columnName = (String) colMap.get("columnName");
             String propertyName = (String) colMap.get("propertyName");
             String comment = (String) colMap.get("comment");
-            String columnType = (String) colMap.get("columnType");
+            String columnType = ((String) colMap.get("columnType")).toUpperCase();
             if(ValueUtils.isBlank(comment)){
                 comment = propertyName;
             }
             String implType = implTypeDict.get(columnType);
-
             if(this.excludeColumn.contains(columnName))
                 continue;
 
@@ -148,9 +168,18 @@ public class PluginClass {
             Integer nullable = (Integer) colMap.get("nullable");
             if(nullable == 0){
                 String anStr = msgValidDict.get(columnType);
+                if(ValueUtils.isBlank(anStr))
+                    throw new BusinessException("msgValidDict不支持的类型:" + columnType);
                 fieldsText.append("\n\t");
                 fieldsText.append(anStr.replace("__comment__", comment));
+//                try{
+//                    fieldsText.append(anStr.replace("__comment__", comment));
+//                }catch (Exception e){
+//                    e.printStackTrace();
+//                }
                 String importStr = implValidDict.get(columnType);
+                if(ValueUtils.isBlank(importStr))
+                    throw new BusinessException("implValidDict不支持的类型:" + columnType);
                 if(!imports.contains(importStr)){
                     imports.add(importStr);
                 }
@@ -239,11 +268,13 @@ public class PluginClass {
                 String filePackage = packageStr + "." + templateDict.get("dirName");
                 String oname = this.name;
                 if(!ValueUtils.isBlank(oname)){
-                    oname += "\\";
+                    oname += SLASH_ARG;
                 }
-                String filePath = DataUtils.USER_DIR + "\\target\\generator\\output\\" + oname + filePackage.replace(".", "\\");
+                String filePath = DataUtils.USER_DIR +
+                        SLASH_ARG + "target" + SLASH_ARG + "generator" + SLASH_ARG + "output" + SLASH_ARG +
+                        oname + filePackage.replace(".", SLASH_ARG);
                 DataUtils.makeDir(filePath);
-                DataUtils.writeFile(classText, filePath + "\\" + fileName);
+                DataUtils.writeFile(classText, filePath + SLASH_ARG + fileName);
 
                 System.out.println(fileName);
                 System.out.println(filePackage);
@@ -263,7 +294,6 @@ public class PluginClass {
         final String tableNamePattern = "dym_%";
         PluginTable plugin = new PluginTable(url, userName, password, tablePrefix, tableNamePattern);
 //        Map<String, Map<String, Object>> resDict = plugin.run();
-
         String templatePath = "C:\\Users\\wlpia\\Documents\\Develop\\Java\\framework\\generator-plugin\\src\\main\\resources\\template\\zhzf";
         String packagePath = "org.springblade.online";
         List<String> excludeColumn = new ArrayList(){{

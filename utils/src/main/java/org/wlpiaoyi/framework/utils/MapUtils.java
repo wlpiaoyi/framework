@@ -168,6 +168,12 @@ public class MapUtils {
         return null;
     }
 
+    public static final Map<?, ?> getMap(Map map, Object key){
+        if(map == null || map.isEmpty()) return  null;
+        Map<?, ?> value = get(map, key);
+        return value;
+    }
+
     public static final List getList(Map map, Object key){
         return getList(map, key, null);
     }
@@ -202,7 +208,11 @@ public class MapUtils {
                 item = (T) new BigDecimal(data.toString());
             }else if(clazz == BigInteger.class){
                 item = (T) new BigInteger(data.toString());
-            }else {
+            }else if(clazz == Map.class){
+                if(data instanceof Map)
+                    item = (T) data;
+                else item = null;
+            }else{
                 item = gson.fromJson(gson.toJson(data), clazz);
             }
             items.add(item);
@@ -238,7 +248,11 @@ public class MapUtils {
                 item = (T) new BigDecimal(data.toString());
             }else if(clazz == BigInteger.class){
                 item = (T) new BigInteger(data.toString());
-            }else {
+            }else if(clazz == Map.class){
+                if(data instanceof Map)
+                    item = (T) data;
+                else item = null;
+            }else{
                 item = gson.fromJson(gson.toJson(data), clazz);
             }
             items.add(item);
