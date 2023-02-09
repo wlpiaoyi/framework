@@ -8,16 +8,17 @@ import lombok.EqualsAndHashCode;
 import org.springblade.core.mp.base.BaseEntity;
 /*__import__*/
 
+
 /**
- * __table_comment__ 实体类
- *
- * @author __author__
- * @since __create_time__
+ * {@code @author:} 		__author__
+ * {@code @description:} 	__table_comment__ 实体类
+ * {@code @date:} 			__create_time__
+ * {@code @version:}: 		__version__
  */
 @Data
 @TableName("__table_name__")
 @ApiModel(value = "__class_name__对象", description = "__table_comment__")
 @EqualsAndHashCode(callSuper = true)
-public class __class_name__Entity extends BaseEntity {
+public class __class_name__ extends BaseEntity {
 	/*__fields__*/
 }

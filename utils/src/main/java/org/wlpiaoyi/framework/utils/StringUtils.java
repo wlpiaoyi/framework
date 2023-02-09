@@ -156,20 +156,51 @@ public class StringUtils {
     }
 
     /**
-     * 转换成驼峰
+     * 下划线名称转换成驼峰
      * @param name
      * @return
      */
     public static String parseUnderlineToHump(String name){
-        String[] args = name.split("_");
+        String[] args = name.split("\\_");
         StringBuffer sb = new StringBuffer();
         for (String arg : args){
-            if(ValueUtils.isBlank(arg)) continue;
+            if(ValueUtils.isBlank(arg)){ continue; }
+            if(arg.length() == 1){ sb.append(arg.toUpperCase()); continue; }
             sb.append(arg.substring(0, 1).toUpperCase());
-            if(arg.length() == 1) continue;
+            if(arg.length() == 1){ continue; }
             sb.append(arg.substring(1).toLowerCase());
         }
-        if(sb.length() == 0) return name;
+        if(sb.length() == 0){ return name; }
         return sb.toString();
     }
+    /**
+     * 下划线名称转换成驼峰
+     * @param name
+     * @return
+     */
+    public static String parseHumpToUnderline(String name){
+        char[] cs = name.toCharArray();
+
+        for(char c : cs){
+
+        }
+        String[] args = name.split("\\_");
+        StringBuffer sb = new StringBuffer();
+        for (String arg : args){
+            if(ValueUtils.isBlank(arg)){ continue; }
+            if(arg.length() == 1){ sb.append(arg.toUpperCase()); continue; }
+            sb.append(arg.substring(0, 1).toUpperCase());
+            if(arg.length() == 1){ continue; }
+            sb.append(arg.substring(1).toLowerCase());
+        }
+        if(sb.length() == 0){ return name; }
+        return sb.toString();
+    }
+
+    public static void main(String[] args) {
+        String a = parseUnderlineToHump("abc_deg_fc");
+        String b = parseUnderlineToHump(a);
+        System.out.println();
+    }
+
 }

@@ -12,9 +12,9 @@ import org.springblade.core.mp.support.Query;
 import org.springblade.core.tool.api.R;
 import org.springblade.core.tool.utils.Func;
 import org.springblade.core.tool.utils.BeanUtil;
-import __package__.entity.__class_name__Entity;
+import __package__.entity.__class_name__;
 import __package__.service.I__class_name__Service;
-import __package__.vo.__class_name__VO;
+import __package__.vo.__class_name__Vo;
 import __package__.ro.__class_name__Ro;
 import __package__.wrapper.__class_name__Wrapper;
 import org.springframework.web.bind.annotation.*;
@@ -22,10 +22,10 @@ import org.springframework.web.bind.annotation.*;
 import javax.validation.Valid;
 
 /**
- * __table_comment__ 控制器
- *
- * @author __author__
- * @since __create_time__
+ * {@code @author:} 		__author__
+ * {@code @description:} 	__table_comment__ 控制器
+ * {@code @date:} 			__create_time__
+ * {@code @version:}: 		__version__
  */
 @RestController
 @AllArgsConstructor
@@ -41,8 +41,8 @@ public class __class_name__Controller extends BladeController {
 	@GetMapping("/detail")
 	@ApiOperationSupport(order = 1)
 	@ApiOperation(value = "详情", notes = "传入__class_name__")
-	public R<__class_name__VO> detail(@RequestParam Long id) {
-		__class_name__Entity detail = __class_var_name__Service.getById(id);
+	public R<__class_name__Vo> detail(@RequestParam Long id) {
+		__class_name__ detail = __class_var_name__Service.getById(id);
 		return R.data(__class_name__Wrapper.entityVO(detail));
 	}
 
@@ -52,8 +52,8 @@ public class __class_name__Controller extends BladeController {
 	@GetMapping("/list")
 	@ApiOperationSupport(order = 2)
 	@ApiOperation(value = "分页", notes = "传入__class_name__")
-	public R<IPage<__class_name__VO>> list(@RequestBody __class_name__Ro.List body) {
-		IPage<__class_name__Entity> pages = __class_var_name__Service.page(Condition.getPage(body),
+	public R<IPage<__class_name__Vo>> list(@RequestBody __class_name__Ro.Query body) {
+		IPage<__class_name__> pages = __class_var_name__Service.page(Condition.getPage(body),
 				Condition.getQueryWrapper(__class_name__Wrapper.entity(body)));
 		return R.data(__class_name__Wrapper.pageVO(pages));
 	}
@@ -64,8 +64,8 @@ public class __class_name__Controller extends BladeController {
 //	@PostMapping("/list")
 //	@ApiOperationSupport(order = 3)
 //	@ApiOperation(value = "分页", notes = "传入__class_name__")
-//	public R<IPage<__class_name__VO>> list(@RequestBody __class_name__Ro.List body) {
-//		IPage<__class_name__VO> pages = __class_var_name__Service.select__class_name__Page(Condition.getPage(body), body);
+//	public R<IPage<__class_name__Vo>> list(@RequestBody __class_name__Ro.Query body) {
+//		IPage<__class_name__Vo> pages = __class_var_name__Service.select__class_name__Page(Condition.getPage(body), body);
 //		return R.data(pages);
 //	}
 

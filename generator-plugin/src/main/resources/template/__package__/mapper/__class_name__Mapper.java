@@ -2,19 +2,19 @@ package __package__.mapper;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
-import __package__.entity.__class_name__Entity;
+import __package__.entity.__class_name__;
 import __package__.ro.__class_name__Ro;
-import __package__.vo.__class_name__VO;
+import __package__.vo.__class_name__Vo;
 
 import java.util.List;
 
 /**
- * __table_comment__ Mapper 接口
- *
- * @author __author__
- * @since __create_time__
+ * {@code @author:} 		__author__
+ * {@code @description:} 	__table_comment__ Mapper 接口
+ * {@code @date:} 			__create_time__
+ * {@code @version:}: 		__version__
  */
-public interface __class_name__Mapper extends BaseMapper<__class_name__Entity> {
+public interface __class_name__Mapper extends BaseMapper<__class_name__> {
 
 	/**
 	 * 自定义分页
@@ -23,7 +23,7 @@ public interface __class_name__Mapper extends BaseMapper<__class_name__Entity> {
 	 * @param ro
 	 * @return
 	 */
-	List<__class_name__VO> select__class_name__Page(IPage page, __class_name__Ro.List ro);
+	List<__class_name__Vo> select__class_name__Page(IPage page, __class_name__Ro.Query ro);
 
 
 }

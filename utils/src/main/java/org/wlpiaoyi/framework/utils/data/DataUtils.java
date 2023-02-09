@@ -20,17 +20,17 @@ public class DataUtils {
 //load file=====================================================================>
     public static File loadPath(@NonNull String path){
         File file = new File(path);
-        if(!file.exists()) return null;
+        if(!file.exists()){ return null; }
         return file;
     }
     public static File loadFile(@NonNull String path){
         File file = loadPath(path);
-        if(!file.isFile()) return null;
+        if(!file.isFile()){ return null; }
         return file;
     }
     public static File isDirectory(@NonNull String path){
         File file = loadPath(path);
-        if(!file.isDirectory()) return null;
+        if(!file.isDirectory()){ return null; }
         return file;
     }
 //load file<=====================================================================

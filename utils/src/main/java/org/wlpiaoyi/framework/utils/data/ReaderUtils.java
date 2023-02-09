@@ -19,6 +19,7 @@ import java.util.Properties;
 
 /**
  * file reading tools
+ * @author wlpiaoyi
  */
 public class ReaderUtils extends DataUtils{
 
@@ -41,7 +42,7 @@ public class ReaderUtils extends DataUtils{
      */
     public static Properties loadProperties(@NonNull String path) throws IOException {
         File file = loadFile(path);
-        if(file == null) throw new IOException("没有找到文件");
+        if(file == null){ throw new IOException("没有找到文件"); }
         return ReaderUtils.loadProperties(file);
     }
 
@@ -66,7 +67,7 @@ public class ReaderUtils extends DataUtils{
      */
     public static byte[] loadBytes(@NonNull String path) throws IOException {
         File file = loadFile(path);
-        if(file == null) throw new IOException("没有找到文件");
+        if(file == null){ throw new IOException("没有找到文件"); }
         return Files.readAllBytes(file.toPath());
     }
 
@@ -93,7 +94,7 @@ public class ReaderUtils extends DataUtils{
      */
     public static JsonElement loadJson(@NonNull String path, Charset encoding) throws IOException {
         Map map = ReaderUtils.loadMap(path, encoding);
-        if(ValueUtils.isBlank(map)) return null;
+        if(ValueUtils.isBlank(map)){ return null; }
         Gson gson = GsonBuilder.gsonDefault();
         return gson.toJsonTree(map);
     }
@@ -107,7 +108,7 @@ public class ReaderUtils extends DataUtils{
      */
     public static Map loadMap(@NonNull String path, Charset encoding) throws IOException {
         String str = ReaderUtils.loadString(path, encoding);
-        if(ValueUtils.isBlank(str)) return null;
+        if(ValueUtils.isBlank(str)){ return null; }
         Gson gson = GsonBuilder.gsonDefault();
         return gson.fromJson(str, Map.class);
     }
@@ -123,14 +124,9 @@ public class ReaderUtils extends DataUtils{
      */
     public static <T> T loadObject(@NonNull String path, Charset encoding, Class<T> clazz) throws IOException {
         JsonElement json = ReaderUtils.loadJson(path, encoding);
-        if(json == null) return null;
+        if(json == null){ return null; }
         Gson gson = GsonBuilder.gsonDefault();
         return gson.fromJson(json, clazz);
-    }
-
-    public static void main(String[] args) {
-
-        System.out.println();
     }
 
 }

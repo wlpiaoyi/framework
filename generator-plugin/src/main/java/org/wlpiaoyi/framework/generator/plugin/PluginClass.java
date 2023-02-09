@@ -78,9 +78,10 @@ public class PluginClass {
     private final List<Map<String, String>> templateList;
 
     private static final String SLASH_ARG = "\\";
+    private final String classVersion;
 
-    public PluginClass(PluginTable pluginTable, String templatePath, String name, String packagePath, List<String> excludeColumn){
-        this.templatePath = templatePath + SLASH_ARG + "__package__";
+    public PluginClass(PluginTable pluginTable, String templatePath, String name, String packagePath, List<String> excludeColumn, String classVersion){
+        this.templatePath = templatePath + SLASH_ARG + "/__package__";
         this.packagePath = packagePath;
         this.name = name;
         this.pluginTable = pluginTable;
@@ -97,6 +98,7 @@ public class PluginClass {
         List<Map<String, String>> templateList = new ArrayList<>();
         this.templateList = templateList;
         this.iteratorInitTemplateList(templateList, subFiles, "");
+        this.classVersion = classVersion;
     }
 
     private void iteratorInitTemplateList(List<Map<String, String>> templateList, File subFiles[], String dirName){
@@ -133,12 +135,17 @@ public class PluginClass {
         classText = classText.replace("__object_name__", table.get("suffixName"));
         classText = classText.replace("__class_name__", table.get("className"));
         classText = classText.replace("__class_var_name__", table.get("classVarName"));
-        classText = classText.replace("__package__", packageStr);
+        classText = classText.replace("template/__package__", packageStr);
         return classText;
     }
 
-    private String getFieldsText(List<Map<String, Object>> columns, List<String> imports){
+    private String getFieldsText(List<Map<String, Object>> columns, List<String> imports, int tabNum){
         StringBuffer fieldsText = new StringBuffer();
+
+        String tabArgs = "\n";
+        for (int i = 0; i < tabNum; i++){
+            tabArgs += "\t";
+        }
 
         for (Map<String, Object> colMap : columns) {
 
@@ -158,19 +165,23 @@ public class PluginClass {
                     imports.add(implType);
             }
 
-            fieldsText.append("\n\t/**");
-            fieldsText.append("\n\t * ");
+            fieldsText.append(tabArgs);
+            fieldsText.append("/**");
+            fieldsText.append(tabArgs);
+            fieldsText.append(" * ");
             fieldsText.append(comment);
-            fieldsText.append("\n\t */");
-
-            fieldsText.append("\n\t@ApiModelProperty(value = \"" + comment + "\")");
+            fieldsText.append(tabArgs);
+            fieldsText.append(" */");
+            fieldsText.append(tabArgs);
+            fieldsText.append("@ApiModelProperty(value = \"" + comment + "\")");
 
             Integer nullable = (Integer) colMap.get("nullable");
             if(nullable == 0){
                 String anStr = msgValidDict.get(columnType);
-                if(ValueUtils.isBlank(anStr))
+                if(ValueUtils.isBlank(anStr)) {
                     throw new BusinessException("msgValidDict不支持的类型:" + columnType);
-                fieldsText.append("\n\t");
+                }
+                fieldsText.append(tabArgs);
                 fieldsText.append(anStr.replace("__comment__", comment));
 //                try{
 //                    fieldsText.append(anStr.replace("__comment__", comment));
@@ -199,12 +210,12 @@ public class PluginClass {
             if(!ValueUtils.isBlank(fieldDec)){
                 for (String arg :
                         fieldDec.split(",")) {
-                    fieldsText.append("\n\t");
+                    fieldsText.append(tabArgs);
                     fieldsText.append(arg);
                 }
             }
-
-            fieldsText.append("\n\tprivate ");
+            fieldsText.append(tabArgs);
+            fieldsText.append("private ");
             fieldsText.append(columnTypeDict.get(columnType));
             fieldsText.append(" ");
             fieldsText.append(propertyName);
@@ -244,7 +255,8 @@ public class PluginClass {
                 String packageStr = this.packagePath;
 
                 List<String> imports = new ArrayList<>();
-                String fieldsText = this.getFieldsText(columns, imports);
+                String fieldsText1 = this.getFieldsText(columns, imports, 1);
+                String fieldsText2 = this.getFieldsText(columns, imports, 2);
                 String resultText = this.getResultText(columns);
 
                 String importsStr = "";
@@ -254,14 +266,21 @@ public class PluginClass {
 
                 classText = classText.replace("<!--<result_map_items/>-->", resultText);
                 classText = classText.replace("/*__import__*/", importsStr);
-                classText = classText.replace("/*__fields__*/", fieldsText);
+                classText = classText.replace("/*__fields__*/", fieldsText1);
+                classText = classText.replace("/*__fields_2__*/", fieldsText2);
                 classText = classText.replace("__create_time__", DateUtils.formatLocalDateTime(LocalDateTime.now()));
                 Map<String, String> map = System.getenv();
-                String pcUserName = map.get("USERNAME");// 获取// 用户名
-                if(ValueUtils.isBlank(pcUserName))
+                String pcUserName = map.get("USERNAME");
+                String pcComputerName = map.get("COMPUTERNAME");
+                if(ValueUtils.isBlank(pcUserName)){
                     pcUserName = "unkown";
+                }
+                if(ValueUtils.isBlank(pcUserName)){
+                    pcUserName = "unkown";
+                }
 
-                classText = classText.replace("__author__", pcUserName);
+                classText = classText.replace("__author__", pcUserName + ":" + pcComputerName);
+                classText = classText.replace("__version__", this.classVersion);
 
 
                 String fileName = templateDict.get("fileName").replace("__class_name__", table.get("className"));
@@ -287,12 +306,13 @@ public class PluginClass {
 
     public static void main(String[] args) throws SQLException {
 
-        final String url = "jdbc:mysql://36.138.30.68:3306/bladex?characterEncoding=utf8&&useInformationSchema=true";
+        final String url = "jdbc:mysql://36.138.30.68:3306?characterEncoding=utf8&&useInformationSchema=true";
+        final String databaseName = "bladex";
         final String userName = "root";
         final String password = "zrgj@2022*";
         final String tablePrefix = "dym";
         final String tableNamePattern = "dym_%";
-        PluginTable plugin = new PluginTable(url, userName, password, tablePrefix, tableNamePattern);
+        PluginTable plugin = new PluginTable(url, userName, password, databaseName, tablePrefix, tableNamePattern);
 //        Map<String, Map<String, Object>> resDict = plugin.run();
         String templatePath = "C:\\Users\\wlpia\\Documents\\Develop\\Java\\framework\\generator-plugin\\src\\main\\resources\\template\\zhzf";
         String packagePath = "org.springblade.online";
@@ -306,7 +326,7 @@ public class PluginClass {
             add("id");
             add("is_deleted");
         }};
-        PluginClass pluginClass = new PluginClass(plugin, templatePath, "zhzf", packagePath, excludeColumn);
+        PluginClass pluginClass = new PluginClass(plugin, templatePath, "zhzf", packagePath, excludeColumn, "1.1");
         pluginClass.run();
 
         System.out.println();
