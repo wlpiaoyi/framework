@@ -19,7 +19,7 @@ public class __class_name__Ro {
     @Data
     @ApiModel("__table_comment__ 请求实例")
 	public static class Query extends org.springblade.core.mp.support.Query{
-        /*__fields__*/
+        /*__fields_2__*/
     }
 
     @Data
@@ -33,6 +33,6 @@ public class __class_name__Ro {
 			value = "id",
 			type = IdType.ASSIGN_ID
 		)
-		private Long id;/*__fields__*/
+		private Long id;/*__fields_2__*/
     }
 }

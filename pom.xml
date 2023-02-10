@@ -11,16 +11,14 @@
 
     <modules>
         <module>utils</module>
-        <module>proxy</module>
-        <module>selenium</module>
         <module>mybatis-plugin</module>
         <module>generator-plugin</module>
-        <module>demo</module>
     </modules>
 
     <properties>
         <skipTests>true</skipTests>
     </properties>
+
     <dependencies>
 
         <dependency>
