@@ -1,5 +1,7 @@
 package org.wlpiaoyi.framework.utils.encrypt.rsa;
 
+import org.wlpiaoyi.framework.utils.StringUtils;
+
 import java.security.Key;
 import java.security.KeyFactory;
 import java.security.PrivateKey;
@@ -9,11 +11,17 @@ import java.security.spec.X509EncodedKeySpec;
 
 abstract class ProtectedRsa extends Coder {
 
-    protected String publicKey;//公钥
-    protected String privateKey;//私钥
+    /** 公钥 **/
+    protected String publicKey;
 
-    protected String signatureAlgorithm;//签名算法
-    protected String keyAlgorithm;//秘钥算法
+    /** 私钥 **/
+    protected String privateKey;
+
+    /** 签名算法 **/
+    protected String signatureAlgorithm;
+
+    /** 秘钥算法 **/
+    protected String keyAlgorithm;
 
     public String getPublicKey() {
         return publicKey;
@@ -23,16 +31,47 @@ abstract class ProtectedRsa extends Coder {
         return privateKey;
     }
 
+    /**
+     * 设置公钥
+     * @param publicKey
+     * @return
+     */
     abstract ProtectedRsa setPublicKey(String publicKey);
 
+    /**
+     * 设置私钥
+     * @param privateKey
+     * @return
+     */
     abstract ProtectedRsa setPrivateKey(String privateKey);
 
+    /**
+     * 设置签名算法
+     * @param signatureAlgorithm
+     * @return
+     */
     abstract ProtectedRsa setSignatureAlgorithm(String signatureAlgorithm);
 
+    /**
+     * 设置秘钥算法
+     * @param keyAlgorithm
+     * @return
+     */
     abstract ProtectedRsa setKeyAlgorithm(String keyAlgorithm);
 
+    /**
+     * 加载密钥
+     * @return
+     * @throws Exception
+     */
     abstract Rsa loadKey() throws Exception;
 
+    /**
+     * 加载密钥
+     * @param keyPairSize
+     * @return
+     * @throws Exception
+     */
     abstract Rsa loadKey(int keyPairSize) throws Exception;
 
     /**
@@ -42,7 +81,7 @@ abstract class ProtectedRsa extends Coder {
      */
     protected PublicKey parsePublicKey(String key)throws Exception{
         //解密公钥
-        byte[] keyBytes = decryptBASE64(key);
+        byte[] keyBytes = StringUtils.base64DecodeToBytes(key);
         //构造X509EncodedKeySpec对象
         X509EncodedKeySpec x509EncodedKeySpec = new X509EncodedKeySpec(keyBytes);
         //指定加密算法
@@ -59,7 +98,7 @@ abstract class ProtectedRsa extends Coder {
      */
     protected PrivateKey parsePrivateKey(String key)throws Exception{
         //解密私钥
-        byte[] keyBytes = decryptBASE64(key);
+        byte[] keyBytes = StringUtils.base64DecodeToBytes(key);
         //构造PKCS8EncodedKeySpec对象
         PKCS8EncodedKeySpec pkcs8EncodedKeySpec = new PKCS8EncodedKeySpec(keyBytes);
         //指定加密算法
@@ -76,7 +115,7 @@ abstract class ProtectedRsa extends Coder {
      * @throws Exception
      */
     protected String getPublicKey(Key key)throws Exception{
-        return encryptBASE64(key.getEncoded());
+        return StringUtils.base64Encode(key.getEncoded());
     }
 
     /**
@@ -86,6 +125,6 @@ abstract class ProtectedRsa extends Coder {
      * @throws Exception
      */
     protected String getPrivateKey(Key key) throws Exception{
-        return encryptBASE64(key.getEncoded());
+        return StringUtils.base64Encode(key.getEncoded());
     }
 }

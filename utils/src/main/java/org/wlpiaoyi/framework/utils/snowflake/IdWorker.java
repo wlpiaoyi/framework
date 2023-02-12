@@ -13,11 +13,12 @@ import org.wlpiaoyi.framework.utils.DateUtils;
  * 12位序列，毫秒内的计数，12位的计数顺序号支持每个节点每毫秒(同一机器，同一时间截)产生4096个ID序号<br>
  * 加起来刚好64位，为一个Long型。<br>
  * SnowFlake的优点是，整体上按照时间自增排序，并且整个分布式系统内不会产生ID碰撞(由数据中心ID和机器ID作区分)，并且效率较高，经测试，SnowFlake每秒能够产生26万ID左右。
+ * @author wlpia
  */
 public class IdWorker {
 // ==============================Fields===========================================
     /** 开始时间截 (2021-10-01) */
-    protected static long twepoch = 1633017600000L;
+    protected static long TWEPOCH = 1633017600000L;
 
     /** 机器id所占的位数 */
     private final long workerIdBits = 5L;
@@ -108,9 +109,9 @@ public class IdWorker {
         lastTimestamp = timestamp;
 
         //移位并通过或运算拼到一起组成64位的ID
-        return ((timestamp - twepoch) << timestampLeftShift) //
-                | (datacenterId << datacenterIdShift) //
-                | (workerId << workerIdShift) //
+        return ((timestamp - TWEPOCH) << timestampLeftShift)
+                | (datacenterId << datacenterIdShift)
+                | (workerId << workerIdShift)
                 | sequence;
     }
 
@@ -146,23 +147,23 @@ public class IdWorker {
             System.out.println(id);
         }
 
-        idWorker.twepoch = DateUtils.toTimestamp(DateUtils.parseLocalDateTime("2021-01-01 08:00:00"));
+        TWEPOCH = DateUtils.toTimestamp(DateUtils.parseLocalDateTime("2021-01-01 08:00:00"));
         long id = idWorker.nextId();
         System.out.println(Long.toBinaryString(id));
         System.out.println(id);
-        idWorker.twepoch = DateUtils.toTimestamp(DateUtils.parseLocalDateTime("2010-01-01 08:00:00"));
+        TWEPOCH = DateUtils.toTimestamp(DateUtils.parseLocalDateTime("2010-01-01 08:00:00"));
         id = idWorker.nextId();
         System.out.println(Long.toBinaryString(id));
         System.out.println(id);
-        idWorker.twepoch = DateUtils.toTimestamp(DateUtils.parseLocalDateTime("2000-01-01 08:00:00"));
+        TWEPOCH = DateUtils.toTimestamp(DateUtils.parseLocalDateTime("2000-01-01 08:00:00"));
         id = idWorker.nextId();
         System.out.println(Long.toBinaryString(id));
         System.out.println(id);
-        idWorker.twepoch = DateUtils.toTimestamp(DateUtils.parseLocalDateTime("1970-01-01 08:00:00"));
+        TWEPOCH = DateUtils.toTimestamp(DateUtils.parseLocalDateTime("1970-01-01 08:00:00"));
         id = idWorker.nextId();
         System.out.println(Long.toBinaryString(id));
         System.out.println(id);
-        idWorker.twepoch = DateUtils.toTimestamp(DateUtils.parseLocalDateTime("1960-01-01 08:00:00"));
+        TWEPOCH = DateUtils.toTimestamp(DateUtils.parseLocalDateTime("1960-01-01 08:00:00"));
         id = idWorker.nextId();
         System.out.println(Long.toBinaryString(id));
         System.out.println(id);

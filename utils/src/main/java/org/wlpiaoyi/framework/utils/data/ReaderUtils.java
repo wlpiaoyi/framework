@@ -10,6 +10,7 @@ import org.wlpiaoyi.framework.utils.gson.GsonBuilder;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.net.URL;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
@@ -69,6 +70,26 @@ public class ReaderUtils extends DataUtils{
         File file = loadFile(path);
         if(file == null){ throw new IOException("没有找到文件"); }
         return Files.readAllBytes(file.toPath());
+    }
+
+    /**
+     * read inputStream convert to string
+     * @param inputStream
+     * @param encoding
+     * @return
+     * @throws IOException
+     */
+    public static String loadString(@NonNull InputStream inputStream, Charset encoding) throws IOException {
+        if(encoding == null){
+            encoding = StandardCharsets.UTF_8;
+        }
+        int nRead;
+        byte[] data = new byte[8];
+        StringBuilder sb = new StringBuilder();
+        while ((nRead = inputStream.read(data, 0, data.length)) != -1) {
+            sb.append(new String(data, 0, nRead, encoding));
+        }
+        return sb.toString();
     }
 
     /**

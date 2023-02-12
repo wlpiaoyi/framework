@@ -30,3 +30,4 @@ utils/target/*
 _resources/*
 demo/target/*
 target/*
+mybatis-plugin/target/*

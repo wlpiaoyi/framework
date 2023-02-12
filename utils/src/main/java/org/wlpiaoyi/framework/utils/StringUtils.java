@@ -197,10 +197,10 @@ public class StringUtils {
         return sb.toString();
     }
 
-    public static void main(String[] args) {
-        String a = parseUnderlineToHump("abc_deg_fc");
-        String b = parseUnderlineToHump(a);
-        System.out.println();
-    }
+//    public static void main(String[] args) {
+//        String a = parseUnderlineToHump("abc_deg_fc");
+//        String b = parseUnderlineToHump(a);
+//        System.out.println();
+//    }
 
 }
