@@ -1,6 +1,7 @@
 package org.wlpiaoyi.framework.utils.http.factory;
 
 import com.google.gson.Gson;
+import lombok.SneakyThrows;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpHost;
 import org.apache.http.NameValuePair;
@@ -13,11 +14,13 @@ import org.apache.http.config.SocketConfig;
 import org.apache.http.conn.socket.ConnectionSocketFactory;
 import org.apache.http.conn.socket.PlainConnectionSocketFactory;
 import org.apache.http.conn.ssl.SSLConnectionSocketFactory;
+import org.apache.http.entity.ByteArrayEntity;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.http.impl.conn.PoolingHttpClientConnectionManager;
 import org.apache.http.message.BasicNameValuePair;
+import org.apache.tomcat.util.http.fileupload.IOUtils;
 import org.jetbrains.annotations.Nullable;
 import org.wlpiaoyi.framework.utils.ValueUtils;
 import org.wlpiaoyi.framework.utils.gson.GsonBuilder;
@@ -199,28 +202,42 @@ public class HttpFactory {
      * @param <T>
      * @return
      */
+    @SneakyThrows
     public static <T> @Nullable HttpEntity bodyEntity(@Nullable Request<T> request, @Nullable String accept){
-
-        String parameter;
-        if(request.getBody() == null){
-            parameter = null;
-        }else if(request.getBody() instanceof String){
-            parameter = (String) request.getBody();
-        }else{
-            parameter = GSON.toJson(request.getBody());
-        }
 
         String charset = request.getCharset();
         if(ValueUtils.isBlank(charset)){
             charset = "UTF-8";
         }
+        byte[] buffer;
+        if(request.getBody() == null){
+            buffer = null;
+        }else if(request.getBody() instanceof String){
+            String parameter = (String) request.getBody();
+            buffer = parameter.getBytes(charset);
+        }else if(request.getBody() instanceof Map){
+            String parameter = GSON.toJson(request.getBody(), Map.class);
+            buffer = parameter.getBytes(charset);
+        }else if(request.getBody() instanceof List){
+            String parameter = GSON.toJson(request.getBody(), List.class);
+            buffer = parameter.getBytes(charset);
+        }else if(request.getBody() instanceof Set){
+            String parameter = GSON.toJson(request.getBody(), Set.class);
+            buffer = parameter.getBytes(charset);
+        }else if((request.getBody() instanceof byte[]) || request.getBody() instanceof Byte[]){
+            buffer = (byte[]) request.getBody();
+        }else{
+            String parameter = GSON.toJson(request.getBody());
+            buffer = parameter.getBytes(charset);
+        }
+
         if(ValueUtils.isBlank(accept)){
             accept = HttpFactory.HEADER_APPLICATION_JSON;
         }
-        if(ValueUtils.isBlank(parameter)){
-            parameter = "";
+        if(ValueUtils.isBlank(buffer)){
+            buffer = new byte[0];
         }
-        StringEntity entity = new StringEntity(parameter, charset);
+        ByteArrayEntity entity = new ByteArrayEntity(buffer);
         entity.setContentEncoding(charset);
         entity.setContentType(accept);
         return entity;

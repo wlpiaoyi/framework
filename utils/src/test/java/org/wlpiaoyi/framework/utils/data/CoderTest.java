@@ -19,7 +19,6 @@ import java.nio.charset.StandardCharsets;
  * {@code @date:}           2023/2/11 20:51
  * {@code @version:}:       1.0
  */
-@Slf4j
 public class CoderTest {
 
     @Before

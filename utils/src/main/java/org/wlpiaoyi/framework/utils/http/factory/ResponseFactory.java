@@ -36,10 +36,11 @@ public class ResponseFactory {
             }
         }
 
-        if(request.getUrl().startsWith(HttpFactory.SCHEME_HTTPS))
+        if(request.getUrl().startsWith(HttpFactory.SCHEME_HTTPS)) {
             return ResponseFactory.HttpsResponse(hr, request);
-        else
+        } else {
             return ResponseFactory.HttpResponse(hr, request);
+        }
 
     }
 
@@ -62,12 +63,15 @@ public class ResponseFactory {
         }
         HttpEntity entity = HttpFactory.autoEntity(request, accept);
 
-        if(entity != null) hr.setEntity(entity);
+        if(entity != null) {
+            hr.setEntity(entity);
+        }
 
-        if(request.getUrl().startsWith(HttpFactory.SCHEME_HTTPS))
+        if(request.getUrl().startsWith(HttpFactory.SCHEME_HTTPS)) {
             return ResponseFactory.HttpsResponse(hr, request);
-        else
+        } else {
             return ResponseFactory.HttpResponse(hr, request);
+        }
     }
 
     /**
@@ -86,10 +90,11 @@ public class ResponseFactory {
                 hr.addHeader(param.getKey(), String.valueOf(param.getValue()));
             }
         }
-        if(request.getUrl().startsWith(HttpFactory.SCHEME_HTTPS))
+        if(request.getUrl().startsWith(HttpFactory.SCHEME_HTTPS)) {
             return ResponseFactory.HttpsResponse(hr, request);
-        else
+        } else {
             return ResponseFactory.HttpResponse(hr, request);
+        }
     }
 
 
@@ -112,12 +117,15 @@ public class ResponseFactory {
         }
 
         HttpEntity entity = HttpFactory.autoEntity(request, accept);
-        if(entity != null) hr.setEntity(entity);
+        if(entity != null) {
+            hr.setEntity(entity);
+        }
 
-        if(request.getUrl().startsWith(HttpFactory.SCHEME_HTTPS))
+        if(request.getUrl().startsWith(HttpFactory.SCHEME_HTTPS)) {
             return ResponseFactory.HttpsResponse(hr, request);
-        else
+        } else {
             return ResponseFactory.HttpResponse(hr, request);
+        }
     }
 
 
@@ -186,34 +194,63 @@ public class ResponseFactory {
 
 
     public static <T> Response<T> ResponseData(HttpResponse rp, Class<T> clazz) throws IOException {
-        if(rp == null) return null;
-
-        Response<String> responseText = ResponseFactory.ResponseText(rp);
-        if(ValueUtils.isBlank(responseText.getBody()) || clazz == String.class){
-            return (Response<T>) responseText;
+        if(rp == null) {
+            return null;
         }
 
-        T body = null;
+        if(clazz == byte[].class){
+            Response<byte[]> response = ResponseFactory.ResponseBuffer(rp);
+            return (Response<T>) response;
+        }
+
+        if(clazz == String.class){
+            Response<String> response = ResponseFactory.ResponseText(rp);
+            return (Response<T>) response;
+        }
+
+        T body;
+        Response<String> responseText = ResponseFactory.ResponseText(rp);
         if(rp.getEntity().getContentType().getValue().contains(HttpFactory.HEADER_APPLICATION_JSON)){
             body = HttpFactory.GSON.fromJson(responseText.getBody(), clazz);
-        }else body = (T) responseText.getBody();
-
+        }else {
+            body = (T) responseText.getBody();
+        }
         Response<T> response = ResponseFactory.Response(rp, body);
         return response;
     }
 
     public static Response<String> ResponseText(HttpResponse rp) throws IOException {
-        if(rp == null) return null;
+        if(rp == null) {
+            return null;
+        }
         HttpEntity entity = rp.getEntity();
-        if (entity == null) return null;
+        if (entity == null) {
+            return null;
+        }
         String body = EntityUtils.toString(entity);
         return ResponseFactory.Response(rp, body);
     }
 
-    public static <T> Response<T> Response(HttpResponse rp, T body){
-        if(rp == null) return null;
+    public static Response<byte[]> ResponseBuffer(HttpResponse rp) throws IOException {
+        if(rp == null) {
+            return null;
+        }
         HttpEntity entity = rp.getEntity();
-        if (entity == null) return null;
+        if (entity == null) {
+            return null;
+        }
+        byte[] buffer = EntityUtils.toByteArray(entity);
+        return ResponseFactory.Response(rp, buffer);
+    }
+
+    public static <T> Response<T> Response(HttpResponse rp, T body){
+        if(rp == null) {
+            return null;
+        }
+        HttpEntity entity = rp.getEntity();
+        if (entity == null) {
+            return null;
+        }
         Set<Header> headers = new HashSet<>();
         for (Header header : rp.getAllHeaders()) {
             headers.add(header);

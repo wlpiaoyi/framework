@@ -5,14 +5,14 @@
     <parent>
         <artifactId>framework</artifactId>
         <groupId>org.wlpiaoyi</groupId>
-        <version>1.0-SNAPSHOT</version>
+        <version>1.0.1-SNAPSHOT</version>
     </parent>
 
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>org.wlpiaoyi.framework</groupId>
     <artifactId>mybatis-plugin</artifactId>
-    <version>1.0-SNAPSHOT</version>
+    <version>${fw.project.version}</version>
     <build>
         <plugins>
             <plugin>
@@ -31,7 +31,7 @@
         <dependency>
             <groupId>org.wlpiaoyi.framework</groupId>
             <artifactId>utils</artifactId>
-            <version>1.0-SNAPSHOT</version>
+            <version>${fw.project.version}</version>
         </dependency>
         <dependency>
             <groupId>org.mybatis.generator</groupId>
