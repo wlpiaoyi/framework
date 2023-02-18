@@ -38,6 +38,9 @@ public class Request<T> {
     }};
 
 
+    /**
+     * Http-Method
+     */
     public enum Method {
         Get,Post,Delete,Put
     }
@@ -73,7 +76,9 @@ public class Request<T> {
     public static Request initForm(String url){
         Request request = new Request(url);
         for (Map.Entry<String, String> entry : HEADER_FORM_DEFAULTS.entrySet()){
-            if(request.getHeaders().containsKey(entry.getKey())) continue;
+            if(request.getHeaders().containsKey(entry.getKey())) {
+                continue;
+            }
             request.getHeaders().put(entry.getKey(), entry.getValue());
         }
         return request;
@@ -84,7 +89,9 @@ public class Request<T> {
     public static Request initJson(String url){
         Request request = new Request(url);
         for (Map.Entry<String, String> entry : HEADER_JSON_DEFAULTS.entrySet()){
-            if(request.getHeaders().containsKey(entry.getKey())) continue;
+            if(request.getHeaders().containsKey(entry.getKey())) {
+                continue;
+            }
             request.getHeaders().put(entry.getKey(), entry.getValue());
         }
         return request;
@@ -144,22 +151,30 @@ public class Request<T> {
     public Request setProxy(String host, int port){
         if(ValueUtils.isBlank(host)){
             this.proxy = null;
-        }else this.proxy = new HttpHost(host, port);
+        }else {
+            this.proxy = new HttpHost(host, port);
+        }
         return this;
     }
 
     public String getContentType(){
-        if(this.getHeaders() == null || this.getHeaders().isEmpty()) return null;
+        if(this.getHeaders() == null || this.getHeaders().isEmpty()) {
+            return null;
+        }
         if(this.getHeaders().containsKey(HttpFactory.HEADER_KEY1)){
             String value = (String) this.getHeaders().get(HttpFactory.HEADER_KEY1);
             String args[] = value.split(";");
-            if(args.length > 0) return args[0];
+            if(args.length > 0) {
+                return args[0];
+            }
         }
         return null;
     }
 
     public String getCharset(){
-        if(this.getHeaders() == null || this.getHeaders().isEmpty()) return null;
+        if(this.getHeaders() == null || this.getHeaders().isEmpty()) {
+            return null;
+        }
         String charset = null;
         if(this.getHeaders().containsKey(HttpFactory.HEADER_KEY0)){
             charset = (String) this.getHeaders().get(HttpFactory.HEADER_KEY0);
@@ -167,7 +182,7 @@ public class Request<T> {
             String value = (String) this.getHeaders().get(HttpFactory.HEADER_KEY1);
             for(String arg : value.split(";")){
                 String args[] = arg.split("=");
-                if(args.length == 2 && args[0].equals("charset")){
+                if(args.length == 2 && "charset".equals(args[0])){
                     charset = args[1];
                     break;
                 }
@@ -187,12 +202,16 @@ public class Request<T> {
     public URI URI() throws URISyntaxException {
         URIBuilder ub = new URIBuilder(this.url);
         List<NameValuePair> pairs = this.covertParams2NVPS();
-        if(pairs != null && pairs.size() > 0) ub.setParameters(pairs);
+        if(pairs != null && pairs.size() > 0) {
+            ub.setParameters(pairs);
+        }
         return ub.build();
     }
 
     private List<NameValuePair> covertParams2NVPS(){
-        if(this.params == null || this.params.isEmpty()) return null;
+        if(this.params == null || this.params.isEmpty()) {
+            return null;
+        }
         List<NameValuePair> pairs = new ArrayList<>();
         for (Map.Entry<String, String> param : this.params.entrySet()) {
             pairs.add(new BasicNameValuePair(param.getKey(), String.valueOf(param.getValue())));

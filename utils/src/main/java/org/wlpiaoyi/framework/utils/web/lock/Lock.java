@@ -12,7 +12,7 @@ import lombok.NonNull;
  */
 public class Lock {
 
-    private static final Object synIndexTag = new Object();
+    private static final Object SYN_INDEX_TAG = new Object();
 
     private static volatile long valueIndex = 0;
 
@@ -21,7 +21,7 @@ public class Lock {
     }
     
     void nextLock(){
-        synchronized (this.synIndexTag){
+        synchronized (SYN_INDEX_TAG){
             this.index = valueIndex ++;
         }
     }
@@ -31,7 +31,7 @@ public class Lock {
     private volatile long index;
 
     public long getIndex() {
-        synchronized (this.synIndexTag){
+        synchronized (SYN_INDEX_TAG){
             return index;
         }
     }

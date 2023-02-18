@@ -9,7 +9,7 @@ import java.security.PublicKey;
 import java.security.spec.PKCS8EncodedKeySpec;
 import java.security.spec.X509EncodedKeySpec;
 
-abstract class ProtectedRsa extends Coder {
+abstract class AbstractRsa extends Coder {
 
     /** 公钥 **/
     protected String publicKey;
@@ -36,28 +36,28 @@ abstract class ProtectedRsa extends Coder {
      * @param publicKey
      * @return
      */
-    abstract ProtectedRsa setPublicKey(String publicKey);
+    abstract AbstractRsa setPublicKey(String publicKey);
 
     /**
      * 设置私钥
      * @param privateKey
      * @return
      */
-    abstract ProtectedRsa setPrivateKey(String privateKey);
+    abstract AbstractRsa setPrivateKey(String privateKey);
 
     /**
      * 设置签名算法
      * @param signatureAlgorithm
      * @return
      */
-    abstract ProtectedRsa setSignatureAlgorithm(String signatureAlgorithm);
+    abstract AbstractRsa setSignatureAlgorithm(String signatureAlgorithm);
 
     /**
      * 设置秘钥算法
      * @param keyAlgorithm
      * @return
      */
-    abstract ProtectedRsa setKeyAlgorithm(String keyAlgorithm);
+    abstract AbstractRsa setKeyAlgorithm(String keyAlgorithm);
 
     /**
      * 加载密钥

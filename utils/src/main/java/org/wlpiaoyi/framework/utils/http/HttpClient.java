@@ -70,13 +70,17 @@ public class HttpClient<T> {
         String setCookieKey = HttpFactory.HEADER_KEY3.toUpperCase();
         for (Header header :
                 rp.getHeaders()) {
-            if(!header.getName().toLowerCase().equals(setCookieKey)) continue;
+            if(!header.getName().toLowerCase().equals(setCookieKey)) {
+                continue;
+            }
             String[] keyValues =  header.getValue().split(";");
             for (String keyValue :
                     keyValues) {
                 String name = keyValue.split("=")[0];
                 Cookie cookie = CookieFactory.getCookie(request.getCookieStore(), name);
-                if(cookie != null) cookies.add(cookie);
+                if(cookie != null) {
+                    cookies.add(cookie);
+                }
             }
         }
         rp.setCookies(cookies);
@@ -84,32 +88,48 @@ public class HttpClient<T> {
     }
 
     public Response<T> GetResponse() throws IOException, URISyntaxException {
-        if(this.request == null) throw new BusinessException("request is null");
-        if(this.rpClazz == null) throw new BusinessException("rpClazz is null");
+        if(this.request == null) {
+            throw new BusinessException("request is null");
+        }
+        if(this.rpClazz == null) {
+            throw new BusinessException("rpClazz is null");
+        }
         HttpResponse rp = ResponseFactory.GetResponse(this.request);
         Response<T> response = ResponseFactory.ResponseData(rp, this.rpClazz);
         return response;
     }
 
     public Response<T> PostResponse() throws IOException, URISyntaxException {
-        if(this.request == null) throw new BusinessException("request is null");
-        if(this.rpClazz == null) throw new BusinessException("rpClazz is null");
+        if(this.request == null) {
+            throw new BusinessException("request is null");
+        }
+        if(this.rpClazz == null) {
+            throw new BusinessException("rpClazz is null");
+        }
         HttpResponse rp = ResponseFactory.PostResponse(this.request, this.rpAccept);
         Response<T> response = ResponseFactory.ResponseData(rp, this.rpClazz);
         return response;
     }
 
     public Response<T> DeleteResponse() throws IOException, URISyntaxException {
-        if(this.request == null) throw new BusinessException("request is null");
-        if(this.rpClazz == null) throw new BusinessException("rpClazz is null");
+        if(this.request == null) {
+            throw new BusinessException("request is null");
+        }
+        if(this.rpClazz == null) {
+            throw new BusinessException("rpClazz is null");
+        }
         HttpResponse rp = ResponseFactory.DeleteResponse(this.request);
         Response<T> response = ResponseFactory.ResponseData(rp, this.rpClazz);
         return response;
     }
 
     public Response<T> PutResponse() throws IOException, URISyntaxException {
-        if(this.request == null) throw new BusinessException("request is null");
-        if(this.rpClazz == null) throw new BusinessException("rpClazz is null");
+        if(this.request == null) {
+            throw new BusinessException("request is null");
+        }
+        if(this.rpClazz == null) {
+            throw new BusinessException("rpClazz is null");
+        }
         HttpResponse rp = ResponseFactory.PutResponse(this.request, this.rpAccept);
         Response<T> response = ResponseFactory.ResponseData(rp, this.rpClazz);
         return response;

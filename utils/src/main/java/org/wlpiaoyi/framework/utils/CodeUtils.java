@@ -68,7 +68,9 @@ public class CodeUtils {
             char adr = MEID[i];
             int index = 0;
             for (char c : ADRS){
-                if(c == adr) break;
+                if(c == adr) {
+                    break;
+                }
                 index ++;
             }
             if((i % 2) == 0){

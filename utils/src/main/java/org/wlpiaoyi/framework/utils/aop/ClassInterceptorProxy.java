@@ -41,7 +41,9 @@ public class ClassInterceptorProxy implements MethodInterceptor {
             if(this.progress != null){
                 e = this.progress.exceptionInterceptorProgress(obj, method, objects, methodProxy, e);
             }
-            if(e != null) throw e;
+            if(e != null) {
+                throw e;
+            }
         }
         if(this.progress != null){
             result = this.progress.endInterceptorProgress(obj, method, objects, methodProxy, result);

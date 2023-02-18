@@ -5,6 +5,7 @@ import org.apache.http.client.utils.URIBuilder;
 import org.java_websocket.handshake.ServerHandshake;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import org.wlpiaoyi.framework.utils.ValueUtils;
 import org.wlpiaoyi.framework.utils.exception.BusinessException;
 import org.wlpiaoyi.framework.utils.StringUtils;
 
@@ -42,7 +43,9 @@ public class WebSocketClient extends org.java_websocket.client.WebSocketClient {
         try{
             if(!downLatch.await(timeout, timeUnit)){
                 downLatch = null;
-                if(connectException == null) connectException = new TimeoutException("connect time out");
+                if(connectException == null) {
+                    connectException = new TimeoutException("connect time out");
+                }
                 throw connectException;
             }
         }catch (Exception e){
@@ -58,10 +61,11 @@ public class WebSocketClient extends org.java_websocket.client.WebSocketClient {
     }
 
     public void send(@Nullable String headSuffix, @NotNull Object data) throws NotYetConnectedException{
-        if(StringUtils.isBlank(headSuffix))
+        if(ValueUtils.isBlank(headSuffix)) {
             this.send(new Gson().toJson(data));
-        else
+        } else {
             this.send(headSuffix + new Gson().toJson(data));
+        }
     }
 
     @Override
@@ -69,13 +73,17 @@ public class WebSocketClient extends org.java_websocket.client.WebSocketClient {
         if(downLatch != null){
             downLatch.countDown();
         }
-        if(this.wsInterface == null || this.wsInterface.isEnqueued()) return;
+        if(this.wsInterface == null || this.wsInterface.isEnqueued()) {
+            return;
+        }
         this.wsInterface.get().onOpen(this, serverHandshake);
     }
 
     @Override
     public void onMessage(String message) {
-        if(this.wsInterface == null || this.wsInterface.isEnqueued()) return;
+        if(this.wsInterface == null || this.wsInterface.isEnqueued()) {
+            return;
+        }
         this.wsInterface.get().onMessage(this, message);
 
     }
@@ -86,7 +94,9 @@ public class WebSocketClient extends org.java_websocket.client.WebSocketClient {
             connectException = new BusinessException(code, message);
             downLatch.countDown();
         }
-        if(this.wsInterface == null || this.wsInterface.isEnqueued()) return;
+        if(this.wsInterface == null || this.wsInterface.isEnqueued()) {
+            return;
+        }
         this.wsInterface.get().onClose(this, code, message, b);
 
     }
@@ -94,7 +104,9 @@ public class WebSocketClient extends org.java_websocket.client.WebSocketClient {
     @Override
     public void onError(Exception e) {
         this.close();
-        if(this.wsInterface == null || this.wsInterface.isEnqueued()) return;
+        if(this.wsInterface == null || this.wsInterface.isEnqueued()) {
+            return;
+        }
         this.wsInterface.get().onError(this, e);
 
     }

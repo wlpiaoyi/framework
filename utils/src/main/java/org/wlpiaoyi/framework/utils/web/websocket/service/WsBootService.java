@@ -50,10 +50,11 @@ public class WsBootService {
      * @throws IOException
      */
     public void sendMessage(@Nullable String headSuffix, @NonNull Object data) throws IOException {
-        if(ValueUtils.isBlank(headSuffix))
+        if(ValueUtils.isBlank(headSuffix)) {
             this.sendMessage(this.gson.toJson(data));
-        else
+        } else {
             this.sendMessage(headSuffix + this.gson.toJson(data));
+        }
     }
 
     /**
@@ -87,8 +88,9 @@ public class WsBootService {
 //    @OnMessage
     protected final <T> T onWsMessage(String headSuffix, String message, Class<T> clazz) throws CatchException {
         if(!ValueUtils.isBlank(headSuffix)){
-            if(!message.startsWith(headSuffix))
+            if(!message.startsWith(headSuffix)) {
                 throw new CatchException("message had not start with \"" + headSuffix + "\"");
+            }
             message = message.substring(headSuffix.length());
         }
         T obj = gson.fromJson(message, clazz);

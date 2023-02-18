@@ -57,15 +57,21 @@ public class WriterUtils extends DataUtils{
             out = new FileOutputStream(file, true);
             dos = new DataOutputStream(out);
             for (int i = 0; i < writerInterface.getSize(); i++) {
-                if(!writerInterface.hasNext(i)) break;
+                if(!writerInterface.hasNext(i)) {
+                    break;
+                }
                 for (byte b : writerInterface.writeBytes(i)) {
                     dos.write(b);
                 }
                 dos.flush();
             }
         }finally {
-            if(out != null) out.close();
-            if(dos != null) dos.close();
+            if(out != null) {
+                out.close();
+            }
+            if(dos != null) {
+                dos.close();
+            }
         }
     }
 
@@ -88,15 +94,21 @@ public class WriterUtils extends DataUtils{
             out = new FileOutputStream(file);
             dos = new DataOutputStream(out);
             for (int i = 0; i < writerInterface.getSize(); i++) {
-                if(!writerInterface.hasNext(i)) break;
+                if(!writerInterface.hasNext(i)) {
+                    break;
+                }
                 for (byte b : writerInterface.writeBytes(i)) {
                     dos.write(b);
                 }
                 dos.flush();
             }
         }finally {
-            if(out != null) out.close();
-            if(dos != null) dos.close();
+            if(out != null) {
+                out.close();
+            }
+            if(dos != null) {
+                dos.close();
+            }
         }
     }
 
@@ -117,12 +129,16 @@ public class WriterUtils extends DataUtils{
         try{
             writer = Files.newBufferedWriter(path, charset);
             for (int i = 0; i < writerInterface.getSize(); i++) {
-                if(!writerInterface.hasNext(i)) break;
+                if(!writerInterface.hasNext(i)) {
+                    break;
+                }
                 writer.write(writerInterface.writeString(i, charset));
                 writer.flush();
             }
         }finally {
-            if(writer != null) writer.close();
+            if(writer != null) {
+                writer.close();
+            }
         }
     }
 
@@ -146,12 +162,16 @@ public class WriterUtils extends DataUtils{
         try{
             writer = Files.newBufferedWriter(path, charset, StandardOpenOption.APPEND);
             for (int i = 0; i < writerInterface.getSize(); i++) {
-                if(!writerInterface.hasNext(i)) break;
+                if(!writerInterface.hasNext(i)) {
+                    break;
+                }
                 writer.write(writerInterface.writeString(i, charset));
                 writer.flush();
             }
         }finally {
-            if(writer != null) writer.close();
+            if(writer != null) {
+                writer.close();
+            }
         }
     }
 

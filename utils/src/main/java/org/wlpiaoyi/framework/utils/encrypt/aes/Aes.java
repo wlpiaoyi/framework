@@ -251,9 +251,9 @@ public class Aes {
      * @throws BadPaddingException
      */
     public void decryptSection(InputStream dataIn, OutputStream dataOut) throws IOException, IllegalBlockSizeException, BadPaddingException {
-        int nRead;
+
         byte[] temps = new byte[7];
-        while ((nRead = dataIn.read(temps, 0, temps.length)) != -1) {
+        while (dataIn.read(temps, 0, temps.length) != -1) {
             int lbsL = 0;
             for (byte bt : temps){
                 if(bt > -128){
@@ -269,13 +269,14 @@ public class Aes {
                 }
             }
 
-            int datasL = (int) ValueUtils.toLong(lbs);
-            byte[] datas = new byte[datasL];
-            if ((nRead = dataIn.read(datas, 0, datasL)) == -1){
+            final int dataL = (int) ValueUtils.toLong(lbs);
+            byte[] data = new byte[dataL];
+            final int dataI = dataIn.read(data, 0, dataL);
+            if (dataI == -1){
                 break;
             }
-            byte[] outBytes = dCipher.doFinal(datas, 0, nRead);
-            dataOut.write(outBytes);
+            byte[] outData = dCipher.doFinal(data, 0, dataI);
+            dataOut.write(outData);
             dataOut.flush();
         }
     }

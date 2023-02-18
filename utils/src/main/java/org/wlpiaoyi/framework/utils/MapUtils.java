@@ -17,22 +17,32 @@ import java.util.regex.Pattern;
 public class MapUtils {
 
     public static final <T> T get(Map map, Object key){
-        if(map == null || map.isEmpty()) return  null;
+        if(map == null || map.isEmpty()) {
+            return  null;
+        }
         Object value = map.get(key);
-        if(value == null) return null;
+        if(value == null) {
+            return null;
+        }
         return (T) value;
     }
 
     public static final Object getObject(Map map, Object key){
-        if(map == null || map.isEmpty()) return  null;
+        if(map == null || map.isEmpty()) {
+            return  null;
+        }
         Object value = map.get(key);
         return value;
     }
 
     public static final String getString(Map map, Object key){
-        if(map == null || map.isEmpty()) return  null;
+        if(map == null || map.isEmpty()) {
+            return  null;
+        }
         Object value = map.get(key);
-        if(value == null) return null;
+        if(value == null) {
+            return null;
+        }
         if(value instanceof String){
             return (String) value;
         }else if(value instanceof LocalDateTime){
@@ -44,9 +54,13 @@ public class MapUtils {
     }
 
     public static final Float getFloat(Map map, Object key){
-        if(map == null || map.isEmpty()) return  null;
+        if(map == null || map.isEmpty()) {
+            return  null;
+        }
         Object value = map.get(key);
-        if(value == null) return null;
+        if(value == null) {
+            return null;
+        }
         if(value instanceof Float){
             return (Float) value;
         }else if (value instanceof String){
@@ -56,9 +70,13 @@ public class MapUtils {
     }
 
     public static final Double getDouble(Map map, Object key){
-        if(map == null || map.isEmpty()) return  null;
+        if(map == null || map.isEmpty()) {
+            return  null;
+        }
         Object value = map.get(key);
-        if(value == null) return null;
+        if(value == null) {
+            return null;
+        }
         if(value instanceof Double){
             return (Double) value;
         }else if (value instanceof String){
@@ -68,9 +86,13 @@ public class MapUtils {
     }
 
     public static final Boolean getBoolean(Map map, Object key){
-        if(map == null || map.isEmpty()) return  null;
+        if(map == null || map.isEmpty()) {
+            return  null;
+        }
         Object value = map.get(key);
-        if(value == null) return null;
+        if(value == null) {
+            return null;
+        }
         if(value instanceof Boolean){
             return (Boolean) value;
         }else if (value instanceof String){
@@ -80,9 +102,13 @@ public class MapUtils {
     }
 
     public static final Byte getByte(Map map, Object key){
-        if(map == null || map.isEmpty()) return  null;
+        if(map == null || map.isEmpty()) {
+            return  null;
+        }
         Object value = map.get(key);
-        if(value == null) return null;
+        if(value == null) {
+            return null;
+        }
         if(value instanceof Byte){
             return (Byte) value;
         }else if (value instanceof String){
@@ -92,9 +118,13 @@ public class MapUtils {
     }
 
     public static final Integer getInteger(Map map, Object key){
-        if(map == null || map.isEmpty()) return  null;
+        if(map == null || map.isEmpty()) {
+            return  null;
+        }
         Object value = map.get(key);
-        if(value == null) return null;
+        if(value == null) {
+            return null;
+        }
         if(value instanceof Integer){
             return (Integer) value;
         }else if(value instanceof LocalDate){
@@ -111,9 +141,13 @@ public class MapUtils {
 
 
     public static final Long getLong(Map map, Object key){
-        if(map == null || map.isEmpty()) return  null;
+        if(map == null || map.isEmpty()) {
+            return  null;
+        }
         Object value = map.get(key);
-        if(value == null) return null;
+        if(value == null) {
+            return null;
+        }
         if(value instanceof Long){
             return (Long) value;
         }else if(value instanceof LocalDateTime){
@@ -131,9 +165,13 @@ public class MapUtils {
     }
 
     public static final LocalDateTime getDateTime(Map map, Object key){
-        if(map == null || map.isEmpty()) return  null;
+        if(map == null || map.isEmpty()) {
+            return  null;
+        }
         Object value = map.get(key);
-        if(value == null) return null;
+        if(value == null) {
+            return null;
+        }
         if(value instanceof LocalDateTime){
             return (LocalDateTime) value;
         }else if (value instanceof Long){
@@ -150,9 +188,13 @@ public class MapUtils {
     }
 
     public static final LocalDate getDate(Map map, Object key){
-        if(map == null || map.isEmpty()) return  null;
+        if(map == null || map.isEmpty()) {
+            return  null;
+        }
         Object value = map.get(key);
-        if(value == null) return null;
+        if(value == null) {
+            return null;
+        }
         if(value instanceof LocalDate){
             return (LocalDate) value;
         }else if (value instanceof Long){
@@ -169,7 +211,9 @@ public class MapUtils {
     }
 
     public static final Map<?, ?> getMap(Map map, Object key){
-        if(map == null || map.isEmpty()) return  null;
+        if(map == null || map.isEmpty()) {
+            return  null;
+        }
         Map<?, ?> value = get(map, key);
         return value;
     }
@@ -179,11 +223,19 @@ public class MapUtils {
     }
 
     public static final <T> List<T> getList(Map map, Object key, Class<T> clazz){
-        if(map == null || map.isEmpty()) return  null;
+        if(map == null || map.isEmpty()) {
+            return  null;
+        }
         List datas = MapUtils.get(map, key);
-        if(datas == null) return null;
-        if(!(datas instanceof List)) return null;
-        if(ValueUtils.isBlank(datas)) return null;
+        if(datas == null) {
+            return null;
+        }
+        if(!(datas instanceof List)) {
+            return null;
+        }
+        if(ValueUtils.isBlank(datas)) {
+            return null;
+        }
         Gson gson = GsonBuilder.gsonDefault();
         List<T> items = new ArrayList<>();
         for (Object data : datas){
@@ -209,9 +261,11 @@ public class MapUtils {
             }else if(clazz == BigInteger.class){
                 item = (T) new BigInteger(data.toString());
             }else if(clazz == Map.class){
-                if(data instanceof Map)
+                if(data instanceof Map) {
                     item = (T) data;
-                else item = null;
+                } else {
+                    item = null;
+                }
             }else{
                 item = gson.fromJson(gson.toJson(data), clazz);
             }
@@ -221,11 +275,19 @@ public class MapUtils {
     }
 
     public static final <T> Set<T> getSet(Map map, Object key, Class<T> clazz){
-        if(map == null || map.isEmpty()) return  null;
+        if(map == null || map.isEmpty()) {
+            return  null;
+        }
         Set datas = MapUtils.get(map, key);
-        if(datas == null) return null;
-        if(!(datas instanceof Set)) return null;
-        if(ValueUtils.isBlank(datas)) return null;
+        if(datas == null) {
+            return null;
+        }
+        if(!(datas instanceof Set)) {
+            return null;
+        }
+        if(ValueUtils.isBlank(datas)) {
+            return null;
+        }
         Gson gson = GsonBuilder.gsonDefault();
         Set<T> items = new HashSet<>();
         for (Object data : datas){
@@ -249,9 +311,11 @@ public class MapUtils {
             }else if(clazz == BigInteger.class){
                 item = (T) new BigInteger(data.toString());
             }else if(clazz == Map.class){
-                if(data instanceof Map)
+                if(data instanceof Map) {
                     item = (T) data;
-                else item = null;
+                } else {
+                    item = null;
+                }
             }else{
                 item = gson.fromJson(gson.toJson(data), clazz);
             }

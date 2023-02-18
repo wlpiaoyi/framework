@@ -42,7 +42,9 @@ public class GsonBuilder  {
     }
 
     protected static final GsonBuilder singleInstance(){
-        if(xGsonBuilder != null) return xGsonBuilder;
+        if(xGsonBuilder != null) {
+            return xGsonBuilder;
+        }
         synchronized (GsonBuilder.class){
             if(xGsonBuilder == null){
                 xGsonBuilder = GsonBuilder.instance();
@@ -81,14 +83,20 @@ public class GsonBuilder  {
     }
 
     public final GsonBuilder addJsonSerializer(JsonSerializer jsonSerializer){
-        if(jsonSerializer == null) return this;
-        if(this.jsonSerializers.contains(jsonSerializer)) return this;
+        if(jsonSerializer == null) {
+            return this;
+        }
+        if(this.jsonSerializers.contains(jsonSerializer)) {
+            return this;
+        }
         this.jsonSerializers.add(jsonSerializer);
         return this;
     }
 
     public final GsonBuilder addFactories(TypeAdapterFactory factory){
-        if(this.factories.contains(factory)) return this;
+        if(this.factories.contains(factory)) {
+            return this;
+        }
         this.factories.add(factory);
         return this;
     }
@@ -99,7 +107,9 @@ public class GsonBuilder  {
             @Override
             public boolean shouldSkipField(FieldAttributes fieldAttributes) {
                 Expose clazz = fieldAttributes.getAnnotation(Expose.class);
-                if(clazz == null) return false;
+                if(clazz == null) {
+                    return false;
+                }
                 return true;
             }
             @Override

@@ -17,7 +17,9 @@ public class CookieFactory {
     static Map<String, HttpContext> xHttpContextMap = new HashMap<>();
     public static HttpContext getLocationContext(@NonNull String host) {
         HttpContext xHttpContext = xHttpContextMap.get(host);
-        if(xHttpContext != null) return xHttpContext;
+        if(xHttpContext != null) {
+            return xHttpContext;
+        }
         synchronized (Request.class){
             if(xHttpContext == null){
                 CookieStore cookieStore = new BasicCookieStore();
@@ -37,14 +39,17 @@ public class CookieFactory {
 
     public static void setCookie(@NonNull CookieStore cookieStore, @NonNull Cookie cookie){
         Cookie c = CookieFactory.getCookie(cookieStore, cookie.getName());
-        if(c != null)
+        if(c != null) {
             CookieFactory.removeCookie(cookieStore,c);
+        }
         cookieStore.addCookie(cookie);
     }
     public static Cookie getCookie(@NonNull CookieStore cookieStore, @NonNull String name){
         for (Cookie cooke :
                 cookieStore.getCookies()) {
-            if (cooke.getName().equals(name)) return cooke;
+            if (cooke.getName().equals(name)) {
+                return cooke;
+            }
         }
         return null;
     }

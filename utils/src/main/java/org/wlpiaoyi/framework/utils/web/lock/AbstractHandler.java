@@ -12,29 +12,32 @@ import java.util.Map;
  * @Version 1.0
  */
 @Slf4j
-abstract class Handler {
-    private static final ThreadLocal<Map<String, Integer>> ThreadLocalObj = ThreadLocal.withInitial(() ->
+abstract class AbstractHandler {
+    private static final ThreadLocal<Map<String, Integer>> THREAD_LOCAL_OBJ = ThreadLocal.withInitial(() ->
             new HashMap<>());
 
     protected final boolean setLock(Lock lock, long lockExpireTime) {
         boolean isGetLock = false;
         try{
             if (hasRedisLock(lock)) {
-                if(ValueUtils.isBlank(ThreadLocalObj.get()))
+                if(ValueUtils.isBlank(THREAD_LOCAL_OBJ.get())) {
                     return false;
-                if(!ThreadLocalObj.get().containsKey(lock.getId()))
+                }
+                if(!THREAD_LOCAL_OBJ.get().containsKey(lock.getId())) {
                     return false;
+                }
             }else{
                 boolean lockFlag = setRedisLock(lock, lockExpireTime);
                 //如果设置锁标识失败进入等待 并 try lock
-                if (!lockFlag)
+                if (!lockFlag) {
                     return false;
+                }
             }
             isGetLock = true;
             return true;
         }finally {
             if(isGetLock){
-                Map<String, Integer> itemMap = ThreadLocalObj.get();
+                Map<String, Integer> itemMap = THREAD_LOCAL_OBJ.get();
                 Integer index = itemMap.get(lock.getId());
                 if(ValueUtils.isBlank(index)){
                     index = 0;
@@ -63,10 +66,11 @@ abstract class Handler {
      * 释放锁
      */
     public boolean unLock(Lock lock) {
-        if(ValueUtils.isBlank(lock.getId()))
+        if(ValueUtils.isBlank(lock.getId())) {
             return false;
+        }
 
-        Map<String, Integer> itemMap = ThreadLocalObj.get();
+        Map<String, Integer> itemMap = THREAD_LOCAL_OBJ.get();
         Integer index = itemMap.get(lock.getId());
         if(ValueUtils.isBlank(index)){
             this.delRedisLock(lock);

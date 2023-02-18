@@ -26,7 +26,9 @@ public class Response <T> {
     }
 
     public Response setHeaders(Collection<Header> headers){
-        if(this.headers == null) this.headers = new HashSet<>();
+        if(this.headers == null) {
+            this.headers = new HashSet<>();
+        }
         this.headers.addAll(headers);
         return this;
     }
@@ -35,8 +37,9 @@ public class Response <T> {
         Set<Header> removes = new HashSet<>();
         for (Header header :
                 this.headers) {
-            if (header.getName().equals(name))
+            if (header.getName().equals(name)) {
                 removes.add(header);
+            }
         }
         this.headers.removeAll(removes);
         return this;
@@ -59,8 +62,9 @@ public class Response <T> {
     public Cookie getCookie(String name) {
         for (Cookie cooke :
                 this.cookies) {
-            if(cooke.getName().equals(name))
+            if(cooke.getName().equals(name)) {
                 return cooke;
+            }
         }
         return null;
     }

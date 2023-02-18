@@ -60,7 +60,9 @@ class RunnableDefault implements Runnable {
     private final Object synRunStatus = new Object();
     private volatile boolean isInRunStatusSetting;
     public int getRunStatus() {
-        if(!this.isInRunStatusSetting) return this.runStatus;
+        if(!this.isInRunStatusSetting) {
+            return this.runStatus;
+        }
         synchronized (this.synRunStatus){
             return runStatus;
         }

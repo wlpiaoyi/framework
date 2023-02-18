@@ -72,8 +72,12 @@ public class DataUtils {
      * @return
      */
     public static boolean moveFile(File move, File to) {
-        if(!move.exists()) throw new BusinessException("被移动文件不存在");
-        if(to.exists()) throw new BusinessException("目标文件已存在");
+        if(!move.exists()) {
+            throw new BusinessException("被移动文件不存在");
+        }
+        if(to.exists()) {
+            throw new BusinessException("目标文件已存在");
+        }
         String toPath = to.getPath();
         toPath = toPath.substring(0, toPath.lastIndexOf("/"));
         makeDir(toPath);
@@ -160,8 +164,9 @@ public class DataUtils {
             return new String(Hex.encodeHex(md.digest()));
         } finally {
             try {
-                if (fileInputStream != null)
+                if (fileInputStream != null) {
                     fileInputStream.close();
+                }
             } catch (IOException e) {
                 e.printStackTrace();
             }

@@ -1,7 +1,7 @@
 package org.wlpiaoyi.framework.utils.lock;
 
 import org.wlpiaoyi.framework.utils.web.lock.Lock;
-import org.wlpiaoyi.framework.utils.web.lock.LockHandler;
+import org.wlpiaoyi.framework.utils.web.lock.AbstractLockHandler;
 
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -11,7 +11,7 @@ import java.util.concurrent.ConcurrentHashMap;
  * @Date 2022/8/1 08:56
  * @Version 1.0
  */
-public class LockHandlerDefault extends LockHandler {
+public class LockHandlerDefault extends AbstractLockHandler {
 
 
     private static final Map<String, String> lockMap = new ConcurrentHashMap<>();

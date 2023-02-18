@@ -1,10 +1,7 @@
 package org.wlpiaoyi.framework.utils.web.response;
 
-import lombok.Data;
 import lombok.NonNull;
 import org.jetbrains.annotations.Nullable;
-import org.wlpiaoyi.framework.utils.exception.BusinessException;
-import org.wlpiaoyi.framework.utils.exception.CatchException;
 import org.wlpiaoyi.framework.utils.gson.GsonBuilder;
 
 import javax.servlet.http.HttpServletResponse;
@@ -16,13 +13,13 @@ import java.io.IOException;
 public class ResponseUtils {
 
 
-    private static final String ContentTypeKey = "content-type";
-    private static final String ContentTypeValueJson = "application/json;charset=utf-8";
+    private static final String CONTENT_TYPE_KEY = "content-type";
+    private static final String CONTENT_TYPE_VALUE_JSON = "application/json;charset=utf-8";
     public static void writeResponseJson(@Nullable Object json,
                                          int code,
                                          @NonNull HttpServletResponse response) throws IOException {
-        response.setHeader(ContentTypeKey, ContentTypeValueJson);
-        ResponseUtils.writeResponseData(json, ContentTypeValueJson, code, response);
+        response.setHeader(CONTENT_TYPE_KEY, CONTENT_TYPE_VALUE_JSON);
+        ResponseUtils.writeResponseData(json, CONTENT_TYPE_VALUE_JSON, code, response);
     }
 
     public static void writeResponseData(@Nullable Object data,

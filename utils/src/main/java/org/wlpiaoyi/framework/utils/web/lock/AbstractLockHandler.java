@@ -9,7 +9,7 @@ import lombok.extern.slf4j.Slf4j;
  * @Version 1.0
  */
 @Slf4j
-public abstract class LockHandler extends Handler{
+public abstract class AbstractLockHandler extends AbstractHandler {
 
     protected static int LOCK_TRY_INTERVAL = 20;//默认20ms尝试一次
     protected static long LOCK_TRY_TIMEOUT = 30 * 1000L;//默认尝试30s

@@ -1,7 +1,5 @@
 package org.wlpiaoyi.framework.utils.snowflake;
 
-import org.wlpiaoyi.framework.utils.DateUtils;
-
 /**
  * Twitter_Snowflake<br>
  * SnowFlake的结构如下(每部分用-分开):<br>
@@ -18,7 +16,14 @@ import org.wlpiaoyi.framework.utils.DateUtils;
 public class IdWorker {
 // ==============================Fields===========================================
     /** 开始时间截 (2021-10-01) */
-    protected static long TWEPOCH = 1633017600000L;
+    protected final long timerEpoch;
+
+    /** 工作机器ID(0~31) */
+    private long workerId;
+
+    /** 数据中心ID(0~31) */
+    private long datacenterId;
+
 
     /** 机器id所占的位数 */
     private final long workerIdBits = 5L;
@@ -46,13 +51,6 @@ public class IdWorker {
 
     /** 生成序列的掩码，这里为4095 (0b111111111111=0xfff=4095) */
     private final long sequenceMask = -1L ^ (-1L << sequenceBits);
-
-    /** 工作机器ID(0~31) */
-    private long workerId;
-
-    /** 数据中心ID(0~31) */
-    private long datacenterId;
-
     /** 毫秒内序列(0~4095) */
     private long sequence = 0L;
 
@@ -65,7 +63,7 @@ public class IdWorker {
      * @param workerId 工作ID (0~31)
      * @param datacenterId 数据中心ID (0~31)
      */
-    public IdWorker(long workerId, long datacenterId) {
+    public IdWorker(byte workerId, byte datacenterId, long timerEpoch) {
         if (workerId > maxWorkerId || workerId < 0) {
             throw new IllegalArgumentException(String.format("worker Id can't be greater than %d or less than 0", maxWorkerId));
         }
@@ -74,6 +72,7 @@ public class IdWorker {
         }
         this.workerId = workerId;
         this.datacenterId = datacenterId;
+        this.timerEpoch = timerEpoch;
     }
 
     // ==============================Methods==========================================
@@ -109,7 +108,7 @@ public class IdWorker {
         lastTimestamp = timestamp;
 
         //移位并通过或运算拼到一起组成64位的ID
-        return ((timestamp - TWEPOCH) << timestampLeftShift)
+        return ((timestamp - timerEpoch) << timestampLeftShift)
                 | (datacenterId << datacenterIdShift)
                 | (workerId << workerIdShift)
                 | sequence;
@@ -136,38 +135,38 @@ public class IdWorker {
         return System.currentTimeMillis();
     }
 
-    //==============================Test=============================================
-    /** 测试 */
-    public static void main(String[] args) {
-
-        IdWorker idWorker = new IdWorker(0, 0);
-        for (int i = 0; i < 100; i++) {
-            long id = idWorker.nextId();
-            System.out.println(Long.toBinaryString(id));
-            System.out.println(id);
-        }
-
-        TWEPOCH = DateUtils.toTimestamp(DateUtils.parseLocalDateTime("2021-01-01 08:00:00"));
-        long id = idWorker.nextId();
-        System.out.println(Long.toBinaryString(id));
-        System.out.println(id);
-        TWEPOCH = DateUtils.toTimestamp(DateUtils.parseLocalDateTime("2010-01-01 08:00:00"));
-        id = idWorker.nextId();
-        System.out.println(Long.toBinaryString(id));
-        System.out.println(id);
-        TWEPOCH = DateUtils.toTimestamp(DateUtils.parseLocalDateTime("2000-01-01 08:00:00"));
-        id = idWorker.nextId();
-        System.out.println(Long.toBinaryString(id));
-        System.out.println(id);
-        TWEPOCH = DateUtils.toTimestamp(DateUtils.parseLocalDateTime("1970-01-01 08:00:00"));
-        id = idWorker.nextId();
-        System.out.println(Long.toBinaryString(id));
-        System.out.println(id);
-        TWEPOCH = DateUtils.toTimestamp(DateUtils.parseLocalDateTime("1960-01-01 08:00:00"));
-        id = idWorker.nextId();
-        System.out.println(Long.toBinaryString(id));
-        System.out.println(id);
-
-
-    }
+//    //==============================Test=============================================
+//    /** 测试 */
+//    public static void main(String[] args) {
+//
+//        IdWorker idWorker = new IdWorker((byte) 0, (byte) 0);
+//        for (int i = 0; i < 100; i++) {
+//            long id = idWorker.nextId();
+//            System.out.println(Long.toBinaryString(id));
+//            System.out.println(id);
+//        }
+//
+//        TWEPOCH = DateUtils.toTimestamp(DateUtils.parseLocalDateTime("2021-01-01 08:00:00"));
+//        long id = idWorker.nextId();
+//        System.out.println(Long.toBinaryString(id));
+//        System.out.println(id);
+//        TWEPOCH = DateUtils.toTimestamp(DateUtils.parseLocalDateTime("2010-01-01 08:00:00"));
+//        id = idWorker.nextId();
+//        System.out.println(Long.toBinaryString(id));
+//        System.out.println(id);
+//        TWEPOCH = DateUtils.toTimestamp(DateUtils.parseLocalDateTime("2000-01-01 08:00:00"));
+//        id = idWorker.nextId();
+//        System.out.println(Long.toBinaryString(id));
+//        System.out.println(id);
+//        TWEPOCH = DateUtils.toTimestamp(DateUtils.parseLocalDateTime("1970-01-01 08:00:00"));
+//        id = idWorker.nextId();
+//        System.out.println(Long.toBinaryString(id));
+//        System.out.println(id);
+//        TWEPOCH = DateUtils.toTimestamp(DateUtils.parseLocalDateTime("1960-01-01 08:00:00"));
+//        id = idWorker.nextId();
+//        System.out.println(Long.toBinaryString(id));
+//        System.out.println(id);
+//
+//
+//    }
 }
