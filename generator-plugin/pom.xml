@@ -41,7 +41,6 @@
         <dependency>
             <groupId>org.wlpiaoyi.framework</groupId>
             <artifactId>utils</artifactId>
-            <version>${fw.project.version}</version>
         </dependency>
 
     </dependencies>

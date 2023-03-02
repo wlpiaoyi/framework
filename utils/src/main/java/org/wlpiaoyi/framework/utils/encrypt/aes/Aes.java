@@ -2,9 +2,7 @@ package org.wlpiaoyi.framework.utils.encrypt.aes;
 
 import lombok.Getter;
 import lombok.Setter;
-import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import org.wlpiaoyi.framework.utils.ValueUtils;
-import org.wlpiaoyi.framework.utils.exception.BusinessException;
 
 import javax.crypto.*;
 import javax.crypto.spec.IvParameterSpec;
@@ -12,11 +10,9 @@ import javax.crypto.spec.SecretKeySpec;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.io.UnsupportedEncodingException;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.security.*;
-import java.util.Base64;
 
 /**
  * {@code @author:} 		wlpia:WLPIAOYI-DELL
@@ -35,14 +31,6 @@ public class Aes {
      * */
     public static final String SIGNATURE_ALGORITHM_SHA1PRNG = "SHA1PRNG";
 
-    /** 加密-解密算法 / 工作模式 / 填充方式 **/
-    @Getter @Setter
-    static final String CIPHER_ALGORITHM_AE5 = "AES/ECB/PKCS5Padding";
-
-    /** 加密-解密算法 / 工作模式 / 填充方式 **/
-    @Getter @Setter
-    static final String CIPHER_ALGORITHM_AC5 = "AES/CBC/PKCS5Padding";
-
     /**
      * AES/CBC/NoPadding 要求
      * 密钥必须是16字节长度的；Initialization vector (IV) 必须是16字节
@@ -56,7 +44,14 @@ public class Aes {
      *  除了NoPadding填充之外的任何方 式，加密数据长度都等于16*(n+1).
      */
     @Getter @Setter
-    static final String CIPHER_ALGORITHM_ACN = "AES/CBC/NoPadding";
+    static final String CIPHER_ALGORITHM_AEN = "AES/EBC/NoPadding";
+    /** 加密-解密算法 / 工作模式 / 填充方式 **/
+    @Getter @Setter
+    static final String CIPHER_ALGORITHM_AE5_7 = "AES/ECB/PKCS5Padding";
+    /** 加密-解密算法 / 工作模式 / 填充方式 **/
+    @Getter @Setter
+    static final String CIPHER_ALGORITHM_AC5_7 = "AES/CBC/PKCS5Padding";
+
 
     @Getter
     private Charset typeEncoding = StandardCharsets.UTF_8;
@@ -103,12 +98,12 @@ public class Aes {
         Aes aes = new Aes();
         return aes;
     }
-    /**
-     * 解决java不支持AES/CBC/PKCS7Padding模式解密
-     */
-    static {
-        Security.addProvider(new BouncyCastleProvider());
-    }
+//    /**
+//     * 解决java不支持AES/CBC/PKCS7Padding模式解密
+//     */
+//    static {
+//        Security.addProvider(new BouncyCastleProvider());
+//    }
 
     public Aes setDCipherAlgorithm(String dCipherAlgorithm) throws NoSuchPaddingException, NoSuchAlgorithmException {
         this.dCipher = Cipher.getInstance(dCipherAlgorithm);
@@ -122,10 +117,10 @@ public class Aes {
 
     public Aes load() throws Exception {
         if(this.dCipher == null){
-            this.setDCipherAlgorithm(CIPHER_ALGORITHM_AC5);
+            this.setDCipherAlgorithm(CIPHER_ALGORITHM_AC5_7);
         }
         if(this.eCipher == null){
-            this.setECipherAlgorithm(CIPHER_ALGORITHM_AC5);
+            this.setECipherAlgorithm(CIPHER_ALGORITHM_AC5_7);
         }
         if(this.key == null){
             throw new Exception("the aes key can't be null");

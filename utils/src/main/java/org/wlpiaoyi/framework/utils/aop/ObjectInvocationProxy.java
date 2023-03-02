@@ -30,7 +30,9 @@ public class ObjectInvocationProxy<T> implements InvocationHandler {
             if(this.progress != null){
                 e = this.progress.exceptionInterceptorProgress(proxy, method, args,e);
             }
-            if(e != null) throw e;
+            if(e != null) {
+                throw e;
+            }
         }
         if(this.progress != null){
             result = this.progress.endInterceptorProgress(proxy, method, args, result);
