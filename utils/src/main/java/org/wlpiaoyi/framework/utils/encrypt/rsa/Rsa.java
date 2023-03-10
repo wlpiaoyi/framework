@@ -78,8 +78,10 @@ public class Rsa extends AbstractRsa implements Serializable {
     }
 
     protected Rsa(){
-        this.signatureAlgorithm = Rsa.SIGNATURE_ALGORITHM_SHA1withRSA;//签名算法
-        this.keyAlgorithm = Rsa.KEY_ALGORTHM_RSA;//秘钥算法
+        //签名算法
+        this.signatureAlgorithm = Rsa.SIGNATURE_ALGORITHM_SHA1withRSA;
+        //秘钥算法
+        this.keyAlgorithm = Rsa.KEY_ALGORTHM_RSA;
     }
 
     public static Rsa create(){

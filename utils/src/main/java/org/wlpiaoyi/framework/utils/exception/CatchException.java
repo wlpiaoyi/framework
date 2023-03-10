@@ -2,6 +2,9 @@ package org.wlpiaoyi.framework.utils.exception;
 
 import lombok.Getter;
 
+/**
+ * @author wlpia
+ */
 @Getter
 public class CatchException extends Exception{
 

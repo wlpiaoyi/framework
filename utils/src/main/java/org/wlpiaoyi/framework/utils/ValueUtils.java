@@ -27,6 +27,12 @@ public final class ValueUtils extends ValueParseUtils{
 
 class ValueParseUtils extends ValueBlankUtils{
 
+//    public static void main(String[] args) {
+//        byte[] res = toBytes(10000L, 7);
+//        long v = toLong(res);
+//        System.out.println();
+//    }
+
     /**
      * byte数组转成Long
      * @param bytes
@@ -43,6 +49,34 @@ class ValueParseUtils extends ValueBlankUtils{
             ci ++;
         }
         return res;
+    }
+
+    /**
+     * Long转化成Byte数组
+     * @param value
+     * @param length
+     * @return
+     */
+    public static byte @NotNull [] toBytes(long value, int length){
+        byte[] lbs = ValueUtils.toBytes(value);
+        if(length < 1){
+            return lbs;
+        }
+        final int lbsL = lbs.length;
+        if(lbsL == length){
+            return lbs;
+        }
+        byte[] res = new byte[length];
+        int offL = length - lbsL;
+        for (int i = length - 1; i >= 0; i--){
+            if(i < offL){
+                res[i] = -128;
+            }else{
+                res[i] = lbs[i - offL];
+            }
+        }
+        return res;
+
     }
 
     /**

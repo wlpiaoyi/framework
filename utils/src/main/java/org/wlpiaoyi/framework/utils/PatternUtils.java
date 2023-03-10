@@ -74,9 +74,9 @@ public class PatternUtils {
         return Pattern.matches(CHINESE_PATTERN, text);
     }
 
-//    public static void main(String[] args) {
-//        PatternUtils.isNumber("222");
-//        PatternUtils.isUSCC18("91510100MA6CW8CM15");
-//
-//    }
+    public static void main(String[] args) {
+        PatternUtils.isNumber("222");
+        PatternUtils.isUSCC18("91510100MA6CW8CM15");
+
+    }
 }

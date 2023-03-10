@@ -183,6 +183,22 @@ public class Aes {
         return eCipher.doFinal(dataBytes);
     }
 
+    /**
+     * @description: AES对称加密字符串，并通过Jdk自带Base64转换为ASCII
+     * @date: 2017年11月7日 上午9:37:48
+     * @param dataBytes
+     * @param off
+     * @param len
+     * @return
+     * @throws IllegalBlockSizeException
+     * @throws BadPaddingException
+     */
+    public byte[] encrypt(byte[] dataBytes, int off, int len)
+            throws IllegalBlockSizeException,
+            BadPaddingException {
+        return eCipher.doFinal(dataBytes, off, len);
+    }
+
     private static final int ME_DATA_SIZE = 512;
     /**
      * @description: AES对称加密字符串，并通过Jdk自带Base64转换为ASCII
@@ -234,6 +250,18 @@ public class Aes {
      */
     public byte[] decrypt(byte[] dataBytes) throws IllegalBlockSizeException, BadPaddingException {
         return dCipher.doFinal(dataBytes);
+    }
+
+    /**
+     * @description: 对AES加密字符串进行解密
+     * @date: 2017年11月7日 上午10:14:00
+     * @param dataBytes
+     * @return
+     * @throws IllegalBlockSizeException
+     * @throws BadPaddingException
+     */
+    public byte[] decrypt(byte[] dataBytes, int off, int len) throws IllegalBlockSizeException, BadPaddingException {
+        return dCipher.doFinal(dataBytes, off, len);
     }
 
     /**
