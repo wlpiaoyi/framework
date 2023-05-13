@@ -46,9 +46,9 @@ public class MapUtils {
         if(value instanceof String){
             return (String) value;
         }else if(value instanceof LocalDateTime){
-            return DateUtils.formatLocalDateTime((LocalDateTime) value);
+            return DateUtils.formatToLocalDateTime((LocalDateTime) value);
         }else if(value instanceof LocalDate){
-            return DateUtils.formatLocalDate((LocalDate) value);
+            return DateUtils.formatToLocalDate((LocalDate) value);
         }
         return value.toString();
     }
@@ -181,7 +181,7 @@ public class MapUtils {
             if(isMatch){
                 return DateUtils.toLocalDateTime(new Long((String) value));
             }else{
-                return DateUtils.parseLocalDateTime((String) value);
+                return DateUtils.formatToLoaTolDateTime((String) value);
             }
         }
         return null;
@@ -204,7 +204,7 @@ public class MapUtils {
             if(isMatch){
                 return DateUtils.toLocalDate(new Long((String) value));
             }else{
-                return DateUtils.parseLocalDate((String) value);
+                return DateUtils.formatToLocalDate((String) value);
             }
         }
         return null;

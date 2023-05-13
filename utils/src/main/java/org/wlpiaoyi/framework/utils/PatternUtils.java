@@ -1,6 +1,7 @@
 package org.wlpiaoyi.framework.utils;
 
 import java.util.Locale;
+import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 /**
@@ -74,9 +75,38 @@ public class PatternUtils {
         return Pattern.matches(CHINESE_PATTERN, text);
     }
 
-    public static void main(String[] args) {
-        PatternUtils.isNumber("222");
-        PatternUtils.isUSCC18("91510100MA6CW8CM15");
 
+    public static void main(String[] args) {
+//        String pattern = "\\$\\{(.*?)}";
+//        pattern = "^(?=.*[A-Z])(?=.*[a-z])(?=.*\\d)(?=.*[@#$%^&*_+=!?\\(\\)\\[\\]{};':\"\\\\|,.<>\\/]).*$";
+//        pattern = "^(?=.*[A-Z])(?=.*[a-z])(?=.*\\d)(?=.*[@#$%^&*_+=!?\\(\\)\\[\\]{};':\"\\\\|,.<>\\/]).*$";
+        String patterns[] = {
+                "^(?=.*[A-Z]).*$",
+                "^(?=.*[a-z]).*$",
+                "^(?=.*\\d).*$",
+                "^(?=.*[@#$%^&*_+=!?\\(\\)\\[\\]{};':\"\\\\|,.<>\\/]).*$",
+        };
+        int i = 0;
+        for (String pattern : patterns){
+            if(Pattern.matches(pattern, "12{}3AB")){
+                i ++;
+            }
+        }
+        String pattern = "/^(?!.*[A-Z][a-z][@#$%^&*_+=!?\\(\\)\\[\\]{};':\"\\\\|,.<>\\/]){3,100}.*$";
+        System.out.println();
+
+//        Pattern p = Pattern.compile(pattern);
+//        Matcher m = p.matcher("喔的按你的剑法${aabc}阿萨的凝聚力${123aba}{}");
+//        StringBuffer sr = new StringBuffer();
+//        while (m.find()) {
+//            String group = m.group();
+//            m.appendReplacement(sr, " ");
+//        }
+//        m.appendTail(sr);
+////        "喔的按你的剑法${aabc}阿萨的凝聚力${123aba}{}".replaceAll("\\$\\{([a-zA-Z0-9_\\.\\-])+\\}", "/")
+//        PatternUtils.isNumber("222");
+//        PatternUtils.isUSCC18("91510100MA6CW8CM15");
+//
+//
     }
 }

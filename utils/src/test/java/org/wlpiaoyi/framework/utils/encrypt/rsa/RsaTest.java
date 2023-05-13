@@ -73,16 +73,20 @@ public class RsaTest {
 
         Rsa rsa = Rsa.create().setPublicKey(publicKey).setPrivateKey(privateKey).loadKey();
 
-
         System.out.println("私人钥加密——公钥解密");
         String source = "这是一行没有任何意义的文字，你看完了等于没看，不是吗";
+        source = "uydh@75YG3.,";
         System.out.println("\r加密前文字：\r\n" + source);
         byte[] data = source.getBytes();
-        byte[] encodedData = rsa.encryptByPrivateKey(data);
-        System.out.println("加密后文字：\r\n" + new BigInteger(1, encodedData).toString(16));
-        byte[] decodedData = rsa.decryptByPublicKey(encodedData);
+        byte[] encodedData = rsa.encryptByPublicKey(data);
+        System.out.println("加密后文字16：\r\n" + new BigInteger(1, encodedData).toString(16));
+        System.out.println("加密后文字64：\r\n" + StringUtils.base64Encode(encodedData));
+        byte[] decodedData = rsa.decryptByPrivateKey(encodedData);
+        decodedData = rsa.decryptByPrivateKey(StringUtils.base64DecodeToBytes(StringUtils.base64Encode(encodedData)));
         System.out.println("解密后文字: \r\n" + new String(decodedData));
 
+        decodedData = rsa.decryptByPrivateKey(StringUtils.base64DecodeToBytes("XkfQwsVZhFIKcOXhZCH8sVISeGdYDW5mXGcnHOFCcmgo9+PInvI48a2Ufn3xXG/QDEdJ9cCS4wKDbRitR40flRcLj6ho/sKu14bb6GLAXycJyPGeJc4ygP/8zL0FcnMzip1cudaMHOcVvkscJtmG0ZS4heFPk7KvOY10lN3oiG8="));
+        System.out.println("解密后文字: \r\n" + new String(decodedData));
     }
     @Test
     public void sign() throws Exception {
@@ -96,6 +100,8 @@ public class RsaTest {
                 "Xr4BPBiiOjrNO/oBHQIgORGmogvnnqF5NGFBrsfJZQnUbt+0tNx+O+wGn0mZnZMCIFx1Fx8qwYJw\n" +
                 "IE6Q8IwfZHMq3W5Zke9SrqoU5zMUFB7ZAiEA6ivL8pimOdMKKyc97xJvAAHKTEErBRyQW71gxKVp\n" +
                 "7Ts=";
+
+//        Rsa rsa = Rsa.create().setPublicKey(publicKey).setPrivateKey(privateKey).loadKey();
 
         Rsa rsa = Rsa.create().setPublicKey(publicKey).setPrivateKey(privateKey).loadKey();
 

@@ -17,11 +17,13 @@ public class PluginClass {
         put("BIGINT UNSIGNED", "Long");
         put("VARCHAR", "String");
         put("LONGTEXT", "String");
+        put("BLOB", "String");
         put("INT", "Integer");
         put("INT UNSIGNED", "Integer");
         put("TINYINT", "Integer");
         put("TINYINT UNSIGNED", "Integer");
         put("DATETIME", "Date");
+        put("DECIMAL", "Double");
     }};
 
     private static final Map<String, String> implTypeDict = new HashMap(){{
@@ -51,7 +53,9 @@ public class PluginClass {
         put("BIGINT", "javax.validation.constraints.NotNull");
         put("BIGINT UNSIGNED", "javax.validation.constraints.NotNull");
         put("VARCHAR", "javax.validation.constraints.NotBlank");
+        put("BLOB", "javax.validation.constraints.NotBlank");
         put("LONGTEXT", "javax.validation.constraints.NotBlank");
+        put("DECIMAL", "javax.validation.constraints.NotNull");
         put("INT", "javax.validation.constraints.NotNull");
         put("INT UNSIGNED", "javax.validation.constraints.NotNull");
         put("TINYINT", "javax.validation.constraints.NotNull");
@@ -62,7 +66,9 @@ public class PluginClass {
         put("BIGINT", "@NotNull(message = \"__comment__不能为空\")");
         put("BIGINT UNSIGNED", "@NotNull(message = \"__comment__不能为空\")");
         put("VARCHAR", "@NotBlank(message = \"__comment__不能为空\")");
+        put("BLOB", "@NotBlank(message = \"__comment__不能为空\")");
         put("LONGTEXT", "@NotBlank(message = \"__comment__不能为空\")");
+        put("DECIMAL", "@NotNull(message = \"__comment__不能为空\")");
         put("INT", "@NotNull(message = \"__comment__不能为空\")");
         put("INT UNSIGNED", "@NotNull(message = \"__comment__不能为空\")");
         put("TINYINT", "@NotNull(message = \"__comment__不能为空\")");
@@ -130,12 +136,13 @@ public class PluginClass {
     private String getClassText(Map<String, String> templateDict, Map<String, String> table){
         String packageStr = this.packagePath;
         String text = templateDict.get("text");
-        String classText = text.replace("__table_name__", table.get("tableName"));
-        classText = classText.replace("__table_comment__", table.get("comment"));
-        classText = classText.replace("__object_name__", table.get("suffixName"));
-        classText = classText.replace("__class_name__", table.get("className"));
-        classText = classText.replace("__class_var_name__", table.get("classVarName"));
-        classText = classText.replace("template/__package__", packageStr);
+        String classText = text.replaceAll("__table_name__", table.get("tableName"));
+        classText = classText.replaceAll("__table_comment__", table.get("comment"));
+        classText = classText.replaceAll("__object_name__", table.get("suffixName"));
+        classText = classText.replaceAll("__class_name__", table.get("className"));
+        classText = classText.replaceAll("__class_var_name__", table.get("classVarName"));
+//        classText = classText.replace("template/__package__", packageStr);
+        classText = classText.replaceAll("__package__", packageStr);
         return classText;
     }
 
@@ -183,11 +190,6 @@ public class PluginClass {
                 }
                 fieldsText.append(tabArgs);
                 fieldsText.append(anStr.replace("__comment__", comment));
-//                try{
-//                    fieldsText.append(anStr.replace("__comment__", comment));
-//                }catch (Exception e){
-//                    e.printStackTrace();
-//                }
                 String importStr = implValidDict.get(columnType);
                 if(ValueUtils.isBlank(importStr))
                     throw new BusinessException("implValidDict不支持的类型:" + columnType);
@@ -268,7 +270,7 @@ public class PluginClass {
                 classText = classText.replace("/*__import__*/", importsStr);
                 classText = classText.replace("/*__fields__*/", fieldsText1);
                 classText = classText.replace("/*__fields_2__*/", fieldsText2);
-                classText = classText.replace("__create_time__", DateUtils.formatLocalDateTime(LocalDateTime.now()));
+                classText = classText.replace("__create_time__", DateUtils.formatToLocalDateTime(LocalDateTime.now()));
                 Map<String, String> map = System.getenv();
                 String pcUserName = map.get("USERNAME");
                 String pcComputerName = map.get("COMPUTERNAME");

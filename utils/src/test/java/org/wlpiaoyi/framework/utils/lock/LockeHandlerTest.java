@@ -1,5 +1,6 @@
 package org.wlpiaoyi.framework.utils.lock;
 
+import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.After;
 import org.junit.Before;
@@ -11,6 +12,8 @@ import org.wlpiaoyi.framework.utils.web.lock.Lock;
 @Slf4j
 public class LockeHandlerTest {
 
+    private int a;
+
 
     @Before
     public void setUp() throws Exception {
@@ -19,7 +22,6 @@ public class LockeHandlerTest {
 
     @Test
     public void test() throws Exception {
-
         LockHandlerDefault handler = new LockHandlerDefault();
 
         Lock lock = new Lock("1");

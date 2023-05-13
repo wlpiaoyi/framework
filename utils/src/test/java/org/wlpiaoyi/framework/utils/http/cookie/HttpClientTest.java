@@ -20,9 +20,27 @@ public class HttpClientTest {
     public void setUp() throws Exception {}
 
     @Test
-    public void test() throws IOException {
-        Response response = this.emartet();
-        System.out.println();
+    public void test() throws IOException, InterruptedException {
+//        Response response = this.emartet();
+//        System.out.println();
+//        String url = "http://www.100csc.com/shop/goods/1604545423286/100000352.html";
+        String url = "http://www.100csc.com/";
+
+        while (true){
+            new Thread(new Runnable() {
+                @Override
+                public void run() {
+                    Response<String> response = HttpClient.instance(
+                                    Request.initJson(url).setMethod(Request.Method.Get).setProxy("127.0.0.1", 8888)
+                            )
+                            .setRpClazz(String.class)
+                            .response();
+                    System.out.println("<======" + response.getStatusCode());
+                }
+            }).start();
+            Thread.sleep(1000);
+        }
+
     }
 
 

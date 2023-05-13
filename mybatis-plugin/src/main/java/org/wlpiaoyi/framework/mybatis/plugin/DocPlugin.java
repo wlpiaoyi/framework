@@ -63,13 +63,13 @@ public class DocPlugin  extends PluginAdapter{
         sb = new StringBuilder();
         sb.append(" * ");
         sb.append("@date ");
-        sb.append(DateUtils.formatLocalDate(LocalDate.now()));
+        sb.append(DateUtils.formatToLocalDate(LocalDate.now()));
         topLevelClass.addJavaDocLine(sb.toString().replace("\n", " "));
 
         sb = new StringBuilder();
         sb.append(" * ");
         sb.append("@time ");
-        sb.append(DateUtils.formatLocalTime(LocalTime.now()));
+        sb.append(DateUtils.formatToString(LocalTime.now()));
         topLevelClass.addJavaDocLine(sb.toString().replace("\n", " "));
 
         sb = new StringBuilder();

@@ -49,7 +49,7 @@ public class HttpFactory {
 
     public static Gson GSON = GsonBuilder.gsonDefault();
 
-    public static final int TIME_OUT_MS = 30000;
+    public static final int TIME_OUT_MS = 120000;
 
     private static PoolingHttpClientConnectionManager CONNECTION_MANAGER;
 

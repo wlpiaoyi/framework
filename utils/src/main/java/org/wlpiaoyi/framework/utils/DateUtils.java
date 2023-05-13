@@ -2,6 +2,7 @@ package org.wlpiaoyi.framework.utils;
 
 
 import lombok.NonNull;
+import lombok.SneakyThrows;
 
 import java.text.SimpleDateFormat;
 import java.time.*;
@@ -16,6 +17,7 @@ public class DateUtils {
     public static final String YYYYMMDDHHMMSS = "yyyy-MM-dd HH:mm:ss";
     public static final String HHMMSS = "HH:mm:ss";
     public static final String YYYYMMDD = "yyyy-MM-dd";
+
 
     /**
      * LocalTime to NanoOfDay
@@ -107,9 +109,9 @@ public class DateUtils {
      * @param localDate
      * @return
      */
-    public static Date localDateToDate(LocalDate localDate) {
+    public static Date parseToDate(LocalDate localDate) {
         ZoneId zoneId = ZoneId.systemDefault();
-        return DateUtils.localDateToDate(localDate, zoneId);
+        return DateUtils.parseToDate(localDate, zoneId);
     }
 
     /**
@@ -118,7 +120,7 @@ public class DateUtils {
      * @param zoneId
      * @return
      */
-    public static Date localDateToDate(LocalDate localDate, ZoneId zoneId) {
+    public static Date parseToDate(LocalDate localDate, ZoneId zoneId) {
         if(zoneId == null){
             zoneId = ZoneId.systemDefault();
         }
@@ -130,9 +132,9 @@ public class DateUtils {
      * @param localDateTime
      * @return
      */
-    public static Date localDateTimeToDate(LocalDateTime localDateTime) {
+    public static Date parseToDate(LocalDateTime localDateTime) {
         ZoneId zoneId = ZoneId.systemDefault();
-        return DateUtils.localDateTimeToDate(localDateTime, zoneId);
+        return DateUtils.parseToDate(localDateTime, zoneId);
     }
 
     /**
@@ -141,7 +143,7 @@ public class DateUtils {
      * @param zoneId
      * @return
      */
-    public static Date localDateTimeToDate(LocalDateTime localDateTime, ZoneId zoneId) {
+    public static Date parseToDate(LocalDateTime localDateTime, ZoneId zoneId) {
         if(zoneId == null){
             zoneId = ZoneId.systemDefault();
         }
@@ -153,9 +155,9 @@ public class DateUtils {
      * @param date
      * @return
      */
-    public static LocalDate dateToLocalDate(Date date) {
+    public static LocalDate parseToLocalDate(Date date) {
         ZoneId zoneId = ZoneId.systemDefault();
-        return DateUtils.dateToLocalDate(date, zoneId);
+        return DateUtils.parseToLocalDate(date, zoneId);
     }
 
     /**
@@ -164,7 +166,7 @@ public class DateUtils {
      * @param zoneId
      * @return
      */
-    public static LocalDate dateToLocalDate(@NonNull Date date, ZoneId zoneId) {
+    public static LocalDate parseToLocalDate(@NonNull Date date, ZoneId zoneId) {
         if (date == null) {
             throw new IllegalArgumentException("参数不能为空");
         }
@@ -179,12 +181,12 @@ public class DateUtils {
      * @param date
      * @return
      */
-    public static LocalDateTime dateToLocalDateTime(Date date) {
+    public static LocalDateTime parseToLocalDateTime(Date date) {
         if (date == null) {
             throw new IllegalArgumentException("参数不能为空");
         }
         ZoneId zoneId = ZoneId.systemDefault();
-        return DateUtils.dateToLocalDateTime(date, zoneId);
+        return DateUtils.parseToLocalDateTime(date, zoneId);
     }
 
     /**
@@ -193,7 +195,7 @@ public class DateUtils {
      * @param zoneId
      * @return
      */
-    public static LocalDateTime dateToLocalDateTime(Date date, ZoneId zoneId) {
+    public static LocalDateTime parseToLocalDateTime(Date date, ZoneId zoneId) {
         if (date == null) {
             throw new IllegalArgumentException("参数不能为空");
         }
@@ -209,8 +211,8 @@ public class DateUtils {
      * @param localDateTime
      * @return
      */
-    public static LocalDateTime parseLocalDateTime(String localDateTime) {
-        return parseLocalDateTime(localDateTime, YYYYMMDDHHMMSS);
+    public static LocalDateTime formatToLoaTolDateTime(String localDateTime) {
+        return formatToLoaTolDateTime(localDateTime, YYYYMMDDHHMMSS);
     }
 
     /**
@@ -219,7 +221,7 @@ public class DateUtils {
      * @param pattern
      * @return
      */
-    public static LocalDateTime parseLocalDateTime(String localDateTime, String pattern) {
+    public static LocalDateTime formatToLoaTolDateTime(String localDateTime, String pattern) {
         if (ValueUtils.isBlank(localDateTime)) {
             throw new IllegalArgumentException("参数不能为空");
         }
@@ -235,7 +237,7 @@ public class DateUtils {
      * @param zoneId
      * @return
      */
-    public static LocalDateTime parseLocalDateTime(String localDateTime, String pattern, ZoneId zoneId) {
+    public static LocalDateTime formatToLoaTolDateTime(String localDateTime, String pattern, ZoneId zoneId) {
         if (ValueUtils.isBlank(localDateTime)) {
             throw new IllegalArgumentException("参数不能为空");
         }
@@ -251,8 +253,8 @@ public class DateUtils {
      * @param localDate
      * @return
      */
-    public static LocalDate parseLocalDate(String localDate) {
-        return parseLocalDate(localDate, YYYYMMDD);
+    public static LocalDate formatToLocalDate(String localDate) {
+        return formatToLocalDate(localDate, YYYYMMDD);
     }
 
     /**
@@ -261,12 +263,35 @@ public class DateUtils {
      * @param pattern
      * @return
      */
-    public static LocalDate parseLocalDate(String localDate, String pattern) {
+    public static LocalDate formatToLocalDate(String localDate, String pattern) {
         if (ValueUtils.isBlank(localDate)) {
             throw new IllegalArgumentException("参数不能为空");
         }
         DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern(pattern);
         return LocalDate.parse(localDate, dateTimeFormatter);
+    }
+
+
+    /**
+     * String formate Date with pattern
+     * @param dateStr
+     * @return
+     */
+    @SneakyThrows
+    public static Date formatToDate(String dateStr){
+        return formatToDate(dateStr, YYYYMMDDHHMMSS);
+    }
+
+    /**
+     * String formate Date with pattern
+     * @param dateStr
+     * @param pattern
+     * @return
+     */
+    @SneakyThrows
+    public static Date formatToDate(String dateStr, String pattern){
+        SimpleDateFormat dateFormat = new SimpleDateFormat(pattern);
+        return dateFormat.parse(dateStr);
     }
 
     /**
@@ -275,7 +300,7 @@ public class DateUtils {
      * @param pattern
      * @return
      */
-    public static String formatLocalDateTime(LocalDateTime localDateTime, String pattern) {
+    public static String formatToLocalDateTime(LocalDateTime localDateTime, String pattern) {
         DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern(pattern);
         return localDateTime.format(dateTimeFormatter);
     }
@@ -285,8 +310,8 @@ public class DateUtils {
      * @param localDateTime
      * @return
      */
-    public static String formatLocalDateTime(LocalDateTime localDateTime) {
-        return formatLocalDateTime(localDateTime, YYYYMMDDHHMMSS);
+    public static String formatToLocalDateTime(LocalDateTime localDateTime) {
+        return formatToLocalDateTime(localDateTime, YYYYMMDDHHMMSS);
     }
 
     /**
@@ -295,7 +320,7 @@ public class DateUtils {
      * @param pattern
      * @return
      */
-    public static String formatLocalDate(LocalDate localDate, String pattern) {
+    public static String formatToLocalDate(LocalDate localDate, String pattern) {
         DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern(pattern);
         return localDate.format(dateTimeFormatter);
     }
@@ -305,8 +330,8 @@ public class DateUtils {
      * @param localDate
      * @return
      */
-    public static String formatLocalDate(LocalDate localDate) {
-        return formatLocalDate(localDate, YYYYMMDD);
+    public static String formatToLocalDate(LocalDate localDate) {
+        return formatToLocalDate(localDate, YYYYMMDD);
     }
 
     /**
@@ -314,9 +339,18 @@ public class DateUtils {
      * @param localTime
      * @return
      */
-    public static String formatLocalTime(LocalTime localTime) {
+    public static String formatToString(LocalTime localTime) {
         DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern(HHMMSS);
         return localTime.format(dateTimeFormatter);
+    }
+
+    /**
+     * Date formate String with default pattern
+     * @param date
+     * @return
+     */
+    public static String formatToString(Date date){
+        return formatToString(date, YYYYMMDDHHMMSS);
     }
 
     /**
@@ -325,7 +359,7 @@ public class DateUtils {
      * @param pattern
      * @return
      */
-    public static String formatDate(Date date, String pattern){
+    public static String formatToString(Date date, String pattern){
         SimpleDateFormat dateFormat = new SimpleDateFormat(pattern);
         return dateFormat.format(date);
     }

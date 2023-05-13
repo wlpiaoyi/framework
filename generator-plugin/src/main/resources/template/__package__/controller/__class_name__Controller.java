@@ -18,6 +18,7 @@ import __package__.vo.__class_name__Vo;
 import __package__.ro.__class_name__Ro;
 import __package__.wrapper.__class_name__Wrapper;
 import org.springframework.web.bind.annotation.*;
+import org.wlpiaoyi.framework.utils.ValueUtils;
 
 import javax.validation.Valid;
 
@@ -106,7 +107,7 @@ public class __class_name__Controller extends BladeController {
 	@ApiOperationSupport(order = 7)
 	@ApiOperation(value = "逻辑删除", notes = "传入ids")
 	public R remove(@ApiParam(value = "主键集合", required = true) @RequestParam String ids) {
-		return R.status(__class_var_name__Service.deleteLogic(Func.toLongList(ids)));
+		return R.status(__class_var_name__Service.deleteLogic(ValueUtils.toLongList(ids)));
 	}
 
 }
