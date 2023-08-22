@@ -55,7 +55,7 @@ public class Utils {
 
             File authFile = new File(PROJECT_ROOT_DIRECTORY + "/auth-" + active);
             if(!authFile.exists()){
-                throw new FileNotFoundException("Auth file path is not found");
+                throw new FileNotFoundException("Auth file path is not found: " + authFile.getAbsolutePath());
             }
 
             Aes aes = Aes.create().setKey("5d839b6ef1f04051831403a3a7fdb78f").setIV("f9c3bec8b33549c6").load();
