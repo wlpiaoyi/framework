@@ -28,7 +28,7 @@ import java.util.Map;
 public class Utils {
 
     public final static Gson GSON = GsonBuilder.gsonDefault();
-    public final static String PROJECT_ROOT_DIRECTORY = System.getProperty("user.dir").replaceAll("\\\\", "/") + "/_tmp_";
+    public final static String PROJECT_ROOT_DIRECTORY;
     final static Map<String, Map<String, String>> AUTH_MAP;
     final static String AUTH_MAP_OPENAI_KEY = "AZURE_OPENAI_KEY";
     final static String AUTH_MAP_OPENAI_ENDPOINT = "AZURE_OPENAI_ENDPOINT";
@@ -40,13 +40,19 @@ public class Utils {
 
     static {
 
+        String active = System.getenv("wlpiaoyi.openai.active");
+        if(ValueUtils.isBlank(active)){
+            active = "prod";
+        }
+        if(active.equals("prod")){
+            PROJECT_ROOT_DIRECTORY = System.getProperty("user.dir").replaceAll("\\\\", "/") + "/A7F41D";
+        }else {
+            PROJECT_ROOT_DIRECTORY = System.getProperty("user.dir").replaceAll("\\\\", "/") + "/_tmp_/openai/azure";
+        }
+
         Map<String, Map<String, String>> authMap = null;
         try {
 
-            String active = System.getenv("wlpiaoyi.openai.active");
-            if(ValueUtils.isBlank(active)){
-                active = "prod";
-            }
             File authFile = new File(PROJECT_ROOT_DIRECTORY + "/auth-" + active);
             if(!authFile.exists()){
                 throw new FileNotFoundException("Auth file path is not found");

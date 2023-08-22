@@ -11,14 +11,12 @@
 
     <artifactId>openai</artifactId>
     <name>${project.artifactId}</name>
-    <version>1.0.2-SNAPSHOT</version>
     <packaging>pom</packaging>
     <description>Open AI</description>
 
     <modules>
         <module>azure</module>
     </modules>
-
 
     <properties>
         <maven.compiler.source>8</maven.compiler.source>

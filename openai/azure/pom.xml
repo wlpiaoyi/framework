@@ -30,7 +30,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-assembly-plugin</artifactId>
-                <version>2.3</version>
+                <version>2.6</version>
                 <configuration>
                     <appendAssemblyId>false</appendAssemblyId>
                     <descriptorRefs>
@@ -85,7 +85,6 @@
                                 <maxVersion>1.9.0</maxVersion>
                                 <initialHeapSize>128</initialHeapSize>
                                 <maxHeapSize>1024</maxHeapSize>
-
                                 <!--jre路径，将生成的exe文件放到和jre同级目录，并把jre文件夹命名为jre-->
                                 <path>./env</path>
                             </jre>
