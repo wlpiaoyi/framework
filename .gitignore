@@ -21,13 +21,10 @@
 
 # virtual machine crash logs, see http://www.java.com/en/download/help/error_hotspot.xml
 hs_err_pid*
-proxy/target/*
-selenium/target/*
-generator-plugin/target/*
 utils/target/*
 .idea/*
 *.iml
-_resources/*
-demo/target/*
 target/*
-mybatis-plugin/target/*
+datasource/mybatis-plugin/target/*
+datasource/generator-plugin/target/*
+
