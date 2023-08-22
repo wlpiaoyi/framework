@@ -50,12 +50,14 @@ public class LombokPlugin extends PluginAdapter {
 
 
     public boolean modelBaseRecordClassGenerated(TopLevelClass topLevelClass, IntrospectedTable introspectedTable) {
-        if(ValueUtils.isBlank(this.classAnMap)) return true;
-        List<String> imports = MapUtils.getList(this.classAnMap, "imports", String.class);
+        if(ValueUtils.isBlank(this.classAnMap)) {
+            return true;
+        }
+        List<String> imports = MapUtils.getListGeneric(this.classAnMap, "imports", String.class);
         for (String impStr : imports){
             topLevelClass.addImportedType(impStr);
         }
-        List<String> classAns = MapUtils.getList(this.classAnMap, "classAns", String.class);
+        List<String> classAns = MapUtils.getListGeneric(this.classAnMap, "classAns", String.class);
         for (String classAn : classAns){
             if(classAn.contains("${TableNameValue}")){
                 classAn = classAn.replace("${TableNameValue}", "\"" +
@@ -79,7 +81,7 @@ public class LombokPlugin extends PluginAdapter {
         if(ValueUtils.isBlank(this.classAnMap)) return true;
         Map models = MapUtils.get(this.classAnMap, "fieldsAns");
         if(ValueUtils.isBlank(models)) return true;
-        List<String> anStrs = MapUtils.getList(models, field.getName(), String.class);
+        List<String> anStrs = MapUtils.getListGeneric(models, field.getName(), String.class);
         if(!ValueUtils.isBlank(anStrs)){
             for (String anStr : anStrs){
                 if(anStr.contains("${TableIdValue}")){

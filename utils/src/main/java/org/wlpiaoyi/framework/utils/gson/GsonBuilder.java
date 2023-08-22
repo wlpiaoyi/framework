@@ -14,6 +14,7 @@ import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class GsonBuilder  {
     public interface JsonSerializer<T> extends com.google.gson.JsonSerializer<T> {
@@ -102,7 +103,10 @@ public class GsonBuilder  {
     }
 
     @SneakyThrows
-    protected final Gson createGson(){
+    public final Gson createGson(){
+
+        com.google.gson.GsonBuilder gsonBuilder = new com.google.gson.GsonBuilder();
+
         ExclusionStrategy myExclusionStrategy = new ExclusionStrategy() {
             @Override
             public boolean shouldSkipField(FieldAttributes fieldAttributes) {
@@ -117,9 +121,7 @@ public class GsonBuilder  {
                 return false;
             }
         };
-
-        com.google.gson.GsonBuilder gsonBuilder = new com.google.gson.GsonBuilder()
-                .setExclusionStrategies(myExclusionStrategy);
+        gsonBuilder.setExclusionStrategies(myExclusionStrategy);
 
         for (TypeAdapterFactory factory : this.factories) {
             gsonBuilder.registerTypeAdapterFactory(factory);

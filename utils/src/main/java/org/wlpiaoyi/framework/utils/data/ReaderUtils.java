@@ -73,6 +73,18 @@ public class ReaderUtils extends DataUtils{
     }
 
     /**
+     * read bytes file
+     * @param file
+     * @return
+     * @throws IOException
+     */
+    public static byte[] loadBytes(@NonNull File file) throws IOException {
+        if(!file.isFile()){ return null; }
+        if(file == null){ throw new IOException("没有找到文件"); }
+        return Files.readAllBytes(file.toPath());
+    }
+
+    /**
      * read inputStream convert to string
      * @param inputStream
      * @param encoding

@@ -332,6 +332,15 @@ class ValueParseUtils extends ValueBlankUtils{
         }
     }
 
+    public static String toStrings(Collection values) {
+        if (isBlank(values)) {
+            return "";
+        } else {
+            Object[] objs = values.toArray();
+            return toStrings(objs);
+        }
+    }
+
     public static String toStrings(Object[] values) {
         if (isBlank(values)) {
             return "";

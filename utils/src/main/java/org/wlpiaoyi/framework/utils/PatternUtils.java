@@ -77,7 +77,10 @@ public class PatternUtils {
 
 
     public static void main(String[] args) {
-//        String pattern = "\\$\\{(.*?)}";
+        String pattern = "^([a-zA-Z0-9]{4,6})$";
+        Pattern.matches(pattern, "abcd");
+
+
 //        pattern = "^(?=.*[A-Z])(?=.*[a-z])(?=.*\\d)(?=.*[@#$%^&*_+=!?\\(\\)\\[\\]{};':\"\\\\|,.<>\\/]).*$";
 //        pattern = "^(?=.*[A-Z])(?=.*[a-z])(?=.*\\d)(?=.*[@#$%^&*_+=!?\\(\\)\\[\\]{};':\"\\\\|,.<>\\/]).*$";
         String patterns[] = {
@@ -86,14 +89,14 @@ public class PatternUtils {
                 "^(?=.*\\d).*$",
                 "^(?=.*[@#$%^&*_+=!?\\(\\)\\[\\]{};':\"\\\\|,.<>\\/]).*$",
         };
-        int i = 0;
-        for (String pattern : patterns){
-            if(Pattern.matches(pattern, "12{}3AB")){
-                i ++;
-            }
-        }
-        String pattern = "/^(?!.*[A-Z][a-z][@#$%^&*_+=!?\\(\\)\\[\\]{};':\"\\\\|,.<>\\/]){3,100}.*$";
-        System.out.println();
+//        int i = 0;
+//        for (String pattern : patterns){
+//            if(Pattern.matches(pattern, "12{}3AB")){
+//                i ++;
+//            }
+//        }
+//        String pattern = "/^(?!.*[A-Z][a-z][@#$%^&*_+=!?\\(\\)\\[\\]{};':\"\\\\|,.<>\\/]){3,100}.*$";
+//        System.out.println();
 
 //        Pattern p = Pattern.compile(pattern);
 //        Matcher m = p.matcher("喔的按你的剑法${aabc}阿萨的凝聚力${123aba}{}");
