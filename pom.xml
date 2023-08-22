@@ -12,6 +12,7 @@
     <modules>
         <module>utils</module>
         <module>datasource</module>
+        <module>openai</module>
     </modules>
 
 
@@ -79,6 +80,11 @@
                 <version>${lombok.version}</version>
                 <scope>provided</scope>
             </dependency>
+            <dependency>
+                <groupId>org.jetbrains</groupId>
+                <artifactId>annotations</artifactId>
+                <version>23.1.0</version>
+            </dependency>
         </dependencies>
     </dependencyManagement>
 
@@ -90,13 +96,11 @@
         <dependency>
             <groupId>org.jetbrains</groupId>
             <artifactId>annotations</artifactId>
-            <version>23.1.0</version>
             <scope>compile</scope>
         </dependency>
         <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
-            <version>${junit.version}</version>
             <scope>test</scope>
         </dependency>
     </dependencies>
