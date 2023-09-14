@@ -14,20 +14,15 @@ public class StringUtils {
     }
 
     /**
-     * 将bytes编码成base64
+     * 已废弃请使用org.wlpiaoyi.framework.utils.data.DataUtils.base64Encode
      * @param bytes
      * @return
      */
+    @Deprecated
     public static String base64Encode(byte[] bytes) {
         return Base64.getMimeEncoder().encodeToString(bytes);
     }
-
-        /**
-         * 将字符编码成base64
-         * @param encodeStr
-         * @param charseName
-         * @return
-         */
+    @Deprecated
     public static String base64Encode(String encodeStr, String charseName){
         try {
             return Base64.getMimeEncoder().encodeToString(encodeStr.getBytes(charseName));
@@ -36,22 +31,12 @@ public class StringUtils {
         }
         return null;
     }
-
-    /**
-     * 将字符编码成base64
-     * @param encodeStr
-     * @return
-     */
+    @Deprecated
     public static String base64Encode(String encodeStr){
         return StringUtils.base64Encode(encodeStr, "UTF-8");
     }
 
-    /**
-     * 将base64字符解码
-     * @param decodeStr
-     * @param charseName
-     * @return
-     */
+    @Deprecated
     public static String base64Decode(String decodeStr, String charseName){
         try {
             byte[] bytes = StringUtils.base64DecodeToBytes(decodeStr);
@@ -61,21 +46,11 @@ public class StringUtils {
         }
         return null;
     }
-
-    /**
-     * 将base64字符解码
-     * @param decodeStr
-     * @return
-     */
+    @Deprecated
     public static byte[] base64DecodeToBytes(String decodeStr){
         return Base64.getMimeDecoder().decode(decodeStr);
     }
-
-    /**
-     * 将base64字符解码
-     * @param decodeStr
-     * @return
-     */
+    @Deprecated
     public static String base64Decode(String decodeStr){
         return StringUtils.base64Decode(decodeStr, "UTF-8");
     }

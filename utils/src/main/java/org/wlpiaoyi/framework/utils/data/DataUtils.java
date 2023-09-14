@@ -4,11 +4,16 @@ import lombok.NonNull;
 import lombok.SneakyThrows;
 import org.apache.commons.codec.binary.Hex;
 import org.apache.commons.codec.digest.DigestUtils;
+import org.wlpiaoyi.framework.utils.StringUtils;
 import org.wlpiaoyi.framework.utils.exception.BusinessException;
 ;
 import java.io.*;
+import java.nio.ByteBuffer;
+import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.util.Base64;
 
 /**
  * collection of data tools
@@ -209,5 +214,56 @@ public class DataUtils {
         return DigestUtils.sha512Hex(new FileInputStream(file));
     }
 //文件指纹<================================================================
+
+//base64转码解码================================================================>
+    /**
+     * 将base64字符解码
+     * @param bytes
+     * @return
+     */
+    public static byte[] base64Decode(byte[] bytes){
+        return Base64.getMimeDecoder().decode(bytes);
+    }
+    /**
+     * 将base64字符解码
+     * @param buffer
+     * @return
+     */
+    public static ByteBuffer base64Decode(ByteBuffer buffer){
+        return Base64.getMimeDecoder().decode(buffer);
+    }
+    public static String base64Encode(String encodeStr){
+        return base64Encode(encodeStr, StandardCharsets.UTF_8);
+    }
+    public static String base64Encode(String encodeStr, Charset charset){
+        byte[] res = DataUtils.base64Encode(encodeStr.getBytes(charset));
+        return new String(res, charset);
+    }
+    /**
+     * 将bytes编码成base64
+     * @param bytes
+     * @return
+     */
+    public static byte[] base64Encode(byte[] bytes) {
+        return Base64.getMimeEncoder().encode(bytes);
+    }
+
+    /**
+     * 将bytes编码成base64
+     * @param buffer
+     * @return
+     */
+    public static ByteBuffer base64Encode(ByteBuffer buffer) {
+        return Base64.getMimeEncoder().encode(buffer);
+    }
+    public static String base64Decode(String decodeStr){
+        return base64Decode(decodeStr, StandardCharsets.UTF_8);
+    }
+    public static String base64Decode(String decodeStr, Charset charset){
+        byte[] res = DataUtils.base64Decode(decodeStr.getBytes(charset));
+        return new String(res, charset);
+    }
+
+//base64转码解码<================================================================
 
 }

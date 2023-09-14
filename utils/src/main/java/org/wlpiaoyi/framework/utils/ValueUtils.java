@@ -34,24 +34,27 @@ public final class ValueUtils extends ValueParseUtils{
  */
 class ValueParseUtils extends ValueBlankUtils{
 
+    final protected static char[] HEX_ARRAY = "0123456789ABCDEF".toCharArray();
 
-//    public static void main(String[] args) {
-////        byte b = (byte) ((0b1 << 7) - 1);
-//        for (int j = 1; j <= 7 ; j++) {
-//            System.out.println("j=============" + j);
-//            for (int i = Byte.MAX_VALUE; i >= Byte.MIN_VALUE ; i--) {
-//                byte b = (byte) i;
-//                byte b2 = offset(b, j);
-//                byte b3 = offset(b2, -j);
-//                System.out.println("b:" + b + ", b2:" + b2 +  ", b3:" + b3 + ", flag=" + (b == b3));
-//                if(b3 != b){
-//                    throw new BusinessException("---------------");
-//                }
-//            }
-//        }
-//        byte[] res = toBytes(10000L, 7);
-//        System.out.println();
-//    }
+    public static String bytesToHex(byte[] bytes) {
+        char[] hexChars = new char[bytes.length * 2];
+        for (int j = 0; j < bytes.length; j++) {
+            int v = bytes[j] & 0xFF;
+            hexChars[j * 2] = HEX_ARRAY[v >>> 4];
+            hexChars[j * 2 + 1] = HEX_ARRAY[v & 0x0F];
+        }
+        return new String(hexChars);
+    }
+
+    public static byte[] hexToBytes(String s) {
+        int len = s.length();
+        byte[] b = new byte[len / 2];
+        for (int i = 0; i < len; i += 2) {
+            b[i / 2] = (byte) ((Character.digit(s.charAt(i), 16) << 4) + Character
+                    .digit(s.charAt(i + 1), 16));
+        }
+        return b;
+    }
 
     /**
      * byte偏移
@@ -89,7 +92,10 @@ class ValueParseUtils extends ValueBlankUtils{
         long res = 0;
         int ci = 0;
         for (int i = pow - 1; i >= 0; i --){
-            long v = ((long)bytes[i]) + 128;
+            long v = bytes[i];
+            if(v < 0){
+                v = 256 + v;
+            }
             v = v << (ci * 8);
             res += v;
             ci ++;
@@ -358,7 +364,7 @@ class ValueParseUtils extends ValueBlankUtils{
     }
 }
 
-class ValueBlankUtils extends  ValueTypeUtils{
+class ValueBlankUtils extends ValueTypeUtils{
 
 //    public interface ValueBlank{
 //        boolean isBlank();
