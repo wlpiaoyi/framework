@@ -18,10 +18,11 @@ package __package__.wrapper;
 
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import org.springblade.core.tool.utils.BeanUtil;
 import __package__.entity.__class_name__;
 import __package__.vo.__class_name__Vo;
 import __package__.ro.__class_name__Ro;
+import org.springframework.beans.BeanUtils;
+import org.wlpiaoyi.framework.utils.ValueUtils;
 
 import java.util.List;
 import java.util.Objects;
@@ -36,39 +37,40 @@ import java.util.stream.Collectors;
 public class __class_name__Wrapper {
 
 	public static __class_name__Vo entityVO(__class_name__ __class_var_name__) {
-		__class_name__Vo __class_var_name__Vo = Objects.requireNonNull(BeanUtil.copy(__class_var_name__, __class_name__Vo.class));
+		__class_name__Vo __class_var_name__Vo = new __class_name__Vo();
+		BeanUtils.copyProperties(__class_var_name__, __class_var_name__Vo);
 		return __class_var_name__Vo;
 	}
 
 
 	public static __class_name__Vo entityVO(__class_name__Ro __class_var_name__Ro) {
-		__class_name__Vo __class_var_name__Vo = Objects.requireNonNull(BeanUtil.copy(__class_var_name__Ro, __class_name__Vo.class));
+		__class_name__Vo __class_var_name__Vo = new __class_name__Vo();
+		BeanUtils.copyProperties(__class_var_name__Ro, __class_var_name__Vo);
 		return __class_var_name__Vo;
 	}
 
 	public static __class_name__Ro entityRo(__class_name__ __class_var_name__) {
-		__class_name__Ro __class_var_name__Ro = Objects.requireNonNull(BeanUtil.copy(__class_var_name__, __class_name__Ro.class));
+		__class_name__Ro __class_var_name__Ro = new __class_name__Ro();
+		BeanUtils.copyProperties(__class_var_name__, __class_var_name__Ro);
 		return __class_var_name__Ro;
 	}
 
 	public static __class_name__Ro entityRo(__class_name__Vo __class_var_name__Vo) {
-		__class_name__Ro __class_var_name__Ro = Objects.requireNonNull(BeanUtil.copy(__class_var_name__Vo, __class_name__Ro.class));
+		__class_name__Ro __class_var_name__Ro = new __class_name__Ro();
+		BeanUtils.copyProperties(__class_var_name__Vo, __class_var_name__Ro);
 		return __class_var_name__Ro;
 	}
 
-	public static __class_name__ entity(__class_name__Ro.Query __class_var_name__Ro) {
-		__class_name__ __class_var_name__ = Objects.requireNonNull(BeanUtil.copy(__class_var_name__Ro, __class_name__.class));
-		return __class_var_name__;
-	}
-
 	public static __class_name__ entity(__class_name__Ro.Submit __class_var_name__Ro) {
-		__class_name__ __class_var_name__ = Objects.requireNonNull(BeanUtil.copy(__class_var_name__Ro, __class_name__.class));
+		__class_name__ __class_var_name__ = new __class_name__();
+		BeanUtils.copyProperties(__class_var_name__Ro, __class_var_name__);
 		return __class_var_name__;
 	}
 
 
 	public static __class_name__ entity(__class_name__Vo __class_var_name__Vo) {
-		__class_name__ __class_var_name__ = Objects.requireNonNull(BeanUtil.copy(__class_var_name__Vo, __class_name__.class));
+		__class_name__ __class_var_name__ = new __class_name__();
+		BeanUtils.copyProperties(__class_var_name__Vo, __class_var_name__);
 		return __class_var_name__;
 	}
 	public static List<__class_name__> list(List<__class_name__Ro.Submit> list) {
@@ -76,14 +78,30 @@ public class __class_name__Wrapper {
 	}
 
 	public static List<__class_name__Vo> listVO(List<__class_name__> list) {
+		if(ValueUtils.isBlank(list)){
+			return null;
+		}
 		return list.stream().map(__class_name__Wrapper::entityVO).collect(Collectors.toList());
 	}
 
 	public static IPage<__class_name__Vo> pageVO(IPage<__class_name__> pages) {
-		List<__class_name__Vo> records = __class_name__Wrapper.listVO(pages.getRecords());
+		if(pages == null){
+			return null;
+		}
 		IPage<__class_name__Vo> pageVo = new Page(pages.getCurrent(), pages.getSize(), pages.getTotal());
+		if(ValueUtils.isBlank(pages.getRecords())){
+			return pageVo;
+		}
+		List<__class_name__Vo> records = __class_name__Wrapper.listVO(pages.getRecords());
 		pageVo.setRecords(records);
 		return pageVo;
+	}
+
+	public static List<__class_name__> listSubmitEntity(List<__class_name__Ro.Submit> list) {
+		if(ValueUtils.isBlank(list)){
+			return null;
+		}
+		return list.stream().map(__class_name__Wrapper::entity).collect(Collectors.toList());
 	}
 
 }

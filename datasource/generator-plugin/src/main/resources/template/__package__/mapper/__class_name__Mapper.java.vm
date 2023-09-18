@@ -16,14 +16,5 @@ import java.util.List;
  */
 public interface __class_name__Mapper extends BaseMapper<__class_name__> {
 
-	/**
-	 * 自定义分页
-	 *
-	 * @param page
-	 * @param ro
-	 * @return
-	 */
-	List<__class_name__Vo> select__class_name__Page(IPage page, __class_name__Ro.Query ro);
-
 
 }

@@ -1,5 +1,6 @@
 package org.wlpiaoyi.framework.generator.plugin;
 
+import lombok.Data;
 import org.wlpiaoyi.framework.utils.DateUtils;
 import org.wlpiaoyi.framework.utils.ValueUtils;
 import org.wlpiaoyi.framework.utils.data.DataUtils;
@@ -45,8 +46,8 @@ public class PluginClass {
     private static final Map<String, String> fieldDecorateDict = new HashMap(){{
         put("BIGINT", "@JsonSerialize(using = ToStringSerializer.class)");
         put("BIGINT UNSIGNED", "@JsonSerialize(using = ToStringSerializer.class)");
-        put("DATETIME", "@DateTimeFormat(pattern = \"yyyy-MM-dd HH:mm:ss\")\n" +
-                "\t@JsonFormat(pattern = \"yyyy-MM-dd HH:mm:ss\")");
+        put("DATETIME", "@DateTimeFormat(pattern = \"yyyy-MM-dd HH:mm:ss\")" +
+                "__tabArgs__@JsonFormat(pattern = \"yyyy-MM-dd HH:mm:ss\")");
     }};
 
     private static final Map<String, String> implValidDict = new HashMap(){{
@@ -146,103 +147,152 @@ public class PluginClass {
         return classText;
     }
 
-    private String getFieldsText(List<Map<String, Object>> columns, List<String> imports, int tabNum){
-        StringBuffer fieldsText = new StringBuffer();
-
-        String tabArgs = "\n";
-        for (int i = 0; i < tabNum; i++){
-            tabArgs += "\t";
-        }
-
-        for (Map<String, Object> colMap : columns) {
-
-            String columnName = (String) colMap.get("columnName");
-            String propertyName = (String) colMap.get("propertyName");
-            String comment = (String) colMap.get("comment");
-            String columnType = ((String) colMap.get("columnType")).toUpperCase();
-            if(ValueUtils.isBlank(comment)){
-                comment = propertyName;
-            }
-            String implType = implTypeDict.get(columnType);
-            if(this.excludeColumn.contains(columnName))
-                continue;
-
-            if(!ValueUtils.isBlank(implType)){
-                if(!imports.contains(implType))
-                    imports.add(implType);
-            }
-
-            fieldsText.append(tabArgs);
-            fieldsText.append("/**");
-            fieldsText.append(tabArgs);
-            fieldsText.append(" * ");
-            fieldsText.append(comment);
-            fieldsText.append(tabArgs);
-            fieldsText.append(" */");
-            fieldsText.append(tabArgs);
-            fieldsText.append("@ApiModelProperty(value = \"" + comment + "\")");
-
-            Integer nullable = (Integer) colMap.get("nullable");
-            if(nullable == 0){
-                String anStr = msgValidDict.get(columnType);
-                if(ValueUtils.isBlank(anStr)) {
-                    throw new BusinessException("msgValidDict不支持的类型:" + columnType);
-                }
-                fieldsText.append(tabArgs);
-                fieldsText.append(anStr.replace("__comment__", comment));
-                String importStr = implValidDict.get(columnType);
-                if(ValueUtils.isBlank(importStr))
-                    throw new BusinessException("implValidDict不支持的类型:" + columnType);
-                if(!imports.contains(importStr)){
-                    imports.add(importStr);
-                }
-            }
-
-            String implDec = implDecorateDict.get(columnType);
-            if(!ValueUtils.isBlank(implDec)){
-                for (String arg :
-                        implDec.split(",")) {
-                    if(!imports.contains(arg)){
-                        imports.add(arg);
-                    }
-                }
-            }
-
-            String fieldDec = fieldDecorateDict.get(columnType);
-            if(!ValueUtils.isBlank(fieldDec)){
-                for (String arg :
-                        fieldDec.split(",")) {
-                    fieldsText.append(tabArgs);
-                    fieldsText.append(arg);
-                }
-            }
-            fieldsText.append(tabArgs);
-            fieldsText.append("private ");
-            fieldsText.append(columnTypeDict.get(columnType));
-            fieldsText.append(" ");
-            fieldsText.append(propertyName);
-            fieldsText.append(";");
-        }
-        fieldsText.append("\n");
-
-        return fieldsText.toString();
+    @Data
+    private class Range{
+        private int startIndex;
+        private int endIndex;
+        private List<String> lines = new ArrayList<>();
     }
 
 
-
-    private String getResultText(List<Map<String, Object>> columns){
-        StringBuffer resultText = new StringBuffer();
-
-        for (Map<String, Object> colMap : columns) {
-            String columnName = (String) colMap.get("columnName");
-            String propertyName = (String) colMap.get("propertyName");
-            if(propertyName.equals("id")){
-                resultText.append("\n\t\t<id column=\"" + columnName + "\" property=\"" + propertyName + "\"/>");
-            }else {
-                resultText.append("\n\t\t<result column=\"" + columnName + "\" property=\"" + propertyName + "\"/>");
+    private String replaceForeachColumn(List<Map<String, Object>> columns, List<String> imports, int tabNum, String classText){
+        List<String> lines = new ArrayList(){{
+            addAll(Arrays.asList(classText.split("\n")));
+        }};
+        List<Range> ranges = new ArrayList<>();
+        Range range = null;
+        for (int i = 0; i < lines.size(); i ++){
+            String line = lines.get(i);
+            if(lines.indexOf(line) > 40){
+                System.out.println();
+            }
+            if(line.contains("\t\t<foreach-column>")){
+                System.out.println();
+            }
+            if(line.contains("<foreach-column>")){
+                if(range != null){
+                    throw new BusinessException("foreach-column 格式错误");
+                }
+                range = new Range();
+                range.setStartIndex(i);
+                continue;
+            }
+            if(line.contains("</foreach-column>")){
+                range.setEndIndex(i);
+                ranges.add(0, range);
+                range = null;
+                continue;
+            }
+            if(range != null){
+                range.getLines().add(line);
             }
         }
-        return resultText.toString();
+        for (Range r : ranges){
+            lines.remove(r.getEndIndex());
+
+            int lIndex = 0;
+            for (String line : r.getLines()){
+                lIndex ++;
+                lines.remove(r.getStartIndex() + 1);
+            }
+            int cIndex = 0;
+            for (Map<String, Object> colMap : columns) {
+                String columnName = (String) colMap.get("columnName");
+                if(this.excludeColumn.contains(columnName))
+                    continue;
+                for (String line : r.getLines()){
+                    String v = getFieldText(colMap, imports, line);
+                    if(v == null){
+                        continue;
+                    }
+                    cIndex ++;
+                    lines.add(r.getStartIndex() + cIndex, v);
+                }
+
+            }
+            lines.remove(r.getStartIndex());
+        }
+        StringBuffer res = new StringBuffer();
+        for (String line : lines){
+            res.append('\n');
+            res.append(line);
+        }
+        return res.substring(1);
+    }
+
+
+    private String getFieldText(Map<String, Object> colMap , List<String> imports, String line){
+        String tabArgs = "\n";
+        for (char c: line.toCharArray()){
+            if(c != '\t' && c != ' ' && c != '\r'){
+                break;
+            }
+            tabArgs += c;
+        }
+        StringBuffer fieldsText = new StringBuffer();
+        String columnName = (String) colMap.get("columnName");
+        String propertyName = (String) colMap.get("propertyName");
+        String comment = (String) colMap.get("comment");
+        String columnType = ((String) colMap.get("columnType")).toUpperCase();
+        String propertyType = columnTypeDict.get(columnType);
+        if(ValueUtils.isBlank(comment)){
+            comment = propertyName;
+        }
+        String implType = implTypeDict.get(columnType);
+        if(this.excludeColumn.contains(columnName))
+            return null;
+
+        if(!ValueUtils.isBlank(implType)){
+            if(!imports.contains(implType))
+                imports.add(implType);
+        }
+
+
+        fieldsText.append("@ApiModelProperty(value = \"" + comment + "\")");
+
+        Integer nullable = (Integer) colMap.get("nullable");
+        if(nullable == 0){
+            String anStr = msgValidDict.get(columnType);
+            if(ValueUtils.isBlank(anStr)) {
+                throw new BusinessException("msgValidDict不支持的类型:" + columnType);
+            }
+            fieldsText.append(tabArgs);
+            fieldsText.append(anStr.replace("__comment__", comment));
+            String importStr = implValidDict.get(columnType);
+            if(ValueUtils.isBlank(importStr))
+                throw new BusinessException("implValidDict不支持的类型:" + columnType);
+            if(!imports.contains(importStr)){
+                imports.add(importStr);
+            }
+        }
+
+        String implDec = implDecorateDict.get(columnType);
+        if(!ValueUtils.isBlank(implDec)){
+            for (String arg :
+                    implDec.split(",")) {
+                if(!imports.contains(arg)){
+                    imports.add(arg);
+                }
+            }
+        }
+
+        String fieldDec = fieldDecorateDict.get(columnType);
+        if(!ValueUtils.isBlank(fieldDec)){
+            fieldDec = fieldDec.replaceAll("__tabArgs__", tabArgs);
+            for (String arg :
+                    fieldDec.split(",")) {
+                fieldsText.append(tabArgs);
+                fieldsText.append(arg);
+            }
+        }
+        String res = new String(line);
+        res = res.replaceAll("__property_type__", propertyType);
+        res = res.replaceAll("__property_name__", propertyName);
+        res = res.replaceAll("__column_comment__", comment);
+        res = res.replaceAll("__property_annotations__", fieldsText.toString());
+        res = res.replaceAll("__column_name__", columnName);
+
+        return res;
     }
 
     public void run() throws SQLException {
@@ -257,19 +307,14 @@ public class PluginClass {
                 String packageStr = this.packagePath;
 
                 List<String> imports = new ArrayList<>();
-                String fieldsText1 = this.getFieldsText(columns, imports, 1);
-                String fieldsText2 = this.getFieldsText(columns, imports, 2);
-                String resultText = this.getResultText(columns);
+                classText = this.replaceForeachColumn(columns, imports, 1, classText);
 
                 String importsStr = "";
                 for (String impStr : imports){
                     importsStr += "import " + impStr + ";\n";
                 }
 
-                classText = classText.replace("<!--<result_map_items/>-->", resultText);
                 classText = classText.replace("/*__import__*/", importsStr);
-                classText = classText.replace("/*__fields__*/", fieldsText1);
-                classText = classText.replace("/*__fields_2__*/", fieldsText2);
                 classText = classText.replace("__create_time__", DateUtils.formatToLocalDateTime(LocalDateTime.now()));
                 Map<String, String> map = System.getenv();
                 String pcUserName = map.get("USERNAME");
@@ -286,6 +331,7 @@ public class PluginClass {
 
 
                 String fileName = templateDict.get("fileName").replace("__class_name__", table.get("className"));
+                fileName = fileName.substring(0, fileName.length() - 3);
                 String filePackage = packageStr + "." + templateDict.get("dirName");
                 String oname = this.name;
                 if(!ValueUtils.isBlank(oname)){
@@ -306,31 +352,30 @@ public class PluginClass {
         }
     }
 
-    public static void main(String[] args) throws SQLException {
-
-        final String url = "jdbc:mysql://36.138.30.68:3306?characterEncoding=utf8&&useInformationSchema=true";
-        final String databaseName = "bladex";
-        final String userName = "root";
-        final String password = "zrgj@2022*";
-        final String tablePrefix = "dym";
-        final String tableNamePattern = "dym_%";
-        PluginTable plugin = new PluginTable(url, userName, password, databaseName, tablePrefix, tableNamePattern);
-//        Map<String, Map<String, Object>> resDict = plugin.run();
-        String templatePath = "C:\\Users\\wlpia\\Documents\\Develop\\Java\\framework\\generator-plugin\\src\\main\\resources\\template\\zhzf";
-        String packagePath = "org.springblade.online";
-        List<String> excludeColumn = new ArrayList(){{
-            add("create_user");
-            add("create_time");
-            add("update_time");
-            add("update_user");
-            add("status");
-            add("create_dept");
-            add("id");
-            add("is_deleted");
-        }};
-        PluginClass pluginClass = new PluginClass(plugin, templatePath, "zhzf", packagePath, excludeColumn, "1.1");
-        pluginClass.run();
-
-        System.out.println();
-    }
+//    public static void main(String[] args) throws SQLException {
+//
+//        final String url = "jdbc:mysql://127.0.0.1:3306/jfr_dev?characterEncoding=utf8&&useInformationSchema=true";
+//        final String databaseName = "jfr_dev";
+//        final String userName = "root";
+//        final String password = "00000000";
+//        final String tablePrefix = "biz";
+//        final String tableNamePattern = "biz_%";
+//        PluginTable plugin = new PluginTable(url, userName, password, databaseName, tablePrefix, tableNamePattern);
+//        String templatePath = DataUtils.USER_DIR + "/generator-plugin/src/main/resources/template/jfr";
+//        String packagePath = "org.out.work.jfr.biz";
+//        List<String> excludeColumn = new ArrayList(){{
+//            add("create_user");
+//            add("create_time");
+//            add("update_time");
+//            add("update_user");
+//            add("status");
+//            add("create_dept");
+//            add("id");
+//            add("is_deleted");
+//        }};
+//        PluginClass pluginClass = new PluginClass(plugin, templatePath, "jfr", packagePath, excludeColumn, "1.1");
+//        pluginClass.run();
+//
+//        System.out.println();
+//    }
 }

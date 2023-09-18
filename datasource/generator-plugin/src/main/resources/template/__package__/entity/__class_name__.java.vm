@@ -5,7 +5,7 @@ import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
-import org.springblade.core.mp.base.BaseEntity;
+import org.out.work.jfr.entity.BaseEntity;
 /*__import__*/
 
 
@@ -20,5 +20,9 @@ import org.springblade.core.mp.base.BaseEntity;
 @ApiModel(value = "__class_name__对象", description = "__table_comment__")
 @EqualsAndHashCode(callSuper = true)
 public class __class_name__ extends BaseEntity {
-	/*__fields__*/
+    <foreach-column>
+    /** __column_comment__ **/
+    __property_annotations__
+    private __property_type__ __property_name__;
+    </foreach-column>
 }

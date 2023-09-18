@@ -71,7 +71,8 @@ public class PluginMojo extends AbstractMojo {
         PluginMojo mogo = new PluginMojo();
         mogo.configDir = "\\src\\main\\resources\\config.properties";
         mogo.templateDir = "\\src\\main\\resources\\template";
-        mogo.basePath = DataUtils.USER_DIR + "\\generator-plugin";
+        mogo.basePath = DataUtils.USER_DIR + "\\datasource\\generator-plugin";
+
         mogo.execute();
     }
 }
