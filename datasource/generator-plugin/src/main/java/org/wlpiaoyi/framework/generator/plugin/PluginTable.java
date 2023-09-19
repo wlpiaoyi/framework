@@ -50,13 +50,13 @@ public class PluginTable {
             final String suffixName = tableName.startsWith(tablePrefix) ?
                     tableName.substring(tablePrefix.length() + 1) : tableName;
             final String className = parseStringToHump(suffixName, true);
-            final String classVarName = parseStringToHump(suffixName, false);
+            final String varClassName = parseStringToHump(suffixName, false);
             final String tableComment = tableRet.getString("REMARKS");
             res.add(new HashMap(){{
                 put("suffixName", suffixName);
                 put("tableName", tableName);
                 put("className", className);
-                put("classVarName", classVarName);
+                put("varClassName", varClassName);
                 put("comment", tableComment);
             }});
         }

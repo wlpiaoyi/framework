@@ -1,0 +1,91 @@
+package ##package##.wrapper;
+
+import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import ##package##.entity.##className##;
+import ##package##.vo.##className##Vo;
+import ##package##.ro.##className##Ro;
+import org.springframework.beans.BeanUtils;
+import org.wlpiaoyi.framework.utils.ValueUtils;
+
+import java.util.List;
+import java.util.Objects;
+import java.util.stream.Collectors;
+
+/**
+ * {@code @author:} 		##author##
+ * {@code @description:} 	##tableComment## 包装类,返回视图层所需的字段
+ * {@code @date:} 			##createTime##
+ * {@code @version:}: 		##version##
+ */
+public class ##className##Wrapper {
+
+	public static ##className##Vo entityVO(##className## ##varClassName##) {
+		##className##Vo ##varClassName##Vo = new ##className##Vo();
+		BeanUtils.copyProperties(##varClassName##, ##varClassName##Vo);
+		return ##varClassName##Vo;
+	}
+
+
+	public static ##className##Vo entityVO(##className##Ro ##varClassName##Ro) {
+		##className##Vo ##varClassName##Vo = new ##className##Vo();
+		BeanUtils.copyProperties(##varClassName##Ro, ##varClassName##Vo);
+		return ##varClassName##Vo;
+	}
+
+	public static ##className##Ro entityRo(##className## ##varClassName##) {
+		##className##Ro ##varClassName##Ro = new ##className##Ro();
+		BeanUtils.copyProperties(##varClassName##, ##varClassName##Ro);
+		return ##varClassName##Ro;
+	}
+
+	public static ##className##Ro entityRo(##className##Vo ##varClassName##Vo) {
+		##className##Ro ##varClassName##Ro = new ##className##Ro();
+		BeanUtils.copyProperties(##varClassName##Vo, ##varClassName##Ro);
+		return ##varClassName##Ro;
+	}
+
+	public static ##className## entity(##className##Ro.Submit ##varClassName##Ro) {
+		##className## ##varClassName## = new ##className##();
+		BeanUtils.copyProperties(##varClassName##Ro, ##varClassName##);
+		return ##varClassName##;
+	}
+
+
+	public static ##className## entity(##className##Vo ##varClassName##Vo) {
+		##className## ##varClassName## = new ##className##();
+		BeanUtils.copyProperties(##varClassName##Vo, ##varClassName##);
+		return ##varClassName##;
+	}
+	public static List<##className##> list(List<##className##Ro.Submit> list) {
+		return list.stream().map(##className##Wrapper::entity).collect(Collectors.toList());
+	}
+
+	public static List<##className##Vo> listVO(List<##className##> list) {
+		if(ValueUtils.isBlank(list)){
+			return null;
+		}
+		return list.stream().map(##className##Wrapper::entityVO).collect(Collectors.toList());
+	}
+
+	public static IPage<##className##Vo> pageVO(IPage<##className##> pages) {
+		if(pages == null){
+			return null;
+		}
+		IPage<##className##Vo> pageVo = new Page(pages.getCurrent(), pages.getSize(), pages.getTotal());
+		if(ValueUtils.isBlank(pages.getRecords())){
+			return pageVo;
+		}
+		List<##className##Vo> records = ##className##Wrapper.listVO(pages.getRecords());
+		pageVo.setRecords(records);
+		return pageVo;
+	}
+
+	public static List<##className##> listSubmitEntity(List<##className##Ro.Submit> list) {
+		if(ValueUtils.isBlank(list)){
+			return null;
+		}
+		return list.stream().map(##className##Wrapper::entity).collect(Collectors.toList());
+	}
+
+}

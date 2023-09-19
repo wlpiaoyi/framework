@@ -1,4 +1,4 @@
-package __package__.ro;
+package ##package##.ro;
 
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableId;
@@ -7,27 +7,27 @@ import com.fasterxml.jackson.databind.ser.std.ToStringSerializer;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
-/*__import__*/
+##/*import*/##
 
 /**
- * {@code @author:} 		__author__
- * {@code @description:} 	__table_comment__ 请求包装类
- * {@code @date:} 			__create_time__
- * {@code @version:}: 		__version__
+ * {@code @author:} 		##author##
+ * {@code @description:} 	##tableComment## 请求包装类
+ * {@code @date:} 			##createTime##
+ * {@code @version:}: 		##version##
  */
-public class __class_name__Ro {
+public class ##className##Ro {
     @Data
-    @ApiModel("__table_comment__ 请求实例")
+    @ApiModel("##tableComment## 请求实例")
 	public static class Query extends org.out.work.jfr.tools.request.Query{
 		<foreach-column>
-		/** __column_comment__ **/
-		__property_annotations__
-		private __property_type__ __property_name__;
+		/** ##columnComment## **/
+		##propertyAnnotationst##
+		private ##propertyType## ##propertyName##;
     	</foreach-column>
     }
 
     @Data
-    @ApiModel("__table_comment__ 请求实例")
+    @ApiModel("##tableComment## 请求实例")
     public static class Submit{
 		@JsonSerialize(
 			using = ToStringSerializer.class
@@ -39,9 +39,9 @@ public class __class_name__Ro {
 		)
 		private Long id;
 		<foreach-column>
-		/** __column_comment__ **/
-		__property_annotations__
-		private __property_type__ __property_name__;
+		/** ##columnComment## **/
+		##propertyAnnotationst##
+		private ##propertyType## ##propertyName##;
     	</foreach-column>
     }
 }

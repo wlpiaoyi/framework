@@ -1,0 +1,30 @@
+package ##package##.entity;
+
+import com.baomidou.mybatisplus.annotation.TableName;
+import io.swagger.annotations.ApiModel;
+import io.swagger.annotations.ApiModelProperty;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import org.out.work.jfr.entity.BaseEntity;
+##/*import*/##
+
+
+/**
+ * {@code @author:} 		##author##
+ * {@code @description:} 	##tableComment## 实体类
+ * {@code @date:} 			##createTime##
+ * {@code @version:}: 		##version##
+ */
+@Data
+@TableName("##tableName##")
+@ApiModel(value = "##className##对象", description = "##tableComment##")
+@EqualsAndHashCode(callSuper = true)
+public class ##className## extends BaseEntity {
+    <foreach-column>
+
+    /** ##columnComment## **/
+    ##propertyAnnotationst##
+    private ##propertyType## ##propertyName##;
+    </foreach-column>
+
+}

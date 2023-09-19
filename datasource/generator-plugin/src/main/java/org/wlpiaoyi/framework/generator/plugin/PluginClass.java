@@ -1,6 +1,7 @@
 package org.wlpiaoyi.framework.generator.plugin;
 
 import lombok.Data;
+import org.wlpiaoyi.framework.generator.plugin.utils.StructureConstant;
 import org.wlpiaoyi.framework.utils.DateUtils;
 import org.wlpiaoyi.framework.utils.ValueUtils;
 import org.wlpiaoyi.framework.utils.data.DataUtils;
@@ -47,7 +48,7 @@ public class PluginClass {
         put("BIGINT", "@JsonSerialize(using = ToStringSerializer.class)");
         put("BIGINT UNSIGNED", "@JsonSerialize(using = ToStringSerializer.class)");
         put("DATETIME", "@DateTimeFormat(pattern = \"yyyy-MM-dd HH:mm:ss\")" +
-                "__tabArgs__@JsonFormat(pattern = \"yyyy-MM-dd HH:mm:ss\")");
+                "##tabArgs##@JsonFormat(pattern = \"yyyy-MM-dd HH:mm:ss\")");
     }};
 
     private static final Map<String, String> implValidDict = new HashMap(){{
@@ -88,7 +89,7 @@ public class PluginClass {
     private final String classVersion;
 
     public PluginClass(PluginTable pluginTable, String templatePath, String name, String packagePath, List<String> excludeColumn, String classVersion){
-        this.templatePath = templatePath + SLASH_ARG + "/__package__";
+        this.templatePath = templatePath + SLASH_ARG + "/##package##";
         this.packagePath = packagePath;
         this.name = name;
         this.pluginTable = pluginTable;
@@ -137,18 +138,18 @@ public class PluginClass {
     private String getClassText(Map<String, String> templateDict, Map<String, String> table){
         String packageStr = this.packagePath;
         String text = templateDict.get("text");
-        String classText = text.replaceAll("__table_name__", table.get("tableName"));
-        classText = classText.replaceAll("__table_comment__", table.get("comment"));
-        classText = classText.replaceAll("__object_name__", table.get("suffixName"));
-        classText = classText.replaceAll("__class_name__", table.get("className"));
-        classText = classText.replaceAll("__class_var_name__", table.get("classVarName"));
-//        classText = classText.replace("template/__package__", packageStr);
-        classText = classText.replaceAll("__package__", packageStr);
+        String classText = text.replaceAll(StructureConstant.TABLE_NAME, table.get("tableName"));
+        classText = classText.replaceAll(StructureConstant.TABLE_COMMENT, table.get("comment"));
+        classText = classText.replaceAll(StructureConstant.OBJECT_NAME, table.get("suffixName"));
+        classText = classText.replaceAll(StructureConstant.CLASS_NAME, table.get("className"));
+        classText = classText.replaceAll(StructureConstant.VAR_CLASS_NAME, table.get("varClassName"));
+        classText = classText.replaceAll(StructureConstant.PACKAGE, packageStr);
         return classText;
     }
 
     @Data
     private class Range{
+        boolean excludeFlag = true;
         private int startIndex;
         private int endIndex;
         private List<String> lines = new ArrayList<>();
@@ -166,15 +167,15 @@ public class PluginClass {
             if(lines.indexOf(line) > 40){
                 System.out.println();
             }
-            if(line.contains("\t\t<foreach-column>")){
-                System.out.println();
-            }
-            if(line.contains("<foreach-column>")){
+            if(line.contains("<foreach-column>") || line.contains("<foreach-column ")){
                 if(range != null){
                     throw new BusinessException("foreach-column 格式错误");
                 }
                 range = new Range();
                 range.setStartIndex(i);
+                if(line.contains("excludeFlag=false")){
+                    range.excludeFlag = false;
+                }
                 continue;
             }
             if(line.contains("</foreach-column>")){
@@ -190,15 +191,16 @@ public class PluginClass {
         for (Range r : ranges){
             lines.remove(r.getEndIndex());
 
-            int lIndex = 0;
             for (String line : r.getLines()){
-                lIndex ++;
                 lines.remove(r.getStartIndex() + 1);
             }
             int cIndex = 0;
             for (Map<String, Object> colMap : columns) {
                 String columnName = (String) colMap.get("columnName");
-                if(this.excludeColumn.contains(columnName))
+                if(columnName.equals("id")){
+                    continue;
+                }
+                if(r.excludeFlag && this.excludeColumn.contains(columnName))
                     continue;
                 for (String line : r.getLines()){
                     String v = getFieldText(colMap, imports, line);
@@ -239,8 +241,8 @@ public class PluginClass {
             comment = propertyName;
         }
         String implType = implTypeDict.get(columnType);
-        if(this.excludeColumn.contains(columnName))
-            return null;
+//        if(this.excludeColumn.contains(columnName))
+//            return null;
 
         if(!ValueUtils.isBlank(implType)){
             if(!imports.contains(implType))
@@ -278,7 +280,7 @@ public class PluginClass {
 
         String fieldDec = fieldDecorateDict.get(columnType);
         if(!ValueUtils.isBlank(fieldDec)){
-            fieldDec = fieldDec.replaceAll("__tabArgs__", tabArgs);
+            fieldDec = fieldDec.replaceAll(StructureConstant.TAB_ARGS, tabArgs);
             for (String arg :
                     fieldDec.split(",")) {
                 fieldsText.append(tabArgs);
@@ -286,11 +288,11 @@ public class PluginClass {
             }
         }
         String res = new String(line);
-        res = res.replaceAll("__property_type__", propertyType);
-        res = res.replaceAll("__property_name__", propertyName);
-        res = res.replaceAll("__column_comment__", comment);
-        res = res.replaceAll("__property_annotations__", fieldsText.toString());
-        res = res.replaceAll("__column_name__", columnName);
+        res = res.replaceAll(StructureConstant.PROPERTY_TYPE, propertyType);
+        res = res.replaceAll(StructureConstant.PROPERTY_NAME, propertyName);
+        res = res.replaceAll(StructureConstant.COLUMN_COMMENT, comment);
+        res = res.replaceAll(StructureConstant.PROPERTY_ANNOTATIONS, fieldsText.toString());
+        res = res.replaceAll(StructureConstant.COLUMN_NAME, columnName);
 
         return res;
     }
@@ -314,8 +316,8 @@ public class PluginClass {
                     importsStr += "import " + impStr + ";\n";
                 }
 
-                classText = classText.replace("/*__import__*/", importsStr);
-                classText = classText.replace("__create_time__", DateUtils.formatToLocalDateTime(LocalDateTime.now()));
+                classText = classText.replace(StructureConstant.IMPORT, importsStr);
+                classText = classText.replace(StructureConstant.CREATE_TIME, DateUtils.formatToLocalDateTime(LocalDateTime.now()));
                 Map<String, String> map = System.getenv();
                 String pcUserName = map.get("USERNAME");
                 String pcComputerName = map.get("COMPUTERNAME");
@@ -326,11 +328,11 @@ public class PluginClass {
                     pcUserName = "unkown";
                 }
 
-                classText = classText.replace("__author__", pcUserName + ":" + pcComputerName);
-                classText = classText.replace("__version__", this.classVersion);
+                classText = classText.replace(StructureConstant.AUTHOR, pcUserName + ":" + pcComputerName);
+                classText = classText.replace(StructureConstant.VERSION, this.classVersion);
 
 
-                String fileName = templateDict.get("fileName").replace("__class_name__", table.get("className"));
+                String fileName = templateDict.get("fileName").replace("##className##", table.get("className"));
                 fileName = fileName.substring(0, fileName.length() - 3);
                 String filePackage = packageStr + "." + templateDict.get("dirName");
                 String oname = this.name;
