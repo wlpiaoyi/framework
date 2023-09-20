@@ -26,7 +26,6 @@ public class ##className##Wrapper {
 		return ##varClassName##Vo;
 	}
 
-
 	public static ##className##Vo entityVO(##className##Ro ##varClassName##Ro) {
 		##className##Vo ##varClassName##Vo = new ##className##Vo();
 		BeanUtils.copyProperties(##varClassName##Ro, ##varClassName##Vo);
@@ -45,18 +44,24 @@ public class ##className##Wrapper {
 		return ##varClassName##Ro;
 	}
 
+	public static ##className## entity(##className##Ro.Query ##varClassName##Ro) {
+		##className## ##varClassName## = new ##className##();
+		BeanUtils.copyProperties(##varClassName##Ro, ##varClassName##);
+		return ##varClassName##;
+	}
+
 	public static ##className## entity(##className##Ro.Submit ##varClassName##Ro) {
 		##className## ##varClassName## = new ##className##();
 		BeanUtils.copyProperties(##varClassName##Ro, ##varClassName##);
 		return ##varClassName##;
 	}
 
-
 	public static ##className## entity(##className##Vo ##varClassName##Vo) {
 		##className## ##varClassName## = new ##className##();
 		BeanUtils.copyProperties(##varClassName##Vo, ##varClassName##);
 		return ##varClassName##;
 	}
+
 	public static List<##className##> list(List<##className##Ro.Submit> list) {
 		return list.stream().map(##className##Wrapper::entity).collect(Collectors.toList());
 	}

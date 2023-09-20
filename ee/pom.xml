@@ -9,16 +9,14 @@
         <version>1.0.2-SNAPSHOT</version>
     </parent>
 
-    <groupId>org.wlpiaoyi.framework</groupId>
-    <artifactId>datasource</artifactId>
-    <name>${project.artifactId}</name>
-    <version>1.0.2-SNAPSHOT</version>
-    <packaging>pom</packaging>
-    <description>数据库相关</description>
 
+    <groupId>org.wlpiaoyi.framework</groupId>
+    <artifactId>ee</artifactId>
+    <version>${fw.project.version}</version>
+    <packaging>pom</packaging>
+    <description>web相关</description>
     <modules>
-        <module>mybatis-plugin</module>
-        <module>generator-plugin</module>
+        <module>springboot.single</module>
     </modules>
     <dependencies>
         <dependency>

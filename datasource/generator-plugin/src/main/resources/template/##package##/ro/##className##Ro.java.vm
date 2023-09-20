@@ -19,6 +19,10 @@ public class ##className##Ro {
     @Data
     @ApiModel("##tableComment## 请求实例")
 	public static class Query extends org.out.work.jfr.tools.request.Query{
+		@JsonSerialize(using = ToStringSerializer.class)
+		@ApiModelProperty("主键id")
+		@TableId(value = "id", type = IdType.ASSIGN_ID)
+		private Long id;
 		<foreach-column>
 		/** ##columnComment## **/
 		##propertyAnnotationst##
@@ -29,14 +33,9 @@ public class ##className##Ro {
     @Data
     @ApiModel("##tableComment## 请求实例")
     public static class Submit{
-		@JsonSerialize(
-			using = ToStringSerializer.class
-		)
+		@JsonSerialize(using = ToStringSerializer.class)
 		@ApiModelProperty("主键id")
-		@TableId(
-			value = "id",
-			type = IdType.ASSIGN_ID
-		)
+		@TableId(value = "id", type = IdType.ASSIGN_ID)
 		private Long id;
 		<foreach-column>
 		/** ##columnComment## **/

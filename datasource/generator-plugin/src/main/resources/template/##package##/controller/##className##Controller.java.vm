@@ -44,9 +44,9 @@ public class ##className##Controller {
 	@GetMapping("/detail")
 	@ApiOperationSupport(order = 1)
 	@ApiOperation(value = "详情", notes = "传入##className##")
-	public R<##className##Vo> detail(@RequestParam Long id) {
-		##className## detail = ##varClassName##Service.getById(id);
-		return R.success(##className##Wrapper.entityVO(detail));
+	public R<##className##Vo> detail(##className##Ro.Query body) {
+		##className## ##varClassName## = ##className##Wrapper.entityVO(this.##varClassName##Service.getOne(Condition.getQueryWrapper(##className##Wrapper.entity(body))));
+		return R.success(##className##Wrapper.entityVO(##varClassName##));
 	}
 
 	/**
