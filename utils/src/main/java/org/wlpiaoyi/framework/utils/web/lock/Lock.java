@@ -3,6 +3,8 @@ package org.wlpiaoyi.framework.utils.web.lock;
 import lombok.Getter;
 import lombok.NonNull;
 
+import java.util.Objects;
+
 
 /**
  * 全局锁，包括锁的名称
@@ -34,5 +36,21 @@ public class Lock {
         synchronized (SYN_INDEX_TAG){
             return index;
         }
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if(obj instanceof Lock){
+            Lock lock = (Lock) obj;
+            if(this.id != null && lock.getId() != null){
+                return this.id.equals(lock.getId());
+            }
+        }
+        return super.equals(obj);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(this.id);
     }
 }

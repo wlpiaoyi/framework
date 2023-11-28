@@ -12,26 +12,29 @@ import java.sql.SQLException;
 import java.time.LocalDateTime;
 import java.util.*;
 
+
 public class PluginClass {
 
     private static final Map<String, String> columnTypeDict = new HashMap(){{
-        put("BIGINT", "Long");
-        put("BIGINT UNSIGNED", "Long");
+        put("CHAR", "String");
         put("VARCHAR", "String");
         put("LONGTEXT", "String");
         put("BLOB", "String");
+        put("TINYINT", "Byte");
+        put("TINYINT UNSIGNED", "Byte");
+        put("SMALLINT", "Short");
+        put("SMALLINT UNSIGNED", "Short");
+        put("MEDIUMINT", "Short");
+        put("MEDIUMINT UNSIGNED", "Short");
         put("INT", "Integer");
         put("INT UNSIGNED", "Integer");
-        put("TINYINT", "Integer");
-        put("TINYINT UNSIGNED", "Integer");
-        put("DATETIME", "Date");
+        put("BIGINT", "Long");
+        put("BIGINT UNSIGNED", "Long");
         put("DECIMAL", "Double");
+        put("DATETIME", "Date");
     }};
 
     private static final Map<String, String> implTypeDict = new HashMap(){{
-//        put("BIGINT", "java.lang.Long");
-//        put("VARCHAR", "java.lang.String");
-//        put("INT", "java.lang.Integer");
         put("DATETIME", "java.util.Date");
     }};
 
@@ -52,29 +55,39 @@ public class PluginClass {
     }};
 
     private static final Map<String, String> implValidDict = new HashMap(){{
-        put("BIGINT", "javax.validation.constraints.NotNull");
-        put("BIGINT UNSIGNED", "javax.validation.constraints.NotNull");
+        put("CHAR", "javax.validation.constraints.NotBlank");
         put("VARCHAR", "javax.validation.constraints.NotBlank");
         put("BLOB", "javax.validation.constraints.NotBlank");
         put("LONGTEXT", "javax.validation.constraints.NotBlank");
-        put("DECIMAL", "javax.validation.constraints.NotNull");
-        put("INT", "javax.validation.constraints.NotNull");
-        put("INT UNSIGNED", "javax.validation.constraints.NotNull");
         put("TINYINT", "javax.validation.constraints.NotNull");
         put("TINYINT UNSIGNED", "javax.validation.constraints.NotNull");
+        put("SMALLINT", "javax.validation.constraints.NotNull");
+        put("SMALLINT UNSIGNED", "javax.validation.constraints.NotNull");
+        put("MEDIUMINT", "javax.validation.constraints.NotNull");
+        put("MEDIUMINT UNSIGNED", "javax.validation.constraints.NotNull");
+        put("INT", "javax.validation.constraints.NotNull");
+        put("INT UNSIGNED", "javax.validation.constraints.NotNull");
+        put("BIGINT", "javax.validation.constraints.NotNull");
+        put("BIGINT UNSIGNED", "javax.validation.constraints.NotNull");
+        put("DECIMAL", "javax.validation.constraints.NotNull");
         put("DATETIME", "javax.validation.constraints.NotNull");
     }};
     private static final Map<String, String> msgValidDict = new HashMap(){{
-        put("BIGINT", "@NotNull(message = \"__comment__不能为空\")");
-        put("BIGINT UNSIGNED", "@NotNull(message = \"__comment__不能为空\")");
+        put("CHAR", "@NotBlank(message = \"__comment__不能为空\")");
         put("VARCHAR", "@NotBlank(message = \"__comment__不能为空\")");
         put("BLOB", "@NotBlank(message = \"__comment__不能为空\")");
         put("LONGTEXT", "@NotBlank(message = \"__comment__不能为空\")");
-        put("DECIMAL", "@NotNull(message = \"__comment__不能为空\")");
-        put("INT", "@NotNull(message = \"__comment__不能为空\")");
-        put("INT UNSIGNED", "@NotNull(message = \"__comment__不能为空\")");
         put("TINYINT", "@NotNull(message = \"__comment__不能为空\")");
         put("TINYINT UNSIGNED", "@NotNull(message = \"__comment__不能为空\")");
+        put("SMALLINT", "@NotNull(message = \"__comment__不能为空\"");
+        put("SMALLINT UNSIGNED", "@NotNull(message = \"__comment__不能为空\"");
+        put("MEDIUMINT", "@NotNull(message = \"__comment__不能为空\"");
+        put("MEDIUMINT UNSIGNED", "@NotNull(message = \"__comment__不能为空\"");
+        put("INT", "@NotNull(message = \"__comment__不能为空\")");
+        put("INT UNSIGNED", "@NotNull(message = \"__comment__不能为空\")");
+        put("BIGINT", "@NotNull(message = \"__comment__不能为空\")");
+        put("BIGINT UNSIGNED", "@NotNull(message = \"__comment__不能为空\")");
+        put("DECIMAL", "@NotNull(message = \"__comment__不能为空\")");
         put("DATETIME", "@NotNull(message = \"__comment__不能为空\")");
     }};
 

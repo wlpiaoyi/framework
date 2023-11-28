@@ -45,7 +45,7 @@ public class MapUtils {
      */
     public static final <T> T get(Map map, Object key, T defaultValue){
         if(map == null || map.isEmpty()) {
-            return  null;
+            return  defaultValue;
         }
         Object value = map.get(key);
         if(value == null) {

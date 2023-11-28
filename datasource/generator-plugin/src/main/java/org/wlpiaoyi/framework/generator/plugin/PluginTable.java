@@ -110,17 +110,16 @@ public class PluginTable {
         Map<String, Map<String, Object>> resDict = new HashMap<>(10);
         this.start();
         try{
-
             List<Map<String, String>> tableDicts = new ArrayList<>();
             if(this.tableNamePattern.contains(TABLE_NAME_PATTERN_SPLIT)){
                 for (String name :
                         tableNamePattern.split(TABLE_NAME_PATTERN_SPLIT)) {
-                    ResultSet tableRet = metaData.getTables(null, databaseName, name,
+                    ResultSet tableRet = metaData.getTables(databaseName, null, name,
                             new String[]{"TABLE"});
                     tableDicts.addAll(PluginTable.iteratorTable(this.tablePrefix, tableRet));
                 }
             }else{
-                ResultSet tableRet = metaData.getTables(null, databaseName, tableNamePattern,
+                ResultSet tableRet = metaData.getTables(databaseName, null, tableNamePattern,
                         new String[]{"TABLE"});
                 tableDicts.addAll(PluginTable.iteratorTable(this.tablePrefix, tableRet));
             }
