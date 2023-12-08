@@ -15,6 +15,11 @@ import java.util.jar.JarFile;
 
 public class PackageUtils {
 
+
+    public interface IteratorRun{
+        void run(Class<?> clazz);
+    }
+
     /**
 
      * 以文件的形式来获取包下的所有Class
@@ -25,11 +30,12 @@ public class PackageUtils {
 
      * @param recursive
 
-     * @param classes
-
      */
 
-    public static void findAndAddClassesInPackageByFile(String packageName, String packagePath, final boolean recursive, List<Class<?>> classes){
+    public static void findAndAddClassesInPackageByFile(String packageName,
+                                                        String packagePath,
+                                                        final boolean recursive,
+                                                        IteratorRun iteratorRun){
         //获取此包的目录 建立一个File
         File dir = new File(packagePath);
         //如果不存在或者 也不是目录就直接返回
@@ -51,13 +57,12 @@ public class PackageUtils {
                 findAndAddClassesInPackageByFile(packageName + "." + file.getName(),
                         file.getAbsolutePath(),
                         recursive,
-                        classes);
+                        iteratorRun);
             } else {
                 //如果是java类文件 去掉后面的.class 只留下类名
                 String className = file.getName().substring(0, file.getName().length() - 6);
                 try {
-                    //添加到集合中去
-                    classes.add(Class.forName(packageName + '.' + className));
+                    iteratorRun.run(Class.forName(packageName + '.' + className));
                 } catch (ClassNotFoundException e) {
                     e.printStackTrace();
                 }
@@ -70,17 +75,13 @@ public class PackageUtils {
      * @param packageName
      * @return
      */
-    public static List<Class<?>> getClasses(String packageName){
-
-        //第一个class类的集合
-        List<Class<?>> classes = new ArrayList<>();
+    public static void iteratorClazz(String packageName, IteratorRun iteratorRun){
         //是否循环迭代
         boolean recursive = true;
         //获取包的名字 并进行替换
         String packageDirName = packageName.replace('.', '/');
         //定义一个枚举的集合 并进行循环来处理这个目录下的things
         Enumeration<URL> dirs;
-
         try {
             dirs = Thread.currentThread().getContextClassLoader().getResources(packageDirName);
             //循环迭代下去
@@ -95,7 +96,7 @@ public class PackageUtils {
                     //获取包的物理路径
                     String filePath = URLDecoder.decode(url.getFile(), "UTF-8");
                     //以文件的方式扫描整个包下的文件 并添加到集合中
-                    findAndAddClassesInPackageByFile(packageName, filePath, recursive, classes);
+                    findAndAddClassesInPackageByFile(packageName, filePath, recursive, iteratorRun);
                 } else if ("jar".equals(protocol)){
                     //如果是jar包文件
                     //定义一个JarFile
@@ -130,8 +131,7 @@ public class PackageUtils {
                                         //去掉后面的".class" 获取真正的类名
                                         String className = name.substring(packageName.length() + 1, name.length() - 6);
                                         try {
-                                            //添加到classes
-                                            classes.add(Class.forName(packageName + '.' + className));
+                                            iteratorRun.run(Class.forName(packageName + '.' + className));
                                         } catch (ClassNotFoundException e) {
                                             e.printStackTrace();
                                         }
@@ -147,7 +147,6 @@ public class PackageUtils {
         } catch (IOException e) {
             e.printStackTrace();
         }
-        return classes;
 
     }
 

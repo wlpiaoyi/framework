@@ -1,6 +1,7 @@
 package org.wlpiaoyi.framework.generator.plugin;
 
 import com.mysql.cj.jdbc.result.ResultSetImpl;
+import org.wlpiaoyi.framework.generator.plugin.model.ConfigModel;
 import org.wlpiaoyi.framework.utils.ValueUtils;
 
 import java.sql.*;
@@ -9,34 +10,18 @@ import java.util.*;
 public class PluginTable {
 
 
-    private final String url;
-    private final String userName;
-    private final String password;
-    private final String databaseName;
-    private final String tablePrefix;
-    private final String tableNamePattern;
-
+    private final ConfigModel configModel;
     private Connection connection;
 
     private DatabaseMetaData metaData;
 
-    public PluginTable(String url, 
-                       String userName, 
-                       String password, 
-                       String databaseName, 
-                       String tablePrefix, 
-                       String tableNamePattern) {
-        this.url = url;
-        this.userName = userName;
-        this.password = password;
-        this.databaseName = databaseName;
-        this.tablePrefix = tablePrefix;
-        this.tableNamePattern = tableNamePattern;
+    public PluginTable(ConfigModel configModel) {
+        this.configModel = configModel;
     }
 
     public void start() throws SQLException {
-        this.connection = DriverManager.getConnection(url,
-                userName, password);
+        this.connection = DriverManager.getConnection(this.configModel.getUrl(),
+                this.configModel.getUserName(), this.configModel.getPassword());
         this.metaData = this.connection.getMetaData();
     }
 
@@ -111,21 +96,20 @@ public class PluginTable {
         this.start();
         try{
             List<Map<String, String>> tableDicts = new ArrayList<>();
-            if(this.tableNamePattern.contains(TABLE_NAME_PATTERN_SPLIT)){
-                for (String name :
-                        tableNamePattern.split(TABLE_NAME_PATTERN_SPLIT)) {
-                    ResultSet tableRet = metaData.getTables(databaseName, null, name,
+            if(this.configModel.getTableNamePattern().contains(TABLE_NAME_PATTERN_SPLIT)){
+                for (String name : this.configModel.getTableNamePattern().split(TABLE_NAME_PATTERN_SPLIT)) {
+                    ResultSet tableRet = metaData.getTables(this.configModel.getDatabaseName(), null, name,
                             new String[]{"TABLE"});
-                    tableDicts.addAll(PluginTable.iteratorTable(this.tablePrefix, tableRet));
+                    tableDicts.addAll(PluginTable.iteratorTable(this.configModel.getTablePrefix(), tableRet));
                 }
             }else{
-                ResultSet tableRet = metaData.getTables(databaseName, null, tableNamePattern,
+                ResultSet tableRet = metaData.getTables(this.configModel.getDatabaseName(), null, this.configModel.getTableNamePattern(),
                         new String[]{"TABLE"});
-                tableDicts.addAll(PluginTable.iteratorTable(this.tablePrefix, tableRet));
+                tableDicts.addAll(PluginTable.iteratorTable(this.configModel.getTablePrefix(), tableRet));
             }
             for (Map<String, String> tableDict : tableDicts) {
                 String tableName = tableDict.get("tableName");
-                ResultSet columnRet = metaData.getColumns(null, databaseName, tableName, "%");
+                ResultSet columnRet = metaData.getColumns(null, this.configModel.getDatabaseName(), tableName, "%");
                 List<Map<String, String>> columnDict = PluginTable.iteratorColumn(columnRet);
                 resDict.put(tableName,
                         new HashMap(2){{

@@ -7,6 +7,7 @@ import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
 import org.apache.maven.plugins.annotations.Mojo;
 import org.apache.maven.plugins.annotations.Parameter;
+import org.wlpiaoyi.framework.generator.plugin.model.ConfigModel;
 import org.wlpiaoyi.framework.utils.ValueUtils;
 import org.wlpiaoyi.framework.utils.data.DataUtils;
 import org.wlpiaoyi.framework.utils.data.ReaderUtils;
@@ -36,33 +37,23 @@ public class PluginMojo extends AbstractMojo {
             this.basePath = DataUtils.USER_DIR;
         }
         Properties properties = ReaderUtils.loadProperties(this.basePath + this.configDir);
-        String url = properties.getProperty("url");
-        String userName = properties.getProperty("userName");
-        String password = properties.getProperty("password");
-        String databaseName = properties.getProperty("databaseName");
-        String tablePrefix = properties.getProperty("tablePrefix");
-        String tableNamePattern = properties.getProperty("tableNamePattern");
-        String packagePath = properties.getProperty("packagePath");
-        String projectName = properties.getProperty("projectName");
-        String excludeColumns = properties.getProperty("excludeColumns");
-        String classVersion = properties.getProperty("classVersion", "1.0");
+        ConfigModel configModel = new ConfigModel(properties);
         log.info("mojo execute:" +
                         "\n\tuserDir:" + this.basePath +
                         "\n\tconfigDir:" + this.configDir +
                         "\n\ttemplateDir:" + this.templateDir +
-                        "\n\turl:" + url +
-                        "\n\tuserName:" + userName +
-                        "\n\tpassword:" + password +
-                        "\n\tdatabaseName:" + databaseName +
-                        "\n\ttablePrefix:" + tablePrefix +
-                        "\n\ttableNamePattern:" + tableNamePattern +
-                        "\n\tpackagePath:" + packagePath +
-                        "\n\tprojectName:" + projectName +
-                        "\n\texcludeColumns:" + excludeColumns);
-        PluginTable plugin = new PluginTable(url, userName, password, databaseName, tablePrefix, tableNamePattern);
+                        "\n\turl:" + configModel.getUrl() +
+                        "\n\tuserName:" + configModel.getUserName() +
+                        "\n\tpassword:" + configModel.getPassword() +
+                        "\n\tdatabaseName:" + configModel.getDatabaseName() +
+                        "\n\ttablePrefix:" + configModel.getTablePrefix() +
+                        "\n\ttableNamePattern:" + configModel.getTableNamePattern() +
+                        "\n\tpackagePath:" + configModel.getPackagePath() +
+                        "\n\tprojectName:" + configModel.getProjectName() +
+                        "\n\texcludeColumns:" + configModel.getExcludeColumns());
+        PluginTable plugin = new PluginTable(configModel);
         String templatePath = this.basePath + templateDir;
-        List<String> excludeColumn = ValueUtils.toStringList(excludeColumns);
-        PluginClass pluginClass = new PluginClass(plugin, templatePath, projectName, packagePath, excludeColumn, classVersion);
+        PluginClass pluginClass = new PluginClass(plugin, templatePath, configModel);
         pluginClass.run();
 
     }

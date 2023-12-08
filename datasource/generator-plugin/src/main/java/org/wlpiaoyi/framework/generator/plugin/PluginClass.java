@@ -1,6 +1,7 @@
 package org.wlpiaoyi.framework.generator.plugin;
 
 import lombok.Data;
+import org.wlpiaoyi.framework.generator.plugin.model.ConfigModel;
 import org.wlpiaoyi.framework.generator.plugin.utils.StructureConstant;
 import org.wlpiaoyi.framework.utils.DateUtils;
 import org.wlpiaoyi.framework.utils.ValueUtils;
@@ -91,22 +92,21 @@ public class PluginClass {
         put("DATETIME", "@NotNull(message = \"__comment__不能为空\")");
     }};
 
+    private ConfigModel configModel;
     private final PluginTable pluginTable;
     private final String templatePath;
-    private final String name;
-    private final String packagePath;
-    private final List<String> excludeColumn;
+//    private final String name;
+//    private final String packagePath;
+//    private final List<String> excludeColumn;
     private final List<Map<String, String>> templateList;
 
     private static final String SLASH_ARG = "\\";
-    private final String classVersion;
+//    private final String classVersion;
 
-    public PluginClass(PluginTable pluginTable, String templatePath, String name, String packagePath, List<String> excludeColumn, String classVersion){
+    public PluginClass(PluginTable pluginTable, String templatePath, ConfigModel configModel){
+        this.configModel = configModel;
         this.templatePath = templatePath + SLASH_ARG + "/##package##";
-        this.packagePath = packagePath;
-        this.name = name;
         this.pluginTable = pluginTable;
-        this.excludeColumn = excludeColumn;
         File file = new File(this.templatePath);
         if(!file.exists())
             throw new RuntimeException(this.templatePath + "is not exists");
@@ -119,7 +119,6 @@ public class PluginClass {
         List<Map<String, String>> templateList = new ArrayList<>();
         this.templateList = templateList;
         this.iteratorInitTemplateList(templateList, subFiles, "");
-        this.classVersion = classVersion;
     }
 
     private void iteratorInitTemplateList(List<Map<String, String>> templateList, File subFiles[], String dirName){
@@ -149,14 +148,14 @@ public class PluginClass {
     }
 
     private String getClassText(Map<String, String> templateDict, Map<String, String> table){
-        String packageStr = this.packagePath;
         String text = templateDict.get("text");
         String classText = text.replaceAll(StructureConstant.TABLE_NAME, table.get("tableName"));
         classText = classText.replaceAll(StructureConstant.TABLE_COMMENT, table.get("comment"));
         classText = classText.replaceAll(StructureConstant.OBJECT_NAME, table.get("suffixName"));
         classText = classText.replaceAll(StructureConstant.CLASS_NAME, table.get("className"));
         classText = classText.replaceAll(StructureConstant.VAR_CLASS_NAME, table.get("varClassName"));
-        classText = classText.replaceAll(StructureConstant.PACKAGE, packageStr);
+        classText = classText.replaceAll(StructureConstant.PACKAGE, this.configModel.getPackagePath());
+        classText = classText.replaceAll(StructureConstant.BIZ_TAG, this.configModel.getTablePrefix());
         return classText;
     }
 
@@ -201,6 +200,7 @@ public class PluginClass {
                 range.getLines().add(line);
             }
         }
+        List<String> excludeColumn = ValueUtils.toStringList(this.configModel.getExcludeColumns());
         for (Range r : ranges){
             lines.remove(r.getEndIndex());
 
@@ -213,7 +213,7 @@ public class PluginClass {
                 if(columnName.equals("id")){
                     continue;
                 }
-                if(r.excludeFlag && this.excludeColumn.contains(columnName))
+                if(r.excludeFlag && excludeColumn.contains(columnName))
                     continue;
                 for (String line : r.getLines()){
                     String v = getFieldText(colMap, imports, line);
@@ -263,7 +263,7 @@ public class PluginClass {
         }
 
 
-        fieldsText.append("@ApiModelProperty(value = \"" + comment + "\")");
+        fieldsText.append("@Schema(description = \"" + comment + "\")");
 
         Integer nullable = (Integer) colMap.get("nullable");
         if(nullable == 0){
@@ -319,7 +319,7 @@ public class PluginClass {
             Map<String, String> table = (Map<String, String>) res.get("table");
             for (Map<String, String> templateDict : this.templateList) {
                 String classText = getClassText(templateDict, table);
-                String packageStr = this.packagePath;
+                String packageStr = this.configModel.getBizPackagePath();
 
                 List<String> imports = new ArrayList<>();
                 classText = this.replaceForeachColumn(columns, imports, 1, classText);
@@ -342,13 +342,13 @@ public class PluginClass {
                 }
 
                 classText = classText.replace(StructureConstant.AUTHOR, pcUserName + ":" + pcComputerName);
-                classText = classText.replace(StructureConstant.VERSION, this.classVersion);
+                classText = classText.replace(StructureConstant.VERSION, this.configModel.getClassVersion());
 
 
                 String fileName = templateDict.get("fileName").replace("##className##", table.get("className"));
                 fileName = fileName.substring(0, fileName.length() - 3);
                 String filePackage = packageStr + "." + templateDict.get("dirName");
-                String oname = this.name;
+                String oname = this.configModel.getProjectName();
                 if(!ValueUtils.isBlank(oname)){
                     oname += SLASH_ARG;
                 }

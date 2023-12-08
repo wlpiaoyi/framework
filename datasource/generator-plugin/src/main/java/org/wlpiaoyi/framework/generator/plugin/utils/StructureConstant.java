@@ -14,6 +14,7 @@ public interface StructureConstant {
     String CLASS_NAME = "##className##";
     String VAR_CLASS_NAME = "##varClassName##";
     String PACKAGE = "##package##";
+    String BIZ_TAG = "##bizTag##";
     String AUTHOR = "##author##";
     String VERSION = "##version##";
     String CREATE_TIME = "##createTime##";
