@@ -1,8 +1,9 @@
-package ##package##.vo;
+package ##package##.##bizTag##.domain.vo;
 
 import lombok.Data;
 import lombok.EqualsAndHashCode;
-import ##package##.entity.##className##;
+import java.io.Serializable;
+import ##package##.##bizTag##.domain.entity.##className##;
 
 /**
  * {@code @author:} 		##author##
@@ -12,7 +13,7 @@ import ##package##.entity.##className##;
  */
 @Data
 @EqualsAndHashCode(callSuper = true)
-public class ##className##Vo extends ##className## {
+public class ##className##Vo extends ##className## implements Serializable {
 	private static final long serialVersionUID = 1L;
 
 }

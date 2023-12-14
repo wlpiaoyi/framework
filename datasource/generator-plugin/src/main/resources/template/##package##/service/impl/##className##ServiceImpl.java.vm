@@ -1,12 +1,11 @@
-package ##package##.service.impl;
+package ##package##.##bizTag##.service.impl;
 
-import com.baomidou.mybatisplus.core.metadata.IPage;
-import org.out.work.jfr.service.impl.BaseServiceImpl;
-import ##package##.entity.##className##;
-import ##package##.mapper.##className##Mapper;
-import ##package##.service.I##className##Service;
-import ##package##.vo.##className##Vo;
-import ##package##.ro.##className##Ro;
+import ##package##.##bizTag##.service.I##className##Service;
+import ##package##.##bizTag##.domain.entity.##className##;
+import ##package##.##bizTag##.domain.mapper.##className##Mapper;
+import ##package##.##bizTag##.domain.vo.##className##Vo;
+import ##package##.##bizTag##.domain.ro.##className##Ro;
+import ##package##.service.impl.BaseServiceImpl;
 import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Service;
 

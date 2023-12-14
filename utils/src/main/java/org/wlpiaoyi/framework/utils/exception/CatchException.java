@@ -14,7 +14,7 @@ public class CatchException extends Exception{
 
     public CatchException(String message) {
         super(message);
-        this.code = 0;
+        this.code = 502;
         this.message = message;
     }
 

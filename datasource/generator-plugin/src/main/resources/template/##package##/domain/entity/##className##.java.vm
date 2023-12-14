@@ -1,11 +1,12 @@
-package ##package##.entity;
+package ##package##.##bizTag##.domain.entity;
 
 import com.baomidou.mybatisplus.annotation.TableName;
-import io.swagger.annotations.ApiModel;
-import io.swagger.annotations.ApiModelProperty;
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
-import org.out.work.jfr.entity.BaseEntity;
+import ##package##.domain.entity.BaseEntity;
+import lombok.experimental.Accessors;
+import java.io.Serializable;
 ##/*import*/##
 
 
@@ -16,10 +17,14 @@ import org.out.work.jfr.entity.BaseEntity;
  * {@code @version:}: 		##version##
  */
 @Data
+@Accessors(chain=true)
 @TableName("##tableName##")
-@ApiModel(value = "##className##对象", description = "##tableComment##")
+@Schema(description = "##tableComment##")
 @EqualsAndHashCode(callSuper = true)
-public class ##className## extends BaseEntity {
+public class ##className## extends BaseEntity implements Serializable {
+
+    private static final long serialVersionUID = 1L;
+
     <foreach-column>
 
     /** ##columnComment## **/

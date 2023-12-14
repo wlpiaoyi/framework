@@ -1,10 +1,9 @@
 package ##package##.service;
 
-import com.baomidou.mybatisplus.core.metadata.IPage;
-import org.out.work.jfr.service.IBaseService;
-import ##package##.entity.##className##;
-import ##package##.vo.##className##Vo;
-import ##package##.ro.##className##Ro;
+import ##package##.##bizTag##.domain.entity.##className##;
+import ##package##.##bizTag##.domain.vo.##className##Vo;
+import ##package##.##bizTag##.domain.ro.##className##Ro;
+import ##package##.service.IBaseService;
 
 
 /**

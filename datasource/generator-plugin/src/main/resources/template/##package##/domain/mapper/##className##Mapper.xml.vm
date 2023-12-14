@@ -3,10 +3,10 @@
 <!--@author ##author##-->
 <!--@since ##createTime##-->
 <!--@desc ##tableComment##-->
-<mapper namespace="##package##.mapper.##className##Mapper">
+<mapper namespace="##package##.##bizTag##.domain.mapper.##className##Mapper">
 
     <!-- 通用查询映射结果 -->
-    <resultMap id="##varClassName##ResultMap" type="##package##.entity.##className##">
+    <resultMap id="##varClassName##ResultMap" type="##package##.##bizTag##.domain.entity.##className##">
         <id column="id" property="id"/>
         <foreach-column excludeFlag=false>
         <!-- ##columnComment## -->

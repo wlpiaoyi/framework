@@ -33,6 +33,9 @@ public class ConfigModel {
         return this.getPackagePath() + "." + this.getTablePrefix();
     }
 
+    public ConfigModel(){
+
+    }
     public ConfigModel(Properties properties){
         this.url = properties.getProperty("url");
         this.userName = properties.getProperty("userName");

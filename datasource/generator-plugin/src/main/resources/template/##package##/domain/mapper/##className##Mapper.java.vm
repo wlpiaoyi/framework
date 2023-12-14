@@ -1,10 +1,10 @@
-package ##package##.mapper;
+package ##package##.##bizTag##.domain.mapper;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
-import ##package##.entity.##className##;
-import ##package##.ro.##className##Ro;
-import ##package##.vo.##className##Vo;
+import ##package##.##bizTag##.domain.entity.##className##;
+import ##package##.##bizTag##.domain.ro.##className##Ro;
+import ##package##.##bizTag##.domain.vo.##className##Vo;
 
 import java.util.List;
 
