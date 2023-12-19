@@ -19,6 +19,13 @@ public class BusinessException extends RuntimeException {
         this.code = 501;
         this.message = message;
     }
+
+    public BusinessException(String message, Throwable cause) {
+        super(message, cause);
+        this.code = 501;
+        this.message = message;
+    }
+
     public BusinessException(int code, String message) {
         super(message);
         this.code = code;
@@ -30,6 +37,7 @@ public class BusinessException extends RuntimeException {
         this.code = code;
         this.message = message;
     }
+
 
 
 }

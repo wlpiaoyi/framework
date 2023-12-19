@@ -45,6 +45,14 @@ public class DataUtilsTest {
         WriterUtils.append(new File(path), "我的", StandardCharsets.UTF_8);
     }
 
+
+
+    @Test
+    public void write5() throws IOException {
+        String path = DataUtils.USER_DIR + "/test1/test1-1/data_plus.txt";
+        System.out.println(DataUtils.MD5PLUS(new File(path)));;
+    }
+
     @After
     public void tearDown() throws Exception {
 

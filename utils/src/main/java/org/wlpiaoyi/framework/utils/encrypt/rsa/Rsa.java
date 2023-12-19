@@ -34,7 +34,7 @@ public class Rsa extends AbstractRsa implements Serializable {
     * */
     //============================================>
     public static final String KEY_ALGORTHM_RSA="RSA";
-//    public static final String KEY_ALGORTHM_DSA ="DSA";
+    public static final String KEY_ALGORTHM_DSA ="DSA";
 //    public static final String KEY_ALGORTHM_ECC ="ECC";
     //<============================================
 
@@ -43,14 +43,17 @@ public class Rsa extends AbstractRsa implements Serializable {
     * 512~65536位（密钥长度必须是64的倍数）
     * */
     //============================================>
-    public static final String SIGNATURE_ALGORITHM_MD5withRSA = "MD5withRSA";
-    public static final String SIGNATURE_ALGORITHM_SHA1withRSA = "SHA1withRSA";
-    public static final String SIGNATURE_ALGORITHM_SHA224withRSA = "SHA224withRSA";
-    public static final String SIGNATURE_ALGORITHM_SHA256withRSA = "SHA256withRSA";
-    public static final String SIGNATURE_ALGORITHM_SHA384withRSA = "SHA384withRSA";
-    public static final String SIGNATURE_ALGORITHM_SHA512withRSA = "SHA512withRSA";
-    public static final String SIGNATURE_ALGORITHM_RIPEMD128withRSA = "RIPEMD128withRSA";
-    public static final String SIGNATURE_ALGORITHM_RIPEMD160withRSA = "RIPEMD160withRSA";
+    public static final String SIGNATURE_ALGORITHM_MD5_WITH_RSA = "MD5withRSA";
+    public static final String SIGNATURE_ALGORITHM_SHA1_WITH_RSA = "SHA1withRSA";
+    public static final String SIGNATURE_ALGORITHM_SHA224_WITH_RSA = "SHA224withRSA";
+    public static final String SIGNATURE_ALGORITHM_SHA256_WITH_RSA = "SHA256withRSA";
+    public static final String SIGNATURE_ALGORITHM_SHA384_WITH_RSA = "SHA384withRSA";
+    public static final String SIGNATURE_ALGORITHM_SHA512_WITH_RSA = "SHA512withRSA";
+    public static final String SIGNATURE_ALGORITHM_SHA1_WITH_DSA = "SHA1withDSA";
+    public static final String SIGNATURE_ALGORITHM_SHA224_WITH_DSA = "SHA224withDSA";
+    public static final String SIGNATURE_ALGORITHM_SHA256_WITH_DSA = "SHA256withDSA";
+    public static final String SIGNATURE_ALGORITHM_SHA384_WITH_DSA = "SHA384withDSA";
+    public static final String SIGNATURE_ALGORITHM_SHA512_WITH_DSA = "SHA512withDSA";
     //<============================================
 
     @Override
@@ -79,7 +82,7 @@ public class Rsa extends AbstractRsa implements Serializable {
 
     protected Rsa(){
         //签名算法
-        this.signatureAlgorithm = Rsa.SIGNATURE_ALGORITHM_SHA1withRSA;
+        this.signatureAlgorithm = Rsa.SIGNATURE_ALGORITHM_SHA1_WITH_RSA;
         //秘钥算法
         this.keyAlgorithm = Rsa.KEY_ALGORTHM_RSA;
     }
