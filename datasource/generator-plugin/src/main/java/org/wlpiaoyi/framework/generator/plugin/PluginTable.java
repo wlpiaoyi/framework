@@ -123,16 +123,21 @@ public class PluginTable {
         return resDict;
     }
 
-//    public static void main(String[] args) throws SQLException {
-//
-//        final String url = "jdbc:mysql://36.138.30.68:3306/bladex?characterEncoding=utf8&&useInformationSchema=true";
-//        final String userName = "root";
-//        final String password = "zrgj@2022*";
-//        final String tablePrefix = "dym";
-//        PluginTable plugin = new PluginTable(url, userName, password, tablePrefix);
-//        Map<String, Map<String, List<Map<String, String>>>> resDict = plugin.run();
-//        System.out.println();
-//    }
+    public static void main(String[] args) throws SQLException {
+        ConfigModel configModel = new ConfigModel();
+        configModel.setUrl("jdbc:mysql://36.138.30.68:13306/filling_dev?useSSL=false&useUnicode=true&characterEncoding=utf-8&transformedBitIsBoolean=true&tinyInt1isBit=false&allowMultiQueries=true&serverTimezone=GMT%2B8");
+        configModel.setDatabaseName("filling_dev");
+        configModel.setUserName("root");
+        configModel.setPassword("zrgj@2022*");
+        configModel.setTablePrefix("poi");
+        configModel.setTableNamePattern("poi_form_data_statistics");
+        configModel.setPackagePath("com.icss.poie.biz");
+        configModel.setProjectName("poie");
+        configModel.setExcludeColumns("id,create_user,create_time,update_time,update_user,status,create_dept,is_deleted");
+        PluginTable plugin = new PluginTable(configModel);
+        Map<String, Map<String, Object>> resDict = plugin.run();
+        System.out.println(resDict);
+    }
 
 }
 

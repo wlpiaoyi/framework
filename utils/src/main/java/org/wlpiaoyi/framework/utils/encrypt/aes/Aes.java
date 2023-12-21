@@ -20,10 +20,11 @@ import java.security.*;
  * {@code @date:} 			2021-02-09 17:14:36
  * {@code @version:}: 		1.0
  */
+@Deprecated
 public class Aes {
 
     /** 秘钥算法 **/
-    public static final String KEY_ALGORTHM_AES="AES";
+    public static final String KEY_ALGORITHM_AES="AES";
 
     /**
      * 签名算法
@@ -138,7 +139,7 @@ public class Aes {
     }
 
     private Aes(){
-        this.setKeyAlgorithm(Aes.KEY_ALGORTHM_AES)
+        this.setKeyAlgorithm(Aes.KEY_ALGORITHM_AES)
                 .setSignatureAlgorithm(Aes.SIGNATURE_ALGORITHM_SHA1PRNG);
     }
 

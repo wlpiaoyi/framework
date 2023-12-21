@@ -27,14 +27,16 @@ import javax.crypto.Cipher;
  * 当时他们三人都在麻省理工学院工作。RSA就是他们三人姓氏开头字母拼在一起组成的。
  * RSA非对称加密解密内容长度是有限制的，加密长度不超过117Byte，解密长度不超过128Byte
  */
+
+@Deprecated
 public class Rsa extends AbstractRsa implements Serializable {
 
     /*
     * 秘钥算法
     * */
     //============================================>
-    public static final String KEY_ALGORTHM_RSA="RSA";
-    public static final String KEY_ALGORTHM_DSA ="DSA";
+    public static final String KEY_ALGORITHM_RSA ="RSA";
+    public static final String KEY_ALGORITHM_DSA ="DSA";
 //    public static final String KEY_ALGORTHM_ECC ="ECC";
     //<============================================
 
@@ -84,7 +86,7 @@ public class Rsa extends AbstractRsa implements Serializable {
         //签名算法
         this.signatureAlgorithm = Rsa.SIGNATURE_ALGORITHM_SHA1_WITH_RSA;
         //秘钥算法
-        this.keyAlgorithm = Rsa.KEY_ALGORTHM_RSA;
+        this.keyAlgorithm = Rsa.KEY_ALGORITHM_DSA;
     }
 
     public static Rsa create(){

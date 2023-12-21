@@ -18,12 +18,12 @@ import java.util.*;
  */
 public final class ValueUtils extends ValueEqualsUtils{
 
-//    public static void main(String[] args) {
-//        long value = 0xF1D1C121;
-//        byte[] bytes = toBytes(Math.abs(value));
-//        long res = toLong(bytes);
-//        System.out.println();
-//    }
+    public static void main(String[] args) {
+        long value = 240;
+        byte[] bytes = toBytes(Math.abs(value), 8);
+        long res = toLong(bytes);
+        System.out.println();
+    }
 
 
 }
@@ -160,7 +160,7 @@ class ValueParseUtils extends ValueBlankUtils{
         int offL = length - lbsL;
         for (int i = length - 1; i >= 0; i--){
             if(i < offL){
-                res[i] = -128;
+                res[i] = 0;
             }else{
                 res[i] = lbs[i - offL];
             }
@@ -180,15 +180,14 @@ class ValueParseUtils extends ValueBlankUtils{
         }
         final long d = 0xFFL;
         final int c = 8;
-        final long k = 128;
         if(value <= d){
-            return new byte[] {(byte) (value - 128)};
+            return new byte[] {(byte)value};
         }
         byte[] temps = new byte[8];
         int i = 0;
         do{
             long v = value - ((value >> c) << c);
-            temps[i] = (byte) (v - k);
+            temps[i] = (byte) v;
             if(value < d){
                 break;
             }

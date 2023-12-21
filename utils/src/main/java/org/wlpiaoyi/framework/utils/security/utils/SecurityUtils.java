@@ -1,33 +1,24 @@
-package org.wlpiaoyi.framework.utils.encrypt.rsa;
+package org.wlpiaoyi.framework.utils.security.utils;
 
+import org.wlpiaoyi.framework.utils.StringUtils;
+
+import javax.crypto.NoSuchPaddingException;
 import java.io.InputStream;
-import java.security.MessageDigest;
+import java.security.*;
+import java.security.spec.InvalidKeySpecException;
+import java.security.spec.PKCS8EncodedKeySpec;
+import java.security.spec.X509EncodedKeySpec;
 
-
-@Deprecated
-public class Coder {
+/**
+ * {@code @author:}         wlpiaoyi
+ * {@code @description:}    TODO
+ * {@code @date:}           2023/12/21 10:59
+ * {@code @version:}:       1.0
+ */
+public class SecurityUtils {
 
     public static final String KEY_SHA = "SHA";
     public static final String KEY_MD5 = "MD5";
-
-//    /**
-//     * BASE64解密
-//     * @param key
-//     * @return
-//     * @throws Exception
-//     */
-//    public static byte[] decryptBASE64(String key) throws Exception{
-//        return (new BASE64Decoder()).decodeBuffer(key);
-//    }
-//    /**
-//     * BASE64加密
-//     * @param key
-//     * @return
-//     * @throws Exception
-//     */
-//    public static String encryptBASE64(byte[] key)throws Exception{
-//        return (new BASE64Encoder()).encodeBuffer(key);
-//    }
 
     /**
      * MD5加密
@@ -86,5 +77,4 @@ public class Coder {
         }
         return sha.digest();
     }
-
 }

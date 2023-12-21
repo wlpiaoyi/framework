@@ -55,21 +55,15 @@ public class RsaTest {
 
     @Test
     public void doSecurity() throws Exception {
-        String publicKey = "MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQCxWB6Lfjs2VspgZtf3Zd42H7vS7V7NxZCSD+yI\n" +
-                "+zpMKukXFdbinMq/TkKstxq8A1vznCRnMQZye3yWgsAvJNQYDOkgXOwn2P0v8M6eaklu1i2tFeEp\n" +
-                "SqWrUPluilNe2WJqF/apdGwODhC/7aKr0lAObEKtqPcNDPY3Ft5FUBeqrwIDAQAB";
-        String privateKey = "MIICdwIBADANBgkqhkiG9w0BAQEFAASCAmEwggJdAgEAAoGBALFYHot+OzZWymBm1/dl3jYfu9Lt\n" +
-                "Xs3FkJIP7Ij7Okwq6RcV1uKcyr9OQqy3GrwDW/OcJGcxBnJ7fJaCwC8k1BgM6SBc7CfY/S/wzp5q\n" +
-                "SW7WLa0V4SlKpatQ+W6KU17ZYmoX9ql0bA4OEL/toqvSUA5sQq2o9w0M9jcW3kVQF6qvAgMBAAEC\n" +
-                "gYByjyjUFUvssy3yDh1OfCiKL/+lpp6KMChOoii66AblswZ1Wi9AneY+pDBf37xOXaElgeTmH/45\n" +
-                "L9nwZC//hDvY5XTyD1P33QpP13cdWRsgV/m1ycjx6hgJnr8slTDNvabXk3oUya5lGDMXq2jvyagf\n" +
-                "CwbxQkdFDgvFDpOdoU95UQJBAORY9FaeE7wiZmkKMnjRJ1cGQlMVV/mngFqnWCdI+RxL+1gNnPlW\n" +
-                "poHdguRDaZb4SiPBe/qIBoB13Fs4hvgVj4kCQQDG0gCqeyVPcumXyTrrOG0dUCauRKgi0wGKn+22\n" +
-                "Zv1VlWNceCrtzN2vNhAru8t7sIhVEge87mRDb7yT14ugw+J3AkEAhyvtP9UFo6nNa8KgjAprukU3\n" +
-                "P81zrZKtFXzYXzEAXfLQj5hHYwYbPObuk8cgG0FRSgdAJ9cb2jFqxwkYRIUm2QJBAIPcOXbXr3oO\n" +
-                "w1/YpQvl43AifVTs0fouqYIP6W8kxPWi20Azrn0CdzBCEd1/ckf5X6HUEG+8R6D2FUKUHNWltKcC\n" +
-                "QH2Cqt2mOkPoqamCkhbpvitOcK4w/IqnxQLKCB7J93tCuklu6nslwlURrdGvyTb9jkNbrtMJHcsr\n" +
-                "R2PF0PTvj28=";
+        String publicKey = "MIHwMIGoBgcqhkjOOAQBMIGcAkEA/KaCzo4Syrom78z3EQ5SbbB4sF7ey80etKII864WF64B81uR\n" +
+                "pH5t9jQTxeEu0ImbzRMqzVDZkVG9xD7nN1kuFwIVAJYu3cw2nLqOuyYO5rahJtk0bjjFAkBnhHGy\n" +
+                "epz0TukaScUUfbGpqvJE8FpDTWSGkx0tFCcbnjUDC3H9c9oXkGmzLik1Yw4cIGI1TQ2iCmxBblC+\n" +
+                "eUykA0MAAkBScLuXSmAOBDskJRZ4HmhVk4Lozf5fap4XwgDMJsc7JI/h2bPeAEeATsItvd5Hc8If\n" +
+                "rbUFZ/mAY8lc45E+qb3J";
+        String privateKey = "MIHGAgEAMIGoBgcqhkjOOAQBMIGcAkEA/KaCzo4Syrom78z3EQ5SbbB4sF7ey80etKII864WF64B\n" +
+                "81uRpH5t9jQTxeEu0ImbzRMqzVDZkVG9xD7nN1kuFwIVAJYu3cw2nLqOuyYO5rahJtk0bjjFAkBn\n" +
+                "hHGyepz0TukaScUUfbGpqvJE8FpDTWSGkx0tFCcbnjUDC3H9c9oXkGmzLik1Yw4cIGI1TQ2iCmxB\n" +
+                "blC+eUykBBYCFCKLEW8qFEg25fmCfk91X78BRKeK";
 
 
         Rsa rsa = Rsa.create().setPublicKey(publicKey).setPrivateKey(privateKey).loadKey();
