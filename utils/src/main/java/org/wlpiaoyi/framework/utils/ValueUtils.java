@@ -18,12 +18,12 @@ import java.util.*;
  */
 public final class ValueUtils extends ValueEqualsUtils{
 
-    public static void main(String[] args) {
-        long value = 240;
-        byte[] bytes = toBytes(Math.abs(value), 8);
-        long res = toLong(bytes);
-        System.out.println();
-    }
+//    public static void main(String[] args) {
+//        long value = 240;
+//        byte[] bytes = toBytes(Math.abs(value), 8);
+//        long res = toLong(bytes);
+//        System.out.println();
+//    }
 
 
 }

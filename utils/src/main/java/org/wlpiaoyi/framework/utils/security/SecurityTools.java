@@ -2,6 +2,7 @@ package org.wlpiaoyi.framework.utils.security;
 
 import org.wlpiaoyi.framework.utils.StringUtils;
 
+import javax.crypto.Cipher;
 import javax.crypto.NoSuchPaddingException;
 import java.security.*;
 import java.security.spec.InvalidKeySpecException;
@@ -64,11 +65,11 @@ class SecurityTools {
      * 创建私钥加密解密工具
      * @param privateKey Base64私钥
      * @param keyAlgorithm 秘钥算法
-     * @param opmode javax.crypto.Cipher.ENCRYPT_MODE,DECRYPT_MODE
+     * @param opmode Cipher.ENCRYPT_MODE,DECRYPT_MODE
      * @return
      * @throws Exception
      */
-    static javax.crypto.Cipher createPrivateCipher(String privateKey, String keyAlgorithm, int opmode) throws NoSuchAlgorithmException, NoSuchPaddingException, InvalidKeySpecException, InvalidKeyException {
+    static Cipher createPrivateCipher(String privateKey, String keyAlgorithm, int opmode) throws NoSuchAlgorithmException, NoSuchPaddingException, InvalidKeySpecException, InvalidKeyException {
         //私钥
         byte[] keyBytes = StringUtils.base64DecodeToBytes(privateKey);
         //取私钥
@@ -76,7 +77,7 @@ class SecurityTools {
         KeyFactory keyFactory = KeyFactory.getInstance(keyAlgorithm);
         Key key = keyFactory.generatePrivate(pkcs8EncodedKeySpec);
         //对数据加密
-        javax.crypto.Cipher cipher = javax.crypto.Cipher.getInstance(keyFactory.getAlgorithm());
+        Cipher cipher = Cipher.getInstance(keyFactory.getAlgorithm());
         cipher.init(opmode, key);
         return cipher;
     }
@@ -85,11 +86,11 @@ class SecurityTools {
      * 创建公钥加密解密工具
      * @param publicKey Base64公钥
      * @param keyAlgorithm 秘钥算法
-     * @param opmode javax.crypto.Cipher.ENCRYPT_MODE,DECRYPT_MODE
+     * @param opmode Cipher.ENCRYPT_MODE,DECRYPT_MODE
      * @return
      * @throws Exception
      */
-    static javax.crypto.Cipher createPublicCipher(String publicKey, String keyAlgorithm, int opmode) throws NoSuchAlgorithmException, NoSuchPaddingException, InvalidKeySpecException, InvalidKeyException {
+    static Cipher createPublicCipher(String publicKey, String keyAlgorithm, int opmode) throws NoSuchAlgorithmException, NoSuchPaddingException, InvalidKeySpecException, InvalidKeyException {
         //公钥
         byte[] keyBytes = StringUtils.base64DecodeToBytes(publicKey);
         //取公钥
@@ -98,7 +99,7 @@ class SecurityTools {
         Key key = keyFactory.generatePublic(x509EncodedKeySpec);
 
         //对数据解密
-        javax.crypto.Cipher cipher = javax.crypto.Cipher.getInstance(keyFactory.getAlgorithm());
+        Cipher cipher = Cipher.getInstance(keyFactory.getAlgorithm());
         cipher.init(opmode, key);
         return cipher;
     }
