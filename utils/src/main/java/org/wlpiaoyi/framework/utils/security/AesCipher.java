@@ -67,12 +67,14 @@ public class AesCipher extends Security{
     @SneakyThrows
     @Override
     public AesCipher loadConfig() {
-        this.dCipher = Cipher.getInstance(ConditionAes.CIPHER_ALGORITHM_AC5_7);
-        this.eCipher = Cipher.getInstance(ConditionAes.CIPHER_ALGORITHM_AC5_7);
         if(ValueUtils.isBlank(this.getIV())){
+            this.dCipher = Cipher.getInstance(ConditionAes.CIPHER_ALGORITHM_AE5_5);
+            this.eCipher = Cipher.getInstance(ConditionAes.CIPHER_ALGORITHM_AE5_5);
             this.eCipher.init(Cipher.ENCRYPT_MODE, this.key);
             this.dCipher.init(Cipher.DECRYPT_MODE, this.key);
         }else{
+            this.dCipher = Cipher.getInstance(ConditionAes.CIPHER_ALGORITHM_AC5_5);
+            this.eCipher = Cipher.getInstance(ConditionAes.CIPHER_ALGORITHM_AC5_5);
             this.dCipher.init(Cipher.DECRYPT_MODE, this.key,
                     new IvParameterSpec(this.getIV().getBytes(StandardCharsets.UTF_8)));
             this.eCipher.init(Cipher.ENCRYPT_MODE, this.key,

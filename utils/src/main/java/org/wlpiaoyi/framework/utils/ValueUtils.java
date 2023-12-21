@@ -144,21 +144,24 @@ class ValueParseUtils extends ValueBlankUtils{
     /**
      * Long转化成Byte数组
      * @param value
-     * @param length
+     * @param minLen
      * @return
      */
-    public static byte @NotNull [] toBytes(long value, int length){
+    public static byte @NotNull [] toBytes(long value, int minLen){
         byte[] lbs = ValueUtils.toBytes(value);
-        if(length < 1){
+        if(minLen < 1){
             return lbs;
+        }
+        if(minLen > 8){
+            minLen = 8;
         }
         final int lbsL = lbs.length;
-        if(lbsL == length){
+        if(lbsL == minLen){
             return lbs;
         }
-        byte[] res = new byte[length];
-        int offL = length - lbsL;
-        for (int i = length - 1; i >= 0; i--){
+        byte[] res = new byte[minLen];
+        int offL = minLen - lbsL;
+        for (int i = minLen - 1; i >= 0; i--){
             if(i < offL){
                 res[i] = 0;
             }else{

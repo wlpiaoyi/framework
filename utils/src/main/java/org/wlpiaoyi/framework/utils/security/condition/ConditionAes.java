@@ -34,7 +34,7 @@ public class ConditionAes {
      */
     public static final String CIPHER_ALGORITHM_AEN = "AES/EBC/NoPadding";
     /** 加密-解密算法 / 工作模式 / 填充方式 **/
-    public static final String CIPHER_ALGORITHM_AE5_7 = "AES/ECB/PKCS5Padding";
+    public static final String CIPHER_ALGORITHM_AE5_5 = "AES/ECB/PKCS5Padding";
     /** 加密-解密算法 / 工作模式 / 填充方式 **/
-    public static final String CIPHER_ALGORITHM_AC5_7 = "AES/CBC/PKCS5Padding";
+    public static final String CIPHER_ALGORITHM_AC5_5 = "AES/CBC/PKCS5Padding";
 }

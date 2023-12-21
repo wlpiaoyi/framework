@@ -4,6 +4,7 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.wlpiaoyi.framework.utils.StringUtils;
+import org.wlpiaoyi.framework.utils.ValueUtils;
 import org.wlpiaoyi.framework.utils.data.DataUtils;
 import org.wlpiaoyi.framework.utils.encrypt.aes.Aes;
 
@@ -28,8 +29,8 @@ public class AesCipherTest {
     @Test
     public void test() throws Exception {
 
-        AesCipher aes = AesCipher.build().setKey(StringUtils.getUUID32())
-                .setIV(StringUtils.getUUID32().substring(0, 16)).loadConfig();
+        AesCipher aes = AesCipher.build().setKey(StringUtils.getUUID32()).loadConfig();
+        System.out.println("AEA Key:\n" + aes.getKey().toString());
         String source = "这是一行没有任何意义的文字，你看完了等于没看，不是吗这是一行没有任何意义的文字，你看完了等于没看，不是吗这是一行没有任何意义的文字，你看完了等于没看，不是吗这是一行没有任何意义的文字，你看完了等于没看，不是吗";
         System.out.println("\r加密前文字：\r\n" + source);
         byte[] data = source.getBytes();
@@ -40,8 +41,12 @@ public class AesCipherTest {
         String target = new String(decodedData);
         System.out.println("解密后文字: \r\n" + target);
 
-        aes = AesCipher.build().setKey(StringUtils.getUUID32() + StringUtils.getUUID32(), 256)
+        String keyStr = StringUtils.getUUID32() + StringUtils.getUUID32();
+        aes = AesCipher.build().setKey(keyStr, 128)
                 .setIV(StringUtils.getUUID32().substring(0, 16)).loadConfig();
+        System.out.println("AEA keyStr:\n" + keyStr);
+        System.out.println("AEA Key:\n" + ValueUtils.bytesToHex(aes.getKey().getEncoded()));
+        System.out.println("AEA IV:\n" + aes.getIV().toString());
         source = "这是一行没有任何意义的文字，你看完了等于没看，不是吗这是一行没有任何意义的文字，你看完了等于没看，不是吗这是一行没有任何意义的文字，你看完了等于没看，不是吗这是一行没有任何意义的文字，你看完了等于没看，不是吗";
         System.out.println("\r加密前文字：\r\n" + source);
         data = source.getBytes();
