@@ -71,7 +71,6 @@ public class SecurityUtils {
         MessageDigest sha = MessageDigest.getInstance(KEY_SHA);
         int nRead;
         byte[] data = new byte[8];
-        StringBuilder sb = new StringBuilder();
         while ((nRead = inputStream.read(data, 0, data.length)) != -1) {
             sha.update(data, 0, nRead);
         }

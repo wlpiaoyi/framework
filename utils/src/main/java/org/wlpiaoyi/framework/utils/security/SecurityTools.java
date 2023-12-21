@@ -1,9 +1,12 @@
 package org.wlpiaoyi.framework.utils.security;
 
+import org.wlpiaoyi.framework.utils.DateUtils;
 import org.wlpiaoyi.framework.utils.StringUtils;
+import org.wlpiaoyi.framework.utils.data.DataUtils;
 
 import javax.crypto.Cipher;
 import javax.crypto.NoSuchPaddingException;
+import java.nio.charset.StandardCharsets;
 import java.security.*;
 import java.security.spec.InvalidKeySpecException;
 import java.security.spec.PKCS8EncodedKeySpec;
@@ -28,7 +31,7 @@ class SecurityTools {
      */
     static Signature createSignature(String privateKey, String keyAlgorithm, String signatureAlgorithm)throws Exception{
         //解密私钥
-        byte[] keyBytes = StringUtils.base64DecodeToBytes(privateKey);
+        byte[] keyBytes = DataUtils.base64Decode(privateKey.getBytes(StandardCharsets.UTF_8));
         //构造PKCS8EncodedKeySpec对象
         PKCS8EncodedKeySpec pkcs8EncodedKeySpec = new PKCS8EncodedKeySpec(keyBytes);
         //指定加密算法
@@ -50,7 +53,7 @@ class SecurityTools {
      */
     static Signature createVerifySign(String publicKey, String keyAlgorithm, String signatureAlgorithm) throws Exception{
         //解密公钥
-        byte[] keyBytes = StringUtils.base64DecodeToBytes(publicKey);
+        byte[] keyBytes = DataUtils.base64Decode(publicKey.getBytes(StandardCharsets.UTF_8));
         //构造X509EncodedKeySpec对象
         X509EncodedKeySpec x509EncodedKeySpec = new X509EncodedKeySpec(keyBytes);
         //指定加密算法
@@ -71,7 +74,7 @@ class SecurityTools {
      */
     static Cipher createPrivateCipher(String privateKey, String keyAlgorithm, int opmode) throws NoSuchAlgorithmException, NoSuchPaddingException, InvalidKeySpecException, InvalidKeyException {
         //私钥
-        byte[] keyBytes = StringUtils.base64DecodeToBytes(privateKey);
+        byte[] keyBytes = DataUtils.base64Decode(privateKey.getBytes(StandardCharsets.UTF_8));
         //取私钥
         PKCS8EncodedKeySpec pkcs8EncodedKeySpec = new PKCS8EncodedKeySpec(keyBytes);
         KeyFactory keyFactory = KeyFactory.getInstance(keyAlgorithm);
@@ -92,7 +95,7 @@ class SecurityTools {
      */
     static Cipher createPublicCipher(String publicKey, String keyAlgorithm, int opmode) throws NoSuchAlgorithmException, NoSuchPaddingException, InvalidKeySpecException, InvalidKeyException {
         //公钥
-        byte[] keyBytes = StringUtils.base64DecodeToBytes(publicKey);
+        byte[] keyBytes = DataUtils.base64Decode(publicKey.getBytes(StandardCharsets.UTF_8));
         //取公钥
         X509EncodedKeySpec x509EncodedKeySpec = new X509EncodedKeySpec(keyBytes);
         KeyFactory keyFactory = KeyFactory.getInstance(keyAlgorithm);
@@ -120,8 +123,8 @@ class SecurityTools {
         keyPairGenerator.initialize(keyPairSize);
         KeyPair keyPair = keyPairGenerator.generateKeyPair();
         String[] keyArgs = {
-                StringUtils.base64Encode(keyPair.getPrivate().getEncoded()),
-                StringUtils.base64Encode(keyPair.getPublic().getEncoded()),
+                new String(DataUtils.base64Encode(keyPair.getPrivate().getEncoded())),
+                new String(DataUtils.base64Encode(keyPair.getPublic().getEncoded())),
         };
 
         return keyArgs;
