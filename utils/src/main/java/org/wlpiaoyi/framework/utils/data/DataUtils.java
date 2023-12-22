@@ -137,40 +137,73 @@ public class DataUtils {
         }
     }
 
-//文件指纹================================================================>
-    public static String MD5(byte[] bytes) throws NoSuchAlgorithmException {
-        MessageDigest md = MessageDigest.getInstance("MD5");
+//数据指纹================================================================>
+
+    /** 对撞算法 **/
+    public static final String KEY_SHA = "SHA";
+    public static final String KEY_MD5 = "MD5";
+
+    /**
+     *
+     * @param bytes 数据
+     * @param algorithm 对撞算法
+     * @return
+     * @throws NoSuchAlgorithmException
+     */
+    public static byte[] MD(byte[] bytes, String algorithm) throws NoSuchAlgorithmException {
+        MessageDigest md = MessageDigest.getInstance(algorithm);
         md.update(bytes);
-        byte[] b = md.digest();
-        StringBuffer sb = new StringBuffer();
-        for (int i = 0; i < b.length; i++) {
-            String hex = Integer.toHexString(b[i] & 0xFF);
-            hex = (hex.length() == 1 ? "0" : "") + hex;
-            sb.append(hex);
-        }
-        return sb.toString();
+        return md.digest();
     }
 
     /**
-     * 对一个文件获取md5值
-     * @return md5串
+     *
+     * @param is 数据流
+     * @param algorithm 对撞算法
+     * @return
+     * @throws NoSuchAlgorithmException
+     * @throws IOException
      */
-    @SneakyThrows
-    public static String MD5(File file) {
-        FileInputStream fileInputStream = null;
+    public static byte[] MD(InputStream is, String algorithm) throws NoSuchAlgorithmException, IOException {
+        MessageDigest md = MessageDigest.getInstance(algorithm);
+        byte[] buffer = new byte[1024];
+        int length;
+        while ((length = is.read(buffer)) != -1) {
+            md.update(buffer, 0, length);
+        }
+        return md.digest();
+    }
+
+    /**
+     *
+     * @param datas 数据
+     * @param algorithm 对撞算法
+     * @return
+     * @throws NoSuchAlgorithmException
+     */
+    public static String MD(String datas, String algorithm) throws NoSuchAlgorithmException {
+        MessageDigest md = MessageDigest.getInstance(algorithm);
+        md.update(datas.getBytes());
+        return new String(Hex.encodeHex(md.digest()));
+    }
+
+    /**
+     *
+     * @param file 文件路径
+     * @param algorithm 对撞算法
+     * @return
+     * @throws IOException
+     * @throws NoSuchAlgorithmException
+     */
+    public static String MD(File file, String algorithm) throws IOException, NoSuchAlgorithmException {
+        InputStream is = null;
         try {
-            MessageDigest md = MessageDigest.getInstance("MD5");
-            fileInputStream = new FileInputStream(file);
-            byte[] buffer = new byte[1024];
-            int length;
-            while ((length = fileInputStream.read(buffer)) != -1) {
-                md.update(buffer, 0, length);
-            }
-            return new String(Hex.encodeHex(md.digest()));
+            is = new FileInputStream(file);
+            return new String(Hex.encodeHex(MD(is, algorithm)));
         } finally {
             try {
-                if (fileInputStream != null) {
-                    fileInputStream.close();
+                if (is != null) {
+                    is.close();
                 }
             } catch (IOException e) {
                 e.printStackTrace();
@@ -178,115 +211,120 @@ public class DataUtils {
         }
     }
 
-    /**
-     * 对一个文件获取md5值
-     * @return md5串
-     */
-    @SneakyThrows
-    public static String MD5PLUS(File file) {
-        FileInputStream fileInput = null;
-        StringBuffer bufStr1 = new StringBuffer();
-        StringBuffer bufStr2 = new StringBuffer();
-        try {
-            final long fileSize = DataUtils.getSize(file.getAbsolutePath());
-            long bufSize = (fileSize / 256);
-            boolean supportPlus = true;
-            if(bufSize < 64){
-                bufSize = 64;
-            }else if(bufSize > 8192){
-                bufSize = 8192;
-            }
-            if(fileSize <= 256){
-                supportPlus = false;
-            }
-            MessageDigest md = MessageDigest.getInstance("MD5");
-            MessageDigest md1 = MessageDigest.getInstance("MD5");
-            MessageDigest md2 = MessageDigest.getInstance("MD5");
-            fileInput = new FileInputStream(file);
-            byte[] buffer = new byte[(int) bufSize];
-            int unitLen;
-            int totalLen = 0;
-            long fileSize_2 = fileSize / 2;
-            while ((unitLen = fileInput.read(buffer)) != -1) {
-                md.update(buffer, 0, unitLen);
-                totalLen += unitLen;
-                if(supportPlus){
-                    if(totalLen <= fileSize_2){
-                        bufStr1.append(new String(buffer, 0, unitLen, "UTF-8"));
-                        md1.update(buffer, 0, unitLen);
-                    }else{
-                        bufStr2.append(new String(buffer, 0, unitLen, "UTF-8"));
-                        md2.update(buffer, 0, unitLen);
-                    }
-                }
-            }
-            fileInput.close();
-            fileInput = null;
-            if(!supportPlus){
-                if(fileSize >= 8){
-                    buffer = new byte[(int) fileSize_2];
-                    fileInput = new FileInputStream(file);
-                    unitLen = fileInput.read(buffer);
-                    md1.update(buffer, 0, unitLen);
-                    bufStr1.append(new String(buffer, 0, unitLen, "UTF-8"));
-                    unitLen = fileInput.read(buffer);
-                    bufStr2.append(new String(buffer, 0, unitLen, "UTF-8"));
-                    md2.update(buffer, 0, unitLen);
-                }else {
-                    String md5 = new String(Hex.encodeHex(md.digest()));
-                    return md5 + md5 + md5;
-                }
-            }
-            return new String(Hex.encodeHex(md.digest()))
-                    + new String(Hex.encodeHex(md1.digest()))
-                    + new String(Hex.encodeHex(md2.digest()));
-        } finally {
-            try {
-                if (fileInput != null) {
-                    fileInput.close();
-                }
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        }
-    }
+//    /**
+//     * 对一个文件获取md5值
+//     * @return md5串
+//     */
+//    @SneakyThrows
+//    public static String MD5PLUS(File file) {
+//        FileInputStream fileInput = null;
+//        StringBuffer bufStr1 = new StringBuffer();
+//        StringBuffer bufStr2 = new StringBuffer();
+//        try {
+//            final long fileSize = DataUtils.getSize(file.getAbsolutePath());
+//            long bufSize = (fileSize / 256);
+//            boolean supportPlus = true;
+//            if(bufSize < 64){
+//                bufSize = 64;
+//            }else if(bufSize > 8192){
+//                bufSize = 8192;
+//            }
+//            if(fileSize <= 256){
+//                supportPlus = false;
+//            }
+//            MessageDigest md = MessageDigest.getInstance(KEY_MD5);
+//            MessageDigest md1 = MessageDigest.getInstance(KEY_MD5);
+//            MessageDigest md2 = MessageDigest.getInstance(KEY_MD5);
+//            fileInput = new FileInputStream(file);
+//            byte[] buffer = new byte[(int) bufSize];
+//            int unitLen;
+//            int totalLen = 0;
+//            long fileSize_2 = fileSize / 2;
+//            while ((unitLen = fileInput.read(buffer)) != -1) {
+//                md.update(buffer, 0, unitLen);
+//                totalLen += unitLen;
+//                if(supportPlus){
+//                    if(totalLen <= fileSize_2){
+//                        bufStr1.append(new String(buffer, 0, unitLen, "UTF-8"));
+//                        md1.update(buffer, 0, unitLen);
+//                    }else{
+//                        bufStr2.append(new String(buffer, 0, unitLen, "UTF-8"));
+//                        md2.update(buffer, 0, unitLen);
+//                    }
+//                }
+//            }
+//            fileInput.close();
+//            fileInput = null;
+//            if(!supportPlus){
+//                if(fileSize >= 8){
+//                    buffer = new byte[(int) fileSize_2];
+//                    fileInput = new FileInputStream(file);
+//                    unitLen = fileInput.read(buffer);
+//                    md1.update(buffer, 0, unitLen);
+//                    bufStr1.append(new String(buffer, 0, unitLen, "UTF-8"));
+//                    unitLen = fileInput.read(buffer);
+//                    bufStr2.append(new String(buffer, 0, unitLen, "UTF-8"));
+//                    md2.update(buffer, 0, unitLen);
+//                }else {
+//                    String md5 = new String(Hex.encodeHex(md.digest()));
+//                    return md5 + md5 + md5;
+//                }
+//            }
+//            return new String(Hex.encodeHex(md.digest()))
+//                    + new String(Hex.encodeHex(md1.digest()))
+//                    + new String(Hex.encodeHex(md2.digest()));
+//        } finally {
+//            try {
+//                if (fileInput != null) {
+//                    fileInput.close();
+//                }
+//            } catch (IOException e) {
+//                e.printStackTrace();
+//            }
+//        }
+//    }
 
-    public static String sha256Hex(byte[] fileData) {
-        return DigestUtils.sha256Hex(fileData);
+    public static byte[] sha256(byte[] bytes) {
+        return DigestUtils.sha256(bytes);
     }
-    /**
-     * 生成文件 SHA 指纹
-     * @param	file        文件路径
-     * @return  java.lang.String    文件内容 SHA 指纹
-     */
+    public static String sha256Hex(String datas) {
+        return DigestUtils.sha256Hex(datas);
+    }
+    public static byte[] sha256(InputStream is) throws IOException {
+        return DigestUtils.sha256(is);
+    }
     public static String sha256Hex(File file) throws IOException {
         return DigestUtils.sha256Hex(new FileInputStream(file));
     }
 
-    public static String sha384Hex(byte[] fileData) {
-        return DigestUtils.sha384Hex(fileData);
+    public static byte[] sha384(byte[] bytes) {
+        return DigestUtils.sha384(bytes);
     }
-    /**
-     * 生成文件 SHA 指纹
-     * @param	file        文件路径
-     * @return  java.lang.String    文件内容 SHA 指纹
-     */
+    public static String sha384Hex(String datas) {
+        return DigestUtils.sha384Hex(datas);
+    }
+    public static byte[] sha384(InputStream is) throws IOException {
+        return DigestUtils.sha384(is);
+    }
     public static String sha384Hex(File file) throws IOException {
         return DigestUtils.sha384Hex(new FileInputStream(file));
     }
 
-    public static String sha512Hex(byte[] fileData) {
-        return DigestUtils.sha512Hex(fileData);
+
+
+    public static byte[] sha512(byte[] bytes) {
+        return DigestUtils.sha512(bytes);
     }
-    /**
-     * 生成文件 SHA 指纹
-     * @param	file        文件路径
-     * @return  java.lang.String    文件内容 SHA 指纹
-     */
+    public static String sha512Hex(String datas) {
+        return DigestUtils.sha512Hex(datas);
+    }
+    public static byte[] sha512(InputStream is) throws IOException {
+        return DigestUtils.sha512(is);
+    }
     public static String sha512Hex(File file) throws IOException {
         return DigestUtils.sha512Hex(new FileInputStream(file));
     }
-//文件指纹<================================================================
+//数据指纹<================================================================
 
 //base64转码解码================================================================>
     /**

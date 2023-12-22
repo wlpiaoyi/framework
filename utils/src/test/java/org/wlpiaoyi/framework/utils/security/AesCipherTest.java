@@ -100,8 +100,6 @@ public class AesCipherTest {
         System.out.println("file sign:" + new String(DataUtils.base64Encode(sign)));
         System.out.println("file verify:" + signatureCipher.verify(new FileInputStream(file), sign));
         System.out.println("eFile verify:" + signatureCipher.verify(new FileInputStream(eFile), sign));
-        System.out.println("file md5plus:" + DataUtils.MD5PLUS(file));
-        System.out.println("eFile md5plus:" + DataUtils.MD5PLUS(eFile));
 
 
     }
