@@ -123,21 +123,21 @@ public class PluginTable {
         return resDict;
     }
 
-    public static void main(String[] args) throws SQLException {
-        ConfigModel configModel = new ConfigModel();
-        configModel.setUrl("jdbc:mysql://36.138.30.68:13306/filling_dev?useSSL=false&useUnicode=true&characterEncoding=utf-8&transformedBitIsBoolean=true&tinyInt1isBit=false&allowMultiQueries=true&serverTimezone=GMT%2B8");
-        configModel.setDatabaseName("filling_dev");
-        configModel.setUserName("root");
-        configModel.setPassword("zrgj@2022*");
-        configModel.setTablePrefix("poi");
-        configModel.setTableNamePattern("poi_form_data_statistics");
-        configModel.setPackagePath("com.icss.poie.biz");
-        configModel.setProjectName("poie");
-        configModel.setExcludeColumns("id,create_user,create_time,update_time,update_user,status,create_dept,is_deleted");
-        PluginTable plugin = new PluginTable(configModel);
-        Map<String, Map<String, Object>> resDict = plugin.run();
-        System.out.println(resDict);
-    }
+//    public static void main(String[] args) throws SQLException {
+//        ConfigModel configModel = new ConfigModel();
+//        configModel.setUrl("jdbc:mysql://127.0.0.1:3306/file_manager?useSSL=false&useUnicode=true&characterEncoding=utf-8&transformedBitIsBoolean=true&tinyInt1isBit=false&allowMultiQueries=true&serverTimezone=GMT%2B8");
+//        configModel.setDatabaseName("file_manager");
+//        configModel.setUserName("root");
+//        configModel.setPassword("00000000");
+//        configModel.setTablePrefix("biz");
+//        configModel.setTableNamePattern("biz_%");
+//        configModel.setPackagePath("org.wlpiaoyi.framework.ee.file.manager");
+//        configModel.setProjectName("file.manager");
+//        configModel.setExcludeColumns("id,create_user,create_time,update_time,update_user,status,create_dept,is_deleted");
+//        PluginTable plugin = new PluginTable(configModel);
+//        Map<String, Map<String, Object>> resDict = plugin.run();
+//        System.out.println(resDict);
+//    }
 
 }
 

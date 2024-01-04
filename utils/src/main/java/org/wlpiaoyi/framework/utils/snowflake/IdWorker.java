@@ -1,5 +1,7 @@
 package org.wlpiaoyi.framework.utils.snowflake;
 
+import lombok.Getter;
+
 /**
  * Twitter_Snowflake<br>
  * SnowFlake的结构如下(每部分用-分开):<br>
@@ -19,69 +21,118 @@ public class IdWorker {
     protected final long timerEpoch;
 
     /** 工作机器ID(0~31) */
-    private long workerId;
+    private final long workerId;
 
     /** 数据中心ID(0~31) */
-    private long datacenterId;
-
-
-    /** 机器id所占的位数 */
-    private final long workerIdBits = 5L;
-
-    /** 数据标识id所占的位数 */
-    private final long datacenterIdBits = 5L;
+    private final long datacenterId;
 
     /** 支持的最大机器id，结果是31 (这个移位算法可以很快的计算出几位二进制数所能表示的最大十进制数) */
-    private final long maxWorkerId = -1L ^ (-1L << workerIdBits);
+    private final long maxWorkerId;
 
     /** 支持的最大数据标识id，结果是31 */
-    private final long maxDatacenterId = -1L ^ (-1L << datacenterIdBits);
+    private final long maxDatacenterId;
+
+    /** 机器id所占的位数 */
+    private final long workerIdBits;// = 5L;
+
+    /** 数据标识id所占的位数 */
+    private final long datacenterIdBits;// = 5L;
 
     /** 序列在id中占的位数 */
-    private final long sequenceBits = 12L;
+    private final long sequenceBits;// = 12L;
 
     /** 机器ID向左移12位 */
-    private final long workerIdShift = sequenceBits;
+    private final long workerIdShift;// = sequenceBits;
 
     /** 数据标识id向左移17位(12+5) */
-    private final long datacenterIdShift = sequenceBits + workerIdBits;
+    private final long datacenterIdShift;// = sequenceBits + workerIdBits;
 
     /** 时间截向左移22位(5+5+12) */
-    private final long timestampLeftShift = sequenceBits + workerIdBits + datacenterIdBits;
+    private final long timestampLeftShift;// = sequenceBits + workerIdBits + datacenterIdBits;
 
     /** 生成序列的掩码，这里为4095 (0b111111111111=0xfff=4095) */
-    private final long sequenceMask = -1L ^ (-1L << sequenceBits);
+    private final long sequenceMask;// = -1L ^ (-1L << sequenceBits);
     /** 毫秒内序列(0~4095) */
+    @Getter
     private long sequence = 0L;
 
     /** 上次生成ID的时间截 */
+    @Getter
     private long lastTimestamp = -1L;
 
     //==============================Constructors=====================================
     /**
-     * 构造函数
+     * 使用默认配置方式
      * @param workerId 工作ID (0~31)
      * @param datacenterId 数据中心ID (0~31)
+     * @param timerEpoch 时间起点
+     * @return:
+     * @author: wlpia
+     * @date: 2023/12/25 16:51
      */
     public IdWorker(byte workerId, byte datacenterId, long timerEpoch) {
-        if (workerId > maxWorkerId || workerId < 0) {
-            throw new IllegalArgumentException(String.format("worker Id can't be greater than %d or less than 0", maxWorkerId));
-        }
-        if (datacenterId > maxDatacenterId || datacenterId < 0) {
-            throw new IllegalArgumentException(String.format("datacenter Id can't be greater than %d or less than 0", maxDatacenterId));
-        }
+        this.workerIdBits = 5L;
+        this.datacenterIdBits = 5L;
+        this.sequenceBits = 12L;
+        this.workerIdShift = this.sequenceBits;
+        this.datacenterIdShift = this.sequenceBits + this.workerIdBits;
+        this.timestampLeftShift = this.sequenceBits + this.workerIdBits + this.datacenterIdBits;
+        this.sequenceMask = -1L ^ (-1L << this.sequenceBits);
         this.workerId = workerId;
         this.datacenterId = datacenterId;
         this.timerEpoch = timerEpoch;
+        this.maxWorkerId = -1L ^ (-1L << this.workerIdBits);
+        this.maxDatacenterId = -1L ^ (-1L << this.datacenterIdBits);
+        if (this.workerId > this.maxWorkerId || this.workerId < 0) {
+            throw new IllegalArgumentException(String.format("worker Id can't be greater than %d or less than 0", this.maxWorkerId));
+        }
+        if (this.datacenterId > this.maxDatacenterId || this.datacenterId < 0) {
+            throw new IllegalArgumentException(String.format("datacenter Id can't be greater than %d or less than 0", this.maxDatacenterId));
+        }
+    }
+
+    /**
+     * 自定义配置方式
+     * @param workerIdBits 工作ID位数
+     * @param datacenterIdBits 数据中心ID位数
+     * @param sequenceBits 毫秒内序列ID位数
+     * @param workerId 工作ID
+     * @param datacenterId 数据中心ID
+     * @param timerEpoch 时间起点
+     * @return:
+     * @author: wlpia
+     * @date: 2023/12/25 16:57
+     */
+    public IdWorker(byte workerIdBits, byte datacenterIdBits, byte sequenceBits, int workerId, int datacenterId, long timerEpoch) {
+        this.workerIdBits = workerIdBits;
+        this.datacenterIdBits = datacenterIdBits;
+        this.sequenceBits = sequenceBits;
+        this.workerIdShift = this.sequenceBits;
+        this.datacenterIdShift = this.sequenceBits + this.workerIdBits;
+        this.timestampLeftShift = this.sequenceBits + this.workerIdBits + this.datacenterIdBits;
+        this.sequenceMask = -1L ^ (-1L << this.sequenceBits);
+        this.workerId = workerId;
+        this.datacenterId = datacenterId;
+        this.timerEpoch = timerEpoch;
+        this.maxWorkerId = -1L ^ (-1L << this.workerIdBits);
+        this.maxDatacenterId = -1L ^ (-1L << this.datacenterIdBits);
+        if (this.workerId > this.maxWorkerId || this.workerId < 0) {
+            throw new IllegalArgumentException(String.format("worker Id can't be greater than %d or less than 0", this.maxWorkerId));
+        }
+        if (this.datacenterId > this.maxDatacenterId || this.datacenterId < 0) {
+            throw new IllegalArgumentException(String.format("datacenter Id can't be greater than %d or less than 0", this.maxDatacenterId));
+        }
     }
 
     // ==============================Methods==========================================
 
     /**
      * 获得下一个ID (该方法是线程安全的)
-     * @return SnowflakeId
+     * @return: (long) SnowflakeId
+     * @author: wlpia
+     * @date: 2023/12/25 17:27
      */
-    public synchronized long nextId() {
+    public final synchronized long nextId() {
         long timestamp = timeGen();
 
         //如果当前时间小于上一次ID生成的时间戳，说明系统时钟回退过这个时候应当抛出异常
@@ -115,6 +166,28 @@ public class IdWorker {
     }
 
     /**
+     * 获取对应Id的时间戳
+     * @param id
+     * @return: long
+     * @author: wlpia
+     * @date: 2023/12/25 17:14
+     */
+    public final long getTimestamp(long id){
+        return (id >> timestampLeftShift) + timerEpoch;
+    }
+
+    /**
+     * 获取对应Id的毫秒内序列
+     * @param id
+     * @return: long
+     * @author: wlpia
+     * @date: 2023/12/25 17:15
+     */
+    public final long getSequence(long id){
+        return ((id >> this.sequenceBits) << this.sequenceBits) ^ id;
+    }
+
+    /**
      * 阻塞到下一个毫秒，直到获得新的时间戳
      * @param lastTimestamp 上次生成ID的时间截
      * @return 当前时间戳
@@ -129,44 +202,12 @@ public class IdWorker {
 
     /**
      * 返回以毫秒为单位的当前时间
-     * @return 当前时间(毫秒)
+     * @return: long 当前时间(毫秒)
+     * @author: wlpia
+     * @date: 2023/12/25 17:27
      */
     protected long timeGen() {
         return System.currentTimeMillis();
     }
 
-//    //==============================Test=============================================
-//    /** 测试 */
-//    public static void main(String[] args) {
-//
-//        IdWorker idWorker = new IdWorker((byte) 0, (byte) 0);
-//        for (int i = 0; i < 100; i++) {
-//            long id = idWorker.nextId();
-//            System.out.println(Long.toBinaryString(id));
-//            System.out.println(id);
-//        }
-//
-//        TWEPOCH = DateUtils.toTimestamp(DateUtils.parseLocalDateTime("2021-01-01 08:00:00"));
-//        long id = idWorker.nextId();
-//        System.out.println(Long.toBinaryString(id));
-//        System.out.println(id);
-//        TWEPOCH = DateUtils.toTimestamp(DateUtils.parseLocalDateTime("2010-01-01 08:00:00"));
-//        id = idWorker.nextId();
-//        System.out.println(Long.toBinaryString(id));
-//        System.out.println(id);
-//        TWEPOCH = DateUtils.toTimestamp(DateUtils.parseLocalDateTime("2000-01-01 08:00:00"));
-//        id = idWorker.nextId();
-//        System.out.println(Long.toBinaryString(id));
-//        System.out.println(id);
-//        TWEPOCH = DateUtils.toTimestamp(DateUtils.parseLocalDateTime("1970-01-01 08:00:00"));
-//        id = idWorker.nextId();
-//        System.out.println(Long.toBinaryString(id));
-//        System.out.println(id);
-//        TWEPOCH = DateUtils.toTimestamp(DateUtils.parseLocalDateTime("1960-01-01 08:00:00"));
-//        id = idWorker.nextId();
-//        System.out.println(Long.toBinaryString(id));
-//        System.out.println(id);
-//
-//
-//    }
 }
