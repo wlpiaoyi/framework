@@ -43,7 +43,7 @@ public class ReaderUtils extends DataUtils{
      */
     public static Properties loadProperties(@NonNull String path) throws IOException {
         File file = loadFile(path);
-        if(file == null){ throw new IOException("没有找到文件"); }
+        if(file == null){ throw new IOException("没有找到文件:" + path); }
         return ReaderUtils.loadProperties(file);
     }
 

@@ -33,37 +33,42 @@ public class PluginMojo extends AbstractMojo {
     @SneakyThrows
     @Override
     public void execute() throws MojoExecutionException, MojoFailureException {
-        if(ValueUtils.isBlank(this.basePath)) {
-            this.basePath = DataUtils.USER_DIR;
+        try{
+            if(ValueUtils.isBlank(this.basePath)) {
+                this.basePath = DataUtils.USER_DIR;
+            }
+            Properties properties = ReaderUtils.loadProperties(this.basePath + this.configDir);
+            ConfigModel configModel = new ConfigModel(properties);
+            log.info("mojo execute:" +
+                    "\n\tuserDir:" + this.basePath +
+                    "\n\tconfigDir:" + this.configDir +
+                    "\n\ttemplateDir:" + this.templateDir +
+                    "\n\turl:" + configModel.getUrl() +
+                    "\n\tuserName:" + configModel.getUserName() +
+                    "\n\tpassword:" + configModel.getPassword() +
+                    "\n\tdatabaseName:" + configModel.getDatabaseName() +
+                    "\n\ttablePrefix:" + configModel.getTablePrefix() +
+                    "\n\ttableNamePattern:" + configModel.getTableNamePattern() +
+                    "\n\tpackagePath:" + configModel.getPackagePath() +
+                    "\n\tprojectName:" + configModel.getProjectName() +
+                    "\n\texcludeColumns:" + configModel.getExcludeColumns());
+            PluginTable plugin = new PluginTable(configModel);
+            String templatePath = this.basePath + templateDir;
+            PluginClass pluginClass = new PluginClass(plugin, templatePath, configModel);
+            pluginClass.run();
+        }catch (Exception e){
+            log.error("插件运行失败", e);
+            throw e;
         }
-        Properties properties = ReaderUtils.loadProperties(this.basePath + this.configDir);
-        ConfigModel configModel = new ConfigModel(properties);
-        log.info("mojo execute:" +
-                        "\n\tuserDir:" + this.basePath +
-                        "\n\tconfigDir:" + this.configDir +
-                        "\n\ttemplateDir:" + this.templateDir +
-                        "\n\turl:" + configModel.getUrl() +
-                        "\n\tuserName:" + configModel.getUserName() +
-                        "\n\tpassword:" + configModel.getPassword() +
-                        "\n\tdatabaseName:" + configModel.getDatabaseName() +
-                        "\n\ttablePrefix:" + configModel.getTablePrefix() +
-                        "\n\ttableNamePattern:" + configModel.getTableNamePattern() +
-                        "\n\tpackagePath:" + configModel.getPackagePath() +
-                        "\n\tprojectName:" + configModel.getProjectName() +
-                        "\n\texcludeColumns:" + configModel.getExcludeColumns());
-        PluginTable plugin = new PluginTable(configModel);
-        String templatePath = this.basePath + templateDir;
-        PluginClass pluginClass = new PluginClass(plugin, templatePath, configModel);
-        pluginClass.run();
 
     }
 
-    public static void main(String[] args) throws MojoExecutionException, MojoFailureException {
-        PluginMojo mogo = new PluginMojo();
-        mogo.configDir = "\\src\\main\\resources\\config.properties";
-        mogo.templateDir = "\\src\\main\\resources\\template";
-        mogo.basePath = DataUtils.USER_DIR + "\\datasource\\generator-plugin";
-
-        mogo.execute();
-    }
+//    public static void main(String[] args) throws MojoExecutionException, MojoFailureException {
+//        PluginMojo mogo = new PluginMojo();
+//        mogo.configDir = "\\src\\main\\resources\\config.properties";
+//        mogo.templateDir = "\\src\\main\\resources\\template";
+//        mogo.basePath = DataUtils.USER_DIR + "\\datasource\\generator-plugin";
+//
+//        mogo.execute();
+//    }
 }

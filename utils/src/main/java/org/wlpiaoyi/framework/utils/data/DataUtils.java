@@ -25,16 +25,25 @@ public class DataUtils {
 //load file=====================================================================>
     public static File loadPath(@NonNull String path){
         File file = new File(path);
+        if(file == null){
+            throw new BusinessException("没有找到文件:" + path);
+        }
         if(!file.exists()){ return null; }
         return file;
     }
     public static File loadFile(@NonNull String path){
         File file = loadPath(path);
+        if(file == null){
+            throw new BusinessException("没有找到文件:" + path);
+        }
         if(!file.isFile()){ return null; }
         return file;
     }
     public static File isDirectory(@NonNull String path){
         File file = loadPath(path);
+        if(file == null){
+            throw new BusinessException("没有找到文件:" + path);
+        }
         if(!file.isDirectory()){ return null; }
         return file;
     }
@@ -47,6 +56,9 @@ public class DataUtils {
      */
     public static boolean makeDir(String dirPath) {
         File dir = new File(dirPath);
+        if(dir == null){
+            throw new BusinessException("没有找到文件:" + dirPath);
+        }
         if (!dir.exists()) {
             dir.mkdirs();
             return true;
@@ -61,6 +73,9 @@ public class DataUtils {
      */
     public static long getSize(String filePath){
         File file = new File(filePath);
+        if(file == null){
+            throw new BusinessException("没有找到文件:" + filePath);
+        }
         if (!file.exists()) {
             return -1;
         }
