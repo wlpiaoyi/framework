@@ -2,7 +2,9 @@ package org.wlpiaoyi.framework.utils.security;
 
 import lombok.Getter;
 import lombok.SneakyThrows;
+import org.wlpiaoyi.framework.utils.StringUtils;
 import org.wlpiaoyi.framework.utils.ValueUtils;
+import org.wlpiaoyi.framework.utils.exception.BusinessException;
 import org.wlpiaoyi.framework.utils.security.condition.ConditionAes;
 
 import javax.crypto.BadPaddingException;
@@ -18,6 +20,8 @@ import java.nio.charset.StandardCharsets;
 import java.security.Key;
 import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
+import java.util.Map;
+import java.util.Random;
 
 /**
  * AES是高级加密标准，在密码学中又称Rijndael加密法，是美国联邦政府采用的一种区块加密标准。
@@ -138,6 +142,123 @@ public class AesCipher extends Security{
             dataOut.flush();
         }
     }
+
+    private static byte[] randomBytes(int length){
+        byte[] rbs = new byte[length];
+        int i = 0;
+        Random random = new Random();
+        while (i < length){
+            byte[] rts = ValueUtils.toBytes(Math.abs(random.nextLong()));
+            int rtsl = rts.length;
+            int rtsi = 0;
+            while (rtsi < rtsl){
+                if(i >= length){
+                    break;
+                }
+                rbs[i ++] = rts[rtsi ++];
+            }
+        }
+        return rbs;
+    }
+
+    /**
+     * 填充加密
+     * @param dataBytes 数据
+     * @param fil       填充长度
+     * @return: byte[]
+     * @author: wlpia
+     * @date: 1/24/2024 1:36 PM
+     */
+    public byte[] encryptFill(byte[] dataBytes, int fil) throws IllegalBlockSizeException, BadPaddingException {
+        int dl = dataBytes.length;
+        if(fil > 255){
+            throw new BusinessException("fil can't greater than 255");
+        }
+        if(dl > fil - 1){
+            throw new BusinessException("dataBytes length can't greater than " + (fil -1));
+        }
+        //原始数据长度和数据值
+        int vi = 0;
+        byte[] values = new byte[dl + 1];
+        values[vi ++] = (byte) dl;
+        int vl = values.length;
+        while (vi < vl){
+            values[vi] = dataBytes[vi - 1];
+            vi ++;
+        }
+        //第一部分数据, 填充后的原始数据
+        byte[] part1 = new byte[fil];
+        if(vl < fil){
+            byte[] fillBytes = randomBytes(fil);
+            int fl = fil - vl;
+            int di = 0;
+            while (di < fl){
+                part1[di] = fillBytes[di];
+                di ++;
+            }
+            di = vl;
+            vi = 0;
+            while (di > 0){
+                di --;
+                part1[di + fl] = values[vi ++];
+            }
+        }else if(vl == fil){
+            part1 = values;
+        }else{
+            throw new BusinessException("values length can't greater than " + fil);
+        }
+        byte[] part2 = randomBytes(fil);
+        byte[] data = new byte[fil * 2];
+        int di = 0;
+        int pi = 0;
+        while (pi < fil){
+            data[di ++] = part1[pi];
+            data[di ++] = part2[pi];
+            pi ++;
+        }
+        return this.encrypt(data);
+    }
+    /**
+     * 填充解密
+     * @param dataBytes 数据
+     * @param fil       填充长度
+     * @return: byte[]
+     * @author: wlpia
+     * @date: 1/24/2024 1:36 PM
+     */
+    public byte[] decryptFill(byte[] dataBytes, int fil) throws IllegalBlockSizeException, BadPaddingException {
+        if(fil > 255){
+            throw new BusinessException("fil can't greater than 255");
+        }
+        byte[] data = this.decrypt(dataBytes);
+        int dtl = data.length;
+        if(dtl != fil * 2){
+            throw new BusinessException("decrypted data length must be " + (fil * 2));
+        }
+        int di = 0;
+        //第一部分数据
+        byte[] part1 = new byte[fil];
+        int pi = 0;
+        while (di < fil * 2){
+            part1[pi ++] = data[di ++];
+            di ++;
+        }
+        //原始数据长度数据
+        byte[] vb = {part1[fil - 1]};
+        int vl = (int)ValueUtils.toLong(vb);
+        if(vl > fil - 1){
+            throw new BusinessException("value length can't greater than " + (fil - 1));
+        }
+        //原始数据长度数据
+        byte[] value = new byte[vl];
+        int vi = 0;
+        pi = fil - 2;
+        while (vi < vl){
+            value[vi ++] = part1[pi --];
+        }
+        return value;
+    }
+
 
     /**
      * @description: 对AES加密字符串进行解密

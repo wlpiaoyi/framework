@@ -60,6 +60,8 @@ public class AesCipherTest {
 
     @Test
     public void test2() throws Exception {
+
+
         String path = DataUtils.USER_DIR + "/target/test/aes_simple.mp4";
 //        String path = DataUtils.USER_DIR + "/target/test/1.txt";
         File file = new File(path);
@@ -102,6 +104,18 @@ public class AesCipherTest {
         System.out.println("eFile verify:" + signatureCipher.verify(new FileInputStream(eFile), sign));
 
 
+    }
+
+    @Test
+    public void test3() throws Exception {
+
+        AesCipher aes = AesCipher.build().setKey(StringUtils.getUUID32())
+                .setIV(StringUtils.getUUID32().substring(0, 16)).loadConfig();
+        byte[] d = "我的世界再这里那可就的立法及我的".getBytes();
+        byte[] ed = aes.encryptFill(d, 255);
+        System.out.println(new String(DataUtils.base64Encode(ed)));
+        byte[] dd = aes.decryptFill(ed, 255);
+        System.out.println(new String(dd));
     }
 
 
