@@ -105,17 +105,31 @@ public class AesCipherTest {
 
 
     }
-
     @Test
     public void test3() throws Exception {
+        byte[] d = "我的世界再这里那可就的立法及我的就的立法及我的就的立法及我的就的立法及我的就的立法及我的就的立法及我的就的立法及我的就的立法及我的".getBytes();
+        int i = 0;
+        while (i++ < 10){
+            byte[] ed = FillTools.putIn(d, 2,3, 190);
+            System.out.println(new String(DataUtils.base64Encode(ed)));
+            byte[] dd = FillTools.putOut(ed, 190);
+            System.out.println(new String(dd));
+        }
+    }
+
+    @Test
+    public void test4() throws Exception {
 
         AesCipher aes = AesCipher.build().setKey(StringUtils.getUUID32())
                 .setIV(StringUtils.getUUID32().substring(0, 16)).loadConfig();
-        byte[] d = "我的世界再这里那可就的立法及我的".getBytes();
-        byte[] ed = aes.encryptFill(d, 255);
-        System.out.println(new String(DataUtils.base64Encode(ed)));
-        byte[] dd = aes.decryptFill(ed, 255);
-        System.out.println(new String(dd));
+        byte[] d = "我的世界再这里那可就的立法及我的我的世界再立法及我的我的世界再立法及我的我的世界再世界再立法及我".getBytes();
+        int i = 0;
+        while (i++ < 10){
+            byte[] ed = aes.encryptFill(d, 200);
+            System.out.println(new String(DataUtils.base64Encode(ed)));
+            byte[] dd = aes.decryptFill(ed, 200);
+            System.out.println(new String(dd));
+        }
     }
 
 
