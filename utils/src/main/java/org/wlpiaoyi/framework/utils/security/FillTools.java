@@ -165,12 +165,11 @@ class FillTools {
      */
     static byte[] putOut(byte[] fillDataBytes, int fil_data_unit_c){
 
-        int fill_data_i = 0;
         byte[] fil_head_bytes = new byte[1];
-        fil_head_bytes[0] = fillDataBytes[fill_data_i ++];
+        fil_head_bytes[0] = fillDataBytes[0];
         int fil_head_byte_l = (int) ValueUtils.toLong(fil_head_bytes);
         //已填充的数据索引偏移到body的位置
-        fill_data_i = fil_head_byte_l + 1;
+        int fill_data_i = fil_head_byte_l + 1;
 
         byte[] body_l_bytes = new byte[2];
         body_l_bytes[0] = fillDataBytes[fill_data_i ++];
