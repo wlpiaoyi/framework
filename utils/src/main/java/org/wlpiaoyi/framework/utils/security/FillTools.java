@@ -13,6 +13,9 @@ import java.util.Random;
  */
 class FillTools {
 
+    private static final Random RANDOM = new Random();
+
+
     /**
      * 生成随机数
      * @param length        长度
@@ -23,9 +26,8 @@ class FillTools {
     static byte[] randomBytes(int length){
         byte[] rbs = new byte[length];
         int i = 0;
-        Random random = new Random();
         while (i < length){
-            byte[] rts = ValueUtils.toBytes(Math.abs(random.nextLong()));
+            byte[] rts = ValueUtils.toBytes(Math.abs(RANDOM.nextLong()));
             int rtsl = rts.length;
             int rtsi = 0;
             while (rtsi < rtsl){
@@ -40,26 +42,26 @@ class FillTools {
 
     static int getFillHeadByteLength(byte[] dataBytes){
         byte[] fil_head_byte = new byte[1];
-        fil_head_byte[0] = dataBytes[0];
+        fil_head_byte[0] = dataBytes[1];
         return (int) ValueUtils.toLong(fil_head_byte);
     }
 
     static int getBodyByteLength(byte[] dataBytes, int fil_head_byte_l){
         byte[] fil_body_byte = new byte[2];
-        fil_body_byte[0] = dataBytes[fil_head_byte_l + 1];
-        fil_body_byte[1] = dataBytes[fil_head_byte_l + 2];
+        fil_body_byte[0] = dataBytes[fil_head_byte_l + 1 + 2];
+        fil_body_byte[1] = dataBytes[fil_head_byte_l + 2 + 2];
         return (int) ValueUtils.toLong(fil_body_byte);
     }
 
     static int getDataByteLength(byte[] dataBytes, int fil_head_byte_l){
         byte[] fil_data_byte = new byte[1];
-        fil_data_byte[0] = dataBytes[fil_head_byte_l + 3];
+        fil_data_byte[0] = dataBytes[fil_head_byte_l + 3 + 2];
         return (int) ValueUtils.toLong(fil_data_byte);
     }
 
 //    static int getFillTailByteLength(byte[] dataBytes, int fil_head_byte_l, int body_l){
 //        byte[] fil_tail_byte = new byte[1];
-//        fil_tail_byte[0] = dataBytes[fil_head_byte_l + 1 + body_l + 2];
+//        fil_tail_byte[0] = dataBytes[fil_head_byte_l + 1 + body_l + 2 + 3];
 //        return (int) ValueUtils.toLong(fil_tail_byte);
 //    }
 
@@ -95,7 +97,7 @@ class FillTools {
         //填充尾数据
         final byte[] fil_body_bytes = randomBytes(fil_data_unit_c);
         //总数据长度
-        final int fill_data_byte_l = fil_head_byte_l + 1 + fil_tail_byte_l + 1 + body_l + 2 + 1;
+        final int fill_data_byte_l = fil_head_byte_l + 1 + fil_tail_byte_l + 1 + body_l + 2 + 1 + 3;
         //总数据长度
         byte[] fill_data_bytes = new byte[fill_data_byte_l];
 
@@ -103,6 +105,7 @@ class FillTools {
         int fill_data_i = 0;
         //填充头数据index
         int fil_head_i= 0;
+        fill_data_bytes[fill_data_i ++] = (byte) (RANDOM.nextInt() / 256);
         fill_data_bytes[fill_data_i ++] = (byte) fil_head_byte_l;
         while (fil_head_i < fil_head_byte_l){
             fill_data_bytes[fill_data_i ++] = fil_head_bytes[fil_head_i ++];
@@ -128,7 +131,7 @@ class FillTools {
                 break;
             }
         }
-
+        fill_data_bytes[fill_data_i ++] = (byte) (RANDOM.nextInt() / 256);
         if(body_l <= 255){
             fill_data_bytes[fill_data_i ++] = (byte) 0;
             fill_data_bytes[fill_data_i ++] = (byte) body_l;
@@ -147,6 +150,7 @@ class FillTools {
 
         //填充头数据index
         int fil_tail_i= 0;
+        fill_data_bytes[fill_data_i ++] = (byte) (RANDOM.nextInt() / 256);
         fill_data_bytes[fill_data_i ++] = (byte) fil_tail_byte_l;
         while (fil_tail_i < fil_tail_byte_l){
             fill_data_bytes[fill_data_i ++] = fil_tail_bytes[fil_tail_i ++];
@@ -166,12 +170,13 @@ class FillTools {
     static byte[] putOut(byte[] fillDataBytes, int fil_data_unit_c){
 
         byte[] fil_head_bytes = new byte[1];
-        fil_head_bytes[0] = fillDataBytes[0];
+        fil_head_bytes[0] = fillDataBytes[1];
         int fil_head_byte_l = (int) ValueUtils.toLong(fil_head_bytes);
         //已填充的数据索引偏移到body的位置
-        int fill_data_i = fil_head_byte_l + 1;
+        int fill_data_i = fil_head_byte_l + 1 + 1;
 
         byte[] body_l_bytes = new byte[2];
+        fill_data_i ++;
         body_l_bytes[0] = fillDataBytes[fill_data_i ++];
         body_l_bytes[1] = fillDataBytes[fill_data_i ++];
         fill_data_i ++;

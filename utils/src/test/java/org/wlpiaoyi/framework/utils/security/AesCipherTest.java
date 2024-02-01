@@ -122,13 +122,14 @@ public class AesCipherTest {
 
         AesCipher aes = AesCipher.build().setKey(StringUtils.getUUID32())
                 .setIV(StringUtils.getUUID32().substring(0, 16)).loadConfig();
-        byte[] d = "我的世界再这里那可就的立法及我的我的世界再立法及我的我的世界再立法及我的我的世界再世界再立法及我".getBytes();
+        byte[] d = "我的世界再立法及我的我的世界再世界再立法及我奥i大奥迪发觉山东覅就我i未按时交付".getBytes();
         int i = 0;
         while (i++ < 10){
             byte[] ed = aes.encryptFill(d, 200);
             System.out.println(new String(DataUtils.base64Encode(ed)));
             byte[] dd = aes.decryptFill(ed, 200);
             System.out.println(new String(dd));
+            System.out.println(ed.length + "  " + dd.length);
         }
     }
 
