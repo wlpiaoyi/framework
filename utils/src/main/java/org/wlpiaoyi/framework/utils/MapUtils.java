@@ -24,7 +24,7 @@ public class MapUtils {
      * @return
      * @param <T>
      */
-    public static final <T> boolean checkValueType(Map map, Object key, Class<T> valueType){
+    public static <T> boolean checkValueType(Map map, Object key, Class<T> valueType){
         if(map == null || map.isEmpty()) {
             return false;
         }
@@ -43,7 +43,7 @@ public class MapUtils {
      * @return
      * @param <T>
      */
-    public static final <T> T get(Map map, Object key, T defaultValue){
+    public static <T> T get(Map map, Object key, T defaultValue){
         if(map == null || map.isEmpty()) {
             return  defaultValue;
         }
@@ -54,11 +54,11 @@ public class MapUtils {
         return (T) value;
     }
 
-    public static final <T> T get(Map map, Object key) {
+    public static <T> T get(Map map, Object key) {
         return get(map, key,null);
     }
 
-    public static final Object getObject(Map map, Object key, Object defaultValue){
+    public static Object getObject(Map map, Object key, Object defaultValue){
         if(map == null || map.isEmpty()) {
             return  defaultValue;
         }
@@ -68,14 +68,14 @@ public class MapUtils {
         }
         return value;
     }
-    public static final Object getObject(Map map, Object key){
+    public static Object getObject(Map map, Object key){
         return getObject(map, key, null);
     }
 
-    public static final String getString(Map map, Object key){
+    public static String getString(Map map, Object key){
         return MapUtils.getString(map, key, null);
     }
-    public static final String getString(Map map, Object key, String defaultValue){
+    public static String getString(Map map, Object key, String defaultValue){
         if(map == null || map.isEmpty()) {
             return defaultValue;
         }
@@ -93,10 +93,10 @@ public class MapUtils {
         return value.toString();
     }
 
-    public static final Float getFloat(Map map, Object key){
+    public static Float getFloat(Map map, Object key){
         return MapUtils.getFloat(map, key, null);
     }
-    public static final Float getFloat(Map map, Object key, Float defaultValue){
+    public static Float getFloat(Map map, Object key, Float defaultValue){
         if(map == null || map.isEmpty()) {
             return  defaultValue;
         }
@@ -112,10 +112,10 @@ public class MapUtils {
         return new Float(value.toString());
     }
 
-    public static final Double getDouble(Map map, Object key){
+    public static Double getDouble(Map map, Object key){
         return MapUtils.getDouble(map, key, null);
     }
-    public static final Double getDouble(Map map, Object key, Double defaultValue){
+    public static Double getDouble(Map map, Object key, Double defaultValue){
         if(map == null || map.isEmpty()) {
             return  defaultValue;
         }
@@ -131,10 +131,10 @@ public class MapUtils {
         return new Double(value.toString());
     }
 
-    public static final Boolean getBoolean(Map map, Object key){
+    public static Boolean getBoolean(Map map, Object key){
         return MapUtils.getBoolean(map, key, null);
     }
-    public static final Boolean getBoolean(Map map, Object key, Boolean defaultValue){
+    public static Boolean getBoolean(Map map, Object key, Boolean defaultValue){
         if(map == null || map.isEmpty()) {
             return  defaultValue;
         }
@@ -145,15 +145,15 @@ public class MapUtils {
         if(value instanceof Boolean){
             return (Boolean) value;
         }else if (value instanceof String){
-            return new Boolean((String) value);
+            return Boolean.valueOf((String) value);
         }
-        return new Boolean(value.toString());
+        return Boolean.valueOf(value.toString());
     }
 
-    public static final Byte getByte(Map map, Object key){
+    public static Byte getByte(Map map, Object key){
         return MapUtils.getByte(map, key, null);
     }
-    public static final Byte getByte(Map map, Object key, Byte defaultValue){
+    public static Byte getByte(Map map, Object key, Byte defaultValue){
         if(map == null || map.isEmpty()) {
             return  defaultValue;
         }
@@ -169,10 +169,10 @@ public class MapUtils {
         return new Byte(value.toString());
     }
 
-    public static final Integer getInteger(Map map, Object key){
+    public static Integer getInteger(Map map, Object key){
         return MapUtils.getInteger(map, key, null);
     }
-    public static final Integer getInteger(Map map, Object key, Integer defaultValue){
+    public static Integer getInteger(Map map, Object key, Integer defaultValue){
         if(map == null || map.isEmpty()) {
             return  defaultValue;
         }
@@ -194,10 +194,10 @@ public class MapUtils {
         return new Double(value.toString()).intValue();
     }
 
-    public static final Long getLong(Map map, Object key){
+    public static Long getLong(Map map, Object key){
         return MapUtils.getLong(map, key, null);
     }
-    public static final Long getLong(Map map, Object key, Long defaultValue){
+    public static Long getLong(Map map, Object key, Long defaultValue){
         if(map == null || map.isEmpty()) {
             return  defaultValue;
         }
@@ -211,6 +211,8 @@ public class MapUtils {
             return DateUtils.toTimestamp(((LocalDateTime) value));
         }else if(value instanceof LocalDate){
             return DateUtils.toEpochDay(((LocalDate) value)) * 24 * 3600;
+        }else  if(value instanceof Date){
+            return ((Date)value).getTime();
         }else if(value instanceof Integer){
             return ((Integer) value).longValue();
         }else if(value instanceof Double){
@@ -221,10 +223,10 @@ public class MapUtils {
         return new Double(value.toString()).longValue();
     }
 
-    public static final LocalDateTime getLocalDateTime(Map map, Object key){
+    public static LocalDateTime getLocalDateTime(Map map, Object key){
         return MapUtils.getLocalDateTime(map, key, null);
     }
-    public static final LocalDateTime getLocalDateTime(Map map, Object key, LocalDateTime defaultValue){
+    public static LocalDateTime getLocalDateTime(Map map, Object key, LocalDateTime defaultValue){
         if(map == null || map.isEmpty()) {
             return  defaultValue;
         }
@@ -247,10 +249,10 @@ public class MapUtils {
         return null;
     }
 
-    public static final LocalDate getLocalDate(Map map, Object key){
+    public static LocalDate getLocalDate(Map map, Object key){
         return MapUtils.getLocalDate(map, key, null);
     }
-    public static final LocalDate getLocalDate(Map map, Object key, LocalDate defaultValue){
+    public static LocalDate getLocalDate(Map map, Object key, LocalDate defaultValue){
         if(map == null || map.isEmpty()) {
             return  defaultValue;
         }
@@ -273,10 +275,10 @@ public class MapUtils {
         return null;
     }
 
-    public static final Date getDate(Map map, Object key){
+    public static Date getDate(Map map, Object key){
         return MapUtils.getDate(map, key, null);
     }
-    public static final Date getDate(Map map, Object key, Date defaultValue){
+    public static Date getDate(Map map, Object key, Date defaultValue){
         if(map == null || map.isEmpty()) {
             return  defaultValue;
         }
@@ -299,10 +301,10 @@ public class MapUtils {
         return null;
     }
 
-    public static final Map getMap(Map map, Object key){
+    public static Map getMap(Map map, Object key){
         return MapUtils.getMap(map, key, null);
     }
-    public static final Map getMap(Map map, Object key, Map defaultValue){
+    public static Map getMap(Map map, Object key, Map defaultValue){
         if(map == null || map.isEmpty()) {
             return  defaultValue;
         }
@@ -313,10 +315,10 @@ public class MapUtils {
         return value;
     }
 
-    public static final Object[] getArray(Map map, Object key){
+    public static Object[] getArray(Map map, Object key){
         return MapUtils.getArray(map, key, null);
     }
-    public static final Object[] getArray(Map map, Object key, Object[] defaultValue){
+    public static Object[] getArray(Map map, Object key, Object[] defaultValue){
         if(map == null || map.isEmpty()) {
             return  defaultValue;
         }
@@ -327,11 +329,11 @@ public class MapUtils {
         return value;
     }
 
-    public static final List getList(Map map, Object key){
+    public static List getList(Map map, Object key){
         return getList(map, key, null);
     }
 
-    public static final List getList(Map map, Object key, List defaultValue){
+    public static List getList(Map map, Object key, List defaultValue){
         Object datas = map.get(key);
         if(datas == null){
             return defaultValue;
@@ -346,11 +348,11 @@ public class MapUtils {
     }
 
 
-    public static final <T> List<T> getListGeneric(Map map, Object key, Class<T> clazz){
+    public static <T> List<T> getListGeneric(Map map, Object key, Class<T> clazz){
         return getListGeneric(map, key, clazz, null);
     }
 
-    public static final <T> List<T> getListGeneric(Map map, Object key, Class<T> clazz, List<T> defaultValue){
+    public static <T> List<T> getListGeneric(Map map, Object key, Class<T> clazz, List<T> defaultValue){
         if(map == null || map.isEmpty()) {
             return  defaultValue;
         }
@@ -400,11 +402,11 @@ public class MapUtils {
         return items;
     }
 
-    public static final Set getSet(Map map, Object key){
+    public static Set getSet(Map map, Object key){
         return getSet(map, key, null);
     }
 
-    public static final Set getSet(Map map, Object key, Set defaultValue){
+    public static Set getSet(Map map, Object key, Set defaultValue){
         Object datas = map.get(key);
         if(datas == null){
             return defaultValue;
@@ -419,11 +421,11 @@ public class MapUtils {
     }
 
 
-    public static final <T> Set<T> getSetGeneric(Map map, Object key, Class<T> clazz){
+    public static <T> Set<T> getSetGeneric(Map map, Object key, Class<T> clazz){
         return getSetGeneric(map, key, clazz, null);
     }
 
-    public static final <T> Set<T> getSetGeneric(Map map, Object key, Class<T> clazz, Set<T> defaultValue){
+    public static <T> Set<T> getSetGeneric(Map map, Object key, Class<T> clazz, Set<T> defaultValue){
         if(map == null || map.isEmpty()) {
             return  defaultValue;
         }

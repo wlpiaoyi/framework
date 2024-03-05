@@ -77,12 +77,12 @@ public class IdWorker {
         this.workerIdShift = this.sequenceBits;
         this.datacenterIdShift = this.sequenceBits + this.workerIdBits;
         this.timestampLeftShift = this.sequenceBits + this.workerIdBits + this.datacenterIdBits;
-        this.sequenceMask = -1L ^ (-1L << this.sequenceBits);
+        this.sequenceMask = ~(-1L << this.sequenceBits);
         this.workerId = workerId;
         this.datacenterId = datacenterId;
         this.timerEpoch = timerEpoch;
-        this.maxWorkerId = -1L ^ (-1L << this.workerIdBits);
-        this.maxDatacenterId = -1L ^ (-1L << this.datacenterIdBits);
+        this.maxWorkerId = ~(-1L << this.workerIdBits); //-1L ^ (-1L << this.workerIdBits);
+        this.maxDatacenterId = ~(-1L << this.datacenterIdBits);
         if (this.workerId > this.maxWorkerId || this.workerId < 0) {
             throw new IllegalArgumentException(String.format("worker Id can't be greater than %d or less than 0", this.maxWorkerId));
         }
@@ -110,12 +110,12 @@ public class IdWorker {
         this.workerIdShift = this.sequenceBits;
         this.datacenterIdShift = this.sequenceBits + this.workerIdBits;
         this.timestampLeftShift = this.sequenceBits + this.workerIdBits + this.datacenterIdBits;
-        this.sequenceMask = -1L ^ (-1L << this.sequenceBits);
+        this.sequenceMask = ~(-1L << this.sequenceBits);
         this.workerId = workerId;
         this.datacenterId = datacenterId;
         this.timerEpoch = timerEpoch;
-        this.maxWorkerId = -1L ^ (-1L << this.workerIdBits);
-        this.maxDatacenterId = -1L ^ (-1L << this.datacenterIdBits);
+        this.maxWorkerId = ~(-1L << this.workerIdBits);
+        this.maxDatacenterId = ~(-1L << this.datacenterIdBits);//-1L ^ (-1L << this.datacenterIdBits)
         if (this.workerId > this.maxWorkerId || this.workerId < 0) {
             throw new IllegalArgumentException(String.format("worker Id can't be greater than %d or less than 0", this.maxWorkerId));
         }

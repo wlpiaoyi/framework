@@ -1,13 +1,27 @@
 package org.wlpiaoyi.framework.utils;
 
-
+/**
+ * <p><b>{@code @description:}</b>  随机编码生成器</p>
+ * <p><b>{@code @date:}</b>         2019/08/22 11:13</p>
+ * <p><b>{@code @author:}</b>       wlpiaoyi</p>
+ * <p><b>{@code @version:}</b>      1.0</p>
+ */
 public class CodeUtils {
 
-    private final static char ADRS[] = new char[]{ '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B', 'C', 'D', 'E', 'F'};
+    private final static char[] ADRS = { '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B', 'C', 'D', 'E', 'F'};
 
 
+    /**
+     * <p><b>{@code @description:}</b>
+     * 获取MAC地址
+     * </p>
+     *
+     * <p><b>{@code @date:}</b>2024/2/22 11:16</p>
+     * <p><b>{@code @return:}</b>{@link char[]}</p>
+     * <p><b>{@code @author:}</b>wlpia</p>
+     */
     public static char[] getRandomMAC(){
-        char MAC[] = new char[12];
+        char[] macAddress = new char[12];
 
         for (int i = 0; i < 12; i++) {
             int index = (int) (Math.random() * 100);
@@ -22,12 +36,21 @@ public class CodeUtils {
                     index = index % 16;
                     break;
             }
-            MAC[i] = ADRS[index];
+            macAddress[i] = ADRS[index];
         }
-        return MAC;
+        return macAddress;
     }
 
 
+    /**
+     * <p><b>{@code @description:}</b>
+     * 国际移动设备识别码
+     * </p>
+     *
+     * <p><b>{@code @date:}</b>2024/2/22 11:17</p>
+     * <p><b>{@code @return:}</b>{@link char[]}</p>
+     * <p><b>{@code @author:}</b>wlpia</p>
+     */
     public static char[] getRandomMEID(){
         char MEID[] = new char[15];
         int index = (int) (Math.random() * 1000);

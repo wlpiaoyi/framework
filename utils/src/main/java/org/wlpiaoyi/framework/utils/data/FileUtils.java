@@ -1,33 +1,39 @@
 package org.wlpiaoyi.framework.utils.data;
 
 import lombok.SneakyThrows;
-import lombok.Value;
 import lombok.extern.slf4j.Slf4j;
-import org.wlpiaoyi.framework.utils.ValueUtils;
 
 import java.io.*;
 import java.nio.charset.Charset;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
 /**
- * {@code @author:}         wlpia
- * {@code @description:}    文件工具
- * {@code @date:}           2024-01-31 11:18:39
- * {@code @version:}:       1.0
+ * <p><b>{@code @description:}</b>
+ * 文件工具,用于判断文件的真实格式
+ * </p>
+ * <p><b>{@code @date:}</b>         2024/1/31 11:18</p>
+ * <p><b>{@code @author:}</b>       wlpiaoyi</p>
+ * <p><b>{@code @version:}</b>      1.0</p>
  */
 @Slf4j
 public class FileUtils {
+
     /**
+     * <p><b>{@code @description:}</b> 
      * 获取文件输入流
-     * @param filePath
-     * @return: java.lang.String
-     * @author: wlpia
-     * @throws IOException
-     * @date: 2024/1/31 18:24
+     * </p>
+     * 
+     * <p><b>@param</b> <b>filePath</b>
+     * {@link String}
+     * </p>
+     *
+     * <p><b>{@code @throws:}</b></p>
+     * <p><b>{@code @date:}</b>2024/1/31 18:24</p>
+     * <p><b>{@code @return:}</b>{@link String}</p>
+     * <p><b>{@code @author:}</b>wlpia</p>
      */
     static String getFileContent(String filePath) throws IOException {
         InputStream inputStream = new FileInputStream(filePath);
@@ -63,12 +69,19 @@ public class FileUtils {
         }
         return bytesToHexString(b);
     }
+
     /**
+     * <p><b>{@code @description:}</b>
      * 将文件头转换成16进制字符串
-     * @param src
-     * @return: java.lang.String 16进制字符串
-     * @author: wlpia
-     * @date: 2024/1/31 18:23
+     * </p>
+     *
+     * <p><b>@param</b> <b>src</b>
+     * {@link byte}
+     * </p>
+     *
+     * <p><b>{@code @date:}</b>2024/1/31 18:23</p>
+     * <p><b>{@code @return:}</b>{@link String}</p>
+     * <p><b>{@code @author:}</b>wlpia</p>
      */
     private static String bytesToHexString(byte[] src){
         StringBuilder stringBuilder = new StringBuilder();
@@ -241,11 +254,17 @@ public class FileUtils {
     }
 
     /**
+     * <p><b>{@code @description:}</b>
      * 判断文件类型格式
-     * @param filePath 文件路径
-     * @return: org.wlpiaoyi.framework.utils.data.FileType 文件路径
-     * @author: wlpia
-     * @date: 2024/1/31 18:23
+     * </p>
+     *
+     * <p><b>@param</b> <b>filePath</b>
+     * {@link String}
+     * </p>
+     *
+     * <p><b>{@code @date:}</b>2024/1/31 18:23</p>
+     * <p><b>{@code @return:}</b>{@link FileType}</p>
+     * <p><b>{@code @author:}</b>wlpia</p>
      */
     public static FileType getType(String filePath) throws IOException {
         FileInputStream input = new FileInputStream(filePath);

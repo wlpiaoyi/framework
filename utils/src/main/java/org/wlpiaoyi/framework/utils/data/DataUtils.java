@@ -2,6 +2,7 @@ package org.wlpiaoyi.framework.utils.data;
 
 import lombok.NonNull;
 import lombok.SneakyThrows;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.codec.binary.Hex;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.wlpiaoyi.framework.utils.StringUtils;
@@ -11,6 +12,7 @@ import java.io.*;
 import java.nio.ByteBuffer;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.Base64;
@@ -18,6 +20,7 @@ import java.util.Base64;
 /**
  * collection of data tools
  */
+@Slf4j
 public class DataUtils {
 
     public static final String USER_DIR = System.getProperty("user.dir");
@@ -59,11 +62,10 @@ public class DataUtils {
         if(dir == null){
             throw new BusinessException("没有找到文件:" + dirPath);
         }
-        if (!dir.exists()) {
-            dir.mkdirs();
-            return true;
+        if (dir.exists()) {
+            return false;
         }
-        return false;
+        return dir.mkdirs();
     }
 
     /**
@@ -101,8 +103,7 @@ public class DataUtils {
         String toPath = to.getPath();
         toPath = toPath.substring(0, toPath.lastIndexOf("/"));
         makeDir(toPath);
-        move.renameTo(to);
-        return true;
+        return move.renameTo(to);
     }
 
 
@@ -123,7 +124,7 @@ public class DataUtils {
             }
             return sb.toString();
         }catch (IOException e) {
-            e.printStackTrace();
+            log.error("read file error", e);
         }finally {
             if(br != null) {
                 try {br.close();} catch (IOException e) { e.printStackTrace();}
@@ -147,7 +148,7 @@ public class DataUtils {
             bw.close();
             return true;
         }catch(IOException e) {
-            e.printStackTrace();
+            log.error("write file error", e);
             return false;
         }
     }
@@ -213,7 +214,7 @@ public class DataUtils {
     public static String MD(File file, String algorithm) throws IOException, NoSuchAlgorithmException {
         InputStream is = null;
         try {
-            is = new FileInputStream(file);
+            is = Files.newInputStream(file.toPath());
             return new String(Hex.encodeHex(MD(is, algorithm)));
         } finally {
             try {

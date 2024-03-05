@@ -1,20 +1,33 @@
 package org.wlpiaoyi.framework.utils;
 
 import lombok.Getter;
-import lombok.Setter;
 import org.wlpiaoyi.framework.utils.exception.BusinessException;
 
+import java.util.concurrent.*;
+
+import static java.lang.String.format;
+
+/**
+ * <p><b>{@code @description:}</b>  控制台进度条</p>
+ * <p><b>{@code @date:}</b>         2024/2/18 14:23</p>
+ * <p><b>{@code @author:}</b>       wlpiaoyi</p>
+ * <p><b>{@code @version:}</b>      1.0</p>
+ */
 public class Progress {
 
     private static final int PROGRESS_BAR = 50;    //控制输出的进度条宽度
-    private static final int UNIT_SIZE = PROGRESS_BAR + 17 + 20;
+
+    private String title = "title";
+    private String runTimeMemo = "run-time";
+    private String remainTimeMemo = "remain-time";
+    private int unitSize = PROGRESS_BAR + this.runTimeMemo.length() + this.remainTimeMemo.length() + 20;
     public static int MAX_RATE = 100;
     @Getter
     volatile float rate = 0;
     volatile boolean isRunning = false;
     long beginTimer;
     private static Progress xProgress = null;
-    private Object synFlag = new Object();
+    private final Object synFlag = new Object();
 
 
     public static Progress singleInstance(){
@@ -54,49 +67,180 @@ public class Progress {
     }
 
     private void printTimer(){
-        System.out.print(" RunTime:" + this.runTime());
-        System.out.print(" RemainTime:" + this.remainTime());
+        System.out.print(" " + this.runTimeMemo + ":" + this.runTime());
+        System.out.print(" " + this.remainTimeMemo + ":" + this.remainTime());
     }
 
-    private Progress(){}
+    private ScheduledFuture<?> future;
+    private ScheduledExecutorService service;
 
-    public final boolean begin(String title){
+    /**
+     * <p><b>{@code @description:}</b>
+     * 倒计时名称
+     * </p>
+     *
+     * <p><b>@param</b> <b>title</b>
+     * {@link String}
+     * </p>
+     *
+     * <p><b>{@code @date:}</b>2024/2/18 14:38</p>
+     * <p><b>{@code @return:}</b>{@link Progress}</p>
+     * <p><b>{@code @author:}</b>wlpia</p>
+     */
+    public Progress setTitle(String title) {
+        if(this.isRunning){
+            throw new BusinessException("Can't change value when task running");
+        }
+        this.title = title;
+        return this;
+    }
+
+    /**
+     * <p><b>{@code @description:}</b>
+     * 倒计时运行时间
+     * </p>
+     *
+     * <p><b>@param</b> <b>runTimeMemo</b>
+     * {@link String}
+     * </p>
+     *
+     * <p><b>{@code @date:}</b>2024/2/18 14:38</p>
+     * <p><b>{@code @return:}</b>{@link Progress}</p>
+     * <p><b>{@code @author:}</b>wlpia</p>
+     */
+    public Progress setRunTimeMemo(String runTimeMemo) {
+        if(this.isRunning){
+            throw new BusinessException("Can't change value when task running");
+        }
+        this.runTimeMemo = runTimeMemo;
+        this.unitSize = PROGRESS_BAR + this.runTimeMemo.length() + this.remainTimeMemo.length() + 20;
+        return this;
+    }
+
+    /**
+     * <p><b>{@code @description:}</b>
+     * 倒计时剩余时间
+     * </p>
+     *
+     * <p><b>@param</b> <b>remainTimeMemo</b>
+     * {@link String}
+     * </p>
+     *
+     * <p><b>{@code @date:}</b>2024/2/18 14:39</p>
+     * <p><b>{@code @return:}</b>{@link Progress}</p>
+     * <p><b>{@code @author:}</b>wlpia</p>
+     */
+    public Progress setRemainTimeMemo(String remainTimeMemo) {
+        if(this.isRunning){
+            throw new BusinessException("Can't change value when task running");
+        }
+        this.remainTimeMemo = remainTimeMemo;
+        this.unitSize = PROGRESS_BAR + this.runTimeMemo.length() + this.remainTimeMemo.length() + 20;
+        return this;
+    }
+
+    /**
+     * <p><b>{@code @description:}</b>
+     * 倒计时剩余时间
+     * </p>
+     *
+     * <p><b>{@code @date:}</b>2024/2/18 14:39</p>
+     * <p><b>{@code @return:}</b>{@link Progress}</p>
+     * <p><b>{@code @author:}</b>wlpia</p>
+     */
+    public Progress init(){
+        synchronized (this.synFlag){
+            if(this.future != null && !this.future.isCancelled()){
+                throw new BusinessException("Can't create a schedule when there has a alive schedule");
+            }
+            this.destroy(true);
+            ScheduledExecutorService service = Executors.newSingleThreadScheduledExecutor();
+            this.future = service.scheduleAtFixedRate(() -> {
+                if(!this.isRunning){
+                    return;
+                }
+                if(rate < MAX_RATE){
+                    printCurrentNum(rate);
+                }else{
+                    printCurrentNum(MAX_RATE);
+                    System.out.println();
+                    this.end();
+                }
+            }, 0L, 50L, TimeUnit.MILLISECONDS);
+            this.service = service;
+        }
+        return this;
+    }
+
+    /**
+     * <p><b>{@code @description:}</b>
+     * 销毁
+     * </p>
+     *
+     * <p><b>@param</b> <b>mayInterruptIfRunning</b>
+     * {@link boolean}
+     * </p>
+     *
+     * <p><b>{@code @date:}</b>2024/2/18 14:39</p>
+     * <p><b>{@code @return:}</b>{@link Progress}</p>
+     * <p><b>{@code @author:}</b>wlpia</p>
+     */
+    public Progress destroy(boolean mayInterruptIfRunning){
+        if(this.future != null){
+            this.future.cancel(mayInterruptIfRunning);
+        }
+        if(this.service != null){
+            this.service.shutdownNow();
+        }
+        return this;
+    }
+
+    private Progress(){
+    }
+
+    /**
+     * <p><b>{@code @description:}</b>
+     * 开始计时
+     * </p>
+     *
+     * <p><b>{@code @date:}</b>2024/2/18 14:39</p>
+     * <p><b>{@code @return:}</b>{@link Progress}</p>
+     * <p><b>{@code @author:}</b>wlpia</p>
+     */
+    public final Progress begin(){
         if(isRunning){
-            return false;
+            throw new BusinessException("has a running task!");
         }
         synchronized (this.synFlag){
             if(isRunning){
-                return false;
+                throw new BusinessException("has a running task!");
+            }
+            if(this.future == null || this.future.isCancelled()){
+                throw new BusinessException("Schedule is null");
             }
             this.beginTimer = System.currentTimeMillis();
-            this.isRunning = true;
-            try{
-
-                StringBuffer kg = new StringBuffer();
-                for(int i=0; i < PROGRESS_BAR; i++){
-                    kg.append(undoFlag);
-                }
-                System.out.print(title + ":00.0%[>"+kg.toString()+"]");
-                this.printTimer();
-                rate = 0;
-                while (rate < MAX_RATE){
-                    printCurrentNum(rate);
-                    try {
-                        Thread.sleep(20);
-                    } catch (InterruptedException e) {
-                        e.printStackTrace();
-                    }
-                }
-                printCurrentNum(MAX_RATE);
-                System.out.println();
-            }finally {
-                this.synFlag = false;
+            StringBuilder kg = new StringBuilder();
+            for(int i=0; i < PROGRESS_BAR; i++){
+                kg.append(undoFlag);
             }
+            System.out.print(this.title + ":00.0%[>"+kg.toString()+"]");
+            this.printTimer();
+            rate = 0;
+            this.isRunning = true;
         }
-        return true;
+        return this;
     }
 
-    public final void end(){
+    /**
+     * <p><b>{@code @description:}</b>
+     * 结束计时
+     * </p>
+     *
+     * <p><b>{@code @date:}</b>2024/2/18 14:40</p>
+     * <p><b>{@code @return:}</b>{@link Progress}</p>
+     * <p><b>{@code @author:}</b>wlpia</p>
+     */
+    public final Progress end(){
         this.setRate(Progress.MAX_RATE);
         try {
             Thread.sleep(20);
@@ -105,10 +249,11 @@ public class Progress {
         }
         this.setRate(Progress.MAX_RATE + 1);
         this.isRunning = false;
+        return this;
     }
 
     private void focusGoto(){
-        for(int i=UNIT_SIZE + 8; i > 0; i--){
+        for(int i = unitSize + 8; i > 0; i--){
             System.out.print('\b');
         }
     }
@@ -162,33 +307,52 @@ public class Progress {
 
 //    public static void main(String[] args) {
 //
-//        Progress progress = new Progress();
-//        new Thread(() -> progress.begin("test")).start();
+//        Progress progress = Progress.singleInstance().init();
+//        progress.setTitle("测试标题来了").begin();
 //        while (progress.getRate() <= Progress.MAX_RATE){
 //            try {
 //                Thread.sleep(10);
 //            } catch (InterruptedException e) {
 //                e.printStackTrace();
 //            }
-//            progress.setRate(progress.getRate() + 0.01f);
+//            progress.setRate(progress.getRate() + 0.1f);
 //        }
-//    }
-
-//    public static void main(String[] args) {
+//        try {
+//            Thread.sleep(200);
+//        } catch (InterruptedException e) {
+//            e.printStackTrace();
+//        }
 //
-//        Progress progress = new Progress();
-//        new Thread(() -> progress.begin("test")).start();
-//        progress.beginTimer = System.currentTimeMillis() - 56000;
+//        progress.setRunTimeMemo("运行时间").setRemainTimeMemo("剩余时间").setTitle("test2").begin();
 //        while (progress.getRate() <= Progress.MAX_RATE){
 //            try {
-//                Thread.sleep(200);
+//                Thread.sleep(10);
 //            } catch (InterruptedException e) {
 //                e.printStackTrace();
 //            }
-//            for(int i=8; i > 0; i--){
-//                System.out.print('\b');
-//            }
-//            System.out.print(progress.paresTime(System.currentTimeMillis() - progress.beginTimer));
+//            progress.setRate(progress.getRate() + 0.1f);
 //        }
+//        try {
+//            Thread.sleep(100);
+//        } catch (InterruptedException e) {
+//            e.printStackTrace();
+//        }
+//        progress.destroy(true);
+//
+//        progress.init().setTitle("哈哈这个呢").begin();
+//        while (progress.getRate() <= Progress.MAX_RATE){
+//            try {
+//                Thread.sleep(10);
+//            } catch (InterruptedException e) {
+//                e.printStackTrace();
+//            }
+//            progress.setRate(progress.getRate() + 0.1f);
+//        }
+//        try {
+//            Thread.sleep(200);
+//        } catch (InterruptedException e) {
+//            e.printStackTrace();
+//        }
+//        progress.destroy(true);
 //    }
 }

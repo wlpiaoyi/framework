@@ -2,11 +2,12 @@ package org.wlpiaoyi.framework.utils.data;
 
 import lombok.Getter;
 
+
 /**
- * {@code @author:}         wlpia
- * {@code @description:}    文件格式
- * {@code @date:}           2024-01-31 10:58:18
- * {@code @version:}:       1.0
+ * <p><b>{@code @description:}</b>  文件格式</p>
+ * <p><b>{@code @date:}</b>         2024/1/21 10:58</p>
+ * <p><b>{@code @author:}</b>       wlpia</p>
+ * <p><b>{@code @version:}</b>      1.0</p>
  */
 @Getter
 public enum FileType {
@@ -42,9 +43,9 @@ public enum FileType {
     HTML("68746D6C3E", ".HTML.HTM."),
 
     /**
-     * ZIP Archive, OFFICE >=2007 DOC.XLSX. APK .apk
+     * ZIP Archive, OFFICE >=2007 DOC.XLSX. APK JAR
      */
-    ZIP("504B0304", ".ZIP.DOCX.XLSX.APK."),
+    ZIP("504B0304", ".ZIP.DOCX.XLSX.APK.JAR."),
 
     /**
      * RAR Archive DOC.XLSX.

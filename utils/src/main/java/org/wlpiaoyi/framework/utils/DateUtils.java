@@ -364,8 +364,4 @@ public class DateUtils {
         return dateFormat.format(date);
     }
 
-
-
-
-
 }

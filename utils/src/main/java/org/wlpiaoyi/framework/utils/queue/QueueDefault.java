@@ -32,7 +32,7 @@ class QueueDefault implements Queue, RunnableDefault.Progress, Runnable {
     public List<Task> getWaitingTasks() {
         synchronized (this.taskSynTag){
             List<Task> list = this.waitingTasks;
-            return new ArrayList(){{
+            return new ArrayList<Task>(){{
                 addAll(list);
             }};
         }
@@ -42,7 +42,7 @@ class QueueDefault implements Queue, RunnableDefault.Progress, Runnable {
     public List<Task> getDoingTasks() {
         synchronized (this.taskSynTag){
             List<Task> list = this.doingTasks;
-            return new ArrayList(){{
+            return new ArrayList<Task>(){{
                 addAll(list);
             }};
         }
@@ -138,7 +138,7 @@ class QueueDefault implements Queue, RunnableDefault.Progress, Runnable {
                         new RuntimeException("task(" + task + ") not fund QueueRunnable").printStackTrace();
                     }
                 }
-            }while (task != null);
+            }while (true);
         }finally {
             synchronized (this.taskSynTag){
                 this.isLoadQueue = false;
