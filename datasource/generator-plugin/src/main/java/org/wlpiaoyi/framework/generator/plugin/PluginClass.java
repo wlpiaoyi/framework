@@ -330,7 +330,7 @@ public class PluginClass {
                 }
 
                 classText = classText.replace(StructureConstant.IMPORT, importsStr);
-                classText = classText.replace(StructureConstant.CREATE_TIME, DateUtils.formatToLocalDateTime(LocalDateTime.now()));
+                classText = classText.replace(StructureConstant.CREATE_TIME, DateUtils.formatLocalDateTime(LocalDateTime.now()));
                 Map<String, String> map = System.getenv();
                 String pcUserName = map.get("USERNAME");
                 String pcComputerName = map.get("COMPUTERNAME");

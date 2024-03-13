@@ -86,9 +86,9 @@ public class MapUtils {
         if(value instanceof String){
             return (String) value;
         }else if(value instanceof LocalDateTime){
-            return DateUtils.formatToLocalDateTime((LocalDateTime) value);
+            return DateUtils.formatLocalDateTime((LocalDateTime) value);
         }else if(value instanceof LocalDate){
-            return DateUtils.formatToLocalDate((LocalDate) value);
+            return DateUtils.formatLocalDate((LocalDate) value);
         }
         return value.toString();
     }
@@ -183,7 +183,7 @@ public class MapUtils {
         if(value instanceof Integer){
             return (Integer) value;
         }else if(value instanceof LocalDate){
-            return new Integer((int) DateUtils.toEpochDay(((LocalDate) value)));
+            return new Integer((int) DateUtils.parseToEpochDay(((LocalDate) value)));
         }else if(value instanceof Long){
             return ((Long) value).intValue();
         }else if(value instanceof Double){
@@ -208,9 +208,9 @@ public class MapUtils {
         if(value instanceof Long){
             return (Long) value;
         }else if(value instanceof LocalDateTime){
-            return DateUtils.toTimestamp(((LocalDateTime) value));
+            return DateUtils.parseToTimestamp(((LocalDateTime) value));
         }else if(value instanceof LocalDate){
-            return DateUtils.toEpochDay(((LocalDate) value)) * 24 * 3600;
+            return DateUtils.parseToEpochDay(((LocalDate) value)) * 24 * 3600;
         }else  if(value instanceof Date){
             return ((Date)value).getTime();
         }else if(value instanceof Integer){
@@ -237,11 +237,11 @@ public class MapUtils {
         if(value instanceof LocalDateTime){
             return (LocalDateTime) value;
         }else if (value instanceof Long){
-            return DateUtils.toLocalDateTime((Long) value);
+            return DateUtils.parseToLocalDateTime((Long) value);
         }else if (value instanceof String){
             boolean isMatch = Pattern.matches("^\\d+$", (String) value);
             if(isMatch){
-                return DateUtils.toLocalDateTime(new Long((String) value));
+                return DateUtils.parseToLocalDateTime(new Long((String) value));
             }else{
                 return DateUtils.formatToLoaTolDateTime((String) value);
             }
@@ -262,14 +262,16 @@ public class MapUtils {
         }
         if(value instanceof LocalDate){
             return (LocalDate) value;
+        }else if (value instanceof Integer){
+            return DateUtils.parseToLocalDate((Integer) value);
         }else if (value instanceof Long){
-            return DateUtils.toLocalDate((Long) value);
+            return DateUtils.parseToLocalDate((Long) value);
         }else if (value instanceof String){
             boolean isMatch = Pattern.matches("^\\d+$", (String) value);
             if(isMatch){
-                return DateUtils.toLocalDate(new Long((String) value));
+                return DateUtils.parseToLocalDate(new Long((String) value));
             }else{
-                return DateUtils.formatToLocalDate((String) value);
+                return DateUtils.formatLocalDate((String) value);
             }
         }
         return null;

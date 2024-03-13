@@ -34,13 +34,13 @@ public class JsonLocalDateTimeTypeAdapter implements GsonBuilder.JsonSerializer<
         }
 
         Long time = json.getAsLong();
-        LocalDateTime dateTime = DateUtils.toLocalDateTime(time, this.zoneId);
+        LocalDateTime dateTime = DateUtils.parseToLocalDateTime(time, this.zoneId);
         return dateTime;
     }
 
     @Override
     public JsonElement serialize(LocalDateTime dateTime, Type typeOfSrc, JsonSerializationContext context) {
-        return new JsonPrimitive(DateUtils.toTimestamp(dateTime));
+        return new JsonPrimitive(DateUtils.parseToTimestamp(dateTime));
     }
 
 }

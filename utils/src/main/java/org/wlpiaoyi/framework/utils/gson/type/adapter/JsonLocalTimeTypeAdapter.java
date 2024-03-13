@@ -24,12 +24,12 @@ public class JsonLocalTimeTypeAdapter implements GsonBuilder.JsonSerializer<Loca
         }
 
         long nanoOfDay = json.getAsLong();
-        LocalTime dateTime = DateUtils.toLocalTime(nanoOfDay);
+        LocalTime dateTime = DateUtils.parseToLocalTime(nanoOfDay);
         return dateTime;
     }
 
     @Override
     public JsonElement serialize(LocalTime src, Type typeOfSrc, JsonSerializationContext context) {
-        return new JsonPrimitive(DateUtils.toNanoOfDay(src));
+        return new JsonPrimitive(DateUtils.parseToNanoOfDay(src));
     }
 }

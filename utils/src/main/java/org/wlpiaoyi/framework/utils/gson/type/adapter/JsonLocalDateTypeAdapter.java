@@ -22,14 +22,11 @@ public class JsonLocalDateTypeAdapter implements GsonBuilder.JsonSerializer<Loca
         if (!(json instanceof JsonPrimitive)) {
             throw new JsonParseException("The date should be a string value");
         }
-
-        Long epochDay = json.getAsLong();
-        LocalDate dateTime = DateUtils.toLocalDate(epochDay);
-        return dateTime;
+        return DateUtils.parseToLocalDate(json.getAsLong());
     }
 
     @Override
     public JsonElement serialize(LocalDate date, Type typeOfSrc, JsonSerializationContext context) {
-        return new JsonPrimitive(DateUtils.toEpochDay(date));
+        return new JsonPrimitive(DateUtils.parseToEpochDay(date));
     }
 }

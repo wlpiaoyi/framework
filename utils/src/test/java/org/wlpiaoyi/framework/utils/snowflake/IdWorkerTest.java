@@ -32,32 +32,32 @@ public class IdWorkerTest {
                     + ", sequence assert:" + (idWorker.getSequence() == idWorker.getSequence(id))
                     + ", idWorker.getSequence.id:" + idWorker.getSequence(id));
         }
-        timerEpoch = DateUtils.toTimestamp(DateUtils.formatToLoaTolDateTime("2021-01-01 08:00:00"));
+        timerEpoch = DateUtils.parseToTimestamp(DateUtils.formatToLoaTolDateTime("2021-01-01 08:00:00"));
         idWorker = new IdWorker((byte) 1, (byte) 2, timerEpoch);
         long id = idWorker.nextId();
         System.out.println(Long.toBinaryString(id));
         System.out.println(id);
-        timerEpoch = DateUtils.toTimestamp(DateUtils.formatToLoaTolDateTime("2010-01-01 08:00:00"));
+        timerEpoch = DateUtils.parseToTimestamp(DateUtils.formatToLoaTolDateTime("2010-01-01 08:00:00"));
         idWorker = new IdWorker((byte) 1, (byte) 2, timerEpoch);
         id = idWorker.nextId();
         System.out.println(Long.toBinaryString(id));
         System.out.println(id);
-        timerEpoch = DateUtils.toTimestamp(DateUtils.formatToLoaTolDateTime("2000-01-01 08:00:00"));
+        timerEpoch = DateUtils.parseToTimestamp(DateUtils.formatToLoaTolDateTime("2000-01-01 08:00:00"));
         idWorker = new IdWorker((byte) 1, (byte) 2, timerEpoch);
         id = idWorker.nextId();
         System.out.println(Long.toBinaryString(id));
         System.out.println(id);
-        timerEpoch = DateUtils.toTimestamp(DateUtils.formatToLoaTolDateTime("1970-01-01 08:00:00"));
+        timerEpoch = DateUtils.parseToTimestamp(DateUtils.formatToLoaTolDateTime("1970-01-01 08:00:00"));
         idWorker = new IdWorker((byte) 1, (byte) 2, timerEpoch);
         id = idWorker.nextId();
         System.out.println(Long.toBinaryString(id));
         System.out.println(id);
-        timerEpoch = DateUtils.toTimestamp(DateUtils.formatToLoaTolDateTime("1960-01-01 08:00:00"));
+        timerEpoch = DateUtils.parseToTimestamp(DateUtils.formatToLoaTolDateTime("1960-01-01 08:00:00"));
         idWorker = new IdWorker((byte) 1, (byte) 2, timerEpoch);
         id = idWorker.nextId();
         System.out.println(Long.toBinaryString(id));
         System.out.println(id);
-        timerEpoch = DateUtils.toTimestamp(DateUtils.formatToLoaTolDateTime("1954-04-20 02:30:00"));
+        timerEpoch = DateUtils.parseToTimestamp(DateUtils.formatToLoaTolDateTime("1954-04-20 02:30:00"));
         idWorker = new IdWorker((byte) 1, (byte) 2, timerEpoch);
         id = idWorker.nextId();
         System.out.println(Long.toBinaryString(id));
