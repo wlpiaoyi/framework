@@ -4,9 +4,11 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
-import java.io.File;
-import java.io.IOException;
+import java.io.*;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipOutputStream;
 
 public class DataUtilsTest {
 
@@ -47,11 +49,21 @@ public class DataUtilsTest {
 
 
 
-//    @Test
-//    public void write5() throws IOException {
-//        String path = DataUtils.USER_DIR + "/test1/test1-1/data_plus.txt";
-//        System.out.println(DataUtils.MD5PLUS(new File(path)));;
-//    }
+    @Test
+    public void write5() throws IOException {
+        String readInText = DataUtils.readFile("C:\\Users\\wlpia\\Desktop\\1.txt");
+        assert readInText != null;
+        InputStream readIo = new ByteArrayInputStream(readInText.getBytes(StandardCharsets.UTF_8));
+        ByteArrayOutputStream writOut = new ByteArrayOutputStream();
+        DataUtils.zipData(readIo, writOut);
+        byte[] outBytes = writOut.toByteArray();
+        DataUtils.writeFile(new ByteArrayInputStream(outBytes), "C:\\Users\\wlpia\\Desktop\\1.zip");
+
+        readIo = Files.newInputStream(new File("C:\\Users\\wlpia\\Desktop\\1.zip").toPath());
+        writOut = new ByteArrayOutputStream();
+        DataUtils.unZipData(readIo, writOut);
+        System.out.println(readInText.equals(writOut.toString()));
+    }
 
     @After
     public void tearDown() throws Exception {

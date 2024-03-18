@@ -1,5 +1,6 @@
 package org.wlpiaoyi.framework.utils.data;
 
+import jdk.internal.util.xml.impl.Input;
 import lombok.NonNull;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
@@ -16,6 +17,9 @@ import java.nio.file.Files;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.Base64;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipInputStream;
+import java.util.zip.ZipOutputStream;
 
 /**
  * collection of data tools
@@ -24,6 +28,38 @@ import java.util.Base64;
 public class DataUtils {
 
     public static final String USER_DIR = System.getProperty("user.dir");
+
+    @SneakyThrows
+    public static boolean zipData(InputStream inputStream, OutputStream outputStream){
+        byte[] buf = new byte[1024];
+        // ZipOutputStream类：完成文件或文件夹的压缩
+        ZipOutputStream out = new ZipOutputStream(outputStream);
+        // 给列表中的文件单独命名
+        out.putNextEntry(new ZipEntry("test.txt"));
+        int len;
+        while ((len = inputStream.read(buf)) > 0) {
+            out.write(buf, 0, len);
+        }
+        out.closeEntry();
+        out.close();
+        return true;
+    }
+
+
+    @SneakyThrows
+    public static boolean unZipData(InputStream inputStream, OutputStream outputStream){
+        ZipInputStream zip = new ZipInputStream(inputStream);
+        ZipEntry zipEntry = zip.getNextEntry();
+        if(zipEntry == null){
+            return false;
+        }
+        byte[] byte_s = new byte[1024];
+        int num;
+        while ((num = zip.read(byte_s, 0, byte_s.length)) > 0) {
+            outputStream.write(byte_s, 0, num);
+        }
+        return true;
+    }
 
 //load file=====================================================================>
     public static File loadPath(@NonNull String path){
@@ -149,6 +185,32 @@ public class DataUtils {
             return true;
         }catch(IOException e) {
             log.error("write file error", e);
+            return false;
+        }
+    }
+
+    public static boolean writeFile(InputStream inputStream, String PATH){
+        OutputStream outputStream = null;
+        try {
+            File file = new File(PATH);
+            outputStream = Files.newOutputStream(file.toPath());
+            byte[] buffer = new byte[1024];
+            int len = 0;
+            while ((len = inputStream.read(buffer)) > 0){
+                outputStream.write(buffer, 0, len);
+            }
+            outputStream.flush();
+            outputStream.close();
+            return true;
+        }catch(IOException e) {
+            log.error("write file error", e);
+            if(outputStream != null){
+                try {
+                    outputStream.close();
+                } catch (IOException ex) {
+                    ex.printStackTrace();
+                }
+            }
             return false;
         }
     }
