@@ -415,11 +415,13 @@ public class Socket5Rule implements SocketRule {
         }
         int port = buffer[len-1];
         int thod = buffer[len-2];
-        if(port > 0){
-            return 256 * thod + port;
-        }else{
-            return 256 * thod + (256 + port);
+        if(thod < 0){
+            thod = (256 + thod);
         }
+        if(port < 0){
+            port = (256 + port);
+        }
+        return 256 * thod + port;
     }
     byte getHostLength(byte[] buffer){
         return buffer[4];

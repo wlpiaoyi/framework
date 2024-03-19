@@ -1,7 +1,6 @@
 package org.wlpiaoyi.framework.proxy;
 
 import com.google.gson.Gson;
-import org.wlpiaoyi.framework.proxy.socket.SocketProxy;
 import org.wlpiaoyi.framework.utils.StringUtils;
 import org.wlpiaoyi.framework.utils.data.DataUtils;
 
@@ -22,23 +21,23 @@ public class ProxyLoder {
         for(Map configuration : configurations){
             int port = ((Double)configuration.get("port")).intValue();
             boolean verify = configuration.containsKey("verify") ? (boolean)configuration.get("verify") : false;
-            SocketProxy socketProxy;
+            SocketStreamProxy socketStreamProxy;
             if(verify){
                 String name = (String) configuration.get("name");
                 String password = (String) configuration.get("password");
                 encryptionDatas[0] = name.getBytes("UTF-8");
                 encryptionDatas[1] = password.getBytes("UTF-8");
-                socketProxy = new SocketProxy(port, encryptionDatas);
+                socketStreamProxy = new SocketStreamProxy(port, encryptionDatas);
             }else {
-                socketProxy = new SocketProxy(port);
+                socketStreamProxy = new SocketStreamProxy(port);
             }
 
             String proxy = configuration.containsKey("proxy") ? (String)configuration.get("proxy") : null;
             if(!StringUtils.isBlank(proxy)){
                 String[] proxyArr = proxy.split(":");
-                socketProxy.setProxy(proxyArr[0], new Integer(proxyArr[1]).intValue());
+                socketStreamProxy.setProxy(proxyArr[0], new Integer(proxyArr[1]).intValue());
             }
-            socketProxy.asynStart();
+            socketStreamProxy.asynStart();
         }
 
         try {

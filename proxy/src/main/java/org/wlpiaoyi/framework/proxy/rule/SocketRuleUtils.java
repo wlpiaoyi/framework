@@ -118,7 +118,7 @@ public class SocketRuleUtils {
     public static SocketRule getSocketRule(int version){
         switch (version){
             case SOCKET4_VERSION:{
-                return null;
+                return new Socket4Rule();
             }
             case SOCKET5_VERSION:{
                 return new Socket5Rule();

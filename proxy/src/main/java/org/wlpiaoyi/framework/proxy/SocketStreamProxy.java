@@ -1,17 +1,16 @@
-package org.wlpiaoyi.framework.proxy.socket;
+package org.wlpiaoyi.framework.proxy;
 
 
 import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
+import org.wlpiaoyi.framework.proxy.socket.SocketThread;
 import org.wlpiaoyi.framework.proxy.socket.protocol.SocketCourse;
 import org.wlpiaoyi.framework.proxy.stream.StreamThread;
 import org.wlpiaoyi.framework.proxy.stream.protocol.StreamCourse;
 import org.wlpiaoyi.framework.utils.ValueUtils;
-import org.wlpiaoyi.framework.utils.data.DataUtils;
 
 import java.io.IOException;
-import java.io.UnsupportedEncodingException;
 import java.net.InetSocketAddress;
 import java.net.Proxy;
 import java.net.ServerSocket;
@@ -32,12 +31,12 @@ sh vpnsetup_centos.sh;
 
  */
 @Slf4j
-public class SocketProxy implements SocketCourse, StreamCourse {
+class SocketStreamProxy implements SocketCourse, StreamCourse {
 
 
-    public static boolean hasLog = true;
+    private static boolean hasLog = true;
 
-    private static final Map<Integer, SocketProxy> servers = new HashMap<>();
+    private static final Map<Integer, SocketStreamProxy> servers = new HashMap<>();
 
     @Getter
     private final int listenPort;
@@ -51,22 +50,22 @@ public class SocketProxy implements SocketCourse, StreamCourse {
 
     private byte[][] encryptionDatas;
 
-    public SocketProxy(int listenPort) throws IOException {
+    SocketStreamProxy(int listenPort) throws IOException {
         this.listenPort = listenPort;
         this.encryptionDatas = null;
         this.serverSocket = new ServerSocket(this.listenPort);
         this.proxy = null;
     }
-    public SocketProxy(int listenPort, byte[][] encryptionDatas) throws IOException {
+    SocketStreamProxy(int listenPort, byte[][] encryptionDatas) throws IOException {
         this.listenPort = listenPort;
         this.encryptionDatas = encryptionDatas;
         this.serverSocket = new ServerSocket(this.listenPort);
         this.proxy = null;
     }
 
-    public void synStart(){
+    void synStart(){
         try{
-            SocketProxy.servers.put(listenPort, this);
+            SocketStreamProxy.servers.put(listenPort, this);
             if(hasLog)log.info("server start port:{} encryption:{}", listenPort, this.encryptionDatas != null);
             while (this.serverSocket.isClosed() == false) {
                 try {
@@ -92,11 +91,11 @@ public class SocketProxy implements SocketCourse, StreamCourse {
     }
 
 
-    public void asynStart(){
+    void asynStart(){
         new Thread(this::synStart).start();
     }
 
-    public void close(){
+    void close(){
         try {
             this.closeAllClient();
             this.serverSocket.close();
@@ -106,7 +105,7 @@ public class SocketProxy implements SocketCourse, StreamCourse {
     }
 
 
-    public void closeAllClient(){
+    void closeAllClient(){
         if(this.clients.isEmpty()) return;
         synchronized (this.clients){
             for (SocketThread socketThread : this.clients){
@@ -115,6 +114,15 @@ public class SocketProxy implements SocketCourse, StreamCourse {
                 }catch(Exception e){};
             }
             this.clients.clear();
+        }
+    }
+
+
+    void setProxy(String proxyIP,int proxyPort) {
+        if(ValueUtils.isBlank(proxyIP) || proxyPort <= 0){
+            this.proxy = null;
+        }else {
+            this.proxy = new Proxy(Proxy.Type.SOCKS, new InetSocketAddress(proxyIP, proxyPort));
         }
     }
 
@@ -147,22 +155,13 @@ public class SocketProxy implements SocketCourse, StreamCourse {
         if(hasLog)log.error ("socket ip:" + socketThread.getRequestDomain() + "port:" + socketThread.getRequestDomain() + " exception domain:" + socketThread.getRequestPort() + " port:" + socketThread.getResponseDomain(), e);
     }
 
-    public void setProxy(String proxyIP,int proxyPort) {
-        if(ValueUtils.isBlank(proxyIP) || proxyPort <= 0){
-            this.proxy = null;
-        }else {
-            this.proxy = new Proxy(Proxy.Type.SOCKS, new InetSocketAddress(proxyIP, proxyPort));
-        }
-    }
-
-
-    public static Set<Map.Entry<Integer, SocketProxy>> getServers() {
+    public static Set<Map.Entry<Integer, SocketStreamProxy>> getServers() {
         return servers.entrySet();
     }
-    public static SocketProxy remove(int listenPort){
+    public static SocketStreamProxy remove(int listenPort){
         return servers.remove(listenPort);
     }
-    public static SocketProxy get(int listenPort){
+    public static SocketStreamProxy get(int listenPort){
         return servers.get(listenPort);
     }
 
