@@ -12,6 +12,7 @@ import org.wlpiaoyi.framework.utils.data.DataUtils;
 
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
+import java.net.InetSocketAddress;
 import java.net.Proxy;
 import java.net.ServerSocket;
 import java.net.Socket;
@@ -92,9 +93,7 @@ public class SocketProxy implements SocketCourse, StreamCourse {
 
 
     public void asynStart(){
-        new Thread(() -> {
-            this.synStart();
-        }).start();
+        new Thread(this::synStart).start();
     }
 
     public void close(){
@@ -108,12 +107,12 @@ public class SocketProxy implements SocketCourse, StreamCourse {
 
 
     public void closeAllClient(){
-        if(this.clients == null || this.clients.isEmpty()) return;
+        if(this.clients.isEmpty()) return;
         synchronized (this.clients){
             for (SocketThread socketThread : this.clients){
                 try{
                     socketThread.close();
-                }catch (Exception e){};
+                }catch(Exception e){};
             }
             this.clients.clear();
         }
@@ -149,15 +148,15 @@ public class SocketProxy implements SocketCourse, StreamCourse {
     }
 
     public void setProxy(String proxyIP,int proxyPort) {
-//        if(StringUtils.isBlank(proxyIP) || proxyPort <= 0){
-//            this.proxy = null;
-//        }else {
-//            this.proxy = new Proxy(Proxy.Type.SOCKS, new InetSocketAddress(proxyIP, proxyPort));
-//        }
+        if(ValueUtils.isBlank(proxyIP) || proxyPort <= 0){
+            this.proxy = null;
+        }else {
+            this.proxy = new Proxy(Proxy.Type.SOCKS, new InetSocketAddress(proxyIP, proxyPort));
+        }
     }
 
 
-    public static final Set<Map.Entry<Integer, SocketProxy>> getServers() {
+    public static Set<Map.Entry<Integer, SocketProxy>> getServers() {
         return servers.entrySet();
     }
     public static SocketProxy remove(int listenPort){
@@ -174,58 +173,59 @@ public class SocketProxy implements SocketCourse, StreamCourse {
 
     @Override
     public byte[] streaming(StreamThread stream, byte[] buffer, int len, Map<Object, Object> userMap) {
-        try {
-            log.info("buffer hex:{}", ValueUtils.bytesToHex(buffer, 0, len));
-            log.info("buffer hex:{}", new String(buffer, 0, len, "UTF-8"));
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        if(userMap.containsKey("responseDomain")
-                && userMap.get("responseDomain").equals("mobile.yangkeduo.com") && userMap.get("responsePort").equals(80)){
-            StringBuffer sb = new StringBuffer();
-            String suffix = "\r\n";
-            sb.append("HTTP/1.1 200 OK");
-            sb.append(suffix);
-            sb.append("Host:mobile.yangkeduo.com");
-            sb.append(suffix);
-            sb.append("server: stgw/1.3.12_1.13.5");
-            sb.append(suffix);
-            sb.append("Content-Type: text/html; charset=UTF-8");
-            sb.append(suffix);
-            sb.append("Accept: text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8");
-            sb.append(suffix);
-            sb.append("Upgrade-Insecure-Requests: 1");
-            sb.append(suffix);
-            sb.append("set-cookie: pdd_user_id=2748077958336; Path=/; Expires=Sun, 01 Mar 2030 09:51:54 GMT");
-            sb.append(suffix);
-            sb.append("set-cookie: PDDAccessToken=33OTWG66GXGKGVXTCT4FNRV4OIT2UVDV5QDO4NQ7TWLPS26AYCJQ110c070; Path=/; Expires=Sun, 01 Mar 2030 09:51:54 GMT");
-            sb.append(suffix);
-            sb.append("User-Agent: Mozilla/5.0 (iPhone; CPU iPhone OS 13_2 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) CriOS/78.0.3904.84 Mobile/15E148 Safari/604.1");
-            sb.append(suffix);
-            sb.append("Accept-Language: zh-cn");
-            sb.append(suffix);
-            sb.append("Connection: keep-alive");
-            sb.append(suffix);
-            sb.append(suffix);
-            sb.append(suffix);
-            sb.append("<html>" +
-                    "<script>" +
-//                    "window.location.href='https://mobile.yangkeduo.com/goods.html?goods_id=64482125726';" +
-                    "</script>" +
-                    "</html>");
-            sb.append(suffix);
-            sb.append(suffix);
-            sb.append(suffix);
-            String returnValue = sb.toString();
-
-            try {
-                return returnValue.getBytes("UTF-8");
-            } catch (UnsupportedEncodingException e) {
-                e.printStackTrace();
-                return null;
-            }
-        }else
-            return null;
+//        try {
+//            log.info("buffer hex:{}", ValueUtils.bytesToHex(buffer, 0, len));
+//            log.info("buffer hex:{}", new String(buffer, 0, len, "UTF-8"));
+//        } catch (Exception e) {
+//            e.printStackTrace();
+//        }
+//        if(userMap.containsKey("responseDomain")
+//                && userMap.get("responseDomain").equals("mobile.yangkeduo.com") && userMap.get("responsePort").equals(80)){
+//            StringBuffer sb = new StringBuffer();
+//            String suffix = "\r\n";
+//            sb.append("HTTP/1.1 200 OK");
+//            sb.append(suffix);
+//            sb.append("Host:mobile.yangkeduo.com");
+//            sb.append(suffix);
+//            sb.append("server: stgw/1.3.12_1.13.5");
+//            sb.append(suffix);
+//            sb.append("Content-Type: text/html; charset=UTF-8");
+//            sb.append(suffix);
+//            sb.append("Accept: text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8");
+//            sb.append(suffix);
+//            sb.append("Upgrade-Insecure-Requests: 1");
+//            sb.append(suffix);
+//            sb.append("set-cookie: pdd_user_id=2748077958336; Path=/; Expires=Sun, 01 Mar 2030 09:51:54 GMT");
+//            sb.append(suffix);
+//            sb.append("set-cookie: PDDAccessToken=33OTWG66GXGKGVXTCT4FNRV4OIT2UVDV5QDO4NQ7TWLPS26AYCJQ110c070; Path=/; Expires=Sun, 01 Mar 2030 09:51:54 GMT");
+//            sb.append(suffix);
+//            sb.append("User-Agent: Mozilla/5.0 (iPhone; CPU iPhone OS 13_2 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) CriOS/78.0.3904.84 Mobile/15E148 Safari/604.1");
+//            sb.append(suffix);
+//            sb.append("Accept-Language: zh-cn");
+//            sb.append(suffix);
+//            sb.append("Connection: keep-alive");
+//            sb.append(suffix);
+//            sb.append(suffix);
+//            sb.append(suffix);
+//            sb.append("<html>" +
+//                    "<script>" +
+////                    "window.location.href='https://mobile.yangkeduo.com/goods.html?goods_id=64482125726';" +
+//                    "</script>" +
+//                    "</html>");
+//            sb.append(suffix);
+//            sb.append(suffix);
+//            sb.append(suffix);
+//            String returnValue = sb.toString();
+//
+//            try {
+//                return returnValue.getBytes("UTF-8");
+//            } catch (UnsupportedEncodingException e) {
+//                e.printStackTrace();
+//                return null;
+//            }
+//        }else
+//            return null;
+        return null;
     }
 
     @Override

@@ -2,13 +2,14 @@ package org.wlpiaoyi.framework.proxy.stream;
 
 import lombok.Getter;
 import org.wlpiaoyi.framework.proxy.stream.protocol.StreamCourse;
-import org.wlpiaoyi.framework.proxy.utils.Utils;
 
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.lang.ref.WeakReference;
 import java.util.Map;
 import java.util.concurrent.CountDownLatch;
+
+import static org.wlpiaoyi.framework.proxy.rule.SocketRule.BUFFER_LEN;
 
 //00 00 0D 0A 30 0D 0A 0D 0A
 //61 63 68 65 0D 0A 0D 0A
@@ -34,7 +35,7 @@ public class StreamThread extends Thread{
     private int port;
 
 
-    private CountDownLatch downLatch;
+    private final CountDownLatch downLatch;
 
     private final Map<Object, Object> userMap;
     private final WeakReference<StreamCourse> streamInterface;
@@ -86,6 +87,7 @@ public class StreamThread extends Thread{
                 this.downLatch.countDown();
                 synchronized (this.downLatch){
                     if(this.downLatch.getCount() > 0){
+                        Thread.sleep(50);
                     }
                 }
             }catch (Exception e){e.printStackTrace();}
@@ -96,7 +98,7 @@ public class StreamThread extends Thread{
         try {
             this.beginExecuteTime = System.currentTimeMillis();
             if(this.streamInterface != null && !this.streamInterface.isEnqueued()) this.streamInterface.get().streamStart(this, userMap);
-            byte[] buffer = new byte[Utils.BUFFER_LEN];
+            byte[] buffer = new byte[BUFFER_LEN];
             int len;
             while ((len = inputStream.read(buffer)) != -1) {
                 if (len > 0) {
