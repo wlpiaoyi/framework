@@ -13,7 +13,6 @@
         <module>utils</module>
         <module>datasource</module>
         <module>openai</module>
-        <module>proxy</module>
     </modules>
 
 
