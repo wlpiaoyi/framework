@@ -12,7 +12,6 @@
     <modules>
         <module>utils</module>
         <module>datasource</module>
-        <module>openai</module>
     </modules>
 
 
