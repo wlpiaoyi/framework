@@ -8,6 +8,7 @@ import lombok.Getter;
  * {@code @date:}           2022/11/18 18:48
  * {@code @version:}:       1.0
  */
+@Deprecated
 @Getter
 public class CatchException extends Exception{
 
