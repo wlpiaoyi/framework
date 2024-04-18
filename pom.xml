@@ -16,6 +16,8 @@
 
 
     <properties>
+        <skipTests>true</skipTests>
+
         <fw.project.version>1.0.2-SNAPSHOT</fw.project.version>
         <junit.version>4.12</junit.version>
         <slf4j.version>1.7.36</slf4j.version>
@@ -38,8 +40,8 @@
         <apache.http.client5.version>5.3.1</apache.http.client5.version>
         <apache.tomcat-embed-websocket.version>9.0.21</apache.tomcat-embed-websocket.version>
         <java-websocket.version>1.3.9</java-websocket.version>
-        <skipTests>true</skipTests>
-
+<!--        <markdown.flexmark-all.version>0.64.8</markdown.flexmark-all.version>-->
+        <markdown.flexmark-all.version>0.62.2</markdown.flexmark-all.version>
     </properties>
 
     <dependencyManagement>
@@ -135,6 +137,32 @@
                 <groupId>org.jetbrains</groupId>
                 <artifactId>annotations</artifactId>
                 <version>${org.jetbrains.annotations.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.vladsch.flexmark</groupId>
+                <artifactId>flexmark-all</artifactId>
+                <version>${markdown.flexmark-all.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.vladsch.flexmark</groupId>
+                <artifactId>flexmark</artifactId>
+                <version>${markdown.flexmark-all.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.vladsch.flexmark</groupId>
+                <artifactId>flexmark-profile-pegdown</artifactId>
+                <version>${markdown.flexmark-all.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.vladsch.flexmark</groupId>
+                <artifactId>flexmark-util</artifactId>
+                <version>${markdown.flexmark-all.version}</version>
+            </dependency>
+            <!--表格渲染插件-->
+            <dependency>
+                <groupId>com.vladsch.flexmark</groupId>
+                <artifactId>flexmark-ext-tables</artifactId>
+                <version>${markdown.flexmark-all.version}</version>
             </dependency>
         </dependencies>
     </dependencyManagement>

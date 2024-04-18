@@ -7,10 +7,7 @@ import lombok.Setter;
 import org.wlpiaoyi.framework.utils.ValueUtils;
 import org.wlpiaoyi.framework.utils.gson.GsonBuilder;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.InputStream;
+import java.io.*;
 import java.net.URL;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
@@ -93,14 +90,13 @@ public class ReaderUtils extends DataUtils{
      * @throws IOException
      */
     public static String loadString(@NonNull InputStream inputStream, Charset encoding) throws IOException {
-        if(encoding == null){
-            encoding = StandardCharsets.UTF_8;
-        }
-        int nRead;
-        byte[] data = new byte[8];
+        InputStreamReader inputStreamReader = new InputStreamReader(inputStream, encoding);
+        BufferedReader bufferedReader = new BufferedReader(inputStreamReader);
         StringBuilder sb = new StringBuilder();
-        while ((nRead = inputStream.read(data, 0, data.length)) != -1) {
-            sb.append(new String(data, 0, nRead, encoding));
+        String len;
+        while ((len = bufferedReader.readLine()) != null) {
+            sb.append(len);
+            sb.append("\n");
         }
         return sb.toString();
     }
