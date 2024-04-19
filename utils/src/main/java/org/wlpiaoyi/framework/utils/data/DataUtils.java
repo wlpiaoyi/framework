@@ -6,7 +6,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.codec.binary.Hex;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.wlpiaoyi.framework.utils.exception.BusinessException;
-;
+
 import java.io.*;
 import java.nio.ByteBuffer;
 import java.nio.charset.Charset;

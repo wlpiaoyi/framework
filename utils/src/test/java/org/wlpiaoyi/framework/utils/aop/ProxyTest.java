@@ -6,6 +6,7 @@ import net.sf.cglib.proxy.MethodProxy;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
+import org.wlpiaoyi.framework.utils.exception.BusinessException;
 
 import java.lang.reflect.Method;
 import java.util.ArrayList;
@@ -213,11 +214,14 @@ public class ProxyTest implements ObjectInterceptorProgress, ClassInterceptorPro
         ObjectInvocationProxy<IServiceImpl> invocationHandler2 = new ObjectInvocationProxy<>(new IServiceImpl(dao), this);
         IService service = invocationHandler2.getProxy();
         int value = service.save(10);
-        System.out.println(value);
+        log.info("save value:{} res value:{}", 10, value);
+        if(value != 20){
+            throw new BusinessException("代理截获返回值失败");
+        }
         try{
             service.add();
         }catch (Exception e){
-            e.printStackTrace();
+            log.error("对象动态代理截获异常测试", e);
         }
 
     }
@@ -233,7 +237,7 @@ public class ProxyTest implements ObjectInterceptorProgress, ClassInterceptorPro
         try{
             service.add();
         }catch (Exception e){
-            e.printStackTrace();
+            log.error("字节码动态代理获异常测试", e);
         }
 
     }
@@ -268,15 +272,15 @@ public class ProxyTest implements ObjectInterceptorProgress, ClassInterceptorPro
 
     @Override
     public Exception exceptionInterceptorProgress(Object proxy, Method method, Object[] args, Exception e) {
-        log.info("exceptionInterceptorProgress:" + method);
+        log.error("exceptionInterceptorProgress:" + method);
         return e;
     }
 
     @Override
     public Object endInterceptorProgress(Object proxy, Method method, Object[] args, Object result) {
         log.info("endInterceptorProgress:" + method);
-        if(result instanceof Integer && ((Integer) result).intValue() == 10){
-            return new Integer(20);
+        if(result instanceof Integer && (Integer) result == 10){
+            return 20;
         }
         return result;
     }

@@ -2,6 +2,7 @@ package org.wlpiaoyi.framework.utils.web.websocket.service;
 
 
 import com.google.gson.Gson;
+import jakarta.websocket.Session;
 import lombok.Getter;
 import lombok.NonNull;
 import org.jetbrains.annotations.Nullable;
@@ -9,7 +10,6 @@ import org.wlpiaoyi.framework.utils.exception.CatchException;
 import org.wlpiaoyi.framework.utils.ValueUtils;
 import org.wlpiaoyi.framework.utils.gson.GsonBuilder;
 
-import javax.websocket.*;
 import java.io.IOException;
 import java.util.concurrent.CopyOnWriteArraySet;
 
