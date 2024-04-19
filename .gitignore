@@ -30,3 +30,4 @@ datasource/mybatis-plugin/target/*
 datasource/generator-plugin/target/*
 openai/target/*
 openai/azure/target/*
+.idea .jdk8/
