@@ -31,3 +31,4 @@ datasource/generator-plugin/target/*
 openai/target/*
 openai/azure/target/*
 .idea .jdk21/
+.idea .jdk8/
