@@ -7,11 +7,15 @@ import net.sf.cglib.proxy.MethodProxy;
 
 import java.lang.reflect.Method;
 
+
 /**
+ * <p><b>{@code @description:}</b>
  * 字节码动态代理
- * @Author wlpiaoyi
- * @Date 2022/7/12 16:16
- * @Version 1.0
+ * jvm 需要配置参数 --add-opens java.base/java.lang=ALL-UNNAMED 才能使用此方法
+ * </p>
+ * <p><b>{@code @date:}</b>         2022/7/12 16:16</p>
+ * <p><b>{@code @author:}</b>       wlpiaoyi</p>
+ * <p><b>{@code @version:}</b>      1.0</p>
  */
 public class ClassInterceptorProxy implements MethodInterceptor {
 
@@ -62,8 +66,7 @@ public class ClassInterceptorProxy implements MethodInterceptor {
         // 设置回调函数
         enhancer.setCallback(this);
         // create方法创建代理类
-        T proxyObj = (T)enhancer.create();
-        return proxyObj;
+        return (T) enhancer.create();
     }
 
 

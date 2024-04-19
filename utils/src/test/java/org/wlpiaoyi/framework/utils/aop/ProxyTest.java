@@ -248,37 +248,37 @@ public class ProxyTest implements ObjectInterceptorProgress, ClassInterceptorPro
 
     @Override
     public boolean startInterceptorProgress(Object obj, Method method, Object[] objects, MethodProxy methodProxy) {
-        log.info("startInterceptorProgress:" + methodProxy);
+        log.info("startInterceptorProgress:" + method.getName());
         return true;
     }
 
     @Override
     public Exception exceptionInterceptorProgress(Object obj, Method method, Object[] objects, MethodProxy methodProxy, Exception e) {
-        log.info("exceptionInterceptorProgress:" + methodProxy);
+        log.info("exceptionInterceptorProgress:" + method.getName());
         return e;
     }
 
     @Override
     public Object endInterceptorProgress(Object obj, Method method, Object[] objects, MethodProxy methodProxy, Object result) {
-        log.info("endInterceptorProgress:" + methodProxy);
+        log.info("endInterceptorProgress:" + method.getName());
         return result;
     }
 
     @Override
     public boolean startInterceptorProgress(Object proxy, Method method, Object[] args) {
-        log.info("startInterceptorProgress:" + method);
+        log.info("startInterceptorProgress:" + method.getName());
         return true;
     }
 
     @Override
     public Exception exceptionInterceptorProgress(Object proxy, Method method, Object[] args, Exception e) {
-        log.error("exceptionInterceptorProgress:" + method);
+        log.error("exceptionInterceptorProgress:" + method.getName(), e);
         return e;
     }
 
     @Override
     public Object endInterceptorProgress(Object proxy, Method method, Object[] args, Object result) {
-        log.info("endInterceptorProgress:" + method);
+        log.info("endInterceptorProgress:" + method.getName());
         if(result instanceof Integer && (Integer) result == 10){
             return 20;
         }
