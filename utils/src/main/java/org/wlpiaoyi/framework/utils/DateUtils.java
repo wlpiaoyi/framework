@@ -724,8 +724,74 @@ public class DateUtils {
         return formatDate(date, pattern);
     }
 
-    public static void main(String[] args) {
-        System.out.println();
+
+    private static String getUnit2Number(long n){
+        long un = Math.abs(n);
+        if(un < 10){
+            return "0" + un;
+        }
+        return "" + un;
     }
+
+    /**
+     * <p><b>{@code @description:}</b>
+     * 友好时间~~中文
+     * </p>
+     *
+     * <p><b>@param</b> <b>dateTime</b>
+     * {@link LocalDateTime}
+     * </p>
+     *
+     * <p><b>{@code @date:}</b>2024/4/21 13:15</p>
+     * <p><b>{@code @return:}</b>{@link String}</p>
+     * <p><b>{@code @author:}</b>wlpiaoyi</p>
+     */
+    public static String friendCNLocalDateTime(LocalDateTime dateTime){
+        LocalDateTime curDateTime = LocalDateTime.now();
+        long timestamp = DateUtils.parseToTimestamp(dateTime);
+        long curTimestamp = DateUtils.parseToTimestamp(curDateTime);
+        long offSeconds = (curTimestamp - timestamp) / 1000;
+        String endSuffix;
+        if(offSeconds > 0){
+            endSuffix = "之前";
+        }else if(offSeconds < 0){
+            endSuffix = "之后";
+        }else {
+            return "此时此刻";
+        }
+        offSeconds = Math.abs(offSeconds);
+        if(offSeconds < 60){
+            return getUnit2Number(offSeconds) + "秒" + endSuffix;
+        }
+        long offMinutes = offSeconds / 60;
+        if(offMinutes < 60){
+            long vgSeconds = offSeconds % 60;
+            if(vgSeconds == 0){
+                return getUnit2Number(offMinutes) + "分钟" + endSuffix;
+            }
+            return getUnit2Number(offMinutes) + "分" + getUnit2Number(vgSeconds) + "秒"  + endSuffix;
+        }
+        long offHours = offMinutes / 60;
+        if(offHours < 24){
+            long vgMinutes = offMinutes % 60;
+            if(vgMinutes == 0){
+                return getUnit2Number(offHours) + "小时" + endSuffix;
+            }
+            return getUnit2Number(offHours) + "小时" + getUnit2Number(vgMinutes) + "分" + endSuffix;
+        }
+        long offDay = offHours / 24;
+        if(offDay < 31){
+            long vgHours = offHours % 24;
+            if(vgHours == 0){
+                return getUnit2Number(offDay) + "天" + endSuffix;
+            }
+            return getUnit2Number(offDay) + "天" + getUnit2Number(vgHours) + "小时"  + endSuffix;
+        }
+        return DateUtils.formatLocalDateTime(dateTime, "YY/MM/dd HH:mm:ss");
+    }
+
+//    public static void main(String[] args) {
+//        System.out.println();
+//    }
 
 }
