@@ -15,23 +15,20 @@ import java.security.Signature;
  * {@code @date:}           2023/12/21 11:14
  * {@code @version:}:       1.0
  */
+@Getter
 public class SignVerify extends Security{
 
 
     /** 秘钥算法 **/
-    @Getter
     protected final String keyAlgorithm;
 
     /** 签名算法 **/
-    @Getter
     protected final String signatureAlgorithm;
 
     /** 公钥 **/
-    @Getter
     private String publicKey = null;
 
     /** 私钥 **/
-    @Getter
     private String privateKey = null;
 
 

@@ -40,12 +40,25 @@
         <apache.http.client.version>4.5.14</apache.http.client.version>
         <apache.tomcat-embed-websocket.version>10.1.20</apache.tomcat-embed-websocket.version>
         <java-websocket.version>1.5.6</java-websocket.version>
+        <javax.mail.version>1.6.2</javax.mail.version>
         <skipTests>true</skipTests>
 
     </properties>
 
     <dependencyManagement>
         <dependencies>
+            <!-- 邮件 -->
+            <dependency>
+                <groupId>javax.mail</groupId>
+                <artifactId>javax.mail-api</artifactId>
+                <version>${javax.mail.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.sun.mail</groupId>
+                <artifactId>javax.mail</artifactId>
+                <version>${javax.mail.version}</version>
+            </dependency>
+
             <dependency>
                 <groupId>com.google.code.gson</groupId>
                 <artifactId>gson</artifactId>

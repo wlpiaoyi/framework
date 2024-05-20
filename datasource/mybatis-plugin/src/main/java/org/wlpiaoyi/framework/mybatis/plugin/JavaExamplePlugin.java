@@ -21,9 +21,8 @@ public class JavaExamplePlugin extends PluginAdapter {
     @Override
     public boolean validate(List<String> warnings) {
         String delPrefix = properties.getProperty("delPrefix");
-        if(!ValueUtils.isBlank(delPrefix)){
-            this.delPrefix = new Boolean(properties.getProperty("delPrefix"));
-        }
+        if(!ValueUtils.isBlank(delPrefix))
+            this.delPrefix = Boolean.parseBoolean(properties.getProperty("delPrefix"));
         String suffix = properties.getProperty("suffix");
         if(!ValueUtils.isBlank(suffix)){
             this.suffix = properties.getProperty("suffix");
