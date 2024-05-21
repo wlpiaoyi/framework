@@ -251,17 +251,17 @@ class ValueParseUtils extends ValueBlankUtils{
             if(ValueUtils.isBlank((String) value)){
                 return defaultValue;
             }
-            return new Integer((String) value);
+            return Integer.valueOf((String) value);
         } else  if(value instanceof StringBuffer) {
             if(ValueUtils.isBlank((StringBuffer) value)){
                 return defaultValue;
             }
-            return new Integer(((StringBuffer) value).toString());
+            return Integer.valueOf(((StringBuffer) value).toString());
         } else if(value instanceof StringBuilder) {
             if(ValueUtils.isBlank((StringBuilder) value)){
                 return defaultValue;
             }
-            return new Integer(((StringBuilder) value).toString());
+            return Integer.valueOf(((StringBuilder) value).toString());
         } else if(value instanceof BigDecimal) {
             return ((BigDecimal) value).intValue();
         } else if(value instanceof BigInteger) {
@@ -273,13 +273,13 @@ class ValueParseUtils extends ValueBlankUtils{
         } else if(value instanceof Byte) {
             return ((Byte) value).intValue();
         } else if(value instanceof Boolean) {
-            return ((Boolean) value).booleanValue() ? 1 : 0;
+            return (Boolean) value ? 1 : 0;
         } else if(value instanceof Double) {
             return ((Double) value).intValue();
         } else if(value instanceof Float) {
             return ((Float) value).intValue();
         } else {
-            return new Integer(String.valueOf(value));
+            return Integer.valueOf(String.valueOf(value));
         }
     }
 
@@ -303,17 +303,17 @@ class ValueParseUtils extends ValueBlankUtils{
             if(ValueUtils.isBlank((String) value)){
                 return defaultValue;
             }
-            return new Long((String) value);
+            return Long.valueOf((String) value);
         } else if(value instanceof StringBuffer) {
             if(ValueUtils.isBlank((StringBuffer) value)){
                 return defaultValue;
             }
-            return new Long(((StringBuffer) value).toString());
+            return Long.valueOf(((StringBuffer) value).toString());
         } else if(value instanceof StringBuilder) {
             if(ValueUtils.isBlank((StringBuilder) value)){
                 return defaultValue;
             }
-            return new Long(((StringBuilder) value).toString());
+            return Long.valueOf(((StringBuilder) value).toString());
         } else if(value instanceof BigDecimal) {
             return ((BigDecimal) value).longValue();
         } else if(value instanceof BigInteger) {
@@ -325,13 +325,13 @@ class ValueParseUtils extends ValueBlankUtils{
         } else if(value instanceof Byte) {
             return ((Byte) value).longValue();
         } else if(value instanceof Boolean) {
-            return ((Boolean) value).booleanValue() ? 1L : 0L;
+            return (Boolean) value ? 1L : 0L;
         } else if(value instanceof Double) {
             return ((Double) value).longValue();
         } else if(value instanceof Float) {
             return ((Float) value).longValue();
         } else {
-            return new Long(String.valueOf(value));
+            return Long.valueOf(String.valueOf(value));
         }
     }
 
@@ -413,12 +413,12 @@ class ValueParseUtils extends ValueBlankUtils{
         if (isBlank(values)) {
             return "";
         } else {
-            StringBuffer sb = new StringBuffer();
+            StringBuilder sb = new StringBuilder();
             for (Object value : values){
                 sb.append(",");
                 sb.append(value.toString());
             }
-            if(sb.length() == 0){
+            if(sb.isEmpty()){
                 return "";
             }
             return sb.substring(1);
@@ -464,19 +464,19 @@ class ValueBlankUtils extends ValueTypeUtils{
         if(value == null) {
             return true;
         }
-        return value.length() == 0;
+        return value.isEmpty();
     }
     public static boolean isBlank(StringBuffer value){
         if(value == null) {
             return true;
         }
-        return value.length() == 0;
+        return value.isEmpty();
     }
     public static boolean isBlank(StringBuilder value){
         if(value == null) {
             return true;
         }
-        return value.length() == 0;
+        return value.isEmpty();
     }
     public static boolean isBlank(Number value){
         if(value instanceof Byte){
