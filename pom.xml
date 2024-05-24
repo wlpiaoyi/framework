@@ -12,6 +12,7 @@
     <modules>
         <module>utils</module>
         <module>datasource</module>
+        <module>shell</module>
     </modules>
 
 
@@ -37,6 +38,8 @@
         <apache.http.client.version>4.5.14</apache.http.client.version>
         <apache.tomcat-embed-websocket.version>9.0.21</apache.tomcat-embed-websocket.version>
         <java-websocket.version>1.3.9</java-websocket.version>
+        <javax.mail.version>1.6.2</javax.mail.version>
+        <jsch.version>0.1.55</jsch.version>
         <skipTests>true</skipTests>
 
     </properties>
@@ -113,6 +116,11 @@
                 <groupId>org.slf4j</groupId>
                 <artifactId>slf4j-log4j12</artifactId>
                 <version>${slf4j.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>log4j</groupId>
+                <artifactId>log4j</artifactId>
+                <version>${log4j.version}</version>
             </dependency>
             <dependency>
                 <groupId>junit</groupId>
