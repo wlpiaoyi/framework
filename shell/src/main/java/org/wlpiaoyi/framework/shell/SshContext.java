@@ -144,24 +144,38 @@ public class SshContext {
                 }
             }).start();
 
-        /*
-         shell管道本身就是交互模式的。要想停止，有两种方式：
-         一、人为的发送一个exit命令，告诉程序本次交互结束
-         二、使用字节流中的available方法，来获取数据的总大小，然后循环去读。
-         为了避免阻塞
-         */
-            byte[] tmp = new byte[2048];
+            /*
+             shell管道本身就是交互模式的。要想停止，有两种方式：
+             一、人为的发送一个exit命令，告诉程序本次交互结束
+             二、使用字节流中的available方法，来获取数据的总大小，然后循环去读。
+             为了避免阻塞
+             */
+            final int bufferLength = 64;
+            byte[] resBuffer = new byte[bufferLength];
             while(true){
-                while(inputStream.available() > 0){
-                    int i = inputStream.read(tmp, 0, 2048);
+                int totalLength;
+                while((totalLength = inputStream.available()) > 0){
+                    StringBuilder resBuilder = new StringBuilder();
+                    int i = inputStream.read(resBuffer, 0, bufferLength);
                     if(i < 0) break;
-                    String s = new String(tmp, 0, i);
-                    historyRes.add(s);
+                    String s = new String(resBuffer, 0, i);
+                    resBuilder.append(s);
                     if(s.contains("--More--")){
                         outputStream.write((" ").getBytes());
                         outputStream.flush();
                     }
-                    execShell.response(s, new ArrayList(){{
+                    int curLength = totalLength;
+                    while ((curLength = curLength - bufferLength) > 0){
+                        i = inputStream.read(resBuffer, 0, bufferLength);
+                        if(i < 0) break;
+                        s = new String(resBuffer, 0, i);
+                        resBuilder.append(s);
+                        if(s.contains("--More--")){
+                            outputStream.write((" ").getBytes());
+                            outputStream.flush();
+                        }
+                    }
+                    execShell.response(resBuilder.toString(), new ArrayList(){{
                         addAll(historyCmd);
                     }}, new ArrayList(){{
                         addAll(historyRes);
@@ -203,18 +217,18 @@ public class SshContext {
 
     /**
      * 上传文件
-     * @param directory     上传的目录
-     * @param fileName      上传的文件名
-     * @param uploadFile    要上传的文件
+     * @param remoteDirectory   上传的目录
+     * @param fileName          上传的文件名
+     * @param uploadFile        要上传的文件
      */
-    public boolean upload(String directory, String fileName, File uploadFile) {
+    public boolean upload(String remoteDirectory, String fileName, String uploadFile) {
         FileInputStream fileInputStream=null;
         ChannelSftp channelSftp=null;
         try {
             channelSftp= (ChannelSftp) this.session.openChannel("sftp");
             channelSftp.connect();
             log.info("start upload channel file!");
-            channelSftp.cd(directory);
+            channelSftp.cd(remoteDirectory);
             fileInputStream = new FileInputStream(uploadFile);
             channelSftp.put(fileInputStream, fileName);
             return true;
@@ -237,17 +251,17 @@ public class SshContext {
 
     /**
      * 下载文件
-     * @param directory     下载目录
-     * @param fileName      下载的文件名
-     * @param saveFile      存在本地的路径
+     * @param remoteDirectory   下载目录
+     * @param fileName          下载的文件名
+     * @param saveFile          存在本地的路径
      */
-    public File download(String directory, String fileName, String saveFile) {
+    public File download(String remoteDirectory, String fileName, String saveFile) {
         ChannelSftp channelSftp = null;
         FileOutputStream fileOutputStream = null;
         try {
             channelSftp= (ChannelSftp) session.openChannel("sftp");
             channelSftp.connect();
-            channelSftp.cd(directory);
+            channelSftp.cd(remoteDirectory);
             File file = new File(saveFile);
             if (file.exists()) {
                 file.delete();
