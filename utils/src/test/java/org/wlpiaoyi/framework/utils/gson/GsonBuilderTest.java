@@ -1,6 +1,7 @@
 package org.wlpiaoyi.framework.utils.gson;
 
 import lombok.Data;
+import lombok.extern.slf4j.Slf4j;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -11,6 +12,7 @@ import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.Date;
 
+@Slf4j
 public class GsonBuilderTest {
 
     @Data
@@ -40,7 +42,7 @@ public class GsonBuilderTest {
         to.lDate = LocalDate.of(2021,01,02);
         to.lTime = LocalTime.of(12,02);
         String json =  GsonBuilder.gsonDefault().toJson(to);
-        System.out.println(json);
+        log.info(json);
     }
 
     @After

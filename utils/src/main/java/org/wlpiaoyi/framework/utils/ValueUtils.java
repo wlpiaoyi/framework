@@ -401,21 +401,28 @@ class ValueParseUtils extends ValueBlankUtils{
     }
 
     public static String toStrings(Collection values) {
+        return toStrings(values, ",");
+    }
+
+    public static String toStrings(Collection values, String splitTag) {
         if (isBlank(values)) {
             return "";
         } else {
             Object[] objs = values.toArray();
-            return toStrings(objs);
+            return toStrings(objs, splitTag);
         }
     }
 
     public static String toStrings(Object[] values) {
+        return toStrings(values, ",");
+    }
+    public static String toStrings(Object[] values, String splitTag) {
         if (isBlank(values)) {
             return "";
         } else {
             StringBuilder sb = new StringBuilder();
             for (Object value : values){
-                sb.append(",");
+                sb.append(splitTag);
                 sb.append(value.toString());
             }
             if(sb.isEmpty()){
