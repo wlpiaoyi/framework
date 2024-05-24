@@ -7,6 +7,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.wlpiaoyi.framework.utils.ValueUtils;
 
+import java.io.File;
 import java.util.List;
 
 @Slf4j
@@ -45,6 +46,72 @@ public class SshContextTest {
         });
     }
 
+    @Test
+    public void upload() throws Exception {
+        String userDir = this.sshContext.exec("pwd").getLast();
+        String uploadDir = userDir + "/upload";
+        this.sshContext.exec(new ExecShell() {
+            @SneakyThrows
+            @Override
+            public String execCmd(int cmdIndex, List<String> historyCmd, List<String> historyRes) {
+                Thread.sleep(1000);
+                return switch (cmdIndex) {
+                    case 0 -> "rm -rf " + uploadDir;
+                    case 1 -> "mkdir " + uploadDir;
+                    default -> null;
+                };
+            }
+
+            @Override
+            public void response(String curRes, List<String> historyCmd, List<String> historyRes) {
+                System.out.printf(curRes);
+            }
+        });
+        this.sshContext.upload(uploadDir, "test.mp4", "/Users/piaoyiwl/Desktop/1.mp4");
+
+        this.sshContext.exec(new ExecShell() {
+            @SneakyThrows
+            @Override
+            public String execCmd(int cmdIndex, List<String> historyCmd, List<String> historyRes) {
+                Thread.sleep(1000);
+                return switch (cmdIndex) {
+                    case 0 -> "cd " + uploadDir;
+                    case 1 -> "ls";
+                    default -> "exit";
+                };
+            }
+            @Override
+            public void response(String curRes, List<String> historyCmd, List<String> historyRes) {
+                System.out.printf(curRes);
+            }
+        });
+    }
+
+
+    @Test
+    public void download() throws Exception {
+        String userDir = this.sshContext.exec("pwd").getLast();
+        String uploadDir = userDir + "/upload";
+        this.sshContext.exec(new ExecShell() {
+            @SneakyThrows
+            @Override
+            public String execCmd(int cmdIndex, List<String> historyCmd, List<String> historyRes) {
+                Thread.sleep(1000);
+                return switch (cmdIndex) {
+                    case 0 -> "rm -rf " + uploadDir;
+                    case 1 -> "mkdir " + uploadDir;
+                    default -> null;
+                };
+            }
+
+            @Override
+            public void response(String curRes, List<String> historyCmd, List<String> historyRes) {
+                System.out.printf(curRes);
+            }
+        });
+        this.sshContext.upload(uploadDir, "test.mp4", "/Users/piaoyiwl/Desktop/1.mp4");
+        this.sshContext.download(uploadDir , "test.mp4", "/Users/piaoyiwl/Desktop/2.mp4");
+    }
 
     @After
     public void tearDown() throws Exception {
