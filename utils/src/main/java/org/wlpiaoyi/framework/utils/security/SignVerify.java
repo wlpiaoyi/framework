@@ -25,6 +25,9 @@ public class SignVerify extends Security{
     /** 签名算法 **/
     protected final String signatureAlgorithm;
 
+    /** 密钥长度 ,512,1024,... **/
+    protected final int keyPairSize;
+
     /** 公钥 **/
     private String publicKey = null;
 
@@ -33,21 +36,26 @@ public class SignVerify extends Security{
 
 
     public static SignVerify build(){
-        return new SignVerify(ConditionDsa.KEY_ALGORITHM, ConditionDsa.SIGNATURE_ALGORITHM_SHA1);
+        return new SignVerify(1024, ConditionDsa.KEY_ALGORITHM, ConditionDsa.SIGNATURE_ALGORITHM_SHA1);
     }
     public static SignVerify build(String keyAlgorithm, String signatureAlgorithm){
-        return new SignVerify(keyAlgorithm, signatureAlgorithm);
+        return new SignVerify(1024, keyAlgorithm, signatureAlgorithm);
     }
-    private SignVerify(String keyAlgorithm, String signatureAlgorithm) {
+    public static SignVerify build(int keyPairSize, String keyAlgorithm, String signatureAlgorithm){
+        return new SignVerify(keyPairSize, keyAlgorithm, signatureAlgorithm);
+    }
+    private SignVerify(int keyPairSize, String keyAlgorithm, String signatureAlgorithm) {
+        this.keyPairSize = keyPairSize;
         this.keyAlgorithm = keyAlgorithm;
         this.signatureAlgorithm = signatureAlgorithm;
     }
+
 
     @SneakyThrows
     @Override
     public SignVerify loadConfig() {
         if(ValueUtils.isBlank(this.publicKey) || ValueUtils.isBlank(this.privateKey)){
-            String[] keys = SecurityTools.intKey(1024, this.keyAlgorithm);
+            String[] keys = SecurityTools.intKey(this.keyPairSize, this.keyAlgorithm);
             this.privateKey = keys[0];
             this.publicKey = keys[1];
         }

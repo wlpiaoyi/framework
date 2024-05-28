@@ -43,6 +43,7 @@
         <java-websocket.version>1.5.6</java-websocket.version>
         <javax.mail.version>1.6.2</javax.mail.version>
         <jsch.version>0.1.55</jsch.version>
+        <sshd.core.version>2.12.1</sshd.core.version>
         <skipTests>true</skipTests>
 
     </properties>
@@ -60,7 +61,11 @@
                 <artifactId>javax.mail</artifactId>
                 <version>${javax.mail.version}</version>
             </dependency>
-
+            <dependency>
+                <groupId>org.apache.sshd</groupId>
+                <artifactId>sshd-core</artifactId>
+                <version>${sshd.core.version}</version>
+            </dependency>
             <dependency>
                 <groupId>com.google.code.gson</groupId>
                 <artifactId>gson</artifactId>

@@ -22,6 +22,9 @@ public class RsaCipher extends Security{
     @Getter
     protected final String keyAlgorithm;
 
+    /** 密钥长度 ,512,1024,... **/
+    protected final int keyPairSize;
+
     /** 公钥 **/
     @Getter
     private String publicKey = null;
@@ -36,14 +39,18 @@ public class RsaCipher extends Security{
     private Cipher dCipher;
 
     public static RsaCipher build(){
-        return new RsaCipher(0);
+        return new RsaCipher(0, 1024);
     }
     public static RsaCipher build(int type){
-        return new RsaCipher(type);
+        return new RsaCipher(type, 1024);
+    }
+    public static RsaCipher build(int type, int keyPairSize){
+        return new RsaCipher(type, keyPairSize);
     }
 
-    private RsaCipher(int type){
+    private RsaCipher(int type, int keyPairSize){
         this.keyAlgorithm = ConditionRsa.KEY_ALGORITHM;
+        this.keyPairSize = keyPairSize;
         this.type = type;
     }
 
@@ -51,7 +58,7 @@ public class RsaCipher extends Security{
     @Override
     public RsaCipher loadConfig() {
         if(ValueUtils.isBlank(this.publicKey) || ValueUtils.isBlank(this.privateKey)){
-            String[] keys = SecurityTools.intKey(1024, this.keyAlgorithm);
+            String[] keys = SecurityTools.intKey(this.keyPairSize, this.keyAlgorithm);
             this.privateKey = keys[0];
             this.publicKey = keys[1];
         }

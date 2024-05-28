@@ -17,7 +17,7 @@ public class SshContextTest {
 
     @Before
     public void setUp() throws Exception {
-        this.sshContext = new SshContext("172.16.22.201", 22, "root", "000000");
+        this.sshContext = new SshContext("172.16.22.118", 22, "root", "000000");
         this.sshContext.connectSession(30000);
     }
 

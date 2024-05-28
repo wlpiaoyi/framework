@@ -84,14 +84,14 @@ public class SshContext {
                 try {
                     channelExec.disconnect();
                 } catch (Exception e) {
-                    log.error("JSch channel disconnect error:", e);
+                    log.error("Shell channel disconnect error:", e);
                 }
             }
             if (inputStream!=null){
                 try {
                     inputStream.close();
                 } catch (Exception e) {
-                    log.error("inputStream close error:", e);
+                    log.error("InputStream close error:", e);
                 }
             }
         }
@@ -133,7 +133,7 @@ public class SshContext {
                         printWriter.flush();
                     }
                 }catch (Exception e){
-                    log.error("send cmd error", e);
+                    log.error("Send cmd error", e);
                 }finally {
                     try{
                         printWriter.println("exit");
@@ -175,6 +175,7 @@ public class SshContext {
                             outputStream.flush();
                         }
                     }
+                    historyRes.add(s);
                     execShell.response(resBuilder.toString(), new ArrayList(){{
                         addAll(historyCmd);
                     }}, new ArrayList(){{
@@ -195,21 +196,21 @@ public class SshContext {
                 try {
                     channelShell.disconnect();
                 } catch (Exception e) {
-                    log.error("JSch channel disconnect error:", e);
+                    log.error("Shell channel disconnect error:", e);
                 }
             }
             if (inputStream!=null){
                 try {
                     inputStream.close();
                 } catch (Exception e) {
-                    log.error("inputStream close error:", e);
+                    log.error("InputStream close error:", e);
                 }
             }
             if (outputStream!=null){
                 try {
                     outputStream.close();
                 } catch (Exception e) {
-                    log.error("outputStream close error:", e);
+                    log.error("OutputStream close error:", e);
                 }
             }
         }
@@ -227,13 +228,13 @@ public class SshContext {
         try {
             channelSftp= (ChannelSftp) this.session.openChannel("sftp");
             channelSftp.connect();
-            log.info("start upload channel file!");
+            log.info("Start upload channel file!");
             channelSftp.cd(remoteDirectory);
             fileInputStream = new FileInputStream(uploadFile);
             channelSftp.put(fileInputStream, fileName);
             return true;
         } catch (Exception e) {
-            log.error("SFTPClient upload file failed, {}", e.getMessage(), e);
+            log.error("Sftp client upload file failed, {}", e.getMessage(), e);
             return false;
         }finally {
             if (fileInputStream != null) {
@@ -263,14 +264,14 @@ public class SshContext {
             channelSftp.connect();
             channelSftp.cd(remoteDirectory);
             File file = new File(saveFile);
-            if (file.exists()) {
-                file.delete();
+            if (file.exists() && !file.delete()) {
+                log.warn("File delete failed for path [{}]", file.getAbsolutePath());
             }
             fileOutputStream = new FileOutputStream(file);
             channelSftp.get(fileName, fileOutputStream);
             return file;
         } catch (Exception e) {
-            log.error("SFTPClient download file failed, {}", e.getMessage(), e);
+            log.error("Sftp client download file failed, {}", e.getMessage(), e);
             return null;
         }finally {
             if (fileOutputStream != null) {
