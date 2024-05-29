@@ -10,7 +10,7 @@
     </parent>
 
     <groupId>org.wlpiaoyi.framework</groupId>
-    <artifactId>shell</artifactId>
+    <artifactId>sshd</artifactId>
     <version>${fw.project.version}</version>
     <packaging>jar</packaging>
 

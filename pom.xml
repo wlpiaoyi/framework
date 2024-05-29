@@ -12,7 +12,7 @@
     <modules>
         <module>utils</module>
         <module>datasource</module>
-        <module>shell</module>
+        <module>sshd</module>
     </modules>
 
 

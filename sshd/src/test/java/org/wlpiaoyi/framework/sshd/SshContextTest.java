@@ -1,4 +1,4 @@
-package org.wlpiaoyi.framework.shell;
+package org.wlpiaoyi.framework.sshd;
 
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
@@ -7,7 +7,6 @@ import org.junit.Before;
 import org.junit.Test;
 import org.wlpiaoyi.framework.utils.ValueUtils;
 
-import java.io.File;
 import java.util.List;
 
 @Slf4j
