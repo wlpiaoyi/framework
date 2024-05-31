@@ -44,6 +44,8 @@
         <javax.mail.version>1.6.2</javax.mail.version>
         <jsch.version>0.1.55</jsch.version>
         <sshd.core.version>2.12.1</sshd.core.version>
+        <sshd.sftp.version>2.12.1</sshd.sftp.version>
+        <eddsa.version>0.3.0</eddsa.version>
         <skipTests>true</skipTests>
 
     </properties>
@@ -65,6 +67,16 @@
                 <groupId>org.apache.sshd</groupId>
                 <artifactId>sshd-core</artifactId>
                 <version>${sshd.core.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.sshd</groupId>
+                <artifactId>sshd-sftp</artifactId>
+                <version>${sshd.sftp.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>net.i2p.crypto</groupId>
+                <artifactId>eddsa</artifactId>
+                <version>${eddsa.version}</version>
             </dependency>
             <dependency>
                 <groupId>com.google.code.gson</groupId>

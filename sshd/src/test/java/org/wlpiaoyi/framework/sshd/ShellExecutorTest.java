@@ -2,22 +2,18 @@ package org.wlpiaoyi.framework.sshd;
 
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.sshd.client.channel.ClientChannel;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.wlpiaoyi.framework.sshd.shell.ExecShell;
 import org.wlpiaoyi.framework.sshd.shell.ShellExecutor;
-import org.wlpiaoyi.framework.sshd.shell.ShellRequestExec;
-import org.wlpiaoyi.framework.sshd.shell.ShellResponseListener;
 
-import java.io.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
 @Slf4j
-public class ShellRequestExecutorTest {
+public class ShellExecutorTest {
     private ShellExecutor shellExecutor;
 
     @Before
@@ -31,7 +27,7 @@ public class ShellRequestExecutorTest {
     public void test1(){
         ShellExecutor shellExecutor = this.shellExecutor;
         log.info("start exec");
-        shellExecutor.createChannel((channel, cmdOs) -> {
+        CountDown countDown = shellExecutor.createChannel((channel, cmdOs, cd) -> {
             List<String> shells = new ArrayList<>();
             shells.add("pwd");
             shells.add("cd ../");
@@ -45,20 +41,27 @@ public class ShellRequestExecutorTest {
             for (String shell : shells) {
                 try {
                     Thread.sleep(Math.abs(random.nextInt() % 1000) + 1000);
-                    ShellExecutor.execShell(ExecShell.build(shell, channel, cmdOs));
+                    ShellExecutor.execShell(ExecShell.build(shell, channel, cmdOs, 3000));
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
             }
+            new Thread(new Runnable() {
+                @SneakyThrows
+                @Override
+                public void run() {
+                    Thread.sleep(2000);
+                    channel.close();
+                    shellExecutor.disconnectSession();
+                }
+            }).start();
         },
                 (channelShell, buffer, bufferLength) -> System.out.printf(new String(buffer, 0, bufferLength)),
                 (channelShell, buffer, bufferLength) -> System.out.printf(new String(buffer, 0, bufferLength)),
-                1024);
-
+                1024, 5000);
+        log.info("first shell end exec");
+        ShellExecutor.await(countDown);
         log.info("end exec");
-        while (true){
-            Thread.sleep(1000);
-        }
     }
 
     @After
