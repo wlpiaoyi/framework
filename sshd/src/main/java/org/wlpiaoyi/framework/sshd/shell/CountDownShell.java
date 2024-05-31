@@ -1,62 +1,47 @@
 package org.wlpiaoyi.framework.sshd.shell;
 
 import lombok.NonNull;
-import lombok.SneakyThrows;
 import org.apache.sshd.client.channel.ClientChannel;
 import org.wlpiaoyi.framework.sshd.CountDown;
-import org.wlpiaoyi.framework.utils.exception.BusinessException;
-
-import java.util.HashMap;
-import java.util.Map;
-import java.util.concurrent.CountDownLatch;
+import org.wlpiaoyi.framework.utils.MapUtils;
 import java.util.concurrent.TimeUnit;
 
-class CountDownShell implements CountDown {
+class CountDownShell extends CountDown {
 
-    private int count;
-
-    private final CountDownLatch countDownLatch = new CountDownLatch(1);
-
-    private final Object synTag = new Object();
-
-    private ClientChannel channel;
-
-    static final Map<ClientChannel, CountDownShell> CHANNEL_MAP = new HashMap<>();
+    static void putCountDown(ClientChannel key, CountDownShell value){
+        CountDown.CHANNEL_MAP.put(key, value);
+    }
+    static CountDownShell getCountDown(ClientChannel key){
+        return MapUtils.get(CountDown.CHANNEL_MAP, key);
+    }
 
     CountDownShell(@NonNull ClientChannel channel){
-        this.channel = channel;
+        super(channel);
     }
 
-    @SneakyThrows
-    void awaitCount(){
-        this.countDownLatch.await();
+    public void awaitCount(){
+        super.awaitCount();
     }
 
-    @SneakyThrows
-    boolean awaitCount(long timeout, TimeUnit unit){
-        return this.countDownLatch.await(timeout, unit);
+    public boolean awaitCount(long timeout, TimeUnit unit){
+        return super.awaitCount(timeout, unit);
     }
 
-    void plusCount(){
-        synchronized (this.synTag){
-            if(this.channel == null){
-                throw new BusinessException("channel key is null, may be channel is stop");
-            }
-            count ++;
-            if(!CHANNEL_MAP.containsKey(this.channel)){
-               CHANNEL_MAP.put(this.channel, this);
-            }
-        }
+    public void plusCount(){
+        super.plusCount();
     }
 
-    void minusCount(){
-        synchronized (this.synTag){
-            count --;
-            if(count <= 0){
-                this.countDownLatch.countDown();
-                if(this.channel != null) CHANNEL_MAP.remove(this.channel);
-                this.channel = null;
-            }
-        }
+    @Override
+    protected void firstPlusCount() {
+
+    }
+
+    public boolean minusCount(){
+        return super.minusCount();
+    }
+
+    @Override
+    protected void lastPlusCount() {
+
     }
 }

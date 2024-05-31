@@ -41,7 +41,7 @@ public class ExecShell implements Runnable{
 
     @Override
     public void run() {
-        CountDownShell countDown = CountDownShell.CHANNEL_MAP.get(this.channel);
+        CountDownShell countDown = CountDownShell.getCountDown(this.channel);
         try {
             if(countDown != null){
                 countDown.plusCount();
