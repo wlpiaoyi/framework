@@ -17,7 +17,7 @@ public class SftpExecutorTest {
 
     @Before
     public void setUp() throws Exception {
-        this.sftpExecutor = SftpExecutor.build("172.16.22.118", 22, "root");
+        this.sftpExecutor = SftpExecutor.build("172.16.23.19", 22, "root");
         this.sftpExecutor.connectSession("000000");
     }
 
@@ -27,6 +27,8 @@ public class SftpExecutorTest {
         String localFilePath = "/Users/piaoyiwl/Desktop/1.mp4";
         String remoteFilePath = "/root/upload";
         String remoteFileName = "1.up.mp4";
+        this.sftpExecutor.upload(localFilePath, remoteFilePath, remoteFileName);
+        remoteFileName = "1.up.1.mp4";
         this.sftpExecutor.upload(localFilePath, remoteFilePath, remoteFileName, new UploadListener() {
             @Override
             public void uploadBegin(String localFilePath, SftpClient sftpClient, long fileSize) {
@@ -43,6 +45,10 @@ public class SftpExecutorTest {
                 log.info("upload end for fileSize [{}]", fileSize);
             }
         });
+
+        while (true){
+            Thread.sleep(1000);
+        }
 
     }
 

@@ -1,6 +1,5 @@
 package org.wlpiaoyi.framework.sshd.shell;
 
-import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.sshd.client.channel.ClientChannel;
 
