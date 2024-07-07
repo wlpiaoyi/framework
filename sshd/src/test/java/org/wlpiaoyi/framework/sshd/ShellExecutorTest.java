@@ -18,7 +18,7 @@ public class ShellExecutorTest {
 
     @Before
     public void setUp() throws Exception {
-        this.shellExecutor = ShellExecutor.build("172.16.22.118", 22, "root");
+        this.shellExecutor = ShellExecutor.build("172.16.23.19", 22, "root");
         this.shellExecutor.connectSession("000000");
     }
 
