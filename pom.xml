@@ -45,6 +45,7 @@
         <jsch.version>0.1.55</jsch.version>
         <sshd.core.version>2.12.1</sshd.core.version>
         <sshd.sftp.version>2.12.1</sshd.sftp.version>
+        <sshd.scp.version>2.12.1</sshd.scp.version>
         <eddsa.version>0.3.0</eddsa.version>
         <skipTests>true</skipTests>
 
@@ -72,6 +73,11 @@
                 <groupId>org.apache.sshd</groupId>
                 <artifactId>sshd-sftp</artifactId>
                 <version>${sshd.sftp.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.sshd</groupId>
+                <artifactId>sshd-scp</artifactId>
+                <version>${sshd.scp.version}</version>
             </dependency>
             <dependency>
                 <groupId>net.i2p.crypto</groupId>
