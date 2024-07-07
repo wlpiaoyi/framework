@@ -11,12 +11,12 @@
 
     <groupId>org.wlpiaoyi.framework</groupId>
     <artifactId>sshd</artifactId>
-    <version>${fw.project.version}</version>
+    <version>1.0.2-SNAPSHO</version>
     <packaging>jar</packaging>
 
     <properties>
-        <maven.compiler.source>21</maven.compiler.source>
-        <maven.compiler.target>21</maven.compiler.target>
+        <maven.compiler.source>${java.version}</maven.compiler.source>
+        <maven.compiler.target>${java.version}</maven.compiler.target>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
 

@@ -32,3 +32,4 @@ openai/target/*
 openai/azure/target/*
 .idea .jdk21/
 .idea .jdk8/
+lab/selenium/chromedriver.126.0.v
