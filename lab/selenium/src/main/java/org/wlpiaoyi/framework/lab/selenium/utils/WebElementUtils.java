@@ -1,10 +1,45 @@
 package org.wlpiaoyi.framework.lab.selenium.utils;
 
+import lombok.SneakyThrows;
+import org.openqa.selenium.By;
+import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.Keys;
 import org.openqa.selenium.WebElement;
+import org.wlpiaoyi.framework.lab.selenium.Browser;
+import org.wlpiaoyi.framework.utils.ValueUtils;
 
 public class WebElementUtils {
 
+    public static void click(Browser browser, WebElement ele){
+        try{
+            ele.click();
+        }catch (Exception e){
+            ((JavascriptExecutor)browser.getDriver()).executeScript("arguments[0].click();", ele);
+        }
+    }
+    @SneakyThrows
+    public static String getValue(WebElement element, int reGetNum){
+        if(reGetNum <= 0){
+            return getValue(element);
+        }
+        String value = null;
+        while (-- reGetNum > 0){
+            value = getValue(element);
+            if(ValueUtils.isNotBlank(value)){
+                break;
+            }
+            Thread.sleep(1000);
+        }
+        return value;
+    }
+
+    public static String getValue(WebElement element){
+        String value = element.getText();
+        if(value == null){
+            value = element.getAttribute("value");
+        }
+        return value;
+    }
 
     /**
      * 给元素设置value
