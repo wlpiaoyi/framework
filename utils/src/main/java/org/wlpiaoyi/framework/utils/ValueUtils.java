@@ -425,7 +425,7 @@ class ValueParseUtils extends ValueBlankUtils{
                 sb.append(splitTag);
                 sb.append(value.toString());
             }
-            if(sb.isEmpty()){
+            if(sb.length() == 0){
                 return "";
             }
             return sb.substring(1);
@@ -477,13 +477,13 @@ class ValueBlankUtils extends ValueTypeUtils{
         if(value == null) {
             return true;
         }
-        return value.isEmpty();
+        return value.length() == 0;
     }
     public static boolean isBlank(StringBuilder value){
         if(value == null) {
             return true;
         }
-        return value.isEmpty();
+        return value.length() == 0;
     }
     public static boolean isBlank(Number value){
         if(value instanceof Byte){
