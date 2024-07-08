@@ -5,6 +5,7 @@ import org.apache.sshd.client.session.ClientSession;
 import org.apache.sshd.sftp.client.SftpClient;
 import org.apache.sshd.sftp.client.SftpClientFactory;
 import org.apache.sshd.sftp.client.fs.SftpFileSystem;
+import org.wlpiaoyi.framework.sshd.UploadListener;
 import org.wlpiaoyi.framework.utils.data.DataUtils;
 import org.wlpiaoyi.framework.utils.exception.BusinessException;
 
@@ -16,7 +17,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 
 @Slf4j
-public class ExecSftp implements Runnable {
+public class ExecUpload implements Runnable {
 
     private final WeakReference<ClientSession> clientSessionWeakReference;
     private final String localFilePath;
@@ -24,18 +25,18 @@ public class ExecSftp implements Runnable {
     private final String remoteFileName;
     private UploadListener uploadListener;
 
-    public static ExecSftp build(ClientSession clientSession, String localFilePath, String remoteFilePath, String remoteFileName){
-        return new ExecSftp(clientSession, localFilePath, remoteFilePath, remoteFileName);
+    public static ExecUpload build(ClientSession clientSession, String localFilePath, String remoteFilePath, String remoteFileName){
+        return new ExecUpload(clientSession, localFilePath, remoteFilePath, remoteFileName);
     }
 
-    private ExecSftp(ClientSession clientSession, String localFilePath, String remoteFilePath, String remoteFileName){
+    private ExecUpload(ClientSession clientSession, String localFilePath, String remoteFilePath, String remoteFileName){
         this.clientSessionWeakReference = new WeakReference<>(clientSession);
         this.localFilePath = localFilePath;
         this.remoteFilePath = remoteFilePath;
         this.remoteFileName = remoteFileName;
     }
 
-    public ExecSftp setUploadListener(UploadListener uploadListener) {
+    public ExecUpload setUploadListener(UploadListener uploadListener) {
         this.uploadListener = uploadListener;
         return this;
     }

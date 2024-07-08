@@ -6,19 +6,17 @@ import org.apache.sshd.sftp.client.SftpClient;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
-import org.wlpiaoyi.framework.sshd.sftp.SftpExecutor;
-import org.wlpiaoyi.framework.sshd.sftp.UploadListener;
-import org.wlpiaoyi.framework.sshd.shell.ShellExecutor;
+import org.wlpiaoyi.framework.sshd.sftp.UploadExecutor;
 
 @Slf4j
-public class SftpExecutorTest {
+public class UploadExecutorTest {
 
-    private SftpExecutor sftpExecutor;
+    private UploadExecutor uploadExecutor;
 
     @Before
     public void setUp() throws Exception {
-        this.sftpExecutor = SftpExecutor.build("172.16.23.19", 22, "root");
-        this.sftpExecutor.connectSession("000000");
+        this.uploadExecutor = UploadExecutor.build("172.16.23.19", 22, "root");
+        this.uploadExecutor.connectSession("000000");
     }
 
     @SneakyThrows
@@ -26,23 +24,26 @@ public class SftpExecutorTest {
     public void test1(){
         String localFilePath = "/Users/piaoyiwl/Desktop/1.mp4";
         String remoteFilePath = "/root/upload";
-        String remoteFileName = "1.up.mp4";
-        this.sftpExecutor.upload(localFilePath, remoteFilePath, remoteFileName);
-        remoteFileName = "1.up.1.mp4";
-        this.sftpExecutor.upload(localFilePath, remoteFilePath, remoteFileName, new UploadListener() {
+        String remoteFileName = "1.up.sftp.mp4";
+        this.uploadExecutor.upload(localFilePath, remoteFilePath, remoteFileName, new UploadListener() {
             @Override
-            public void uploadBegin(String localFilePath, SftpClient sftpClient, long fileSize) {
+            public void uploadBegin(String localFilePath, Object sftpClient, long fileSize) {
                 log.info("upload begin for fileSize [{}]", fileSize);
             }
 
             @Override
-            public void uploadDoing(String localFilePath, SftpClient sftpClient, long fileSize, long bufferOffset) {
+            public void uploadDoing(String localFilePath, Object sftpClient, long fileSize, long bufferOffset) {
                 log.info("upload doing for fileSize [{}]/ bufferOffset [{}]", fileSize, bufferOffset);
             }
 
             @Override
-            public void uploadEnd(String localFilePath, SftpClient sftpClient, long fileSize) {
+            public void uploadEnd(String localFilePath, Object sftpClient, long fileSize) {
                 log.info("upload end for fileSize [{}]", fileSize);
+            }
+
+            @Override
+            public void uploadError(String localFilePath, Object curTag, Throwable error) {
+
             }
         });
 
