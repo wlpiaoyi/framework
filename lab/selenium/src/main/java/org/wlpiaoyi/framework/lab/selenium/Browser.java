@@ -110,6 +110,10 @@ public class Browser {
         ChromeOptions options = new ChromeOptions();
         //以最高权限运行
         options.addArguments("--no-sandbox");
+        options.addArguments("--disable-popup-blocking"); // 禁用阻止弹出窗口
+//        options.addArguments("no-sandbox"); // 启动无沙盒模式运行
+        options.addArguments("disable-extensions"); // 禁用扩展
+        options.addArguments("no-default-browser-check"); // 默认浏览器检查
         if(!this.isOptionLoadimg()){
             HashMap<String, Object> prefs = new HashMap<String, Object>();
             prefs.put("profile.managed_default_content_settings.images", 2);
@@ -168,7 +172,6 @@ public class Browser {
             throw new BusinessException("the url can't be null");
         this.driver.manage().timeouts().pageLoadTimeout(OUTTIMEMILLISECONDS, TimeUnit.MILLISECONDS).setScriptTimeout(OUTTIMEMILLISECONDS, TimeUnit.MILLISECONDS);
         this.driver.get(this.url);
-        this.cookies = this.cookies;
     }
 
 

@@ -41,8 +41,13 @@ public class BrowserCabgov {
         List<Map<String, String>> itemsList = new ArrayList<>();
         try{
             for(String arg : args){
-                this.exce(arg, itemsList);
-                System.out.println("car_no:" + arg);
+                try{
+                    this.exce(arg, itemsList);
+                    System.out.println("success car_no:" + arg);
+                }catch (Exception e){
+                    e.printStackTrace();
+                    System.out.println("failed car_no:" + arg);
+                }
                 writeExcel(itemsList);
             }
         }finally {
@@ -154,6 +159,20 @@ public class BrowserCabgov {
         }
     }
 
+    boolean clickFeed(){
+        try{
+            WebElement webElement = browser.getDriver().findElement(By.className("aui_state_highlight"));
+            if(webElement != null){
+                WebElementUtils.click(browser, webElement);
+                return true;
+            }
+        }catch (Exception e){
+//            e.printStackTrace();
+        }
+        return false;
+
+    }
+
     void openAndLogin(){
 
         String errorMsg = null;
@@ -198,9 +217,7 @@ public class BrowserCabgov {
                 while (ti -- > 0){
                     try{
                         Thread.sleep(1000);
-                        webElement = browser.getDriver().findElement(By.className("aui_state_highlight"));
-                        if(webElement != null){
-                            WebElementUtils.click(browser, webElement);
+                        if(clickFeed()){
                             break;
                         }else if(ti > 5){
                             break;
