@@ -1,13 +1,19 @@
 package org.wlpiaoyi.framework.utils.http.cookie;
 
+import com.google.gson.Gson;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
+import org.wlpiaoyi.framework.utils.MapUtils;
+import org.wlpiaoyi.framework.utils.exception.BusinessException;
+import org.wlpiaoyi.framework.utils.gson.GsonBuilder;
 import org.wlpiaoyi.framework.utils.http.HttpClient;
 import org.wlpiaoyi.framework.utils.http.request.Request;
 import org.wlpiaoyi.framework.utils.http.response.Response;
 
 import java.io.IOException;
+import java.util.List;
+import java.util.Map;
 
 public class HttpClientTest {
 
@@ -24,22 +30,40 @@ public class HttpClientTest {
 //        Response response = this.emartet();
 //        System.out.println();
 //        String url = "http://www.100csc.com/shop/goods/1604545423286/100000352.html";
-        String url = "http://www.100csc.com/";
+        String url = "https://sc.122.gov.cn/user/m/uservio/suriquery";
 
-        while (true){
-            new Thread(new Runnable() {
-                @Override
-                public void run() {
-                    Response<String> response = HttpClient.instance(
-                                    Request.initJson(url).setMethod(Request.Method.Get).setProxy("127.0.0.1", 8888)
-                            )
-                            .setRpClazz(String.class)
-                            .response();
-                    System.out.println("<======" + response.getStatusCode());
-                }
-            }).start();
-            Thread.sleep(1000);
+        Response<Map> response = HttpClient.instance(
+                        Request.initJson(url)
+                                .setHeader("Host","sc.122.gov.cn")
+                                .setHeader("Origin","https://sc.122.gov.cn")
+                                .setHeader("Referer","https://sc.122.gov.cn/views/memfyy/violation.html")
+                                .setHeader("Sec-Ch-Ua","\"Not/A)Brand\";v=\"8\", \"Chromium\";v=\"126\", \"Google Chrome\";v=\"126\"")
+                                .setHeader("Sec-Ch-Ua-Mobile","?0")
+                                .setHeader("Sec-Ch-Ua-Platform:","\"Windows\"")
+                                .setHeader("Sec-Fetch-Dest","empty")
+                                .setHeader("Sec-Fetch-Mode","cors")
+                                .setHeader("Sec-Fetch-Site","same-origin")
+                                .setHeader("User-Agent","Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/123.0.0.0 Safari/537.36")
+                                .setHeader("X-Requested-With", "XMLHttpRequest")
+                                .setHeader("Content-Type", "application/x-www-form-urlencoded; charset=UTF-8")
+                                .setHeader("Cookie","_qrcode_digest=25c82b9baf0886a02f07a9b6f5b8b634351d5af0f9bc120e1d521cf46b874ed1; _122_gt=WGT-173947-plGwGkucjnhxfh33o12lkHZdFAS6sSGwouC; _122_gt_tag=1; JSESSIONID-L=fae904c1-5ca0-4b93-8d3f-c4959d5bbe20; JSESSIONID=00A7335EB29F807B4FC5259095496A7F; accessToken=6DcN65VqJor33DVso1QwXdb713eb7VIEqfkt8ir54JVXPtsubliHUOVwnkCyt2KAF1Rfq24+lm+lA3XMzLMu7MubTr2xIiJyfzlKK0DamMKkrStOSL844QFw4RWKaZK3lQ3etE7FdlwXh3C5oI/xB+0vf2OCrJSNdArM7gdTl4/eFsay7Z9vTs+douwj+qUH; c_yhlx_=2; tmri_csfr_token=D9F5B9AB1B43265C9ED8DC32BF7A446E")
+                                .setMethod(Request.Method.Post)
+                                .setParam("startDate","20200105")
+                                .setParam("endDate","20240709")
+                                .setParam("hpzl","52")
+                                .setParam("hphm","川ADD3933")
+                                .setParam("page","1")
+                                .setParam("type","0")
+                )
+                .setRpClazz(Map.class)
+                .response();
+        Gson gson = GsonBuilder.gsonDefault();
+        if(response.getStatusCode() != 200){
+            throw new BusinessException("列表请求错误：" + gson.toJson(response.getBody()));
         }
+        Integer totalPages = MapUtils.getValueByKeyPath(response.getBody(),"data.totalPages", -1, Integer.class);
+        List<Map> content = MapUtils.getValueByKeyPath(response.getBody(),"data.content", null, List.class);
+        System.out.println("<======" + response.getStatusCode());
 
     }
 

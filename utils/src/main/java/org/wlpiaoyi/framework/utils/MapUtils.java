@@ -36,6 +36,81 @@ public class MapUtils {
     }
 
     /**
+     * <p><b>{@code @description:}</b> 
+     * TODO
+     * </p>
+     * 
+     * <p><b>@param</b> <b>map</b>
+     * {@link Map}
+     * </p>
+     * 
+     * <p><b>@param</b> <b>keyPath</b>
+     * {@link String}
+     * </p>
+     * 
+     * <p><b>@param</b> <b>defaultValue</b>
+     * {@link T}
+     * </p>
+     * 
+     * <p><b>@param</b> <b>clazz</b>
+     * {@link Class<T>}
+     * </p>
+     *
+     * <p><b>{@code @date:}</b>2024/7/10 7:56</p>
+     * <p><b>{@code @return:}</b>{@link T}</p>
+     * <p><b>{@code @author:}</b>wlpiaoyi</p>
+     */
+    public static <T> T getValueByKeyPath(Map map, String keyPath, T defaultValue, Class<T> clazz){
+        if(map == null || map.isEmpty()) {
+            return  defaultValue;
+        }
+        String keys[] = keyPath.split("\\.");
+        Map valueMap = map;
+        int ki = 0;
+        int ksl = keys.length;
+        for (String key : keys){
+            ki ++;
+            if(ki == ksl){
+                if(clazz == Boolean.class){
+                    return (T) MapUtils.getBoolean(valueMap, key, (Boolean) defaultValue);
+                }
+                if(clazz == Integer.class){
+                    return (T) MapUtils.getInteger(valueMap, key, (Integer) defaultValue);
+                }
+                if(clazz == Long.class){
+                    return (T) MapUtils.getLong(valueMap, key, (Long) defaultValue);
+                }
+                if(clazz == Float.class){
+                    return (T) MapUtils.getFloat(valueMap, key, (Float) defaultValue);
+                }
+                if(clazz == Double.class){
+                    return (T) MapUtils.getDouble(valueMap, key, (Double) defaultValue);
+                }
+                if(clazz == Map.class){
+                    return (T) MapUtils.getMap(valueMap, key, (Map) defaultValue);
+                }
+                if(clazz == List.class){
+                    return (T) MapUtils.getList(valueMap, key, (List) defaultValue);
+                }
+                if(clazz == Set.class){
+                    return (T) MapUtils.getSet(valueMap, key, (Set) defaultValue);
+                }
+                return MapUtils.get(valueMap, key, defaultValue);
+            }
+            Object value = MapUtils.get(valueMap, key, null);
+            if(value == null){
+                return defaultValue;
+            }
+            if(!(value instanceof Map)){
+                return defaultValue;
+            }
+            valueMap = (Map) value;
+        }
+        return defaultValue;
+    }
+
+
+    /**
      * 获取指定类型的对象
      * @param map
      * @param key

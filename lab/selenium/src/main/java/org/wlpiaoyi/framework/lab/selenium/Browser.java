@@ -158,10 +158,9 @@ public class Browser {
                     .usingAnyFreePort().build();
             this.driver = new ChromeDriver(driverService,options);
         }
-        this.openDriver();
     }
 
-    private void openDriver(){
+    public void openDriver(){
         if(this.dimension == null){
             this.driver.manage().window().maximize();
         }else{

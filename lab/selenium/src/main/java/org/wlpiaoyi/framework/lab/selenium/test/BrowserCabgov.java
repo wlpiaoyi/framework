@@ -2,18 +2,24 @@ package org.wlpiaoyi.framework.lab.selenium.test;
 
 import com.google.gson.Gson;
 import lombok.SneakyThrows;
+import lombok.extern.slf4j.Slf4j;
 import org.openqa.selenium.By;
+import org.openqa.selenium.Cookie;
 import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.WebElement;
 import org.wlpiaoyi.framework.lab.selenium.Browser;
 import org.wlpiaoyi.framework.lab.selenium.excel.ExcelWriter;
 import org.wlpiaoyi.framework.lab.selenium.utils.WebElementUtils;
 import org.wlpiaoyi.framework.utils.DateUtils;
+import org.wlpiaoyi.framework.utils.MapUtils;
 import org.wlpiaoyi.framework.utils.ValueUtils;
 import org.wlpiaoyi.framework.utils.data.ReaderUtils;
 import org.wlpiaoyi.framework.utils.data.WriterUtils;
 import org.wlpiaoyi.framework.utils.exception.BusinessException;
 import org.wlpiaoyi.framework.utils.gson.GsonBuilder;
+import org.wlpiaoyi.framework.utils.http.HttpClient;
+import org.wlpiaoyi.framework.utils.http.request.Request;
+import org.wlpiaoyi.framework.utils.http.response.Response;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -21,26 +27,41 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.util.*;
 
+@Slf4j
 public class BrowserCabgov {
 
     private Browser browser;
+    String cookies = "_qrcode_digest=25c82b9baf0886a02f07a9b6f5b8b634351d5af0f9bc120e1d521cf46b874ed1; _122_gt=WGT-173947-plGwGkucjnhxfh33o12lkHZdFAS6sSGwouC; _122_gt_tag=1; JSESSIONID-L=fae904c1-5ca0-4b93-8d3f-c4959d5bbe20; JSESSIONID=00A7335EB29F807B4FC5259095496A7F; accessToken=6DcN65VqJor33DVso1QwXdb713eb7VIEqfkt8ir54JVXPtsubliHUOVwnkCyt2KAF1Rfq24+lm+lA3XMzLMu7MubTr2xIiJyfzlKK0DamMKkrStOSL844QFw4RWKaZK3lQ3etE7FdlwXh3C5oI/xB+0vf2OCrJSNdArM7gdTl4/eFsay7Z9vTs+douwj+qUH; c_yhlx_=2; tmri_csfr_token=D9F5B9AB1B43265C9ED8DC32BF7A446E";
+
 
     public BrowserCabgov(){
-        browser = new Browser().setOptionHeadless(false).setUrl("https://gab.122.gov.cn/m/login");
+        browser = new Browser().setOptionHeadless(false).setUrl("https://sc.122.gov.cn/views/memfyy/violation.html");
 //        this.browser.setOptionHeadless(true);
         this.browser.setOptionLoadimg(true);
         this.browser.setDriverPath(System.getProperty("user.dir") +"/chromedriver.126.0.v");
     }
-
     @SneakyThrows
     public void start(){
         try{
+
             browser.openChromeDriver();
+            browser.openDriver();
+            String args[] = this.cookies.split("; ");
+            Set<Cookie> cookies = new HashSet<>();
+            for (String arg : args){
+                String as[] = arg.split("=");
+                cookies.add(new Cookie(as[0], as[1]));
+            }
+            this.browser.setCookies(cookies);;
+            browser.openDriver();
         }catch (Exception e) {e.printStackTrace();}
         String[] args = ReaderUtils.loadString(System.getProperty("user.dir") + "/car_no.txt", null).split("\n");
+
         List<Map<String, String>> itemsList = new ArrayList<>();
         try{
             for(String arg : args){
+                arg = arg.replaceAll("\r", "");
+                arg = arg.replaceAll("\n", "");
                 try{
                     this.exce(arg, itemsList);
                     System.out.println("success car_no:" + arg);
@@ -56,10 +77,11 @@ public class BrowserCabgov {
 
     }
 
+
     @SneakyThrows
     public void writeExcel(List<Map<String, String>> itemsList){
         Gson gson = GsonBuilder.gsonDefault();
-        String fileName = DateUtils.formatDate(new Date(), "YYMMDD HH:mm:ss");
+        String fileName = DateUtils.formatDate(new Date(), "YYMMDDHHmmss");
         WriterUtils.overwrite(new File(System.getProperty("user.dir") + "/" + fileName  + ".txt"), gson.toJson(itemsList).getBytes());
         OutputStream os = new FileOutputStream(System.getProperty("user.dir") + "/" + fileName + ".xlsx");
         ExcelWriter.exportData(itemsList).write(os);
@@ -403,5 +425,150 @@ public class BrowserCabgov {
             WebElementUtils.click(browser, webElement.findElement(By.id("bind_close")));
             Thread.sleep(1000);
         }
+    }
+
+    public Map<String, String> querySurvielDetail(String hphm, String xh, String cjjg, String cookies) throws IOException, InterruptedException {
+        Thread.sleep(5000);
+        String url = "https://sc.122.gov.cn/user/m/tsc/vio/querySurvielDetail";
+        Response<Map> response = HttpClient.instance(
+                        Request.initJson(url)
+                                .setHeader("Host","sc.122.gov.cn")
+                                .setHeader("Origin","https://sc.122.gov.cn")
+                                .setHeader("Referer","https://sc.122.gov.cn/views/memfyy/violation.html")
+                                .setHeader("Sec-Ch-Ua","\"Not/A)Brand\";v=\"8\", \"Chromium\";v=\"126\", \"Google Chrome\";v=\"126\"")
+                                .setHeader("Sec-Ch-Ua-Mobile","?0")
+                                .setHeader("Sec-Ch-Ua-Platform:","\"Windows\"")
+                                .setHeader("Sec-Fetch-Dest","empty")
+                                .setHeader("Sec-Fetch-Mode","cors")
+                                .setHeader("Sec-Fetch-Site","same-origin")
+                                .setHeader("User-Agent","Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/123.0.0.0 Safari/537.36")
+                                .setHeader("X-Requested-With", "XMLHttpRequest")
+                                .setHeader("Content-Type", "application/x-www-form-urlencoded; charset=UTF-8")
+                                .setHeader("Cookie", cookies)
+                                .setMethod(Request.Method.Post)
+                                .setParam("hpzl","52")
+                                .setParam("hphm","川" + hphm)
+                                .setParam("xh", xh)
+                                .setParam("cjjg",cjjg)
+                )
+                .setRpClazz(Map.class)
+                .response();
+        System.out.println(url + "?" + hphm + "," + xh);
+        Gson gson = GsonBuilder.gsonDefault();
+        if(response.getStatusCode() != 200){
+            throw new BusinessException("列表请求错误：" + gson.toJson(response.getBody()));
+        }
+        Map<String, String> dict = new HashMap(){{
+            put("hpzlStr","号牌种类");
+            put("hphm", "号牌号码");
+            put("wfsj", "违法时间");
+            put("wfdz", "违法地点");
+            put("wfms", "违法行为");
+            put("cjjgmc", "采集单位");
+            put("fkje", "罚款金额");
+            put("wfjfs", "记分值");
+        }};
+        Map<String, String> item = new HashMap<>();;
+        for (String key : dict.keySet()){
+            item.put(dict.get(key), MapUtils.getValueByKeyPath(response.getBody(), "data." + key, "", String.class));
+        }
+        return item;
+    }
+
+
+    public int suriquery(String hphm, int page, String cookies, List<Map<String, String>> itemsList) throws IOException, InterruptedException {
+        String url = "https://sc.122.gov.cn/user/m/uservio/suriquery";
+        Response<Map> response = HttpClient.instance(
+                        Request.initJson(url)
+                                .setHeader("Host","sc.122.gov.cn")
+                                .setHeader("Origin","https://sc.122.gov.cn")
+                                .setHeader("Referer","https://sc.122.gov.cn/views/memfyy/violation.html")
+                                .setHeader("Sec-Ch-Ua","\"Not/A)Brand\";v=\"8\", \"Chromium\";v=\"126\", \"Google Chrome\";v=\"126\"")
+                                .setHeader("Sec-Ch-Ua-Mobile","?0")
+                                .setHeader("Sec-Ch-Ua-Platform:","\"Windows\"")
+                                .setHeader("Sec-Fetch-Dest","empty")
+                                .setHeader("Sec-Fetch-Mode","cors")
+                                .setHeader("Sec-Fetch-Site","same-origin")
+                                .setHeader("User-Agent","Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/123.0.0.0 Safari/537.36")
+                                .setHeader("X-Requested-With", "XMLHttpRequest")
+                                .setHeader("Content-Type", "application/x-www-form-urlencoded; charset=UTF-8")
+                                .setHeader("Cookie", cookies)
+                                .setMethod(Request.Method.Post)
+                                .setParam("startDate","20200105")
+                                .setParam("endDate","20240709")
+                                .setParam("hpzl","52")
+                                .setParam("hphm","川" + hphm)
+                                .setParam("page",page + "")
+                                .setParam("type","0")
+                )
+                .setRpClazz(Map.class)
+                .response();
+        System.out.println(url + "?"+ hphm + "," + page);
+        Gson gson = GsonBuilder.gsonDefault();
+        if(response.getStatusCode() != 200){
+            throw new BusinessException("列表请求错误：" + gson.toJson(response.getBody()));
+        }
+        Integer totalPages = MapUtils.getValueByKeyPath(response.getBody(),"data.totalPages", -1, Integer.class);
+        List<Map> content = MapUtils.getValueByKeyPath(response.getBody(),"data.content", null, List.class);
+        if(ValueUtils.isBlank(content)){
+            System.out.printf("没有数据了：" + hphm);
+            return 0;
+        }
+        for (Map item : content){
+            Integer isHandle = MapUtils.getInteger(item, "clbj", 0);
+            Integer isPay = MapUtils.getInteger(item, "jkbj", 0);
+            if(isHandle == 0 || isPay == 0){
+                this.querySurvielDetail(hphm, MapUtils.getString(item, "xh"), MapUtils.getString(item, "cjjg"), isHandle, isPay, cookies, itemsList);
+            }
+        }
+        return totalPages - page;
+    }
+    public void querySurvielDetail(String hphm, String xh, String cjjg, Integer isHandle, Integer isPay, String cookies, List<Map<String, String>> itemsList) throws IOException, InterruptedException {
+        Thread.sleep(5000);
+        String url = "https://sc.122.gov.cn/user/m/tsc/vio/querySurvielDetail";
+        Response<Map> response = HttpClient.instance(
+                        Request.initJson(url)
+                                .setHeader("Host","sc.122.gov.cn")
+                                .setHeader("Origin","https://sc.122.gov.cn")
+                                .setHeader("Referer","https://sc.122.gov.cn/views/memfyy/violation.html")
+                                .setHeader("Sec-Ch-Ua","\"Not/A)Brand\";v=\"8\", \"Chromium\";v=\"126\", \"Google Chrome\";v=\"126\"")
+                                .setHeader("Sec-Ch-Ua-Mobile","?0")
+                                .setHeader("Sec-Ch-Ua-Platform:","\"Windows\"")
+                                .setHeader("Sec-Fetch-Dest","empty")
+                                .setHeader("Sec-Fetch-Mode","cors")
+                                .setHeader("Sec-Fetch-Site","same-origin")
+                                .setHeader("User-Agent","Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/123.0.0.0 Safari/537.36")
+                                .setHeader("X-Requested-With", "XMLHttpRequest")
+                                .setHeader("Content-Type", "application/x-www-form-urlencoded; charset=UTF-8")
+                                .setHeader("Cookie", cookies)
+                                .setMethod(Request.Method.Post)
+                                .setParam("hpzl","52")
+                                .setParam("hphm","川" + hphm)
+                                .setParam("xh", xh)
+                                .setParam("cjjg",cjjg)
+                )
+                .setRpClazz(Map.class)
+                .response();
+        System.out.println(url + "?" + hphm + "," + xh);
+        Gson gson = GsonBuilder.gsonDefault();
+        if(response.getStatusCode() != 200){
+            throw new BusinessException("列表请求错误：" + gson.toJson(response.getBody()));
+        }
+        Map<String, String> dict = new HashMap(){{
+            put("hpzlStr","号牌种类");
+            put("hphm", "号牌号码");
+            put("wfsj", "违法时间");
+            put("wfdz", "违法地点");
+            put("wfms", "违法行为");
+            put("cjjgmc", "采集单位");
+            put("fkje", "罚款金额");
+            put("wfjfs", "记分值");
+        }};
+        Map<String, String> item = new HashMap<>();
+        item.put("状态", (isHandle == 1 ? "已处理" : "未处理") + "|" + (isPay == 1 ? "已交款" : "未交款"));
+        for (String key : dict.keySet()){
+            item.put(dict.get(key), MapUtils.getValueByKeyPath(response.getBody(), "data." + key, "", String.class));
+        }
+        itemsList.add(item);
     }
 }
