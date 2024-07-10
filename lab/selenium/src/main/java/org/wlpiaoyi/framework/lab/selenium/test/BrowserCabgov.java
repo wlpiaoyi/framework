@@ -5,7 +5,6 @@ import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.openqa.selenium.By;
 import org.openqa.selenium.Cookie;
-import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.WebElement;
 import org.wlpiaoyi.framework.lab.selenium.Browser;
 import org.wlpiaoyi.framework.lab.selenium.excel.ExcelWriter;
@@ -30,51 +29,67 @@ import java.util.*;
 @Slf4j
 public class BrowserCabgov {
 
+    private final String CONFIG_PATH = System.getProperty("user.dir") + "/config/selenium";
     private Browser browser;
-    String cookies = "_qrcode_digest=25c82b9baf0886a02f07a9b6f5b8b634351d5af0f9bc120e1d521cf46b874ed1; _122_gt=WGT-173947-plGwGkucjnhxfh33o12lkHZdFAS6sSGwouC; _122_gt_tag=1; JSESSIONID-L=fae904c1-5ca0-4b93-8d3f-c4959d5bbe20; JSESSIONID=00A7335EB29F807B4FC5259095496A7F; accessToken=6DcN65VqJor33DVso1QwXdb713eb7VIEqfkt8ir54JVXPtsubliHUOVwnkCyt2KAF1Rfq24+lm+lA3XMzLMu7MubTr2xIiJyfzlKK0DamMKkrStOSL844QFw4RWKaZK3lQ3etE7FdlwXh3C5oI/xB+0vf2OCrJSNdArM7gdTl4/eFsay7Z9vTs+douwj+qUH; c_yhlx_=2; tmri_csfr_token=D9F5B9AB1B43265C9ED8DC32BF7A446E";
-
+    private String cookies = null;
 
     public BrowserCabgov(){
         browser = new Browser().setOptionHeadless(false).setUrl("https://sc.122.gov.cn/views/memfyy/violation.html");
 //        this.browser.setOptionHeadless(true);
         this.browser.setOptionLoadimg(true);
-        this.browser.setDriverPath(System.getProperty("user.dir") +"/chromedriver.126.0.v");
+        this.browser.setDriverPath(CONFIG_PATH +"/chromedriver.126.0.v");
     }
     @SneakyThrows
-    public void start(){
+    public boolean start(){
+        log.info("prepare charles data");
+        this.cookies = ReaderUtils.loadString(CONFIG_PATH + "/cookies.txt", null).replaceAll("\n","").replaceAll("\r","");
         try{
-
             browser.openChromeDriver();
             browser.openDriver();
-            String args[] = this.cookies.split("; ");
-            Set<Cookie> cookies = new HashSet<>();
-            for (String arg : args){
-                String as[] = arg.split("=");
-                cookies.add(new Cookie(as[0], as[1]));
+            if(ValueUtils.isNotBlank(this.cookies)){
+                String args[] = this.cookies.split("; ");
+                Set<Cookie> cookies = new HashSet<>();
+                for (String arg : args){
+                    String as[] = arg.split("=");
+                    cookies.add(new Cookie(as[0], as[1]));
+                }
+                this.browser.setCookies(cookies);;
+                browser.openDriver();
+            }else {
+                log.info("cookies is null");
+                this.cookies = null;
             }
-            this.browser.setCookies(cookies);;
-            browser.openDriver();
-        }catch (Exception e) {e.printStackTrace();}
-        String[] args = ReaderUtils.loadString(System.getProperty("user.dir") + "/car_no.txt", null).split("\n");
+        }catch (Exception e) {
+            log.error("set cookies error", e);
+            browser.quit();
+            return false;
+        }
 
+        String[] args = ReaderUtils.loadString(CONFIG_PATH + "/car_no.txt", null).split("\n");
+        log.info("start charles data");
         List<Map<String, String>> itemsList = new ArrayList<>();
         try{
             for(String arg : args){
                 arg = arg.replaceAll("\r", "");
                 arg = arg.replaceAll("\n", "");
+                log.info(">charles data by car_no:{} ==================>", arg);
                 try{
                     this.exce(arg, itemsList);
-                    System.out.println("success car_no:" + arg);
+                    log.info("<charles data by car_no:{} <==================", arg);
                 }catch (Exception e){
-                    e.printStackTrace();
-                    System.out.println("failed car_no:" + arg);
+                    log.error("<charles data error by car_no:{} <==================", arg, e);
                 }
                 writeExcel(itemsList);
             }
         }finally {
-            writeExcel(itemsList);
+            try{
+                this.browser.quit();
+            }catch (Exception e){};
+            try{
+                writeExcel(itemsList);
+            }catch (Exception e){}
         }
-
+        return true;
     }
 
 
@@ -82,8 +97,8 @@ public class BrowserCabgov {
     public void writeExcel(List<Map<String, String>> itemsList){
         Gson gson = GsonBuilder.gsonDefault();
         String fileName = DateUtils.formatDate(new Date(), "YYMMDDHHmmss");
-        WriterUtils.overwrite(new File(System.getProperty("user.dir") + "/" + fileName  + ".txt"), gson.toJson(itemsList).getBytes());
-        OutputStream os = new FileOutputStream(System.getProperty("user.dir") + "/" + fileName + ".xlsx");
+        WriterUtils.overwrite(new File(CONFIG_PATH + "/" + fileName  + ".txt"), gson.toJson(itemsList).getBytes());
+        OutputStream os = new FileOutputStream(CONFIG_PATH + "/" + fileName + ".xlsx");
         ExcelWriter.exportData(itemsList).write(os);
         os.flush();
         os.close();
@@ -103,7 +118,9 @@ public class BrowserCabgov {
                 try{
                     webElement = browser.getDriver().findElement(By.id("violationveh"));
                     Thread.sleep(1000);
-                }catch (Exception e){ continue;}
+                }catch (Exception e){
+                    continue;
+                }
                 if(webElement == null){ continue; }
 
 
@@ -131,7 +148,6 @@ public class BrowserCabgov {
                     Map<String, String> item = this.view();
                     item.put("状态", datas.get(4).getText() + "|" +datas.get(6).getText());
                     itemsList.add(item);
-                    System.out.println("=========================================>");
                 }
                 try{
                     webElement = browser.getDriver().findElement(By.id("mypagination1"));
@@ -189,7 +205,7 @@ public class BrowserCabgov {
                 return true;
             }
         }catch (Exception e){
-//            e.printStackTrace();
+            log.warn("click feed error:{}", e.getMessage());
         }
         return false;
 
@@ -235,20 +251,22 @@ public class BrowserCabgov {
                     continue;
                 }
 
-                int ti = 10;
-                while (ti -- > 0){
-                    try{
-                        Thread.sleep(1000);
-                        if(clickFeed()){
-                            break;
-                        }else if(ti > 5){
-                            break;
-                        }
-                    }catch (Exception e){}
+                if (ValueUtils.isBlank(this.cookies)){
+                    int ti = 10;
+                    while (ti -- > 0){
+                        try{
+                            Thread.sleep(1000);
+                            if(clickFeed()){
+                                break;
+                            }else if(ti > 5){
+                                break;
+                            }
+                        }catch (Exception e){}
+                    }
                 }
 
                 WebElementUtils.click(browser, webElements.get(0));
-
+                Thread.sleep(1000);
                 WebElementUtils.click(browser, browser.getDriver().findElement(By.id("sidebar_menu_5")));
                 Thread.sleep(1000);
                 break;
@@ -381,8 +399,7 @@ public class BrowserCabgov {
                         continue;
                     }
                     Thread.sleep(1000);
-                    int itm = 10;
-                    while (--itm > 0){
+                    while (true){
                         Map<String, String> data = new HashMap<>();
                         boolean isGoon = false;
                         for (WebElement ele : webElements){
@@ -393,7 +410,7 @@ public class BrowserCabgov {
                             String name = spans.get(0).getText();
                             String value = spans.get(1).getText();
                             if(ValueUtils.isBlank(name) || ValueUtils.isBlank(value)){
-                                System.out.println("waiting");
+                                log.info("charles data field null, waiting ==================");
                                 isGoon = true;
                                 break;
                             }
@@ -404,7 +421,9 @@ public class BrowserCabgov {
                             webElements = webElement.findElements(By.xpath("form/div"));
                             continue;
                         }
+                        log.info("charles data success:{}", GsonBuilder.gsonDefault().toJson(data));
                         itemMap.putAll(data);
+                        break;
                     }
                     errorMsg = null;
                     break;
@@ -570,5 +589,10 @@ public class BrowserCabgov {
             item.put(dict.get(key), MapUtils.getValueByKeyPath(response.getBody(), "data." + key, "", String.class));
         }
         itemsList.add(item);
+    }
+
+    public static void main(String[] args) {
+        BrowserCabgov bc = new BrowserCabgov();
+        bc.start();
     }
 }
