@@ -6,7 +6,7 @@
     <parent>
         <groupId>org.wlpiaoyi</groupId>
         <artifactId>framework</artifactId>
-        <version>1.0.2-SNAPSHOT</version>
+        <version>1.0.2-BATA-JDK21</version>
     </parent>
 
     <modelVersion>4.0.0</modelVersion>
@@ -15,13 +15,6 @@
     <artifactId>utils</artifactId>
     <version>${fw.project.version}</version>
     <packaging>jar</packaging>
-
-<!--    <repositories>-->
-<!--        <repository>-->
-<!--            <id>com.e-iceblue</id>-->
-<!--            <url>https://repo.e-iceblue.cn/repository/maven-public/</url>-->
-<!--        </repository>-->
-<!--    </repositories>-->
 
     <dependencies>
         <dependency>
@@ -54,10 +47,10 @@
             <groupId>org.apache.tomcat.embed</groupId>
             <artifactId>tomcat-embed-websocket</artifactId>
         </dependency>
-<!--        <dependency>-->
-<!--            <groupId>org.bouncycastle</groupId>-->
-<!--            <artifactId>bcprov-jdk16</artifactId>-->
-<!--        </dependency>-->
+        <!--        <dependency>-->
+        <!--            <groupId>org.bouncycastle</groupId>-->
+        <!--            <artifactId>bcprov-jdk16</artifactId>-->
+        <!--        </dependency>-->
     </dependencies>
 
     <build>

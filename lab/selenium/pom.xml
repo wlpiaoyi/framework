@@ -11,7 +11,7 @@
     <parent>
         <groupId>org.wlpiaoyi.framework</groupId>
         <artifactId>lab</artifactId>
-        <version>1.0.2-SNAPSHOT</version>
+        <version>1.0.2-BATA-JDK21</version>
     </parent>
 
     <groupId>org.wlpiaoyi.framework.lab</groupId>
@@ -67,7 +67,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-assembly-plugin</artifactId>
-                <version>2.3</version>
+                <version>2.6</version>
                 <configuration>
                     <!--如果不想在打包的后缀加上assembly.xml中设置的id，可以加上下面的配置-->
                     <appendAssemblyId>false</appendAssemblyId>
@@ -76,11 +76,7 @@
                     </descriptorRefs>
                     <archive>
                         <manifest>
-                            <!-- 是否绑定依赖，将外部jar包依赖加入到classPath中 -->
-                            <addClasspath>true</addClasspath>
-                            <!-- 依赖前缀，与之前设置的文件夹路径要匹配 -->
-                            <classpathPrefix>lib/</classpathPrefix>
-                            <!-- 执行的主程序入口 -->
+                            <!--换成自己的主类-->
                             <mainClass>org.wlpiaoyi.framework.lab.selenium.test.BrowserCabgov</mainClass>
                         </manifest>
                     </archive>
@@ -88,7 +84,6 @@
                 <executions>
                     <execution>
                         <id>make-assembly</id>
-                        <!--绑定的maven操作-->
                         <phase>package</phase>
                         <goals>
                             <goal>assembly</goal>
@@ -96,6 +91,57 @@
                     </execution>
                 </executions>
             </plugin>
+<!--            <plugin>-->
+<!--                &lt;!&ndash; https://mvnrepository.com/artifact/org.bluestemsoftware.open.maven.plugin/launch4j-plugin &ndash;&gt;-->
+<!--                <groupId>org.bluestemsoftware.open.maven.plugin</groupId>-->
+<!--                <artifactId>launch4j-plugin</artifactId>-->
+<!--                <version>1.5.0.0</version>-->
+<!--                <executions>-->
+<!--                    <execution>-->
+<!--                        <id>l4j-clui</id>-->
+<!--                        <phase>package</phase>-->
+<!--                        <goals><goal>launch4j</goal></goals>-->
+<!--                        <configuration>-->
+<!--                            &lt;!&ndash;运行方式，控制台&ndash;&gt;-->
+<!--                            <headerType>console</headerType>-->
+<!--                            &lt;!&ndash;输出的exe文件&ndash;&gt;-->
+<!--                            <outfile>target/selenium-1.0.2-BATA-JDK21.exe</outfile>-->
+<!--                            &lt;!&ndash;输出的jar&ndash;&gt;-->
+<!--                            <jar>${project.build.directory}/${artifactId}-${version}.jar</jar>-->
+<!--                            &lt;!&ndash;错误标题&ndash;&gt;-->
+<!--                            <errTitle>cmd</errTitle>-->
+<!--                            <classPath>-->
+<!--                                &lt;!&ndash;换成自己的主类&ndash;&gt;-->
+<!--                                <mainClass>org.wlpiaoyi.framework.lab.selenium.test.BrowserCabgov</mainClass>-->
+<!--                                <addDependencies>true</addDependencies>-->
+<!--                                <preCp>anything</preCp>-->
+<!--                            </classPath>-->
+
+<!--                            &lt;!&ndash;配置jre&ndash;&gt;-->
+<!--                            <jre>-->
+<!--                                <minVersion>1.8.0</minVersion>-->
+<!--                                <maxVersion>21</maxVersion>-->
+<!--                                <initialHeapSize>128</initialHeapSize>-->
+<!--                                <maxHeapSize>1024</maxHeapSize>-->
+<!--                                &lt;!&ndash;jre路径，将生成的exe文件放到和jre同级目录，并把jre文件夹命名为jre&ndash;&gt;-->
+<!--                                <path>./env</path>-->
+<!--                            </jre>-->
+<!--                            &lt;!&ndash;一些版本信息配置，根据需要配置&ndash;&gt;-->
+<!--                            <versionInfo>-->
+<!--                                <fileVersion>1.0.0.0</fileVersion>-->
+<!--                                <txtFileVersion>1.0</txtFileVersion>-->
+<!--                                <fileDescription>wlpiaoyi.selenium</fileDescription>-->
+<!--                                <copyright>wlpiaoyi</copyright>-->
+<!--                                <productVersion>1.0.0.0</productVersion>-->
+<!--                                <txtProductVersion>cmd</txtProductVersion>-->
+<!--                                <productName>selenium</productName>-->
+<!--                                <internalName>cmd</internalName>-->
+<!--                                <originalFilename>selenium.exe</originalFilename>-->
+<!--                            </versionInfo>-->
+<!--                        </configuration>-->
+<!--                    </execution>-->
+<!--                </executions>-->
+<!--            </plugin>-->
         </plugins>
     </build>
 </project>
