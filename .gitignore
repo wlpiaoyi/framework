@@ -33,3 +33,4 @@ openai/azure/target/*
 .idea .jdk21/
 .idea .jdk8/
 config/selenium/chromedriver.*
+lab/selenium/target/*

@@ -152,7 +152,7 @@ public class BrowserCabgov {
                 try{
                     webElement = browser.getDriver().findElement(By.id("mypagination1"));
                     Thread.sleep(1000);
-                }catch (Exception e){ continue;}
+                }catch (Exception e){ break;}
                 if(webElement == null){ break; }
 
                 try{
@@ -219,18 +219,18 @@ public class BrowserCabgov {
             try {
                 Thread.sleep(1000);
                 List<WebElement> webElements = null;
-                try{
-                    webElements = browser.getDriver().findElements(By.xpath("/html/body/div"));
-                }catch (Exception e){}
-                if(ValueUtils.isBlank(webElements)){
-                    continue;
-                }
-                if(ValueUtils.isBlank(webElements) || webElements.size() < 2){
-                    continue;
-                }
+//                try{
+//                    webElements = browser.getDriver().findElements(By.xpath("/html/body/div"));
+//                }catch (Exception e){}
+//                if(ValueUtils.isBlank(webElements)){
+//                    continue;
+//                }
+//                if(ValueUtils.isBlank(webElements) || webElements.size() < 2){
+//                    continue;
+//                }
                 WebElement webElement = null;
                 try{
-                    webElement = webElements.get(1).findElement(By.className("pull-right"));
+                    webElement = browser.getDriver().findElement(By.className("pull-right"));
                 }catch (Exception e){}
                 if(webElement == null){
                     continue;
