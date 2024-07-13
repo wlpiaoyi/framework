@@ -64,7 +64,7 @@ public class BrowserCabgov {
             browser.quit();
             return false;
         }
-
+        this.openAndLogin();
         String[] args = ReaderUtils.loadString(CONFIG_PATH + "/car_no.txt", null).split("\n");
         log.info("start charles data");
         List<Map<String, String>> itemsList = new ArrayList<>();
@@ -74,8 +74,13 @@ public class BrowserCabgov {
                 arg = arg.replaceAll("\n", "");
                 log.info(">charles data by car_no:{} ==================>", arg);
                 try{
-                    this.exce(arg, itemsList);
-                    log.info("<charles data by car_no:{} <==================", arg);
+                    List<Map<String, String>> items = this.exce(arg);
+                    log.info("<charles data by car_no:{} {} <==================", arg, items.size());
+                    if(ValueUtils.isBlank(items)){
+                        log.info("has no items not write data");
+                        continue;
+                    }
+                    itemsList.addAll(items);
                 }catch (Exception e){
                     log.error("<charles data error by car_no:{} <==================", arg, e);
                 }
@@ -104,8 +109,8 @@ public class BrowserCabgov {
         os.close();
     }
 
-    void exce(String value, List<Map<String, String>> itemsList){
-        this.openAndLogin();
+    List<Map<String, String>> exce(String value){
+        List<Map<String, String>> itemsList = new ArrayList<>();
         this.search(value);
         String errorMsg = null;
         int i = 30;
@@ -119,27 +124,38 @@ public class BrowserCabgov {
                     webElement = browser.getDriver().findElement(By.id("violationveh"));
                     Thread.sleep(1000);
                 }catch (Exception e){
+                    log.warn("========== not fund 车辆列表 ele:{}", "violationveh");
                     continue;
                 }
-                if(webElement == null){ continue; }
+                if(webElement == null){
+                    log.warn("========== not fund 车辆列表 ele:{}", "violationveh");
+                    continue;
+                }
 
 
                 try{
                     webElements = webElement.findElements(By.xpath("table/tbody/tr"));
                     Thread.sleep(1000);
-                }catch (Exception e){ continue;}
+                }catch (Exception e){
+                    log.warn("========== not fund 车辆列表 ele.ex:{}", "table/tbody/tr");
+                    continue;
+                }
 
                 if(ValueUtils.isBlank(webElements)){
+                    log.warn("========== not fund 车辆列表 ele:{}", "table/tbody/tr");
                     continue;
                 }
                 for(WebElement trEle : webElements){
                     List<WebElement> datas = trEle.findElements(By.xpath("td"));
                     if(!"未交款".equals(datas.get(6).getText())){
+                        log.info("========== continue.6:{}", datas.get(6).getText());
                         continue;
                     }
                     try{
                         Thread.sleep(500);
+                        log.info("==========> click view.a");
                         WebElementUtils.click(browser, datas.get(7).findElement(By.xpath("a")));
+                        log.info("==========< click view.a");
                     }catch (Exception e){
                         throw e;
                     }
@@ -152,14 +168,24 @@ public class BrowserCabgov {
                 try{
                     webElement = browser.getDriver().findElement(By.id("mypagination1"));
                     Thread.sleep(1000);
-                }catch (Exception e){ break;}
-                if(webElement == null){ break; }
+                }catch (Exception e){
+                    log.info("========== page is null.1");
+                    break;
+                }
+                if(webElement == null){
+                    log.info("========== page is null.2");
+                    break;
+                }
 
                 try{
                     webElements = webElement.findElements(By.xpath("ul/li"));
                     Thread.sleep(1000);
-                }catch (Exception e){ continue;}
+                }catch (Exception e){
+                    log.warn("========== not fund 车辆列表 ele:{}", "ul/li");
+                    continue;
+                }
                 if(ValueUtils.isBlank(webElements) || webElements.size() <= 5){
+                    log.info("========== page is null.3");
                     break;
                 }
                 webElements.remove(0);
@@ -174,6 +200,7 @@ public class BrowserCabgov {
                 for(WebElement ele : webElements){
                     removes.add(ele);
                     if("active".equals(ele.getAttribute("class"))){
+                        log.info("========== page is null.4");
                         break;
                     }
                 }
@@ -181,7 +208,9 @@ public class BrowserCabgov {
                 if(webElements.size() == 0){
                     break;
                 }
+                log.info("==========> click next page");
                 WebElementUtils.click(browser, webElements.get(0).findElement(By.xpath("a")));
+                log.info("==========< click next page");
                 Thread.sleep(2000);
                 i = 30;
             } catch (InterruptedException e) {
@@ -195,6 +224,7 @@ public class BrowserCabgov {
         if(ValueUtils.isNotBlank(errorMsg)){
             throw new BusinessException(errorMsg);
         }
+        return itemsList;
     }
 
     boolean clickFeed(){
@@ -233,18 +263,21 @@ public class BrowserCabgov {
                     webElement = browser.getDriver().findElement(By.className("pull-right"));
                 }catch (Exception e){}
                 if(webElement == null){
+                    log.warn("========== not fund 请选择服务类型 ele:{}", "pull-right");
                     continue;
                 }
                 try{
                     webElement = webElement.findElement(By.xpath("select"));
                 }catch (Exception e){}
                 if(webElement == null){
+                    log.warn("========== not fund 请选择服务类型 ele:{}", "select");
                     continue;
                 }
                 try{
                     webElements = webElement.findElements(By.xpath("option"));
                 }catch (Exception e){}
-                if(webElement == null){
+                if(ValueUtils.isBlank(webElements)){
+                    log.warn("========== not fund 请选择服务类型 ele:{}", "option");
                     continue;
                 }
                 if(ValueUtils.isBlank(webElements) || webElements.size() < 1){
@@ -264,10 +297,13 @@ public class BrowserCabgov {
                         }catch (Exception e){}
                     }
                 }
-
+                log.info("==========> click 请选择服务类型:{}", "非营运机动车信息服务");
                 WebElementUtils.click(browser, webElements.get(0));
+                log.info("==========< click 请选择服务类型:{}", "非营运机动车信息服务");
                 Thread.sleep(1000);
+                log.info("==========> click 交通违法查询");
                 WebElementUtils.click(browser, browser.getDriver().findElement(By.id("sidebar_menu_5")));
+                log.info("==========< click 交通违法查询");
                 Thread.sleep(1000);
                 break;
             } catch (InterruptedException e) {
@@ -296,6 +332,7 @@ public class BrowserCabgov {
                     webElement = browser.getDriver().findElement(By.id("mem-content")).findElement(By.id("vehSearchForm"));
                 }catch (Exception e){}
                 if(webElement == null){
+                    log.warn("========== not fund 违法查询 ele:{}", "mem-content.vehSearchForm");
                     continue;
                 }
                 try{
@@ -309,42 +346,66 @@ public class BrowserCabgov {
                 try{
                     WebElementUtils.click(browser, webElements.get(0).findElements(By.className("add-on")).get(0));
                     Thread.sleep(1000);
-                }catch (Exception e){ continue;}
+                }catch (Exception e){
+                    log.warn("========== not fund 违法查询 ele:{}", "add-on");
+                    continue;
+                }
 
                 try{
                     WebElementUtils.click(browser, browser.getDriver().findElements(By.className("datetimepicker-months")).get(0).findElements(By.xpath("table/thead/tr/th")).get(1));
                     Thread.sleep(1000);
-                }catch (Exception e){ continue;}
+                }catch (Exception e){
+                    log.warn("========== not fund 违法查询 ele:{}", "datetimepicker-months-option");
+                    continue;
+                }
 
                 try{
                     WebElementUtils.click(browser, browser.getDriver().findElements(By.className("datetimepicker-years")).get(0).findElements(By.xpath("table/tbody/tr/td/span")).get(1));
                     Thread.sleep(1000);
-                }catch (Exception e){ continue;}
+                }catch (Exception e){
+                    log.warn("========== not fund 违法查询 ele:{}", "datetimepicker-years");
+                    continue;
+                }
 
                 try{
                     WebElementUtils.click(browser,browser.getDriver().findElements(By.className("datetimepicker-months")).get(0).findElements(By.xpath("table/tbody/tr/td/span")).get(0));
                     Thread.sleep(1000);
-                }catch (Exception e){ continue;}
+                }catch (Exception e){
+                    log.warn("========== not fund 违法查询 ele:{}", "datetimepicker-months");
+                    continue;
+                }
 
                 try{
                     WebElementUtils.click(browser, browser.getDriver().findElements(By.className("datetimepicker-days")).get(0).findElements(By.xpath("table/tbody/tr/td")).get(6));
                     Thread.sleep(1000);
-                }catch (Exception e){ continue;}
+                }catch (Exception e){
+                    log.warn("========== not fund 违法查询 ele:{}", "datetimepicker-days");
+                    continue;
+                }
 
                 try{
                     WebElementUtils.click(browser, webElements.get(1).findElement(By.id("hpzl")).findElements(By.xpath("option")).get(3));
                     Thread.sleep(1000);
-                }catch (Exception e){ continue;}
+                }catch (Exception e){
+                    log.warn("========== not fund 违法查询 ele:{}", "hpzl.option");
+                    continue;
+                }
 
                 try{
                     WebElementUtils.setValue(webElements.get(2).findElement(By.id("hphm")), text);
                     Thread.sleep(1000);
-                }catch (Exception e){ continue;}
+                }catch (Exception e){
+                    log.warn("========== not fund 违法查询 ele:{}", "hphm");
+                    continue;
+                }
 
                 try{
                     WebElementUtils.click(browser, webElements.get(3).findElement(By.xpath("button")));
                     Thread.sleep(1000);
-                }catch (Exception e){ continue;}
+                }catch (Exception e){
+                    log.warn("========== not fund 违法查询 ele:{}", "button");
+                    continue;
+                }
                 errorMsg = null;
                 break;
             } catch (InterruptedException e) {
@@ -383,6 +444,7 @@ public class BrowserCabgov {
                         webElement = webElement.findElement(By.className("modal-body"));
                     }catch (Exception e){}
                     if(webElement == null){
+                        log.warn("========== not fund 查看详情 ele:{}", "modal-body");
                         continue;
                     }
 
@@ -390,12 +452,14 @@ public class BrowserCabgov {
                         webElement = webElement.findElement(By.className("xqInfo"));
                     }catch (Exception e){}
                     if(webElement == null){
+                        log.warn("========== not fund 查看详情 ele:{}", "xqInfo");
                         continue;
                     }
                     try{
                         webElements = webElement.findElements(By.xpath("form/div"));
                     }catch (Exception e){}
                     if(ValueUtils.isBlank(webElements) || webElements.size() < 1){
+                        log.warn("========== not fund 查看详情 ele:{}", "form/div");
                         continue;
                     }
                     Thread.sleep(1000);
@@ -418,7 +482,6 @@ public class BrowserCabgov {
                         }
                         if(isGoon){
                             Thread.sleep(1000);
-                            webElements = webElement.findElements(By.xpath("form/div"));
                             continue;
                         }
                         log.info("charles data success:{}", GsonBuilder.gsonDefault().toJson(data));
@@ -440,156 +503,158 @@ public class BrowserCabgov {
             }
             return itemMap;
         }finally {
+            log.info("==========> click 查看详情: close");
             WebElement webElement = browser.getDriver().findElement(By.id("view"));
             WebElementUtils.click(browser, webElement.findElement(By.id("bind_close")));
+            log.info("==========< click 查看详情: close");
             Thread.sleep(1000);
         }
     }
-
-    public Map<String, String> querySurvielDetail(String hphm, String xh, String cjjg, String cookies) throws IOException, InterruptedException {
-        Thread.sleep(5000);
-        String url = "https://sc.122.gov.cn/user/m/tsc/vio/querySurvielDetail";
-        Response<Map> response = HttpClient.instance(
-                        Request.initJson(url)
-                                .setHeader("Host","sc.122.gov.cn")
-                                .setHeader("Origin","https://sc.122.gov.cn")
-                                .setHeader("Referer","https://sc.122.gov.cn/views/memfyy/violation.html")
-                                .setHeader("Sec-Ch-Ua","\"Not/A)Brand\";v=\"8\", \"Chromium\";v=\"126\", \"Google Chrome\";v=\"126\"")
-                                .setHeader("Sec-Ch-Ua-Mobile","?0")
-                                .setHeader("Sec-Ch-Ua-Platform:","\"Windows\"")
-                                .setHeader("Sec-Fetch-Dest","empty")
-                                .setHeader("Sec-Fetch-Mode","cors")
-                                .setHeader("Sec-Fetch-Site","same-origin")
-                                .setHeader("User-Agent","Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/123.0.0.0 Safari/537.36")
-                                .setHeader("X-Requested-With", "XMLHttpRequest")
-                                .setHeader("Content-Type", "application/x-www-form-urlencoded; charset=UTF-8")
-                                .setHeader("Cookie", cookies)
-                                .setMethod(Request.Method.Post)
-                                .setParam("hpzl","52")
-                                .setParam("hphm","川" + hphm)
-                                .setParam("xh", xh)
-                                .setParam("cjjg",cjjg)
-                )
-                .setRpClazz(Map.class)
-                .response();
-        System.out.println(url + "?" + hphm + "," + xh);
-        Gson gson = GsonBuilder.gsonDefault();
-        if(response.getStatusCode() != 200){
-            throw new BusinessException("列表请求错误：" + gson.toJson(response.getBody()));
-        }
-        Map<String, String> dict = new HashMap(){{
-            put("hpzlStr","号牌种类");
-            put("hphm", "号牌号码");
-            put("wfsj", "违法时间");
-            put("wfdz", "违法地点");
-            put("wfms", "违法行为");
-            put("cjjgmc", "采集单位");
-            put("fkje", "罚款金额");
-            put("wfjfs", "记分值");
-        }};
-        Map<String, String> item = new HashMap<>();;
-        for (String key : dict.keySet()){
-            item.put(dict.get(key), MapUtils.getValueByKeyPath(response.getBody(), "data." + key, "", String.class));
-        }
-        return item;
-    }
-
-
-    public int suriquery(String hphm, int page, String cookies, List<Map<String, String>> itemsList) throws IOException, InterruptedException {
-        String url = "https://sc.122.gov.cn/user/m/uservio/suriquery";
-        Response<Map> response = HttpClient.instance(
-                        Request.initJson(url)
-                                .setHeader("Host","sc.122.gov.cn")
-                                .setHeader("Origin","https://sc.122.gov.cn")
-                                .setHeader("Referer","https://sc.122.gov.cn/views/memfyy/violation.html")
-                                .setHeader("Sec-Ch-Ua","\"Not/A)Brand\";v=\"8\", \"Chromium\";v=\"126\", \"Google Chrome\";v=\"126\"")
-                                .setHeader("Sec-Ch-Ua-Mobile","?0")
-                                .setHeader("Sec-Ch-Ua-Platform:","\"Windows\"")
-                                .setHeader("Sec-Fetch-Dest","empty")
-                                .setHeader("Sec-Fetch-Mode","cors")
-                                .setHeader("Sec-Fetch-Site","same-origin")
-                                .setHeader("User-Agent","Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/123.0.0.0 Safari/537.36")
-                                .setHeader("X-Requested-With", "XMLHttpRequest")
-                                .setHeader("Content-Type", "application/x-www-form-urlencoded; charset=UTF-8")
-                                .setHeader("Cookie", cookies)
-                                .setMethod(Request.Method.Post)
-                                .setParam("startDate","20200105")
-                                .setParam("endDate","20240709")
-                                .setParam("hpzl","52")
-                                .setParam("hphm","川" + hphm)
-                                .setParam("page",page + "")
-                                .setParam("type","0")
-                )
-                .setRpClazz(Map.class)
-                .response();
-        System.out.println(url + "?"+ hphm + "," + page);
-        Gson gson = GsonBuilder.gsonDefault();
-        if(response.getStatusCode() != 200){
-            throw new BusinessException("列表请求错误：" + gson.toJson(response.getBody()));
-        }
-        Integer totalPages = MapUtils.getValueByKeyPath(response.getBody(),"data.totalPages", -1, Integer.class);
-        List<Map> content = MapUtils.getValueByKeyPath(response.getBody(),"data.content", null, List.class);
-        if(ValueUtils.isBlank(content)){
-            System.out.printf("没有数据了：" + hphm);
-            return 0;
-        }
-        for (Map item : content){
-            Integer isHandle = MapUtils.getInteger(item, "clbj", 0);
-            Integer isPay = MapUtils.getInteger(item, "jkbj", 0);
-            if(isHandle == 0 || isPay == 0){
-                this.querySurvielDetail(hphm, MapUtils.getString(item, "xh"), MapUtils.getString(item, "cjjg"), isHandle, isPay, cookies, itemsList);
-            }
-        }
-        return totalPages - page;
-    }
-    public void querySurvielDetail(String hphm, String xh, String cjjg, Integer isHandle, Integer isPay, String cookies, List<Map<String, String>> itemsList) throws IOException, InterruptedException {
-        Thread.sleep(5000);
-        String url = "https://sc.122.gov.cn/user/m/tsc/vio/querySurvielDetail";
-        Response<Map> response = HttpClient.instance(
-                        Request.initJson(url)
-                                .setHeader("Host","sc.122.gov.cn")
-                                .setHeader("Origin","https://sc.122.gov.cn")
-                                .setHeader("Referer","https://sc.122.gov.cn/views/memfyy/violation.html")
-                                .setHeader("Sec-Ch-Ua","\"Not/A)Brand\";v=\"8\", \"Chromium\";v=\"126\", \"Google Chrome\";v=\"126\"")
-                                .setHeader("Sec-Ch-Ua-Mobile","?0")
-                                .setHeader("Sec-Ch-Ua-Platform:","\"Windows\"")
-                                .setHeader("Sec-Fetch-Dest","empty")
-                                .setHeader("Sec-Fetch-Mode","cors")
-                                .setHeader("Sec-Fetch-Site","same-origin")
-                                .setHeader("User-Agent","Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/123.0.0.0 Safari/537.36")
-                                .setHeader("X-Requested-With", "XMLHttpRequest")
-                                .setHeader("Content-Type", "application/x-www-form-urlencoded; charset=UTF-8")
-                                .setHeader("Cookie", cookies)
-                                .setMethod(Request.Method.Post)
-                                .setParam("hpzl","52")
-                                .setParam("hphm","川" + hphm)
-                                .setParam("xh", xh)
-                                .setParam("cjjg",cjjg)
-                )
-                .setRpClazz(Map.class)
-                .response();
-        System.out.println(url + "?" + hphm + "," + xh);
-        Gson gson = GsonBuilder.gsonDefault();
-        if(response.getStatusCode() != 200){
-            throw new BusinessException("列表请求错误：" + gson.toJson(response.getBody()));
-        }
-        Map<String, String> dict = new HashMap(){{
-            put("hpzlStr","号牌种类");
-            put("hphm", "号牌号码");
-            put("wfsj", "违法时间");
-            put("wfdz", "违法地点");
-            put("wfms", "违法行为");
-            put("cjjgmc", "采集单位");
-            put("fkje", "罚款金额");
-            put("wfjfs", "记分值");
-        }};
-        Map<String, String> item = new HashMap<>();
-        item.put("状态", (isHandle == 1 ? "已处理" : "未处理") + "|" + (isPay == 1 ? "已交款" : "未交款"));
-        for (String key : dict.keySet()){
-            item.put(dict.get(key), MapUtils.getValueByKeyPath(response.getBody(), "data." + key, "", String.class));
-        }
-        itemsList.add(item);
-    }
+//
+//    public Map<String, String> querySurvielDetail(String hphm, String xh, String cjjg, String cookies) throws IOException, InterruptedException {
+//        Thread.sleep(5000);
+//        String url = "https://sc.122.gov.cn/user/m/tsc/vio/querySurvielDetail";
+//        Response<Map> response = HttpClient.instance(
+//                        Request.initJson(url)
+//                                .setHeader("Host","sc.122.gov.cn")
+//                                .setHeader("Origin","https://sc.122.gov.cn")
+//                                .setHeader("Referer","https://sc.122.gov.cn/views/memfyy/violation.html")
+//                                .setHeader("Sec-Ch-Ua","\"Not/A)Brand\";v=\"8\", \"Chromium\";v=\"126\", \"Google Chrome\";v=\"126\"")
+//                                .setHeader("Sec-Ch-Ua-Mobile","?0")
+//                                .setHeader("Sec-Ch-Ua-Platform:","\"Windows\"")
+//                                .setHeader("Sec-Fetch-Dest","empty")
+//                                .setHeader("Sec-Fetch-Mode","cors")
+//                                .setHeader("Sec-Fetch-Site","same-origin")
+//                                .setHeader("User-Agent","Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/123.0.0.0 Safari/537.36")
+//                                .setHeader("X-Requested-With", "XMLHttpRequest")
+//                                .setHeader("Content-Type", "application/x-www-form-urlencoded; charset=UTF-8")
+//                                .setHeader("Cookie", cookies)
+//                                .setMethod(Request.Method.Post)
+//                                .setParam("hpzl","52")
+//                                .setParam("hphm","川" + hphm)
+//                                .setParam("xh", xh)
+//                                .setParam("cjjg",cjjg)
+//                )
+//                .setRpClazz(Map.class)
+//                .response();
+//        System.out.println(url + "?" + hphm + "," + xh);
+//        Gson gson = GsonBuilder.gsonDefault();
+//        if(response.getStatusCode() != 200){
+//            throw new BusinessException("列表请求错误：" + gson.toJson(response.getBody()));
+//        }
+//        Map<String, String> dict = new HashMap(){{
+//            put("hpzlStr","号牌种类");
+//            put("hphm", "号牌号码");
+//            put("wfsj", "违法时间");
+//            put("wfdz", "违法地点");
+//            put("wfms", "违法行为");
+//            put("cjjgmc", "采集单位");
+//            put("fkje", "罚款金额");
+//            put("wfjfs", "记分值");
+//        }};
+//        Map<String, String> item = new HashMap<>();;
+//        for (String key : dict.keySet()){
+//            item.put(dict.get(key), MapUtils.getValueByKeyPath(response.getBody(), "data." + key, "", String.class));
+//        }
+//        return item;
+//    }
+//
+//
+//    public int suriquery(String hphm, int page, String cookies, List<Map<String, String>> itemsList) throws IOException, InterruptedException {
+//        String url = "https://sc.122.gov.cn/user/m/uservio/suriquery";
+//        Response<Map> response = HttpClient.instance(
+//                        Request.initJson(url)
+//                                .setHeader("Host","sc.122.gov.cn")
+//                                .setHeader("Origin","https://sc.122.gov.cn")
+//                                .setHeader("Referer","https://sc.122.gov.cn/views/memfyy/violation.html")
+//                                .setHeader("Sec-Ch-Ua","\"Not/A)Brand\";v=\"8\", \"Chromium\";v=\"126\", \"Google Chrome\";v=\"126\"")
+//                                .setHeader("Sec-Ch-Ua-Mobile","?0")
+//                                .setHeader("Sec-Ch-Ua-Platform:","\"Windows\"")
+//                                .setHeader("Sec-Fetch-Dest","empty")
+//                                .setHeader("Sec-Fetch-Mode","cors")
+//                                .setHeader("Sec-Fetch-Site","same-origin")
+//                                .setHeader("User-Agent","Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/123.0.0.0 Safari/537.36")
+//                                .setHeader("X-Requested-With", "XMLHttpRequest")
+//                                .setHeader("Content-Type", "application/x-www-form-urlencoded; charset=UTF-8")
+//                                .setHeader("Cookie", cookies)
+//                                .setMethod(Request.Method.Post)
+//                                .setParam("startDate","20200105")
+//                                .setParam("endDate","20240709")
+//                                .setParam("hpzl","52")
+//                                .setParam("hphm","川" + hphm)
+//                                .setParam("page",page + "")
+//                                .setParam("type","0")
+//                )
+//                .setRpClazz(Map.class)
+//                .response();
+//        System.out.println(url + "?"+ hphm + "," + page);
+//        Gson gson = GsonBuilder.gsonDefault();
+//        if(response.getStatusCode() != 200){
+//            throw new BusinessException("列表请求错误：" + gson.toJson(response.getBody()));
+//        }
+//        Integer totalPages = MapUtils.getValueByKeyPath(response.getBody(),"data.totalPages", -1, Integer.class);
+//        List<Map> content = MapUtils.getValueByKeyPath(response.getBody(),"data.content", null, List.class);
+//        if(ValueUtils.isBlank(content)){
+//            System.out.printf("没有数据了：" + hphm);
+//            return 0;
+//        }
+//        for (Map item : content){
+//            Integer isHandle = MapUtils.getInteger(item, "clbj", 0);
+//            Integer isPay = MapUtils.getInteger(item, "jkbj", 0);
+//            if(isHandle == 0 || isPay == 0){
+//                this.querySurvielDetail(hphm, MapUtils.getString(item, "xh"), MapUtils.getString(item, "cjjg"), isHandle, isPay, cookies, itemsList);
+//            }
+//        }
+//        return totalPages - page;
+//    }
+//    public void querySurvielDetail(String hphm, String xh, String cjjg, Integer isHandle, Integer isPay, String cookies, List<Map<String, String>> itemsList) throws IOException, InterruptedException {
+//        Thread.sleep(5000);
+//        String url = "https://sc.122.gov.cn/user/m/tsc/vio/querySurvielDetail";
+//        Response<Map> response = HttpClient.instance(
+//                        Request.initJson(url)
+//                                .setHeader("Host","sc.122.gov.cn")
+//                                .setHeader("Origin","https://sc.122.gov.cn")
+//                                .setHeader("Referer","https://sc.122.gov.cn/views/memfyy/violation.html")
+//                                .setHeader("Sec-Ch-Ua","\"Not/A)Brand\";v=\"8\", \"Chromium\";v=\"126\", \"Google Chrome\";v=\"126\"")
+//                                .setHeader("Sec-Ch-Ua-Mobile","?0")
+//                                .setHeader("Sec-Ch-Ua-Platform:","\"Windows\"")
+//                                .setHeader("Sec-Fetch-Dest","empty")
+//                                .setHeader("Sec-Fetch-Mode","cors")
+//                                .setHeader("Sec-Fetch-Site","same-origin")
+//                                .setHeader("User-Agent","Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/123.0.0.0 Safari/537.36")
+//                                .setHeader("X-Requested-With", "XMLHttpRequest")
+//                                .setHeader("Content-Type", "application/x-www-form-urlencoded; charset=UTF-8")
+//                                .setHeader("Cookie", cookies)
+//                                .setMethod(Request.Method.Post)
+//                                .setParam("hpzl","52")
+//                                .setParam("hphm","川" + hphm)
+//                                .setParam("xh", xh)
+//                                .setParam("cjjg",cjjg)
+//                )
+//                .setRpClazz(Map.class)
+//                .response();
+//        System.out.println(url + "?" + hphm + "," + xh);
+//        Gson gson = GsonBuilder.gsonDefault();
+//        if(response.getStatusCode() != 200){
+//            throw new BusinessException("列表请求错误：" + gson.toJson(response.getBody()));
+//        }
+//        Map<String, String> dict = new HashMap(){{
+//            put("hpzlStr","号牌种类");
+//            put("hphm", "号牌号码");
+//            put("wfsj", "违法时间");
+//            put("wfdz", "违法地点");
+//            put("wfms", "违法行为");
+//            put("cjjgmc", "采集单位");
+//            put("fkje", "罚款金额");
+//            put("wfjfs", "记分值");
+//        }};
+//        Map<String, String> item = new HashMap<>();
+//        item.put("状态", (isHandle == 1 ? "已处理" : "未处理") + "|" + (isPay == 1 ? "已交款" : "未交款"));
+//        for (String key : dict.keySet()){
+//            item.put(dict.get(key), MapUtils.getValueByKeyPath(response.getBody(), "data." + key, "", String.class));
+//        }
+//        itemsList.add(item);
+//    }
 
     public static void main(String[] args) {
         BrowserCabgov bc = new BrowserCabgov();
