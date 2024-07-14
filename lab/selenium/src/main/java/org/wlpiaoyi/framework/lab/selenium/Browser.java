@@ -62,9 +62,6 @@ public class Browser {
     private String url;
 
     @Getter
-    private Set<Cookie> cookies;
-
-    @Getter
     private String optionLang;
 
     @Getter
@@ -74,6 +71,7 @@ public class Browser {
 //        this.deviceName = "IPhone X";
         this.optionLang = "zh_CN.UTF-8";
     }
+
 
     public void openFirfoxDriver(){
         System.setProperty(FirefoxDriver.SystemProperty.BROWSER_LOGFILE,"/dev/null");
@@ -221,18 +219,19 @@ public class Browser {
     }
 
     public Browser setCookies(Set<Cookie> cookies) {
-        this.cookies = cookies;
         if(this.driver == null) return this;
         synchronized (this.driver){
             this.driver.manage().deleteAllCookies();
-            if(this.cookies == null || this.cookies.isEmpty()) return this;
-            for (Cookie cookie : this.cookies){
+            for (Cookie cookie : cookies){
                 this.driver.manage().addCookie(cookie);
             }
         }
         return this;
     }
 
+    public Set<Cookie> getCookies() {
+        return this.driver.manage().getCookies();
+    }
     public void addCookie(Cookie cookie) {
         if(this.driver == null) throw new BusinessException("can't set this value before loaded driver!!");
         this.driver.manage().addCookie(cookie);
