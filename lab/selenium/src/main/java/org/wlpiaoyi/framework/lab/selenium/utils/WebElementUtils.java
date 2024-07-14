@@ -1,15 +1,35 @@
 package org.wlpiaoyi.framework.lab.selenium.utils;
 
-import lombok.SneakyThrows;
-import org.openqa.selenium.By;
 import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.Keys;
 import org.openqa.selenium.WebElement;
 import org.wlpiaoyi.framework.lab.selenium.Browser;
-import org.wlpiaoyi.framework.utils.ValueUtils;
+
+/**
+ * <p><b>{@code @author:}</b>         wlpiaoyi</p>
+ * <p><b>{@code @description:}</b>    元素操控</p>
+ * <p><b>{@code @date:}</b>           2024/7/14 10:24</p>
+ * <p><b>{@code @version:}</b>        1.0</p>
+ */
 
 public class WebElementUtils {
 
+    /**
+     * <p><b>{@code @description:}</b>
+     * 出发click事件
+     * </p>
+     *
+     * <p><b>@param</b> <b>browser</b>
+     * {@link Browser}
+     * </p>
+     *
+     * <p><b>@param</b> <b>ele</b>
+     * {@link WebElement}
+     * </p>
+     *
+     * <p><b>{@code @date:}</b>2024/7/14 10:23</p>
+     * <p><b>{@code @author:}</b>wlpiaoyi</p>
+     */
     public static void click(Browser browser, WebElement ele){
         try{
             ele.click();
@@ -17,22 +37,20 @@ public class WebElementUtils {
             ((JavascriptExecutor)browser.getDriver()).executeScript("arguments[0].click();", ele);
         }
     }
-    @SneakyThrows
-    public static String getValue(WebElement element, int reGetNum){
-        if(reGetNum <= 0){
-            return getValue(element);
-        }
-        String value = null;
-        while (-- reGetNum > 0){
-            value = getValue(element);
-            if(ValueUtils.isNotBlank(value)){
-                break;
-            }
-            Thread.sleep(1000);
-        }
-        return value;
-    }
 
+    /**
+     * <p><b>{@code @description:}</b>
+     * 获取元素Value
+     * </p>
+     *
+     * <p><b>@param</b> <b>element</b>
+     * {@link WebElement}
+     * </p>
+     *
+     * <p><b>{@code @date:}</b>2024/7/14 10:23</p>
+     * <p><b>{@code @return:}</b>{@link String}</p>
+     * <p><b>{@code @author:}</b>wlpiaoyi</p>
+     */
     public static String getValue(WebElement element){
         String value = element.getText();
         if(value == null){
@@ -41,11 +59,23 @@ public class WebElementUtils {
         return value;
     }
 
+
     /**
+     * <p><b>{@code @description:}</b>
      * 给元素设置value
-     * @param element
-     * @param value
-     * @return
+     * </p>
+     *
+     * <p><b>@param</b> <b>element</b>
+     * {@link WebElement}
+     * </p>
+     *
+     * <p><b>@param</b> <b>value</b>
+     * {@link String}
+     * </p>
+     *
+     * <p><b>{@code @date:}</b>2024/7/14 10:22</p>
+     * <p><b>{@code @return:}</b>{@link boolean}</p>
+     * <p><b>{@code @author:}</b>wlpiaoyi</p>
      */
     public static boolean setValue(WebElement element, String value) {
 
