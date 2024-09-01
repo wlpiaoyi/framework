@@ -1,23 +1,12 @@
-package org.wlpiaoyi.framework.lab.selenium.test;
+package org.wlpiaoyi.framework.lab.selenium.for12123.test;
 
 import lombok.SneakyThrows;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
-import org.openqa.selenium.By;
-import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.remote.RemoteWebElement;
-import org.wlpiaoyi.framework.lab.selenium.Browser;
-import org.wlpiaoyi.framework.lab.selenium.excel.ExcelWriter;
-import org.wlpiaoyi.framework.lab.selenium.utils.WebElementUtils;
-import org.wlpiaoyi.framework.utils.DateUtils;
-import org.wlpiaoyi.framework.utils.ValueUtils;
-import org.wlpiaoyi.framework.utils.data.DataUtils;
-import org.wlpiaoyi.framework.utils.exception.BusinessException;
 
-import java.io.FileOutputStream;
-import java.io.OutputStream;
 import java.util.*;
 
 public class BrowserTesGabgov {
