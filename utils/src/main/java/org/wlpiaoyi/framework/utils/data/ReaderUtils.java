@@ -81,6 +81,7 @@ public class ReaderUtils extends DataUtils{
         return Files.readAllBytes(file.toPath());
     }
 
+
     /**
      * read inputStream convert to string
      * @param inputStream

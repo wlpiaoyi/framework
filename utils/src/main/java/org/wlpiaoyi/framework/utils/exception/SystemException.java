@@ -4,12 +4,12 @@ import lombok.Getter;
 
 /**
  * {@code @author:}         wlpiaoyi
- * {@code @description:}    系统异常
+ * {@code @description:}    系统异常 必须catch
  * {@code @date:}           2022/11/18 18:48
  * {@code @version:}:       1.0
  */
 @Getter
-public class SystemException extends RuntimeException{
+public class SystemException extends Exception{
 
     protected int code;
 
@@ -17,13 +17,13 @@ public class SystemException extends RuntimeException{
 
     public SystemException(String message) {
         super(message);
-        this.code = 401;
+        this.code = 502;
         this.message = message;
     }
 
     public SystemException(String message, Throwable cause) {
         super(message, cause);
-        this.code = 401;
+        this.code = 502;
         this.message = message;
     }
 

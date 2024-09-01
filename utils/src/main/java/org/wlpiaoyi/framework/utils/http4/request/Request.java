@@ -1,13 +1,13 @@
 package org.wlpiaoyi.framework.utils.http.request;
 
 import lombok.Getter;
-import org.apache.http.HttpHost;
-import org.apache.http.NameValuePair;
-import org.apache.http.client.CookieStore;
-import org.apache.http.client.utils.URIBuilder;
-import org.apache.http.impl.cookie.BasicClientCookie;
-import org.apache.http.message.BasicNameValuePair;
-import org.apache.http.protocol.HttpContext;
+import org.apache.hc.client5.http.cookie.CookieStore;
+import org.apache.hc.client5.http.impl.cookie.BasicClientCookie;
+import org.apache.hc.core5.http.HttpHost;
+import org.apache.hc.core5.http.NameValuePair;
+import org.apache.hc.core5.http.message.BasicNameValuePair;
+import org.apache.hc.core5.http.protocol.HttpContext;
+import org.apache.hc.core5.net.URIBuilder;
 import org.wlpiaoyi.framework.utils.http.factory.CookieFactory;
 import org.wlpiaoyi.framework.utils.http.factory.HttpFactory;
 import org.wlpiaoyi.framework.utils.ValueUtils;

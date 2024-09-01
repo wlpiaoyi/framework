@@ -5,7 +5,7 @@ import lombok.Getter;
 
 /**
  * {@code @author:}         wlpiaoyi
- * {@code @description:}    业务异常
+ * {@code @description:}    业务异常,可以不用catch
  * {@code @date:}           2022/11/18 18:48
  * {@code @version:}:       1.0
  */

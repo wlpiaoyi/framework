@@ -1,23 +1,20 @@
 package org.wlpiaoyi.framework.utils.http.response;
 
 import lombok.Getter;
-import org.apache.http.Header;
-import org.apache.http.cookie.Cookie;
+import org.apache.hc.client5.http.cookie.Cookie;
+import org.apache.hc.core5.http.Header;
 
 import java.util.*;
 
+@Getter
 public class Response <T> {
 
-    @Getter
     private T body;
 
-    @Getter
     private Set<Header> headers;
 
-    @Getter
     private Set<Cookie> cookies;
 
-    @Getter
     private int statusCode;
 
     public Response setBody(T body){

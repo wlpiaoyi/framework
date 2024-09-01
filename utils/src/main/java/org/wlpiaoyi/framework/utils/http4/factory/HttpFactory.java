@@ -2,23 +2,25 @@ package org.wlpiaoyi.framework.utils.http.factory;
 
 import com.google.gson.Gson;
 import lombok.SneakyThrows;
-import org.apache.http.HttpEntity;
-import org.apache.http.HttpHost;
-import org.apache.http.NameValuePair;
-import org.apache.http.client.config.AuthSchemes;
-import org.apache.http.client.config.RequestConfig;
-import org.apache.http.client.entity.UrlEncodedFormEntity;
-import org.apache.http.config.Registry;
-import org.apache.http.config.RegistryBuilder;
-import org.apache.http.config.SocketConfig;
-import org.apache.http.conn.socket.ConnectionSocketFactory;
-import org.apache.http.conn.socket.PlainConnectionSocketFactory;
-import org.apache.http.conn.ssl.SSLConnectionSocketFactory;
-import org.apache.http.entity.ByteArrayEntity;
-import org.apache.http.impl.client.CloseableHttpClient;
-import org.apache.http.impl.client.HttpClients;
-import org.apache.http.impl.conn.PoolingHttpClientConnectionManager;
-import org.apache.http.message.BasicNameValuePair;
+import org.apache.hc.client5.http.auth.StandardAuthScheme;
+import org.apache.hc.client5.http.config.RequestConfig;
+import org.apache.hc.client5.http.entity.UrlEncodedFormEntity;
+import org.apache.hc.client5.http.impl.classic.CloseableHttpClient;
+import org.apache.hc.client5.http.impl.classic.HttpClients;
+import org.apache.hc.client5.http.impl.io.PoolingHttpClientConnectionManager;
+import org.apache.hc.client5.http.socket.ConnectionSocketFactory;
+import org.apache.hc.client5.http.socket.PlainConnectionSocketFactory;
+import org.apache.hc.client5.http.ssl.SSLConnectionSocketFactory;
+import org.apache.hc.core5.http.ContentType;
+import org.apache.hc.core5.http.HttpEntity;
+import org.apache.hc.core5.http.HttpHost;
+import org.apache.hc.core5.http.NameValuePair;
+import org.apache.hc.core5.http.config.Registry;
+import org.apache.hc.core5.http.config.RegistryBuilder;
+import org.apache.hc.core5.http.io.SocketConfig;
+import org.apache.hc.core5.http.io.entity.ByteArrayEntity;
+import org.apache.hc.core5.http.message.BasicNameValuePair;
+import org.apache.hc.core5.util.Timeout;
 import org.jetbrains.annotations.Nullable;
 import org.wlpiaoyi.framework.utils.ValueUtils;
 import org.wlpiaoyi.framework.utils.gson.GsonBuilder;
@@ -28,6 +30,7 @@ import javax.net.ssl.SSLContext;
 import javax.net.ssl.TrustManager;
 import javax.net.ssl.X509TrustManager;
 import java.io.UnsupportedEncodingException;
+import java.nio.charset.Charset;
 import java.security.KeyManagementException;
 import java.security.NoSuchAlgorithmException;
 import java.security.cert.CertificateException;
@@ -57,11 +60,12 @@ public class HttpFactory {
     public static final String SCHEME_HTTPS = "https";
 
 
-    static final RequestConfig.Builder createConfig(final HttpHost proxy){
+    static RequestConfig.Builder createConfig(final HttpHost proxy){
         RequestConfig.Builder config = RequestConfig.copy(RequestConfig.DEFAULT);
-        config.setProxy(proxy);
-        config.setConnectionRequestTimeout(HttpFactory.TIME_OUT_MS);
-        config.setSocketTimeout(HttpFactory.TIME_OUT_MS);
+        config.setProxy(proxy)
+                .setConnectionRequestTimeout(Timeout.ofMinutes(1))
+                .setConnectionKeepAlive(Timeout.ofMinutes(5))
+                .setResponseTimeout(Timeout.ofMinutes(1));
         return config;
     }
 
@@ -69,7 +73,6 @@ public class HttpFactory {
     /**
      * 通过连接池获取HttpClient
      *
-     * @return
      */
     static CloseableHttpClient getHttpClient(){
         initCM();
@@ -80,23 +83,22 @@ public class HttpFactory {
     /**
      * 通过连接池获取HttpClient
      *
-     * @return
      */
     static CloseableHttpClient getHttpsClient(){
         initCM();
         try {
 
-            SSLContext ctx = SSLContext.getInstance(SSLConnectionSocketFactory.TLS);
+            SSLContext ctx = SSLContext.getInstance("TLSv1.1");
             ctx.init(null, new TrustManager[]{new TrustAllManager()}, null);
             SSLConnectionSocketFactory socketFactory = new SSLConnectionSocketFactory(ctx, (s, sslSession) -> true);
             // 创建Registry
             RequestConfig defaultRequestConfig = RequestConfig.custom()
                     .setExpectContinueEnabled(Boolean.TRUE)
-                    .setTargetPreferredAuthSchemes(Arrays.asList(AuthSchemes.NTLM, AuthSchemes.DIGEST))
-                    .setProxyPreferredAuthSchemes(Arrays.asList(AuthSchemes.BASIC))
-                    .setSocketTimeout(TIME_OUT_MS/5)
-                    .setConnectTimeout(TIME_OUT_MS/5)
-                    .setConnectionRequestTimeout(TIME_OUT_MS/8)
+                    .setTargetPreferredAuthSchemes(Arrays.asList(StandardAuthScheme.BASIC, StandardAuthScheme.DIGEST))
+                    .setProxyPreferredAuthSchemes(Arrays.asList(StandardAuthScheme.BASIC))
+                    .setConnectionRequestTimeout(Timeout.ofMinutes(1))
+                    .setConnectionKeepAlive(Timeout.ofMinutes(5))
+                    .setResponseTimeout(Timeout.ofMinutes(1))
                     .setRedirectsEnabled(false)
                     .build();
 
@@ -116,14 +118,14 @@ public class HttpFactory {
     }
 
 
-    private static final void initCM(){
+    private static void initCM(){
         if(CONNECTION_MANAGER == null){
             synchronized (HttpFactory.class){
                 if (CONNECTION_MANAGER == null) {
                     CONNECTION_MANAGER = new PoolingHttpClientConnectionManager();
                     CONNECTION_MANAGER.setMaxTotal(50);// 整个连接池最大连接数
                     CONNECTION_MANAGER.setDefaultMaxPerRoute(5);// 每路由最大连接数，默认值是2
-                    SocketConfig sc = SocketConfig.custom().setSoTimeout(TIME_OUT_MS).build();
+                    SocketConfig sc = SocketConfig.custom().setSoTimeout(Timeout.ofMinutes(5)).build();
                     CONNECTION_MANAGER.setDefaultSocketConfig(sc);
                 }
             }
@@ -177,20 +179,12 @@ public class HttpFactory {
         for (Map.Entry<String, Object> map : formMap.entrySet()) {
             paramsUri.add(new BasicNameValuePair(map.getKey(), map.getValue().toString()));
         }
-        UrlEncodedFormEntity entity = new UrlEncodedFormEntity(paramsUri);
-
         String charset = request.getCharset();
         if(ValueUtils.isBlank(charset)){
             charset = "UTF-8";
         }
-        if(ValueUtils.isBlank(accept)){
-            accept = HttpFactory.HEADER_APPLICATION_JSON;
-        }
 
-        entity.setContentType(accept);
-        entity.setContentEncoding(charset);
-
-        return entity;
+        return new UrlEncodedFormEntity(paramsUri, Charset.forName(charset));
     }
 
     /**
@@ -210,8 +204,7 @@ public class HttpFactory {
         byte[] buffer;
         if(request.getBody() == null){
             buffer = null;
-        }else if(request.getBody() instanceof String){
-            String parameter = (String) request.getBody();
+        }else if(request.getBody() instanceof String parameter){
             buffer = parameter.getBytes(charset);
         }else if(request.getBody() instanceof Map){
             String parameter = GSON.toJson(request.getBody(), Map.class);
@@ -235,9 +228,6 @@ public class HttpFactory {
         if(ValueUtils.isBlank(buffer)){
             buffer = new byte[0];
         }
-        ByteArrayEntity entity = new ByteArrayEntity(buffer);
-        entity.setContentEncoding(charset);
-        entity.setContentType(accept);
-        return entity;
+        return new ByteArrayEntity(buffer, ContentType.create(accept, Charset.forName(charset)));
     }
 }

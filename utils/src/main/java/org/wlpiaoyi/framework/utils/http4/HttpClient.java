@@ -2,9 +2,9 @@ package org.wlpiaoyi.framework.utils.http;
 
 import lombok.Getter;
 import lombok.SneakyThrows;
-import org.apache.http.Header;
-import org.apache.http.HttpResponse;
-import org.apache.http.cookie.Cookie;
+import org.apache.hc.client5.http.cookie.Cookie;
+import org.apache.hc.core5.http.Header;
+import org.apache.hc.core5.http.HttpResponse;
 import org.wlpiaoyi.framework.utils.exception.BusinessException;
 import org.wlpiaoyi.framework.utils.http.factory.CookieFactory;
 import org.wlpiaoyi.framework.utils.http.factory.HttpFactory;
@@ -17,15 +17,13 @@ import java.net.URISyntaxException;
 import java.util.HashSet;
 import java.util.Set;
 
+@Getter
 public class HttpClient<T> {
 
-    @Getter
-    private Request<T> request;
+    private final Request<T> request;
 
-    @Getter
     private Class<T> rpClazz;
 
-    @Getter
     public String rpAccept;
 
     private HttpClient(Request request){
