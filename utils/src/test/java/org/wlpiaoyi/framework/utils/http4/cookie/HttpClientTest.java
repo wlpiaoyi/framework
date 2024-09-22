@@ -1,4 +1,4 @@
-package org.wlpiaoyi.framework.utils.http.cookie;
+package org.wlpiaoyi.framework.utils.http4.cookie;
 
 import com.google.gson.Gson;
 import org.junit.After;
@@ -7,36 +7,13 @@ import org.junit.Test;
 import org.wlpiaoyi.framework.utils.MapUtils;
 import org.wlpiaoyi.framework.utils.exception.BusinessException;
 import org.wlpiaoyi.framework.utils.gson.GsonBuilder;
-import org.apache.hc.client5.http.classic.methods.HttpGet;
-import org.apache.hc.client5.http.classic.methods.HttpPost;
-import org.apache.hc.client5.http.impl.classic.BasicHttpClientResponseHandler;
-import org.apache.hc.client5.http.impl.classic.CloseableHttpClient;
-import org.apache.hc.client5.http.impl.classic.CloseableHttpResponse;
-import org.apache.hc.client5.http.impl.classic.HttpClients;
-import org.apache.hc.client5.http.impl.routing.DefaultProxyRoutePlanner;
-import org.apache.hc.core5.http.*;
-import org.apache.hc.core5.http.io.HttpClientResponseHandler;
-import org.apache.hc.core5.http.io.entity.BufferedHttpEntity;
-import org.apache.hc.core5.http.io.entity.ByteArrayEntity;
-import org.apache.hc.core5.http.io.entity.InputStreamEntity;
-import org.apache.hc.core5.http.message.BasicClassicHttpRequest;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
-import org.wlpiaoyi.framework.utils.data.ReaderUtils;
-import org.wlpiaoyi.framework.utils.http.HttpClient;
-import org.wlpiaoyi.framework.utils.http.request.Request;
-import org.wlpiaoyi.framework.utils.http.response.Response;
+import org.wlpiaoyi.framework.utils.http4.HttpClient;
+import org.wlpiaoyi.framework.utils.http4.request.Request;
+import org.wlpiaoyi.framework.utils.http4.response.Response;
 
-import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.util.List;
 import java.util.Map;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.nio.charset.Charset;
-import java.nio.charset.StandardCharsets;
-import java.util.Arrays;
 
 public class HttpClientTest {
 

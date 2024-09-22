@@ -1,4 +1,4 @@
-package org.wlpiaoyi.framework.utils.http.request;
+package org.wlpiaoyi.framework.utils.http4.request;
 
 import lombok.Getter;
 import org.apache.hc.client5.http.cookie.CookieStore;
@@ -8,8 +8,8 @@ import org.apache.hc.core5.http.NameValuePair;
 import org.apache.hc.core5.http.message.BasicNameValuePair;
 import org.apache.hc.core5.http.protocol.HttpContext;
 import org.apache.hc.core5.net.URIBuilder;
-import org.wlpiaoyi.framework.utils.http.factory.CookieFactory;
-import org.wlpiaoyi.framework.utils.http.factory.HttpFactory;
+import org.wlpiaoyi.framework.utils.http4.factory.CookieFactory;
+import org.wlpiaoyi.framework.utils.http4.factory.HttpFactory;
 import org.wlpiaoyi.framework.utils.ValueUtils;
 
 import java.net.URI;

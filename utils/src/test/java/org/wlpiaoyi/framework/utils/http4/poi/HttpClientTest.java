@@ -1,15 +1,14 @@
-package org.wlpiaoyi.framework.utils.http.poi;
+package org.wlpiaoyi.framework.utils.http4.poi;
 
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
-import org.wlpiaoyi.framework.utils.http.HttpClient;
-import org.wlpiaoyi.framework.utils.http.request.Request;
-import org.wlpiaoyi.framework.utils.http.response.Response;
+import org.wlpiaoyi.framework.utils.http4.HttpClient;
+import org.wlpiaoyi.framework.utils.http4.request.Request;
+import org.wlpiaoyi.framework.utils.http4.response.Response;
 
 import java.io.IOException;
 import java.util.Random;
-import java.util.concurrent.*;
 
 public class HttpClientTest {
 

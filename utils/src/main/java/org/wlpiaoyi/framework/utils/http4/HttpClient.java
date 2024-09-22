@@ -1,4 +1,4 @@
-package org.wlpiaoyi.framework.utils.http;
+package org.wlpiaoyi.framework.utils.http4;
 
 import lombok.Getter;
 import lombok.SneakyThrows;
@@ -6,11 +6,11 @@ import org.apache.hc.client5.http.cookie.Cookie;
 import org.apache.hc.core5.http.Header;
 import org.apache.hc.core5.http.HttpResponse;
 import org.wlpiaoyi.framework.utils.exception.BusinessException;
-import org.wlpiaoyi.framework.utils.http.factory.CookieFactory;
-import org.wlpiaoyi.framework.utils.http.factory.HttpFactory;
-import org.wlpiaoyi.framework.utils.http.factory.ResponseFactory;
-import org.wlpiaoyi.framework.utils.http.request.Request;
-import org.wlpiaoyi.framework.utils.http.response.Response;
+import org.wlpiaoyi.framework.utils.http4.factory.CookieFactory;
+import org.wlpiaoyi.framework.utils.http4.factory.HttpFactory;
+import org.wlpiaoyi.framework.utils.http4.factory.ResponseFactory;
+import org.wlpiaoyi.framework.utils.http4.request.Request;
+import org.wlpiaoyi.framework.utils.http4.response.Response;
 
 import java.io.IOException;
 import java.net.URISyntaxException;

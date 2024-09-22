@@ -1,4 +1,4 @@
-package org.wlpiaoyi.framework.utils.http;
+package org.wlpiaoyi.framework.utils.http4;
 
 import org.apache.hc.client5.http.classic.methods.HttpGet;
 import org.apache.hc.client5.http.classic.methods.HttpPost;

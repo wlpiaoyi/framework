@@ -1,4 +1,4 @@
-package org.wlpiaoyi.framework.utils.http.factory;
+package org.wlpiaoyi.framework.utils.http4.factory;
 
 import com.google.gson.Gson;
 import lombok.SneakyThrows;
@@ -24,7 +24,7 @@ import org.apache.hc.core5.util.Timeout;
 import org.jetbrains.annotations.Nullable;
 import org.wlpiaoyi.framework.utils.ValueUtils;
 import org.wlpiaoyi.framework.utils.gson.GsonBuilder;
-import org.wlpiaoyi.framework.utils.http.request.Request;
+import org.wlpiaoyi.framework.utils.http4.request.Request;
 
 import javax.net.ssl.SSLContext;
 import javax.net.ssl.TrustManager;

@@ -1,4 +1,4 @@
-package org.wlpiaoyi.framework.utils.http.response;
+package org.wlpiaoyi.framework.utils.http4.response;
 
 import lombok.Getter;
 import org.apache.hc.client5.http.cookie.Cookie;

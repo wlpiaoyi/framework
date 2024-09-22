@@ -1,4 +1,4 @@
-package org.wlpiaoyi.framework.utils.http.factory;
+package org.wlpiaoyi.framework.utils.http4.factory;
 
 import lombok.NonNull;
 import org.apache.hc.client5.http.classic.methods.*;
@@ -6,15 +6,12 @@ import org.apache.hc.client5.http.cookie.Cookie;
 import org.apache.hc.client5.http.impl.classic.CloseableHttpResponse;
 import org.apache.hc.core5.http.HttpEntity;
 import org.apache.hc.core5.http.HttpResponse;
-import org.wlpiaoyi.framework.utils.http.request.Request;
-import org.wlpiaoyi.framework.utils.http.response.Response;
-import org.wlpiaoyi.framework.utils.ValueUtils;
+import org.wlpiaoyi.framework.utils.http4.request.Request;
+import org.wlpiaoyi.framework.utils.http4.response.Response;
 
 import java.io.IOException;
 import java.net.URISyntaxException;
-import java.util.HashSet;
 import java.util.Map;
-import java.util.Set;
 
 
 public class ResponseFactory {

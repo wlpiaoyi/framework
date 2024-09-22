@@ -1,4 +1,4 @@
-package org.wlpiaoyi.framework.utils.http.factory;
+package org.wlpiaoyi.framework.utils.http4.factory;
 
 import lombok.NonNull;
 import org.apache.hc.client5.http.cookie.BasicCookieStore;
@@ -7,7 +7,7 @@ import org.apache.hc.client5.http.cookie.CookieStore;
 import org.apache.hc.client5.http.protocol.HttpClientContext;
 import org.apache.hc.core5.http.protocol.BasicHttpContext;
 import org.apache.hc.core5.http.protocol.HttpContext;
-import org.wlpiaoyi.framework.utils.http.request.Request;
+import org.wlpiaoyi.framework.utils.http4.request.Request;
 
 import java.util.HashMap;
 import java.util.Map;
