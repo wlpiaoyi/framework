@@ -1,7 +1,7 @@
 package org.wlpiaoyi.framework.utils.web.websocket.client;
 
 import com.google.gson.Gson;
-import org.apache.http.client.utils.URIBuilder;
+import org.apache.hc.core5.net.URIBuilder;
 import org.java_websocket.handshake.ServerHandshake;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;

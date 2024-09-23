@@ -1,141 +1,170 @@
 package org.wlpiaoyi.framework.utils.http.factory;
 
-import lombok.NonNull;
-import lombok.extern.slf4j.Slf4j;
-import org.apache.hc.client5.http.auth.StandardAuthScheme;
+import com.google.gson.Gson;
+import org.apache.hc.client5.http.classic.methods.*;
 import org.apache.hc.client5.http.config.RequestConfig;
-import org.apache.hc.client5.http.cookie.BasicCookieStore;
-import org.apache.hc.client5.http.cookie.CookieStore;
-import org.apache.hc.client5.http.impl.classic.CloseableHttpClient;
-import org.apache.hc.client5.http.impl.classic.HttpClients;
-import org.apache.hc.client5.http.impl.io.PoolingHttpClientConnectionManager;
-import org.apache.hc.client5.http.protocol.HttpClientContext;
-import org.apache.hc.client5.http.socket.ConnectionSocketFactory;
-import org.apache.hc.client5.http.socket.PlainConnectionSocketFactory;
-import org.apache.hc.client5.http.ssl.SSLConnectionSocketFactory;
-import org.apache.hc.core5.http.config.Registry;
-import org.apache.hc.core5.http.config.RegistryBuilder;
-import org.apache.hc.core5.http.io.SocketConfig;
-import org.apache.hc.core5.http.protocol.BasicHttpContext;
-import org.apache.hc.core5.http.protocol.HttpContext;
-import org.apache.hc.core5.util.Timeout;
+import org.apache.hc.core5.http.*;
+import org.apache.hc.core5.http.io.entity.ByteArrayEntity;
+import org.jetbrains.annotations.Nullable;
+import org.wlpiaoyi.framework.utils.ValueUtils;
+import org.wlpiaoyi.framework.utils.data.ReaderUtils;
+import org.wlpiaoyi.framework.utils.gson.GsonBuilder;
+import org.wlpiaoyi.framework.utils.http.request.Request;
+import org.wlpiaoyi.framework.utils.http.response.Response;
 
-import javax.net.ssl.SSLContext;
-import javax.net.ssl.TrustManager;
-import javax.net.ssl.X509TrustManager;
-import java.security.KeyManagementException;
-import java.security.NoSuchAlgorithmException;
-import java.security.cert.CertificateException;
-import java.security.cert.X509Certificate;
-import java.util.Arrays;
+import java.io.IOException;
+import java.io.UnsupportedEncodingException;
+import java.nio.charset.Charset;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.concurrent.TimeUnit;
 
 /**
  * <p><b>{@code @author:}</b>wlpiaoyi</p>
  * <p><b>{@code @description:}</b></p>
- * <p><b>{@code @date:}</b>2024-08-04 10:50:40</p>
+ * <p><b>{@code @date:}</b>2024-09-22 22:14:09</p>
  * <p><b>{@code @version:}:</b>1.0</p>
  */
-@Slf4j
 public class HttpFactory {
+
+    public static final String HEADER_CHARSET = "utf-8";
+    public static final String HEADER_APPLICATION_JSON = "application/json";
+    public static final String HEADER_APPLICATION_FORM = "application/x-www-form-urlencoded";
+    public static final String HEADER_KEY0 = "content-encoding";
+    public static final String HEADER_KEY1 = "content-type";
+    public static final String HEADER_KEY2 = "accept";
+    public static final String HEADER_KEY3 = "set-cookie";
+    public static final String HEADER_VALUE1_1 = HEADER_APPLICATION_JSON + ";charset=" + HEADER_CHARSET;
+    public static final String HEADER_VALUE1_2 = HEADER_APPLICATION_FORM + ";charset=" + HEADER_CHARSET;
+    public static final String HEADER_VALUE2 = HttpFactory.HEADER_APPLICATION_JSON;
+
+    public static Gson GSON = GsonBuilder.gsonDefault();
+
+    public static final int TIME_OUT_MS = 120000;
 
     public static final String SCHEME_HTTP = "http";
     public static final String SCHEME_HTTPS = "https";
 
-    private static final PoolingHttpClientConnectionManager CONNECTION_MANAGER;
 
-    static {
-        PoolingHttpClientConnectionManager connectionManager = new PoolingHttpClientConnectionManager();
-        connectionManager.setMaxTotal(50);// 整个连接池最大连接数
-        connectionManager.setDefaultMaxPerRoute(5);// 每路由最大连接数，默认值是2
-        SocketConfig sc = SocketConfig.custom().setSoTimeout(Timeout.ofMinutes(5)).build();
-        connectionManager.setDefaultSocketConfig(sc);
-        CONNECTION_MANAGER = connectionManager;
+
+    public static <T> Response<T> handleResponse(ClassicHttpResponse res, Class<T> tClass) throws IOException {
+        Header[] hds = res.getHeaders();
+        Map<String, String> headers = HashMap.newHashMap(hds.length);
+        for (Header header : hds) {
+            headers.put(header.getName(), header.getValue());
+        }
+        T body = getResponseBody(res.getEntity(), headers, tClass);
+        return new Response<>(res.getCode(), headers, body);
     }
 
-    /**
-     * <p><b>{@code @description:}</b>
-     * TODO
-     * </p>
-     *
-     * <p><b>@param</b> <b>host</b>
-     * {@link String}
-     * </p>
-     *
-     * <p><b>{@code @date:}</b>2024/8/4 10:52</p>
-     * <p><b>{@code @return:}</b>{@link HttpContext}</p>
-     * <p><b>{@code @author:}</b>wlpiaoyi</p>
-     */
-    public static HttpContext createLocationContext(@NonNull String host) {
-        CookieStore cookieStore = new BasicCookieStore();
-        HttpContext localContext = new BasicHttpContext();
-        localContext.setAttribute(HttpClientContext.COOKIE_STORE, cookieStore);
-        return localContext;
-    }
-
-    /**
-     * <p><b>{@code @description:}</b>
-     * 通过连接池创建HttpClient
-     * </p>
-     *
-     * <p><b>@param</b> <b></b>
-     * {@link }
-     * </p>
-     *
-     * <p><b>{@code @date:}</b>2024/8/4 11:08</p>
-     * <p><b>{@code @return:}</b>{@link CloseableHttpClient}</p>
-     * <p><b>{@code @author:}</b>wlpiaoyi</p>
-     */
-    static CloseableHttpClient createDefaultHttpClient(){
-        return HttpClients.custom().setConnectionManager(CONNECTION_MANAGER)
-                .setConnectionManagerShared(true).build();
-    }
-    /**
-     * 通过连接池获取HttpClient
-     *
-     */
-    static CloseableHttpClient createCustomHttpClient(TrustManager[] trustManagers){
-        try {
-            if(trustManagers == null || trustManagers.length > 0){
-                trustManagers = new TrustAllManager[]{new TrustAllManager()};
+    public static ClassicHttpRequest getHttpRequest(String executeUrl, Request<?> request) throws UnsupportedEncodingException {
+        HttpUriRequestBase httpRequest;
+        switch (request.getMethod()){
+            case Get -> {
+                httpRequest = new HttpGet(executeUrl);
             }
-            SSLContext ctx = SSLContext.getInstance("TLSv1.1");
-            ctx.init(null, trustManagers, null);
-            SSLConnectionSocketFactory socketFactory = new SSLConnectionSocketFactory(ctx, (s, sslSession) -> true);
-            // 创建Registry
-            RequestConfig defaultRequestConfig = RequestConfig.custom()
-                    .setExpectContinueEnabled(Boolean.TRUE)
-                    .setTargetPreferredAuthSchemes(Arrays.asList(StandardAuthScheme.BASIC, StandardAuthScheme.DIGEST))
-                    .setProxyPreferredAuthSchemes(List.of(StandardAuthScheme.BASIC))
-                    .setConnectionRequestTimeout(Timeout.ofMinutes(1))
-                    .setConnectionKeepAlive(Timeout.ofMinutes(5))
-                    .setResponseTimeout(Timeout.ofMinutes(1))
-                    .setRedirectsEnabled(false)
-                    .build();
-
-            Registry<ConnectionSocketFactory> socketFactoryRegistry = RegistryBuilder.<ConnectionSocketFactory>create()
-                    .register(SCHEME_HTTP, PlainConnectionSocketFactory.INSTANCE)
-                    .register(SCHEME_HTTPS, socketFactory).build();
-            // 创建ConnectionManager，添加Connection配置信息
-            PoolingHttpClientConnectionManager connectionManager = new PoolingHttpClientConnectionManager(socketFactoryRegistry);
-            return HttpClients.custom().setConnectionManager(CONNECTION_MANAGER)
-                    .setConnectionManager(connectionManager)
-                    .setDefaultRequestConfig(defaultRequestConfig)
-                    .setConnectionManagerShared(true).build();
-        } catch (NoSuchAlgorithmException | KeyManagementException e) {
-            log.error("create http client error", e);
-            return null;
+            case Put -> {
+                HttpPut httpPut = new HttpPut(executeUrl);
+                httpPut.setEntity(bodyEntity(request, null, null));
+                httpRequest = httpPut;
+            }
+            case Post -> {
+                HttpPost httpPost = new HttpPost(executeUrl);
+                httpPost.setEntity(bodyEntity(request, null, null));
+                httpRequest = httpPost;
+            }
+            case Delete -> {
+                httpRequest = new HttpDelete(executeUrl);
+            }
+            default -> {
+                httpRequest = new HttpPatch(executeUrl);
+            }
         }
+        RequestConfig requestConfig = RequestConfig.custom()
+                .setConnectionRequestTimeout(HttpFactory.TIME_OUT_MS, TimeUnit.MILLISECONDS)
+                .setResponseTimeout(HttpFactory.TIME_OUT_MS, TimeUnit.MILLISECONDS).build();
+        httpRequest.setConfig(requestConfig);
+        if(ValueUtils.isNotBlank(request.getHeaders())){
+            Set<Map.Entry<String, String>> entrySet = request.getHeaders().entrySet();
+            for (Map.Entry<String, String> entry : entrySet){
+                httpRequest.setHeader(entry.getKey(), entry.getValue());
+            }
+        }
+        return httpRequest;
+    }
+
+    /**
+     * 创建Json
+     * @param request
+     * @param <T>
+     * @return
+     */
+    public static <T> HttpEntity bodyEntity(Request<T> request, @Nullable String charset, @Nullable String accept) throws UnsupportedEncodingException {
+        if(ValueUtils.isBlank(charset)){
+            charset = getCharsetInHeaders(request.getHeaders());
+        }
+        if(ValueUtils.isBlank(charset)){
+            charset = HEADER_CHARSET;
+        }
+        byte[] buffer;
+        if(request.getBody() == null){
+            buffer = null;
+        }else if(request.getBody() instanceof String parameter){
+            buffer = parameter.getBytes(charset);
+        }else if(request.getBody() instanceof Map){
+            String parameter = GSON.toJson(request.getBody(), Map.class);
+            buffer = parameter.getBytes(charset);
+        }else if(request.getBody() instanceof List){
+            String parameter = GSON.toJson(request.getBody(), List.class);
+            buffer = parameter.getBytes(charset);
+        }else if(request.getBody() instanceof Set){
+            String parameter = GSON.toJson(request.getBody(), Set.class);
+            buffer = parameter.getBytes(charset);
+        }else if((request.getBody() instanceof byte[]) || request.getBody() instanceof Byte[]){
+            buffer = (byte[]) request.getBody();
+        }else{
+            String parameter = GSON.toJson(request.getBody());
+            buffer = parameter.getBytes(charset);
+        }
+
+        if(ValueUtils.isBlank(accept)){
+            accept = HttpFactory.HEADER_APPLICATION_JSON;
+        }
+        if(ValueUtils.isBlank(buffer)){
+            buffer = new byte[0];
+        }
+        return new ByteArrayEntity(buffer, ContentType.create(accept, Charset.forName(charset)));
     }
 
 
-    private static class TrustAllManager implements X509TrustManager {
-        public void checkClientTrusted(X509Certificate[] x509Certificates, String s) throws CertificateException {}
-
-        public void checkServerTrusted(X509Certificate[] x509Certificates, String s) throws CertificateException {}
-
-        public X509Certificate[] getAcceptedIssuers() {
-            return new X509Certificate[0];
+    public static String getCharsetInHeaders(Map<String, String> headers){
+        if(headers == null || headers.isEmpty()) {
+            return HEADER_CHARSET;
         }
+        String charset = HEADER_CHARSET;
+        if(headers.containsKey(HttpFactory.HEADER_KEY0)){
+            charset = headers.get(HttpFactory.HEADER_KEY0);
+        }else if(headers.containsKey(HttpFactory.HEADER_KEY1)){
+            String value = headers.get(HttpFactory.HEADER_KEY1);
+            for(String arg : value.split(";")){
+                String args[] = arg.split("=");
+                if(args.length == 2 && "charset".equals(args[0])){
+                    charset = args[1];
+                    break;
+                }
+            }
+        }
+        return charset;
+    }
+
+
+    private static <T> T getResponseBody(HttpEntity entity, Map<String, String> headers, Class<T> tClass) throws IOException {
+        String resStr = ReaderUtils.loadString(entity.getContent(), Charset.forName(HttpFactory.getCharsetInHeaders(headers)));
+        if(tClass == String.class){
+            return (T) resStr;
+        }
+        return HttpFactory.GSON.fromJson(resStr, tClass);
     }
 }
