@@ -1,4 +1,4 @@
-package org.wlpiaoyi.framework.lab.selenium.test;
+package org.wlpiaoyi.framework.lab.selenium.for12123.test;
 
 import org.junit.After;
 import org.junit.Before;
