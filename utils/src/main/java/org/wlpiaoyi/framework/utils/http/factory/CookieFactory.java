@@ -1,5 +1,6 @@
 package org.wlpiaoyi.framework.utils.http.factory;
 
+import jakarta.annotation.Nullable;
 import lombok.NonNull;
 import org.apache.hc.client5.http.cookie.BasicCookieStore;
 import org.apache.hc.client5.http.cookie.Cookie;
@@ -8,6 +9,8 @@ import org.apache.hc.client5.http.impl.cookie.BasicClientCookie;
 import org.apache.hc.client5.http.protocol.HttpClientContext;
 import org.apache.hc.core5.http.protocol.HttpContext;
 import org.wlpiaoyi.framework.utils.ValueUtils;
+
+import java.time.Instant;
 
 /**
  * <p><b>{@code @author:}</b>wlpiaoyi</p>
@@ -60,6 +63,10 @@ public class CookieFactory {
         httpContext.setAttribute(HttpClientContext.COOKIE_STORE, cookieStore);
     }
 
+    public static void setCookie(@NonNull CookieStore cookieStore, @NonNull String cookieName, @NonNull String cookieValue){
+        CookieFactory.setCookie(cookieStore, cookieName, cookieValue, null,"/");
+    }
+
     /**
      * <p><b>{@code @description:}</b>
      * TODO
@@ -67,6 +74,10 @@ public class CookieFactory {
      *
      * <p><b>@param</b> <b>cookieStore</b>
      * {@link CookieStore}
+     * </p>
+     *
+     * <p><b>@param</b> <b>domain</b>
+     * {@link String}
      * </p>
      *
      * <p><b>@param</b> <b>cookieName</b>
@@ -77,11 +88,15 @@ public class CookieFactory {
      * {@link String}
      * </p>
      *
+     * <p><b>@param</b> <b>domain</b>
+     * {@link String}
+     * </p>
+     *
      * <p><b>{@code @date:}</b>2024/9/22 22:12</p>
      * <p><b>{@code @author:}</b>wlpiaoyi</p>
      */
-    public static void setCookie(@NonNull CookieStore cookieStore, @NonNull String cookieName, @NonNull String cookieValue){
-        CookieFactory.setCookie(cookieStore, cookieName, cookieValue, null, null);
+    public static void setCookie(@NonNull CookieStore cookieStore, @NonNull String cookieName, @NonNull String cookieValue, String domain){
+        CookieFactory.setCookie(cookieStore, cookieName, cookieValue, domain, "/");
     }
 
     /**
@@ -112,9 +127,48 @@ public class CookieFactory {
      * <p><b>{@code @date:}</b>2024/9/22 22:12</p>
      * <p><b>{@code @author:}</b>wlpiaoyi</p>
      */
-    public static void setCookie(@NonNull CookieStore cookieStore, @NonNull String cookieName, @NonNull String cookieValue,  String domain, String path){
+    public static void setCookie(@NonNull CookieStore cookieStore, @NonNull String cookieName, @NonNull String cookieValue, String domain, String path){
+        setCookie(cookieStore, cookieName, cookieValue, 0, domain, path);
+    }
+
+    /**
+     * <p><b>{@code @description:}</b>
+     * TODO
+     * </p>
+     *
+     * <p><b>@param</b> <b>cookieStore</b>
+     * {@link CookieStore}
+     * </p>
+     *
+     * <p><b>@param</b> <b>cookieName</b>
+     * {@link String}
+     * </p>
+     *
+     * <p><b>@param</b> <b>cookieValue</b>
+     * {@link String}
+     * </p>
+     *
+     * <p><b>@param</b> <b>expirySecond</b>
+     * {@link Integer}
+     * </p>
+     *
+     * <p><b>@param</b> <b>domain</b>
+     * {@link String}
+     * </p>
+     *
+     * <p><b>@param</b> <b>path</b>
+     * {@link String}
+     * </p>
+     *
+     * <p><b>{@code @date:}</b>2024/9/23 19:59</p>
+     * <p><b>{@code @author:}</b>wlpiaoyi</p>
+     */
+    public static void setCookie(@NonNull CookieStore cookieStore, @NonNull String cookieName, @NonNull String cookieValue, Integer expirySecond, String domain, String path){
         BasicClientCookie cookie = new BasicClientCookie(cookieName, cookieValue);
-        if(ValueUtils.isNotBlank(domain)){
+        if(ValueUtils.isBlank(domain)){
+            cookie.setDomain(".");
+//            cookie.setAttribute("domain", "false");
+        }else {
             cookie.setDomain(domain);
             cookie.setAttribute("domain", "true");
         }
@@ -122,6 +176,9 @@ public class CookieFactory {
             path = "/";
         }
         cookie.setPath(path);
+        if(ValueUtils.isNotBlank(expirySecond) && expirySecond > 0){
+            cookie.setExpiryDate(Instant.ofEpochSecond(Instant.now().getEpochSecond() + expirySecond));
+        }
         CookieFactory.setCookie(cookieStore, cookie);
     }
 
@@ -142,7 +199,7 @@ public class CookieFactory {
      * <p><b>{@code @author:}</b>wlpiaoyi</p>
      */
     public static void setCookie(@NonNull CookieStore cookieStore, @NonNull Cookie cookie){
-        Cookie c = getCookie(cookieStore, cookie.getName());
+        Cookie c = getCookie(cookieStore, cookie.getName(), cookie.getDomain());
         if(c != null) {
             removeCookie(cookieStore, c);
         }
@@ -162,14 +219,24 @@ public class CookieFactory {
      * {@link String}
      * </p>
      *
+     * <p><b>@param</b> <b>domain</b>
+     * {@link String}
+     * </p>
+     *
      * <p><b>{@code @date:}</b>2024/8/4 11:00</p>
      * <p><b>{@code @return:}</b>{@link Cookie}</p>
      * <p><b>{@code @author:}</b>wlpiaoyi</p>
      */
-    public static Cookie getCookie(@NonNull CookieStore cookieStore, @NonNull String name){
+    public static Cookie getCookie(@NonNull CookieStore cookieStore, @NonNull String name, String domain){
         for (Cookie cooke : cookieStore.getCookies()) {
-            if (cooke.getName().equals(name)) {
-                return cooke;
+            if(ValueUtils.isBlank(domain)){
+                if (ValueUtils.isBlank(cooke.getDomain()) && name.equals(cooke.getName())) {
+                    return cooke;
+                }
+            }else{
+                if (domain.equals(cooke.getDomain()) && name.equals(cooke.getName())) {
+                    return cooke;
+                }
             }
         }
         return null;
@@ -188,12 +255,16 @@ public class CookieFactory {
      * {@link String}
      * </p>
      *
+     * <p><b>@param</b> <b>domain</b>
+     * {@link String}
+     * </p>
+     *
      * <p><b>{@code @date:}</b>2024/8/4 11:00</p>
      * <p><b>{@code @return:}</b>{@link boolean}</p>
      * <p><b>{@code @author:}</b>wlpiaoyi</p>
      */
-    public static boolean removeCookie(@NonNull CookieStore cookieStore, @NonNull String name){
-        Cookie cookie = getCookie(cookieStore, name);
+    public static boolean removeCookie(@NonNull CookieStore cookieStore, @NonNull String name, String domain){
+        Cookie cookie = getCookie(cookieStore, name, domain);
         if(cookie == null){
             return false;
         }

@@ -1,7 +1,6 @@
 package org.wlpiaoyi.framework.utils.http.request;
 
 import lombok.Getter;
-import org.apache.hc.client5.http.config.RequestConfig;
 import org.apache.hc.client5.http.impl.classic.HttpClientBuilder;
 import org.apache.hc.client5.http.impl.classic.HttpClients;
 import org.apache.hc.client5.http.protocol.HttpClientContext;
@@ -15,7 +14,6 @@ import org.wlpiaoyi.framework.utils.http.response.Response;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.concurrent.TimeUnit;
 
 /**
  * <p><b>{@code @author:}</b>wlpiaoyi</p>
@@ -126,6 +124,27 @@ public class Request<T> implements HttpMessage {
         this.method = method;
     }
 
+    /**
+     * <p><b>{@code @description:}</b>
+     * TODO
+     * </p>
+     *
+     * <p><b>@param</b> <b>context</b>
+     * {@link HttpClientContext}
+     * </p>
+     *
+     * <p><b>@param</b> <b>url</b>
+     * {@link String}
+     * </p>
+     *
+     * <p><b>@param</b> <b>method</b>
+     * {@link Method}
+     * </p>
+     *
+     * <p><b>{@code @date:}</b>2024/9/23 19:37</p>
+     * <p><b>{@code @return:}</b>{@link }</p>
+     * <p><b>{@code @author:}</b>wlpiaoyi</p>
+     */
     public Request(HttpClientContext context, String url, Method method){
         this.context = context;
         this.url = url;
@@ -133,6 +152,19 @@ public class Request<T> implements HttpMessage {
         this.method = method;
     }
 
+    /**
+     * <p><b>{@code @description:}</b>
+     * 执行请求
+     * </p>
+     *
+     * <p><b>@param</b> <b>tClass</b>
+     * {@link Class<T>}
+     * </p>
+     *
+     * <p><b>{@code @date:}</b>2024/9/23 19:37</p>
+     * <p><b>{@code @return:}</b>{@link Response<T>}</p>
+     * <p><b>{@code @author:}</b>wlpiaoyi</p>
+     */
     public Response<T> execute(Class<T> tClass) throws IOException {
         String executeUrl;
         if(ValueUtils.isNotBlank(this.params)){
@@ -192,5 +224,37 @@ public class Request<T> implements HttpMessage {
     public Request setHttpProxy(final String hostname, final int port) {
         this.httpProxy = new HttpHost(hostname, port);
         return this;
+    }
+
+
+
+    private String scheme;
+    private String domain;
+    private int port;
+    private String path;
+
+    public String getScheme() {
+        if(ValueUtils.isBlank(this.scheme)){
+            this.scheme = HttpUtils.schemeFromUrl(this.url);
+        }
+        return scheme;
+    }
+    public String getDomain() {
+        if(ValueUtils.isBlank(this.domain)){
+            this.domain = HttpUtils.domainFromUrl(this.url);
+        }
+        return domain;
+    }
+    public int getPort() {
+        if(ValueUtils.isBlank(this.port)){
+            this.port = HttpUtils.portFromUrl(this.url);
+        }
+        return port;
+    }
+    public String getPath() {
+        if(ValueUtils.isBlank(this.path)){
+            this.path = HttpUtils.pathFromUrl(this.url);
+        }
+        return path;
     }
 }

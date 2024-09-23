@@ -43,7 +43,7 @@ public class HttpUtils {
      * <p><b>{@code @return:}</b>{@link String}</p>
      * <p><b>{@code @author:}</b>wlpiaoyi</p>
      */
-    public static String hostFromUrl(String url){
+    public static String domainFromUrl(String url){
         return url.split("//")[1].split("/")[0].split(":")[0];
     }
 
