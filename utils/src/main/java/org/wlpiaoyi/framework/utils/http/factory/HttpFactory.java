@@ -21,6 +21,8 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
+import static org.wlpiaoyi.framework.utils.http.HttpUtils.*;
+
 /**
  * <p><b>{@code @author:}</b>wlpiaoyi</p>
  * <p><b>{@code @description:}</b></p>
@@ -29,25 +31,7 @@ import java.util.concurrent.TimeUnit;
  */
 public class HttpFactory {
 
-    public static final String HEADER_CHARSET = "utf-8";
-    public static final String HEADER_APPLICATION_JSON = "application/json";
-    public static final String HEADER_APPLICATION_FORM = "application/x-www-form-urlencoded";
-    public static final String HEADER_KEY0 = "content-encoding";
-    public static final String HEADER_KEY1 = "content-type";
-    public static final String HEADER_KEY2 = "accept";
-    public static final String HEADER_KEY3 = "set-cookie";
-    public static final String HEADER_VALUE1_1 = HEADER_APPLICATION_JSON + ";charset=" + HEADER_CHARSET;
-    public static final String HEADER_VALUE1_2 = HEADER_APPLICATION_FORM + ";charset=" + HEADER_CHARSET;
-    public static final String HEADER_VALUE2 = HttpFactory.HEADER_APPLICATION_JSON;
-
-    public static Gson GSON = GsonBuilder.gsonDefault();
-
-    public static final int TIME_OUT_MS = 120000;
-
-    public static final String SCHEME_HTTP = "http";
-    public static final String SCHEME_HTTPS = "https";
-
-
+    private static final Gson GSON = GsonBuilder.gsonDefault();
 
     public static <T> Response<T> handleResponse(ClassicHttpResponse res, Class<T> tClass) throws IOException {
         Header[] hds = res.getHeaders();
@@ -83,8 +67,8 @@ public class HttpFactory {
             }
         }
         RequestConfig requestConfig = RequestConfig.custom()
-                .setConnectionRequestTimeout(HttpFactory.TIME_OUT_MS, TimeUnit.MILLISECONDS)
-                .setResponseTimeout(HttpFactory.TIME_OUT_MS, TimeUnit.MILLISECONDS).build();
+                .setConnectionRequestTimeout(TIME_OUT_MS, TimeUnit.MILLISECONDS)
+                .setResponseTimeout(TIME_OUT_MS, TimeUnit.MILLISECONDS).build();
         httpRequest.setConfig(requestConfig);
         if(ValueUtils.isNotBlank(request.getHeaders())){
             Set<Map.Entry<String, String>> entrySet = request.getHeaders().entrySet();
@@ -130,7 +114,7 @@ public class HttpFactory {
         }
 
         if(ValueUtils.isBlank(accept)){
-            accept = HttpFactory.HEADER_APPLICATION_JSON;
+            accept = HEADER_APPLICATION_JSON;
         }
         if(ValueUtils.isBlank(buffer)){
             buffer = new byte[0];
@@ -144,10 +128,10 @@ public class HttpFactory {
             return HEADER_CHARSET;
         }
         String charset = HEADER_CHARSET;
-        if(headers.containsKey(HttpFactory.HEADER_KEY0)){
-            charset = headers.get(HttpFactory.HEADER_KEY0);
-        }else if(headers.containsKey(HttpFactory.HEADER_KEY1)){
-            String value = headers.get(HttpFactory.HEADER_KEY1);
+        if(headers.containsKey(HEADER_KEY0)){
+            charset = headers.get(HEADER_KEY0);
+        }else if(headers.containsKey(HEADER_KEY1)){
+            String value = headers.get(HEADER_KEY1);
             for(String arg : value.split(";")){
                 String args[] = arg.split("=");
                 if(args.length == 2 && "charset".equals(args[0])){

@@ -52,7 +52,7 @@ public class PluginClass {
         put("BIGINT", "@JsonSerialize(using = ToStringSerializer.class)");
         put("BIGINT UNSIGNED", "@JsonSerialize(using = ToStringSerializer.class)");
         put("DATETIME", "@DateTimeFormat(pattern = \"yyyy-MM-dd HH:mm:ss\")" +
-                "##tabArgs##@JsonFormat(pattern = \"yyyy-MM-dd HH:mm:ss\")");
+                "##tabArgs##@JsonFormat(pattern = \"yyyy-MM-dd HH:mm:ss\", timezone = BaseEntity.ZONE)");
     }};
 
     private static final Map<String, String> implValidDict = new HashMap(){{

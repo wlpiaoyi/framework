@@ -25,17 +25,11 @@ public class CodeUtils {
 
         for (int i = 0; i < 12; i++) {
             int index = (int) (Math.random() * 100);
-            switch (i){
-                case 0:
-                    index = index % 15 + 1;
-                    break;
-                case 1:
-                    index = index % 14 + 2;
-                    break;
-                default:
-                    index = index % 16;
-                    break;
-            }
+            index = switch (i) {
+                case 0 -> index % 15 + 1;
+                case 1 -> index % 14 + 2;
+                default -> index % 16;
+            };
             macAddress[i] = ADRS[index];
         }
         return macAddress;
@@ -52,7 +46,7 @@ public class CodeUtils {
      * <p><b>{@code @author:}</b>wlpia</p>
      */
     public static char[] getRandomMEID(){
-        char MEID[] = new char[15];
+        char[] MEID = new char[15];
         int index = (int) (Math.random() * 1000);
         index = index % 100;
         if(index < 60){

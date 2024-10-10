@@ -1,6 +1,9 @@
 package org.wlpiaoyi.framework.utils.http;
 
+import com.google.gson.Gson;
 import org.wlpiaoyi.framework.utils.ValueUtils;
+import org.wlpiaoyi.framework.utils.gson.GsonBuilder;
+import org.wlpiaoyi.framework.utils.http.factory.HttpFactory;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -12,6 +15,62 @@ import java.util.Map;
  * <p><b>{@code @version:}:</b>1.0</p>
  */
 public class HttpUtils {
+
+    public static final String HEADER_CHARSET = "utf-8";
+    public static final String HEADER_APPLICATION_JSON = "application/json";
+    public static final String HEADER_APPLICATION_FORM = "application/x-www-form-urlencoded";
+    public static final String HEADER_KEY0 = "content-encoding";
+    public static final String HEADER_KEY1 = "content-type";
+    public static final String HEADER_KEY2 = "accept";
+    public static final String HEADER_VALUE1_1 = HEADER_APPLICATION_JSON + ";charset=" + HEADER_CHARSET;
+    public static final String HEADER_VALUE1_2 = HEADER_APPLICATION_FORM + ";charset=" + HEADER_CHARSET;
+    public static final String HEADER_VALUE2 = HEADER_APPLICATION_JSON;
+
+
+    /**
+     * <p><b>{@code @description:}</b>
+     * Json默认Header
+     * </p>
+     *
+     * <p><b>@param</b> <b></b>
+     * {@link }
+     * </p>
+     *
+     * <p><b>{@code @date:}</b>2024/9/23 8:29</p>
+     * <p><b>{@code @return:}</b>{@link Map< String, String>}</p>
+     * <p><b>{@code @author:}</b>wlpiaoyi</p>
+     */
+    public static Map<String, String> HEADER_JSON_DEFAULTS(){
+        Map<String, String> resMap = new HashMap<>();
+        resMap.put(HEADER_KEY1, HEADER_VALUE1_1);
+        resMap.put(HEADER_KEY2, HEADER_VALUE2);
+        return resMap;
+    }
+
+    /**
+     * <p><b>{@code @description:}</b>
+     * Form默认Header
+     * </p>
+     *
+     * <p><b>@param</b> <b></b>
+     * {@link }
+     * </p>
+     *
+     * <p><b>{@code @date:}</b>2024/9/23 8:30</p>
+     * <p><b>{@code @return:}</b>{@link Map< String, String>}</p>
+     * <p><b>{@code @author:}</b>wlpiaoyi</p>
+     */
+    public static Map<String, String> HEADER_FORM_DEFAULTS(){
+        Map<String, String> resMap = new HashMap<>();
+        resMap.put(HEADER_KEY1, HEADER_VALUE1_2);
+        resMap.put(HEADER_KEY2, HEADER_VALUE2);
+        return resMap;
+    }
+
+    public static final int TIME_OUT_MS = 120000;
+
+    public static final String SCHEME_HTTP = "http";
+    public static final String SCHEME_HTTPS = "https";
 
     /**
      * <p><b>{@code @description:}</b>
@@ -161,8 +220,8 @@ public class HttpUtils {
             return url;
         }
         StringBuilder urlBuilder = new StringBuilder();
-        for (String key : patterns.keySet()){
-            urlBuilder.append("&").append(key).append("=").append(patterns.get(key));
+        for (Map.Entry<String, String> entry : patterns.entrySet()){
+            urlBuilder.append("&").append(entry.getKey()).append("=").append(patterns.get(entry.getValue()));
         }
         url = url + "?" + urlBuilder.substring(1);
         return url;

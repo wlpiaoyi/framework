@@ -12,8 +12,8 @@ import org.wlpiaoyi.framework.utils.http.HttpUtils;
 import org.wlpiaoyi.framework.utils.http.response.Response;
 
 import java.io.IOException;
-import java.util.HashMap;
 import java.util.Map;
+
 
 /**
  * <p><b>{@code @author:}</b>wlpiaoyi</p>
@@ -22,47 +22,6 @@ import java.util.Map;
  * <p><b>{@code @version:}:</b>1.0</p>
  */
 public class Request<T> implements HttpMessage<T> {
-
-
-    /**
-     * <p><b>{@code @description:}</b>
-     * Json默认Header
-     * </p>
-     *
-     * <p><b>@param</b> <b></b>
-     * {@link }
-     * </p>
-     *
-     * <p><b>{@code @date:}</b>2024/9/23 8:29</p>
-     * <p><b>{@code @return:}</b>{@link Map< String, String>}</p>
-     * <p><b>{@code @author:}</b>wlpiaoyi</p>
-     */
-    public static Map<String, String> HEADER_JSON_DEFAULTS(){
-        Map<String, String> resMap = new HashMap<>();
-        resMap.put(HttpFactory.HEADER_KEY1, HttpFactory.HEADER_VALUE1_1);
-        resMap.put(HttpFactory.HEADER_KEY2, HttpFactory.HEADER_VALUE2);
-        return resMap;
-    }
-
-    /**
-     * <p><b>{@code @description:}</b>
-     * Form默认Header
-     * </p>
-     *
-     * <p><b>@param</b> <b></b>
-     * {@link }
-     * </p>
-     *
-     * <p><b>{@code @date:}</b>2024/9/23 8:30</p>
-     * <p><b>{@code @return:}</b>{@link Map< String, String>}</p>
-     * <p><b>{@code @author:}</b>wlpiaoyi</p>
-     */
-    public static Map<String, String> HEADER_FORM_DEFAULTS(){
-        Map<String, String> resMap = new HashMap<>();
-        resMap.put(HttpFactory.HEADER_KEY1, HttpFactory.HEADER_VALUE1_2);
-        resMap.put(HttpFactory.HEADER_KEY2, HttpFactory.HEADER_VALUE2);
-        return resMap;
-    }
 
     /**
      * Http-Method
@@ -148,7 +107,7 @@ public class Request<T> implements HttpMessage<T> {
     public Request(HttpClientContext context, String url, Method method){
         this.context = context;
         this.url = url;
-        this.headers = HEADER_JSON_DEFAULTS();
+        this.headers = HttpUtils.HEADER_JSON_DEFAULTS();
         this.method = method;
     }
 
@@ -172,7 +131,7 @@ public class Request<T> implements HttpMessage<T> {
     public Request(HttpClientContext context, String url){
         this.context = context;
         this.url = url;
-        this.headers = HEADER_FORM_DEFAULTS();
+        this.headers = HttpUtils.HEADER_FORM_DEFAULTS();
         this.method = Method.Get;
     }
 

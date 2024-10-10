@@ -21,7 +21,7 @@ public class Response<T> implements HttpMessage<T> {
     private final int code;
 
     @Getter
-    private T body;
+    private final T body;
 
     public Response(int code, Map<String, String> headers, T body){
         this.code = code;
@@ -29,16 +29,5 @@ public class Response<T> implements HttpMessage<T> {
         this.body = body;
 
     }
-
-//    public String getBodyString() throws IOException {
-//        return ;
-//    }
-//
-//    public <T> T getBody(Class<T> tClass) throws IOException {
-//        String resStr = getBodyString();
-//        return HttpFactory.GSON.fromJson(resStr, tClass);
-//    }
-
-
 
 }

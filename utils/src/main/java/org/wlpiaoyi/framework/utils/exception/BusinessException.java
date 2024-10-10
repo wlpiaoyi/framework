@@ -16,19 +16,20 @@ public class BusinessException extends RuntimeException {
 
     protected String message;
 
-    public BusinessException(Throwable throwable) {
+    public BusinessException(int code, String message, Throwable throwable, Object... params) {
         super(throwable);
+        this.code = code;
+        this.message = String.format(message, params);
     }
-
-    public BusinessException(String message) {
-        super(message);
+    public BusinessException(String message, Throwable throwable, Object... params) {
+        super(throwable);
         this.code = 501;
-        this.message = message;
+        this.message = String.format(message, params);
     }
 
-    public BusinessException(String message, Throwable cause) {
+    public BusinessException(int code, String message, Throwable cause) {
         super(message, cause);
-        this.code = 501;
+        this.code = code;
         this.message = message;
     }
 
@@ -38,9 +39,19 @@ public class BusinessException extends RuntimeException {
         this.message = message;
     }
 
-    public BusinessException(int code, String message, Throwable cause) {
+    public BusinessException(String message, Throwable cause) {
         super(message, cause);
-        this.code = code;
+        this.code = 501;
+        this.message = message;
+    }
+
+    public BusinessException(Throwable throwable) {
+        super(throwable);
+    }
+
+    public BusinessException(String message) {
+        super(message);
+        this.code = 501;
         this.message = message;
     }
 

@@ -9,6 +9,7 @@ import org.apache.hc.client5.http.impl.classic.HttpClients;
 import org.apache.hc.client5.http.protocol.HttpClientContext;
 import org.apache.hc.core5.http.HttpEntity;
 import org.apache.hc.core5.http.HttpHost;
+import org.apache.hc.core5.http.impl.Http1StreamListener;
 import org.apache.hc.core5.http.io.HttpClientResponseHandler;
 import org.junit.After;
 import org.junit.Before;
