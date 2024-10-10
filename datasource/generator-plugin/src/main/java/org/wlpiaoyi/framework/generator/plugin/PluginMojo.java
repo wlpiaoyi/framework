@@ -63,12 +63,12 @@ public class PluginMojo extends AbstractMojo {
 
     }
 
-//    public static void main(String[] args) throws MojoExecutionException, MojoFailureException {
-//        PluginMojo mogo = new PluginMojo();
-//        mogo.configDir = "\\src\\main\\resources\\config.properties";
-//        mogo.templateDir = "\\src\\main\\resources\\template";
-//        mogo.basePath = DataUtils.USER_DIR + "\\datasource\\generator-plugin";
-//
-//        mogo.execute();
-//    }
+    public static void main(String[] args) throws MojoExecutionException, MojoFailureException {
+        PluginMojo mogo = new PluginMojo();
+        mogo.configDir = "\\src\\main\\resources\\config.properties";
+        mogo.templateDir = "\\src\\main\\resources\\template";
+        mogo.basePath = DataUtils.USER_DIR + "\\datasource\\generator-plugin";
+
+        mogo.execute();
+    }
 }

@@ -109,7 +109,7 @@ public class PluginTable {
             }
             for (Map<String, String> tableDict : tableDicts) {
                 String tableName = tableDict.get("tableName");
-                ResultSet columnRet = metaData.getColumns(null, this.configModel.getDatabaseName(), tableName, "%");
+                ResultSet columnRet = metaData.getColumns(this.configModel.getDatabaseName(), null, tableName, "%");
                 List<Map<String, String>> columnDict = PluginTable.iteratorColumn(columnRet);
                 resDict.put(tableName,
                         new HashMap(2){{

@@ -19,6 +19,7 @@ public class PluginClass {
     private static final Map<String, String> columnTypeDict = new HashMap(){{
         put("CHAR", "String");
         put("VARCHAR", "String");
+        put("TEXT", "String");
         put("LONGTEXT", "String");
         put("BLOB", "String");
         put("TINYINT", "Byte");
@@ -56,22 +57,22 @@ public class PluginClass {
     }};
 
     private static final Map<String, String> implValidDict = new HashMap(){{
-        put("CHAR", "javax.validation.constraints.NotBlank");
-        put("VARCHAR", "javax.validation.constraints.NotBlank");
-        put("BLOB", "javax.validation.constraints.NotBlank");
-        put("LONGTEXT", "javax.validation.constraints.NotBlank");
-        put("TINYINT", "javax.validation.constraints.NotNull");
-        put("TINYINT UNSIGNED", "javax.validation.constraints.NotNull");
-        put("SMALLINT", "javax.validation.constraints.NotNull");
-        put("SMALLINT UNSIGNED", "javax.validation.constraints.NotNull");
-        put("MEDIUMINT", "javax.validation.constraints.NotNull");
-        put("MEDIUMINT UNSIGNED", "javax.validation.constraints.NotNull");
-        put("INT", "javax.validation.constraints.NotNull");
-        put("INT UNSIGNED", "javax.validation.constraints.NotNull");
-        put("BIGINT", "javax.validation.constraints.NotNull");
-        put("BIGINT UNSIGNED", "javax.validation.constraints.NotNull");
-        put("DECIMAL", "javax.validation.constraints.NotNull");
-        put("DATETIME", "javax.validation.constraints.NotNull");
+        put("CHAR", "jakarta.validation.constraints.NotBlank");
+        put("VARCHAR", "jakarta.validation.constraints.NotBlank");
+        put("BLOB", "jakarta.validation.constraints.NotBlank");
+        put("LONGTEXT", "jakarta.validation.constraints.NotBlank");
+        put("TINYINT", "jakarta.validation.constraints.NotNull");
+        put("TINYINT UNSIGNED", "jakarta.validation.constraints.NotNull");
+        put("SMALLINT", "jakarta.validation.constraints.NotNull");
+        put("SMALLINT UNSIGNED", "jakarta.validation.constraints.NotNull");
+        put("MEDIUMINT", "jakarta.validation.constraints.NotNull");
+        put("MEDIUMINT UNSIGNED", "jakarta.validation.constraints.NotNull");
+        put("INT", "jakarta.validation.constraints.NotNull");
+        put("INT UNSIGNED", "jakarta.validation.constraints.NotNull");
+        put("BIGINT", "jakarta.validation.constraints.NotNull");
+        put("BIGINT UNSIGNED", "jakarta.validation.constraints.NotNull");
+        put("DECIMAL", "jakarta.validation.constraints.NotNull");
+        put("DATETIME", "jakarta.validation.constraints.NotNull");
     }};
     private static final Map<String, String> msgValidDict = new HashMap(){{
         put("CHAR", "@NotBlank(message = \"__comment__不能为空\")");
@@ -250,6 +251,9 @@ public class PluginClass {
         String comment = (String) colMap.get("comment");
         String columnType = ((String) colMap.get("columnType")).toUpperCase();
         String propertyType = columnTypeDict.get(columnType);
+        if(ValueUtils.isBlank(propertyType)){
+            throw new BusinessException("not fund propertyType for " + columnType);
+        }
         if(ValueUtils.isBlank(comment)){
             comment = propertyName;
         }
@@ -294,11 +298,13 @@ public class PluginClass {
         String fieldDec = fieldDecorateDict.get(columnType);
         if(!ValueUtils.isBlank(fieldDec)){
             fieldDec = fieldDec.replaceAll(StructureConstant.TAB_ARGS, tabArgs);
-            for (String arg :
-                    fieldDec.split(",")) {
-                fieldsText.append(tabArgs);
-                fieldsText.append(arg);
-            }
+//            for (String arg :
+//                    fieldDec.split(",")) {
+//                fieldsText.append(tabArgs);
+//                fieldsText.append(arg);
+//            }
+            fieldsText.append(tabArgs);
+            fieldsText.append(fieldDec);
         }
         String res = new String(line);
         res = res.replaceAll(StructureConstant.PROPERTY_TYPE, propertyType);

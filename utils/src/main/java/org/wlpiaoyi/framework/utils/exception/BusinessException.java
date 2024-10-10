@@ -47,6 +47,7 @@ public class BusinessException extends RuntimeException {
 
     public BusinessException(Throwable throwable) {
         super(throwable);
+        this.code = 501;
     }
 
     public BusinessException(String message) {
