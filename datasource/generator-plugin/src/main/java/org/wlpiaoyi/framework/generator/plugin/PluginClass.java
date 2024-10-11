@@ -2,8 +2,10 @@ package org.wlpiaoyi.framework.generator.plugin;
 
 import lombok.Data;
 import org.wlpiaoyi.framework.generator.plugin.model.ConfigModel;
+import org.wlpiaoyi.framework.generator.plugin.utils.PluginUtils;
 import org.wlpiaoyi.framework.generator.plugin.utils.StructureConstant;
 import org.wlpiaoyi.framework.utils.DateUtils;
+import org.wlpiaoyi.framework.utils.MapUtils;
 import org.wlpiaoyi.framework.utils.ValueUtils;
 import org.wlpiaoyi.framework.utils.data.DataUtils;
 import org.wlpiaoyi.framework.utils.exception.BusinessException;
@@ -13,85 +15,10 @@ import java.sql.SQLException;
 import java.time.LocalDateTime;
 import java.util.*;
 
+import static org.wlpiaoyi.framework.generator.plugin.utils.PluginUtils.*;
+
 
 public class PluginClass {
-
-    private static final Map<String, String> columnTypeDict = new HashMap(){{
-        put("CHAR", "String");
-        put("VARCHAR", "String");
-        put("TEXT", "String");
-        put("LONGTEXT", "String");
-        put("BLOB", "String");
-        put("TINYINT", "Byte");
-        put("TINYINT UNSIGNED", "Byte");
-        put("SMALLINT", "Short");
-        put("SMALLINT UNSIGNED", "Short");
-        put("MEDIUMINT", "Short");
-        put("MEDIUMINT UNSIGNED", "Short");
-        put("INT", "Integer");
-        put("INT UNSIGNED", "Integer");
-        put("BIGINT", "Long");
-        put("BIGINT UNSIGNED", "Long");
-        put("DECIMAL", "Double");
-        put("DATETIME", "Date");
-    }};
-
-    private static final Map<String, String> implTypeDict = new HashMap(){{
-        put("DATETIME", "java.util.Date");
-    }};
-
-
-    private static final Map<String, String> implDecorateDict = new HashMap(){{
-        put("BIGINT", "com.fasterxml.jackson.databind.annotation.JsonSerialize," +
-                "com.fasterxml.jackson.databind.ser.std.ToStringSerializer");
-        put("BIGINT UNSIGNED", "com.fasterxml.jackson.databind.annotation.JsonSerialize," +
-                "com.fasterxml.jackson.databind.ser.std.ToStringSerializer");
-        put("DATETIME", "com.fasterxml.jackson.annotation.JsonFormat," +
-                "org.springframework.format.annotation.DateTimeFormat");
-    }};
-    private static final Map<String, String> fieldDecorateDict = new HashMap(){{
-        put("BIGINT", "@JsonSerialize(using = ToStringSerializer.class)");
-        put("BIGINT UNSIGNED", "@JsonSerialize(using = ToStringSerializer.class)");
-        put("DATETIME", "@DateTimeFormat(pattern = \"yyyy-MM-dd HH:mm:ss\")" +
-                "##tabArgs##@JsonFormat(pattern = \"yyyy-MM-dd HH:mm:ss\", timezone = BaseEntity.ZONE)");
-    }};
-
-    private static final Map<String, String> implValidDict = new HashMap(){{
-        put("CHAR", "jakarta.validation.constraints.NotBlank");
-        put("VARCHAR", "jakarta.validation.constraints.NotBlank");
-        put("BLOB", "jakarta.validation.constraints.NotBlank");
-        put("LONGTEXT", "jakarta.validation.constraints.NotBlank");
-        put("TINYINT", "jakarta.validation.constraints.NotNull");
-        put("TINYINT UNSIGNED", "jakarta.validation.constraints.NotNull");
-        put("SMALLINT", "jakarta.validation.constraints.NotNull");
-        put("SMALLINT UNSIGNED", "jakarta.validation.constraints.NotNull");
-        put("MEDIUMINT", "jakarta.validation.constraints.NotNull");
-        put("MEDIUMINT UNSIGNED", "jakarta.validation.constraints.NotNull");
-        put("INT", "jakarta.validation.constraints.NotNull");
-        put("INT UNSIGNED", "jakarta.validation.constraints.NotNull");
-        put("BIGINT", "jakarta.validation.constraints.NotNull");
-        put("BIGINT UNSIGNED", "jakarta.validation.constraints.NotNull");
-        put("DECIMAL", "jakarta.validation.constraints.NotNull");
-        put("DATETIME", "jakarta.validation.constraints.NotNull");
-    }};
-    private static final Map<String, String> msgValidDict = new HashMap(){{
-        put("CHAR", "@NotBlank(message = \"__comment__不能为空\")");
-        put("VARCHAR", "@NotBlank(message = \"__comment__不能为空\")");
-        put("BLOB", "@NotBlank(message = \"__comment__不能为空\")");
-        put("LONGTEXT", "@NotBlank(message = \"__comment__不能为空\")");
-        put("TINYINT", "@NotNull(message = \"__comment__不能为空\")");
-        put("TINYINT UNSIGNED", "@NotNull(message = \"__comment__不能为空\")");
-        put("SMALLINT", "@NotNull(message = \"__comment__不能为空\"");
-        put("SMALLINT UNSIGNED", "@NotNull(message = \"__comment__不能为空\"");
-        put("MEDIUMINT", "@NotNull(message = \"__comment__不能为空\"");
-        put("MEDIUMINT UNSIGNED", "@NotNull(message = \"__comment__不能为空\"");
-        put("INT", "@NotNull(message = \"__comment__不能为空\")");
-        put("INT UNSIGNED", "@NotNull(message = \"__comment__不能为空\")");
-        put("BIGINT", "@NotNull(message = \"__comment__不能为空\")");
-        put("BIGINT UNSIGNED", "@NotNull(message = \"__comment__不能为空\")");
-        put("DECIMAL", "@NotNull(message = \"__comment__不能为空\")");
-        put("DATETIME", "@NotNull(message = \"__comment__不能为空\")");
-    }};
 
     private ConfigModel configModel;
     private final PluginTable pluginTable;
@@ -267,7 +194,32 @@ public class PluginClass {
         }
 
 
-        fieldsText.append("@Schema(description = \"" + comment + "\")");
+        Map commentRes = PluginUtils.patternComment(comment);
+        String schemaInParams = "";
+        String description = MapUtils.getString(commentRes, "name", comment);
+        if(ValueUtils.isNotBlank(description)){
+            String info = MapUtils.getString(commentRes, "desc", "");
+            if(ValueUtils.isNotBlank(info)){
+                description += ":" + info;
+            }
+            String[] examples = MapUtils.get(commentRes, "options", new String[]{});
+            if(ValueUtils.isNotBlank(examples)){
+                description += " enums(" + ValueUtils.toStrings(examples) + ")";
+            }
+
+            schemaInParams += " , description = \"" + description + "\"";
+        }
+        String[] examples = MapUtils.get(commentRes, "options", new String[]{});
+        if(ValueUtils.isNotBlank(examples)){
+            schemaInParams += " , examples = {";
+            for(String example : examples){
+                schemaInParams += "\"" + example + "\",";
+            }
+            schemaInParams = schemaInParams.substring(0, schemaInParams.length() - 1);
+            schemaInParams += "}";
+
+        }
+        fieldsText.append("@Schema(name = \"" + propertyName + "\"" + schemaInParams +")");
 
         Integer nullable = (Integer) colMap.get("nullable");
         if(nullable == 0){
@@ -276,7 +228,7 @@ public class PluginClass {
                 throw new BusinessException("msgValidDict不支持的类型:" + columnType);
             }
             fieldsText.append(tabArgs);
-            fieldsText.append(anStr.replace("__comment__", comment));
+            fieldsText.append(anStr.replace("__comment__", MapUtils.getString(commentRes, "name", comment)));
             String importStr = implValidDict.get(columnType);
             if(ValueUtils.isBlank(importStr))
                 throw new BusinessException("implValidDict不支持的类型:" + columnType);

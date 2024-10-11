@@ -1,0 +1,70 @@
+{
+  "columnTypeDict": {
+    "CHAR": "String",
+    "VARCHAR": "String",
+    "TEXT": "String",
+    "LONGTEXT": "String",
+    "BLOB": "String",
+    "TINYINT": "Byte",
+    "TINYINT UNSIGNED": "Byte",
+    "SMALLINT": "Short",
+    "SMALLINT UNSIGNED": "Short",
+    "MEDIUMINT": "Short",
+    "MEDIUMINT UNSIGNED": "Short",
+    "INT": "Integer",
+    "INT UNSIGNED": "Integer",
+    "BIGINT": "Long",
+    "BIGINT UNSIGNED": "Long",
+    "DECIMAL": "Double",
+    "DATETIME": "Date"
+  },
+  "implTypeDict": {
+    "DATETIME": "java.util.Date"
+  },
+  "implDecorateDict": {
+    "BIGINT": "com.fasterxml.jackson.databind.annotation.JsonSerialize,com.fasterxml.jackson.databind.ser.std.ToStringSerializer",
+    "BIGINT UNSIGNED": "com.fasterxml.jackson.databind.annotation.JsonSerialize,com.fasterxml.jackson.databind.ser.std.ToStringSerializer",
+    "DATETIME": "com.fasterxml.jackson.annotation.JsonFormat,org.springframework.format.annotation.DateTimeFormat"
+  },
+  "fieldDecorateDict": {
+    "BIGINT": "@JsonSerialize(using = ToStringSerializer.class)",
+    "BIGINT UNSIGNED": "@JsonSerialize(using = ToStringSerializer.class)",
+    "DATETIME": "@DateTimeFormat(pattern = \"yyyy-MM-dd HH:mm:ss\")##tabArgs##@JsonFormat(pattern = \"yyyy-MM-dd HH:mm:ss\", timezone = BaseEntity.ZONE)"
+  },
+  "implValidDict": {
+    "CHAR": "jakarta.validation.constraints.NotBlank",
+    "VARCHAR": "jakarta.validation.constraints.NotBlank",
+    "BLOB": "jakarta.validation.constraints.NotBlank",
+    "LONGTEXT": "jakarta.validation.constraints.NotBlank",
+    "TINYINT": "jakarta.validation.constraints.NotNull",
+    "TINYINT UNSIGNED": "jakarta.validation.constraints.NotNull",
+    "SMALLINT": "jakarta.validation.constraints.NotNull",
+    "SMALLINT UNSIGNED": "jakarta.validation.constraints.NotNull",
+    "MEDIUMINT": "jakarta.validation.constraints.NotNull",
+    "MEDIUMINT UNSIGNED": "jakarta.validation.constraints.NotNull",
+    "INT": "jakarta.validation.constraints.NotNull",
+    "INT UNSIGNED": "jakarta.validation.constraints.NotNull",
+    "BIGINT": "jakarta.validation.constraints.NotNull",
+    "BIGINT UNSIGNED": "jakarta.validation.constraints.NotNull",
+    "DECIMAL": "jakarta.validation.constraints.NotNull",
+    "DATETIME": "jakarta.validation.constraints.NotNull"
+  },
+  "msgValidDict": {
+    "CHAR": "@NotBlank(message = \"__comment__不能为空\")",
+    "VARCHAR": "@NotBlank(message = \"__comment__不能为空\")",
+    "BLOB": "@NotBlank(message = \"__comment__不能为空\")",
+    "LONGTEXT": "@NotBlank(message = \"__comment__不能为空\")",
+    "TINYINT": "@NotNull(message = \"__comment__不能为空\")",
+    "TINYINT UNSIGNED": "@NotNull(message = \"__comment__不能为空\")",
+    "SMALLINT": "@NotNull(message = \"__comment__不能为空\"",
+    "SMALLINT UNSIGNED": "@NotNull(message = \"__comment__不能为空\"",
+    "MEDIUMINT": "@NotNull(message = \"__comment__不能为空\"",
+    "MEDIUMINT UNSIGNED": "@NotNull(message = \"__comment__不能为空\"",
+    "INT": "@NotNull(message = \"__comment__不能为空\")",
+    "INT UNSIGNED": "@NotNull(message = \"__comment__不能为空\")",
+    "BIGINT": "@NotNull(message = \"__comment__不能为空\")",
+    "BIGINT UNSIGNED": "@NotNull(message = \"__comment__不能为空\")",
+    "DECIMAL": "@NotNull(message = \"__comment__不能为空\")",
+    "DATETIME": "@NotNull(message = \"__comment__不能为空\")"
+  }
+}

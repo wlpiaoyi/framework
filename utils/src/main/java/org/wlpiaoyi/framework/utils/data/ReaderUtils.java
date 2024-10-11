@@ -90,6 +90,9 @@ public class ReaderUtils extends DataUtils{
      * @throws IOException
      */
     public static String loadString(@NonNull InputStream inputStream, Charset encoding) throws IOException {
+        if(encoding == null){
+            encoding = StandardCharsets.UTF_8;
+        }
         InputStreamReader inputStreamReader = new InputStreamReader(inputStream, encoding);
         BufferedReader bufferedReader = new BufferedReader(inputStreamReader);
         StringBuilder sb = new StringBuilder();

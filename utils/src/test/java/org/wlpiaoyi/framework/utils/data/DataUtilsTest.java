@@ -16,7 +16,10 @@ public class DataUtilsTest {
     public void setUp() throws Exception {}
 
 
-
+    @Test
+    public void MD() throws IOException {
+        System.out.println(new String(DataUtils.base64Encode(DataUtils.sha256("admin".getBytes(StandardCharsets.UTF_8)))));
+    }
 
     @Test
     public void write1() throws IOException {
