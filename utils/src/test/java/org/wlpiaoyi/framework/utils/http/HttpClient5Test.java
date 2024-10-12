@@ -54,7 +54,10 @@ public class HttpClient5Test {
     public void login() throws IOException {
         HttpClientContext context = HttpClientContext.create();
         Request<byte[]> request = new Request<>(context, "http://127.0.0.1:8180/test/auth/login", Request.Method.Post);
-        request.setHeader(HttpHeaders.CONTENT_TYPE, "application/json;charset=utf-8");
+        request.setHeader(HttpHeaders.CONTENT_TYPE, "#ENCRYPT#application/json;charset=utf-8");
+        request.setHeader(HttpHeaders.ACCEPT, "#ENCRYPT#application/json");
+//        request.setHeader(HttpHeaders.CONTENT_TYPE, "application/json;charset=utf-8");
+//        request.setHeader(HttpHeaders.ACCEPT, "application/json");
         request.setHeader("token", "wl12");
         Map body = new HashMap(){{
             put("current", "0");

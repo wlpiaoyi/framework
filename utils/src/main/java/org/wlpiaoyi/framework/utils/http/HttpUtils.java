@@ -1,6 +1,7 @@
 package org.wlpiaoyi.framework.utils.http;
 
 import com.google.gson.Gson;
+import org.apache.hc.core5.http.HttpHeaders;
 import org.wlpiaoyi.framework.utils.ValueUtils;
 import org.wlpiaoyi.framework.utils.gson.GsonBuilder;
 import org.wlpiaoyi.framework.utils.http.factory.HttpFactory;
@@ -20,8 +21,8 @@ public class HttpUtils {
     public static final String HEADER_APPLICATION_JSON = "application/json";
     public static final String HEADER_APPLICATION_FORM = "application/x-www-form-urlencoded";
     public static final String HEADER_KEY0 = "content-encoding";
-    public static final String HEADER_KEY1 = "content-type";
-    public static final String HEADER_KEY2 = "accept";
+    public static final String HEADER_KEY1 = HttpHeaders.CONTENT_TYPE;
+    public static final String HEADER_KEY2 = HttpHeaders.ACCEPT;
     public static final String HEADER_VALUE1_1 = HEADER_APPLICATION_JSON + ";charset=" + HEADER_CHARSET;
     public static final String HEADER_VALUE1_2 = HEADER_APPLICATION_FORM + ";charset=" + HEADER_CHARSET;
     public static final String HEADER_VALUE2 = HEADER_APPLICATION_JSON;
