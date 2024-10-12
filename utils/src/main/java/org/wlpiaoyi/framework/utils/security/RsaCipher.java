@@ -3,6 +3,7 @@ package org.wlpiaoyi.framework.utils.security;
 import lombok.Getter;
 import lombok.SneakyThrows;
 import org.wlpiaoyi.framework.utils.ValueUtils;
+import org.wlpiaoyi.framework.utils.exception.BusinessException;
 import org.wlpiaoyi.framework.utils.security.condition.ConditionRsa;
 
 import javax.crypto.Cipher;
@@ -55,22 +56,32 @@ public class RsaCipher extends Security{
     }
 
     @SneakyThrows
+    public RsaCipher loadRandomKey(){
+        String[] keys = SecurityTools.intKey(this.keyPairSize, this.keyAlgorithm);
+        this.privateKey = keys[0];
+        this.publicKey = keys[1];
+        return this;
+    }
+
+    @SneakyThrows
     @Override
     public RsaCipher loadConfig() {
-        if(ValueUtils.isBlank(this.publicKey) || ValueUtils.isBlank(this.privateKey)){
-            String[] keys = SecurityTools.intKey(this.keyPairSize, this.keyAlgorithm);
-            this.privateKey = keys[0];
-            this.publicKey = keys[1];
+        if(ValueUtils.isBlank(this.publicKey) && ValueUtils.isBlank(this.privateKey)){
+            throw new BusinessException("all key is null");
         }
         switch (this.type){
             case 1:{
-                this.eCipher = SecurityTools.createPublicCipher(this.publicKey, this.keyAlgorithm, Cipher.ENCRYPT_MODE);
-                this.dCipher = SecurityTools.createPrivateCipher(this.privateKey, this.keyAlgorithm, Cipher.DECRYPT_MODE);
+                if(ValueUtils.isNotBlank(publicKey))
+                    this.eCipher = SecurityTools.createPublicCipher(this.publicKey, this.keyAlgorithm, Cipher.ENCRYPT_MODE);
+                if(ValueUtils.isNotBlank(privateKey))
+                    this.dCipher = SecurityTools.createPrivateCipher(this.privateKey, this.keyAlgorithm, Cipher.DECRYPT_MODE);
             }
             break;
             default:{
-                this.eCipher = SecurityTools.createPrivateCipher(this.privateKey, this.keyAlgorithm, Cipher.ENCRYPT_MODE);
-                this.dCipher = SecurityTools.createPublicCipher(this.publicKey, this.keyAlgorithm, Cipher.DECRYPT_MODE);
+                if(ValueUtils.isNotBlank(privateKey))
+                    this.eCipher = SecurityTools.createPrivateCipher(this.privateKey, this.keyAlgorithm, Cipher.ENCRYPT_MODE);
+                if(ValueUtils.isNotBlank(publicKey))
+                    this.dCipher = SecurityTools.createPublicCipher(this.publicKey, this.keyAlgorithm, Cipher.DECRYPT_MODE);
             }
             break;
         }
@@ -84,6 +95,9 @@ public class RsaCipher extends Security{
      */
     @SneakyThrows
     public synchronized byte[] encrypt(byte[] buffer){
+        if(this.eCipher == null){
+            throw new BusinessException("not support encrypt");
+        }
         return this.eCipher.doFinal(buffer);
     }
 
@@ -94,6 +108,9 @@ public class RsaCipher extends Security{
      */
     @SneakyThrows
     public synchronized byte[] decrypt(byte[] buffer){
+        if(this.dCipher == null){
+            throw new BusinessException("not support decrypt");
+        }
         return this.dCipher.doFinal(buffer);
     }
 
