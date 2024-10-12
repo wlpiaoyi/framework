@@ -1,5 +1,6 @@
 package org.wlpiaoyi.framework.utils.http;
 
+import lombok.SneakyThrows;
 import org.apache.hc.client5.http.classic.methods.HttpPost;
 import org.apache.hc.client5.http.cookie.CookieStore;
 import org.apache.hc.client5.http.entity.mime.FileBody;
@@ -8,6 +9,7 @@ import org.apache.hc.client5.http.impl.classic.CloseableHttpClient;
 import org.apache.hc.client5.http.impl.classic.HttpClients;
 import org.apache.hc.client5.http.protocol.HttpClientContext;
 import org.apache.hc.core5.http.HttpEntity;
+import org.apache.hc.core5.http.HttpHeaders;
 import org.apache.hc.core5.http.HttpHost;
 import org.apache.hc.core5.http.impl.Http1StreamListener;
 import org.apache.hc.core5.http.io.HttpClientResponseHandler;
@@ -15,6 +17,9 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.wlpiaoyi.framework.utils.data.ReaderUtils;
+import org.wlpiaoyi.framework.utils.encrypt.aes.Aes;
+import org.wlpiaoyi.framework.utils.exception.BusinessException;
+import org.wlpiaoyi.framework.utils.gson.GsonBuilder;
 import org.wlpiaoyi.framework.utils.http.factory.CookieFactory;
 import org.wlpiaoyi.framework.utils.http.request.Request;
 import org.wlpiaoyi.framework.utils.http.response.Response;
@@ -35,6 +40,34 @@ public class HttpClient5Test {
 
     @Before
     public void setUp() throws Exception {}
+
+    private Aes aes;
+    {
+        try {
+            aes = Aes.create().setKey("abcd567890ABCDEF1234567890ABCDEF").setIV("abcd567890123456").load();
+        } catch (Exception e) {
+            throw new BusinessException(e);
+        }
+    }
+    @SneakyThrows
+    @Test
+    public void login() throws IOException {
+        HttpClientContext context = HttpClientContext.create();
+        Request<byte[]> request = new Request<>(context, "http://127.0.0.1:8180/test/auth/login", Request.Method.Post);
+        request.setHeader(HttpHeaders.CONTENT_TYPE, "application/json;charset=utf-8");
+        request.setHeader("token", "wl12");
+        Map body = new HashMap(){{
+            put("current", "0");
+            put("size", "3");
+        }};
+        byte[] buffers = this.aes.encrypt(GsonBuilder.gsonDefault().toJson(body, Map.class).getBytes(StandardCharsets.UTF_8));
+        System.out.println(new String(buffers));
+        request.setBody(buffers).setHttpProxy("127.0.0.1", 8888);
+        Response<byte[]> response = request.execute(byte[].class);
+        buffers = response.getBody();
+        System.out.println(new String(buffers));
+        System.out.println(new String(this.aes.decrypt(buffers)));
+    }
 
 
     @Test

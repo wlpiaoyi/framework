@@ -145,7 +145,11 @@ public class HttpFactory {
 
 
     private static <T> T getResponseBody(HttpEntity entity, Map<String, String> headers, Class<T> tClass) throws IOException {
-        String resStr = ReaderUtils.loadString(entity.getContent(), Charset.forName(HttpFactory.getCharsetInHeaders(headers)));
+        byte[] buffer = ReaderUtils.loadBuffer(entity.getContent());
+        if(tClass == byte[].class){
+            return (T) buffer;
+        }
+        String resStr =  new String(buffer, Charset.forName(HttpFactory.getCharsetInHeaders(headers)));
         if(tClass == String.class){
             return (T) resStr;
         }

@@ -182,9 +182,9 @@ public class MapUtils {
         if(value instanceof Float){
             return (Float) value;
         }else if (value instanceof String){
-            return new Float((String) value);
+            return Float.valueOf((String) value);
         }
-        return new Float(value.toString());
+        return Float.valueOf(value.toString());
     }
 
     public static Double getDouble(Map map, Object key){
@@ -201,9 +201,9 @@ public class MapUtils {
         if(value instanceof Double){
             return (Double) value;
         }else if (value instanceof String){
-            return new Double((String) value);
+            return Double.valueOf((String) value);
         }
-        return new Double(value.toString());
+        return Double.valueOf(value.toString());
     }
 
     public static Boolean getBoolean(Map map, Object key){
@@ -239,9 +239,9 @@ public class MapUtils {
         if(value instanceof Byte){
             return (Byte) value;
         }else if (value instanceof String){
-            return new Byte((String) value);
+            return Byte.valueOf((String) value);
         }
-        return new Byte(value.toString());
+        return Byte.valueOf(value.toString());
     }
 
     public static Integer getInteger(Map map, Object key){
@@ -258,7 +258,7 @@ public class MapUtils {
         if(value instanceof Integer){
             return (Integer) value;
         }else if(value instanceof LocalDate){
-            return new Integer((int) DateUtils.parseToEpochDay(((LocalDate) value)));
+            return Integer.valueOf((int) DateUtils.parseToEpochDay(((LocalDate) value)));
         }else if(value instanceof Long){
             return ((Long) value).intValue();
         }else if(value instanceof Double){
@@ -266,7 +266,7 @@ public class MapUtils {
         }else if(value instanceof Float){
             return ((Float) value).intValue();
         }
-        return new Double(value.toString()).intValue();
+        return Double.valueOf(value.toString()).intValue();
     }
 
     public static Long getLong(Map map, Object key){
@@ -295,7 +295,7 @@ public class MapUtils {
         }else if(value instanceof Float){
             return ((Float) value).longValue();
         }
-        return new Double(value.toString()).longValue();
+        return Double.valueOf(value.toString()).longValue();
     }
 
     public static LocalDateTime getLocalDateTime(Map map, Object key){
@@ -316,7 +316,7 @@ public class MapUtils {
         }else if (value instanceof String){
             boolean isMatch = Pattern.matches("^\\d+$", (String) value);
             if(isMatch){
-                return DateUtils.parseToLocalDateTime(new Long((String) value));
+                return DateUtils.parseToLocalDateTime(Long.valueOf((String) value));
             }else{
                 return DateUtils.formatToLoaTolDateTime((String) value);
             }
@@ -344,7 +344,7 @@ public class MapUtils {
         }else if (value instanceof String){
             boolean isMatch = Pattern.matches("^\\d+$", (String) value);
             if(isMatch){
-                return DateUtils.parseToLocalDate(new Long((String) value));
+                return DateUtils.parseToLocalDate(Long.valueOf((String) value));
             }else{
                 return DateUtils.formatLocalDate((String) value);
             }
@@ -370,7 +370,7 @@ public class MapUtils {
         }else if (value instanceof String){
             boolean isMatch = Pattern.matches("^\\d+$", (String) value);
             if(isMatch){
-                return new Date(new Long((String) value));
+                return new Date(Long.valueOf((String) value));
             }else{
                 return DateUtils.formatToDate((String) value);
             }
@@ -452,13 +452,13 @@ public class MapUtils {
             }else if(clazz == String.class){
                 item = (T) data.toString();
             }else if(clazz == Integer.class){
-                item = (T) new Integer(data.toString());
+                item = (T) Integer.valueOf(data.toString());
             }else if(clazz == Long.class){
-                item = (T) new Long(data.toString());
+                item = (T) Long.valueOf(data.toString());
             }else if(clazz == Float.class){
-                item = (T) new Float(data.toString());
+                item = (T) Float.valueOf(data.toString());
             }else if(clazz == Double.class){
-                item = (T) new Double(data.toString());
+                item = (T) Double.valueOf(data.toString());
             }else if(clazz == Character[].class){
                 item = (T) data.toString().toCharArray();
             }else if(clazz == BigDecimal.class){
@@ -525,13 +525,13 @@ public class MapUtils {
             }else if(clazz == String.class){
                 item = (T) data.toString();
             }else if(clazz == Integer.class){
-                item = (T) new Integer(data.toString());
+                item = (T) Integer.valueOf(data.toString());
             }else if(clazz == Long.class){
-                item = (T) new Long(data.toString());
+                item = (T) Long.valueOf(data.toString());
             }else if(clazz == Float.class){
-                item = (T) new Float(data.toString());
+                item = (T) Float.valueOf(data.toString());
             }else if(clazz == Double.class){
-                item = (T) new Double(data.toString());
+                item = (T) Double.valueOf(data.toString());
             }else if(clazz == Character[].class){
                 item = (T) data.toString().toCharArray();
             }else if(clazz == BigDecimal.class){

@@ -81,6 +81,21 @@ public class ReaderUtils extends DataUtils{
         return Files.readAllBytes(file.toPath());
     }
 
+    /**
+     * read inputStream convert to byte[]
+     * @param inputStream
+     * @return
+     * @throws IOException
+     */
+    public static byte[] loadBuffer(@NonNull InputStream inputStream) throws IOException {
+        ByteArrayOutputStream buffer = new ByteArrayOutputStream();
+        int nRead;
+        byte[] data = new byte[64];
+        while ((nRead = inputStream.read(data, 0, data.length)) != -1) {
+            buffer.write(data, 0, nRead);
+        }
+        return buffer.toByteArray();
+    }
 
     /**
      * read inputStream convert to string
@@ -103,6 +118,7 @@ public class ReaderUtils extends DataUtils{
         }
         return sb.toString();
     }
+
 
     /**
      * read file convert to string
