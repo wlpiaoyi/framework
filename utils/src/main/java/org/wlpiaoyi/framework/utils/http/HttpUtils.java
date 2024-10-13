@@ -222,7 +222,7 @@ public class HttpUtils {
         }
         StringBuilder urlBuilder = new StringBuilder();
         for (Map.Entry<String, String> entry : patterns.entrySet()){
-            urlBuilder.append("&").append(entry.getKey()).append("=").append(patterns.get(entry.getValue()));
+            urlBuilder.append("&").append(entry.getKey()).append("=").append(entry.getValue());
         }
         url = url + "?" + urlBuilder.substring(1);
         return url;

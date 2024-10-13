@@ -12,6 +12,7 @@ import org.wlpiaoyi.framework.utils.http.HttpUtils;
 import org.wlpiaoyi.framework.utils.http.response.Response;
 
 import java.io.IOException;
+import java.util.HashMap;
 import java.util.Map;
 
 
@@ -238,6 +239,9 @@ public class Request<T> implements HttpMessage<T> {
      * <p><b>{@code @author:}</b>wlpiaoyi</p>
      */
     public Request<T> setParam(String name, String value){
+        if(this.params == null){
+            this.params = new HashMap<>();
+        }
         this.params.put(name, value);
         return this;
     }
