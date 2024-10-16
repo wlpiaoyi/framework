@@ -84,7 +84,7 @@ public class SignVerify extends Security{
      */
     public byte[] sign(InputStream dataIn)throws Exception{
         if(ValueUtils.isBlank(this.privateKey)){
-            throw new BusinessException("not have private key, can't sign!");
+            throw new BusinessException("private key is null, can't do sign");
         }
         //用私钥对信息生成数字签名
         Signature signature = SecurityTools.createSignature(this.privateKey, this.keyAlgorithm, this.signatureAlgorithm);
@@ -120,7 +120,7 @@ public class SignVerify extends Security{
      */
     public boolean verify(InputStream dataIn, byte[] signBytes)throws Exception{
         if(ValueUtils.isBlank(this.publicKey)){
-            throw new BusinessException("not have public key, can't verify!");
+            throw new BusinessException("public key is null, can't do verify");
         }
         Signature signature = SecurityTools.createVerifySign(this.publicKey, this.keyAlgorithm, this.signatureAlgorithm);
         int nRead;
