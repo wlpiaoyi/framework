@@ -3,6 +3,7 @@ package org.wlpiaoyi.framework.utils.security;
 import lombok.Getter;
 import lombok.SneakyThrows;
 import org.wlpiaoyi.framework.utils.ValueUtils;
+import org.wlpiaoyi.framework.utils.exception.BusinessException;
 import org.wlpiaoyi.framework.utils.security.condition.ConditionDsa;
 
 import java.io.ByteArrayInputStream;
@@ -54,7 +55,7 @@ public class SignVerify extends Security{
     @SneakyThrows
     @Override
     public SignVerify loadConfig() {
-        if(ValueUtils.isBlank(this.publicKey) || ValueUtils.isBlank(this.privateKey)){
+        if(ValueUtils.isBlank(this.publicKey) && ValueUtils.isBlank(this.privateKey)){
             String[] keys = SecurityTools.intKey(this.keyPairSize, this.keyAlgorithm);
             this.privateKey = keys[0];
             this.publicKey = keys[1];
@@ -82,6 +83,9 @@ public class SignVerify extends Security{
      * @throws Exception
      */
     public byte[] sign(InputStream dataIn)throws Exception{
+        if(ValueUtils.isBlank(this.privateKey)){
+            throw new BusinessException("not have private key, can't sign!");
+        }
         //用私钥对信息生成数字签名
         Signature signature = SecurityTools.createSignature(this.privateKey, this.keyAlgorithm, this.signatureAlgorithm);
         int nRead;
@@ -115,6 +119,9 @@ public class SignVerify extends Security{
      * @throws Exception
      */
     public boolean verify(InputStream dataIn, byte[] signBytes)throws Exception{
+        if(ValueUtils.isBlank(this.publicKey)){
+            throw new BusinessException("not have public key, can't verify!");
+        }
         Signature signature = SecurityTools.createVerifySign(this.publicKey, this.keyAlgorithm, this.signatureAlgorithm);
         int nRead;
         byte[] data = new byte[1024];
