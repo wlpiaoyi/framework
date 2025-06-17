@@ -4,10 +4,12 @@ package org.wlpiaoyi.framework.utils.exception;
 import lombok.Getter;
 
 /**
- * {@code @author:}         wlpiaoyi
- * {@code @description:}    业务异常,可以不用catch
- * {@code @date:}           2022/11/18 18:48
- * {@code @version:}:       1.0
+ * <p<b>{@code @author:}</b>wlpiaoyi</p>
+ * <p><b>{@code @description:}</b>
+ * 业务异常,可以不用catch
+ * </p>
+ * <p><b>{@code @date:}</b>2022/11/18 18:48</p>
+ * <p><b>{@code @version:}</b>1.0</p>
  */
 @Getter
 public class BusinessException extends RuntimeException {
@@ -24,7 +26,7 @@ public class BusinessException extends RuntimeException {
 
     public BusinessException(String message, Throwable throwable, Object... params) {
         super(throwable);
-        this.code = 501;
+        this.code = ErrorDefine.BIZ_BASE_ERROR_CODE;
         this.message = String.format(message, params);
     }
 
@@ -34,10 +36,10 @@ public class BusinessException extends RuntimeException {
         this.message = message;
     }
 
-    public BusinessException(Error error, Throwable cause) {
-        super(error.getMessage(), cause);
-        this.code = error.getCode();
-        this.message = error.getMessage();
+    public BusinessException(ErrorDefine errorDefine, Throwable cause) {
+        super(errorDefine.getMessage(), cause);
+        this.code = errorDefine.getCode();
+        this.message = errorDefine.getMessage();
     }
 
     public BusinessException(int code, String message) {
@@ -46,26 +48,26 @@ public class BusinessException extends RuntimeException {
         this.message = message;
     }
 
-    public BusinessException(Error error) {
-        super(error.getMessage());
-        this.code = error.getCode();
-        this.message = error.getMessage();
+    public BusinessException(ErrorDefine errorDefine) {
+        super(errorDefine.getMessage());
+        this.code = errorDefine.getCode();
+        this.message = errorDefine.getMessage();
     }
 
     public BusinessException(String message, Throwable cause) {
         super(message, cause);
-        this.code = 501;
+        this.code = ErrorDefine.BIZ_BASE_ERROR_CODE;
         this.message = message;
     }
 
     public BusinessException(Throwable throwable) {
         super(throwable);
-        this.code = 501;
+        this.code = ErrorDefine.BIZ_BASE_ERROR_CODE;
     }
 
     public BusinessException(String message) {
         super(message);
-        this.code = 501;
+        this.code = ErrorDefine.BIZ_BASE_ERROR_CODE;
         this.message = message;
     }
 

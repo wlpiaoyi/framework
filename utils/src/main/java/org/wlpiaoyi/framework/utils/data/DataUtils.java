@@ -5,6 +5,8 @@ import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.codec.binary.Hex;
 import org.apache.commons.codec.digest.DigestUtils;
+import org.wlpiaoyi.framework.utils.PatternUtils;
+import org.wlpiaoyi.framework.utils.ValueUtils;
 import org.wlpiaoyi.framework.utils.exception.BusinessException;
 
 import java.io.*;
@@ -328,6 +330,65 @@ public class DataUtils {
         return DigestUtils.sha512Hex(new FileInputStream(file));
     }
 //数据指纹<================================================================
+
+    /**
+     * <p><b>{@code @description:}</b>
+     * Hex字符串转换为byte数组
+     * </p>
+     *
+     * <p><b>@param</b> <b>hexString</b>
+     * {@link String}
+     * </p>
+     *
+     * <p><b>{@code @date:}</b>2025/1/31 12:22</p>
+     * <p><b>{@code @return:}</b>{@link byte[]}</p>
+     * <p><b>{@code @author:}</b>wlpiaoyi</p>
+     */
+    public static byte[] hexToBytes(String hexString) {
+        if(!PatternUtils.isHexadecimal(hexString)){
+            throw new IllegalArgumentException("Must be hex string");
+        }
+        // 确保输入字符串长度为偶数，因为每两个字符代表一个字节
+        if (hexString.length() % 2 != 0) {
+            throw new IllegalArgumentException("Hex string must have an even length");
+        }
+
+        int len = hexString.length();
+        byte[] data = new byte[len / 2];
+
+        for (int i = 0; i < len; i += 2) {
+            // 将每对字符转换为一个字节
+            data[i / 2] = (byte) ((Character.digit(hexString.charAt(i), 16) << 4)
+                    + Character.digit(hexString.charAt(i+1), 16));
+        }
+        return data;
+    }
+    /**
+     * <p><b>{@code @description:}</b>
+     * TODO
+     * </p>
+     * 
+     * <p><b>@param</b> <b>bytes</b>
+     * {@link byte}
+     * </p>
+     *
+     * <p><b>{@code @date:}</b>2025/1/31 12:25</p>
+     * <p><b>{@code @return:}</b>{@link String}</p>
+     * <p><b>{@code @author:}</b>wlpiaoyi</p>
+     */
+    public static String bytesToHex(byte[] bytes) {
+        StringBuilder hexString = new StringBuilder();
+        for (byte b : bytes) {
+            // 将每个字节转换为两个十六进制字符
+            String hex = Integer.toHexString(0xff & b);
+            if (hex.length() == 1) {
+                // 如果结果只有一位，则前面补0
+                hexString.append('0');
+            }
+            hexString.append(hex);
+        }
+        return hexString.toString();
+    }
 
 //base64转码解码================================================================>
     /**

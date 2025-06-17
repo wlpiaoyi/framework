@@ -11,28 +11,89 @@ import org.wlpiaoyi.framework.lab.selenium.for12123.excel.ExcelWriter;
 import org.wlpiaoyi.framework.lab.selenium.utils.WebElementUtils;
 import org.wlpiaoyi.framework.utils.DateUtils;
 import org.wlpiaoyi.framework.utils.ValueUtils;
+import org.wlpiaoyi.framework.utils.data.DataUtils;
 import org.wlpiaoyi.framework.utils.data.ReaderUtils;
 import org.wlpiaoyi.framework.utils.data.WriterUtils;
 import org.wlpiaoyi.framework.utils.exception.BusinessException;
 import org.wlpiaoyi.framework.utils.gson.GsonBuilder;
+import org.wlpiaoyi.framework.utils.security.RsaCipher;
 
 import java.io.File;
 import java.io.FileOutputStream;
+import java.io.IOException;
 import java.io.OutputStream;
+import java.nio.charset.StandardCharsets;
+import java.time.LocalDate;
 import java.util.*;
 
 @Slf4j
 public class BrowserCabgov {
 
-    private final String CONFIG_PATH = System.getProperty("user.dir") + "/config/selenium";
-    private Browser browser;
-    private String cookies = null;
+    private String privateKey = "MIICdQIBADANBgkqhkiG9w0BAQEFAASCAl8wggJbAgEAAoGBAIwgd+H2N2wAAPEHEi8ypKdwaB2I\n" +
+            "ouHQGfI/oXpA8hJFBnq7h/OF/xVm2TN+i5Y4GOCK2TdfgtGa10ed0xwUb13eu6oFtuo1VHCAiSzC\n" +
+            "CbIVutyVysY4l7HvhAJvH1KlHRLRQU4sFNNgdrdYJwSV4hcUU62pgBGIyDFadTetVnW/AgMBAAEC\n" +
+            "gYAziVd+IEe27XNrMl4SRM6BFJr+TbwWUCrSyWtS4uMFLCTba/Bu9Nfh368/vKmLCLvBjd+g+XxM\n" +
+            "KeZGnTnBKJTihnKw4AwqmVN1Sr1RTnXwJ6eNGSitNEqaYhGU4aEwr+714ZkVsVY5v7vTjZJ2hTDr\n" +
+            "ksdZd0llGHG1umy7CYyE0QJBAMVPc6813nJ6rF/v8KQqVfIhO1qChb4BH47zaegMGOS4NYEgdNjK\n" +
+            "YmOIHh47+GvVQj5aTbmPScXZySEJ4Z5eYQ8CQQC1zqzDaPTN4Ts46JfrpNJhUjJOFr/dqAUfifln\n" +
+            "UsGYrPtthviDrMzemnT+hq9HIXRM+fYsWn8QN0/teainakBRAkBYvty0kNElwoFngT9GR3hyuHm+\n" +
+            "wvgutsif/mHDKjXEIgqGsrd7jsPkKqQJS0X4EmqCKxHMhWNUJxmsz4n4NlEHAkA09qR1uNm4MGkk\n" +
+            "Rv4a88Ul/OASx6XVWOFFMtipNP6ZD6ufWLaFBY4ZOz3h+DKPsjtDQX5ppWNmwfZS5CIxw05BAkAn\n" +
+            "HGet1e6kl9bGv+8LXsE2/JHHr97dS52I6xWkdW5yp5/OmV0X90NF4P7Fb5zE870lWG3/orBdRqgp\n" +
+            "4JTodTCj";
+    private String publicKey = "MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQCMIHfh9jdsAADxBxIvMqSncGgdiKLh0BnyP6F6\n" +
+            "QPISRQZ6u4fzhf8VZtkzfouWOBjgitk3X4LRmtdHndMcFG9d3ruqBbbqNVRwgIkswgmyFbrclcrG\n" +
+            "OJex74QCbx9SpR0S0UFOLBTTYHa3WCcEleIXFFOtqYARiMgxWnU3rVZ1vwIDAQAB";
 
-    public BrowserCabgov(){
-        browser = new Browser().setOptionHeadless(false).setUrl("https://sc.122.gov.cn/views/memfyy/violation.html");
+    private int type = 0;
+    private final String CONFIG_PATH = System.getProperty("user.dir") + "/config/selenium";
+    private final Browser browser;
+    private String cookies = null;
+    private Long curDateL = 0L;
+
+    private void loadCurDateValue(){
+        log.info("in. 读取到期配置文件");
+        try {
+            byte[] value = ReaderUtils.loadBytes(new File(CONFIG_PATH + "/cur_date.dat"));
+            RsaCipher cipher = RsaCipher.build(0).setPrivateKey(this.privateKey).setPublicKey(this.publicKey).loadConfig();
+            String dText = new String(
+                    cipher.decrypt(
+                            DataUtils.base64Decode(value)
+                    ),
+                    StandardCharsets.UTF_8
+            );
+            this.curDateL = Long.parseLong(dText);
+        } catch (IOException e) {
+            log.error("读取配置文件错误", e);
+        }
+        log.info("end. 读取到期配置文件");
+    }
+
+    public BrowserCabgov(int type){
+        this.type = type;
+        this.loadCurDateValue();
+        log.warn("charles type:{}", type);
+        browser = new Browser().setOptionHeadless(false).setUrl("https://sc.122.gov.cn/views/memrent/vehlist.html");
 //        this.browser.setOptionHeadless(true);
         this.browser.setOptionLoadimg(true);
-        this.browser.setDriverPath(CONFIG_PATH +"/chromedriver.126.0.v");
+        this.browser.setDriverPath(CONFIG_PATH +"/chromedriver");
+//        Runtime.getRuntime().addShutdownHook(new RTMServer(this.browser));
+        // 添加一个shutdown hook
+        Runtime.getRuntime().addShutdownHook(new Thread(() -> {
+            log.info("检测到程序即将关闭...");
+            log.warn("browser start quit");
+            try {
+                this.browser.getDriver().close();
+            }catch (Exception e){}
+            try {
+                this.browser.getDriver().quit();
+            }catch (Exception e){}
+            try {
+                this.browser.quit();
+            }catch (Exception e){}
+            log.warn("browser quit success");
+        }));
+
     }
     @SneakyThrows
     public boolean start(){
@@ -63,30 +124,36 @@ public class BrowserCabgov {
         String[] args = ReaderUtils.loadString(CONFIG_PATH + "/car_no.txt", null).split("\n");
         log.info("start charles data");
         List<Map<String, String>> itemsList = new ArrayList<>();
+        StringBuffer errorCarNo = new StringBuffer();
+        StringBuffer noItemCarNo = new StringBuffer();
         try{
             for(String arg : args){
                 arg = arg.replaceAll("\r", "");
                 arg = arg.replaceAll("\n", "");
                 log.info(">charles data by car_no:{} ==================>", arg);
                 try{
-                    List<Map<String, String>> items = this.exce(arg);
+                    List<Map<String, String>> items = this.filterItem(arg);
                     log.info("<charles data by car_no:{} {} <==================", arg, items.size());
                     if(ValueUtils.isBlank(items)){
-                        log.info("has no items not write data");
+                        log.info("has no items not write data:{}", arg);
+                        noItemCarNo.append(arg + "\n");
                         continue;
                     }
                     itemsList.addAll(items);
                 }catch (Exception e){
                     log.error("<charles data error by car_no:{} <==================", arg, e);
+                    errorCarNo.append(arg + "\n");
                 }
-                writeExcel(itemsList);
+                writeExcel(itemsList, errorCarNo, noItemCarNo);
             }
+            itemsList.clear();
+            errorCarNo = new StringBuffer();
         }finally {
             try{
                 this.browser.quit();
             }catch (Exception e){};
             try{
-                writeExcel(itemsList);
+                writeExcel(itemsList, errorCarNo, noItemCarNo);
             }catch (Exception e){}
         }
         return true;
@@ -94,22 +161,29 @@ public class BrowserCabgov {
 
 
     @SneakyThrows
-    public void writeExcel(List<Map<String, String>> itemsList){
-        Gson gson = GsonBuilder.gsonDefault();
+    public void writeExcel(List<Map<String, String>> itemsList, StringBuffer errorCarNo, StringBuffer noItemCarNo){
         String fileName = DateUtils.formatDate(new Date(), "YYMMDDHHmmss");
-        WriterUtils.overwrite(new File(CONFIG_PATH + "/" + fileName  + ".txt"), gson.toJson(itemsList).getBytes());
-        OutputStream os = new FileOutputStream(CONFIG_PATH + "/" + fileName + ".xlsx");
-        ExcelWriter.exportData(itemsList).write(os);
-        os.flush();
-        os.close();
+        if(itemsList.size() > 0){
+            Gson gson = GsonBuilder.gsonDefault();
+            WriterUtils.overwrite(new File(CONFIG_PATH + "/" + fileName  + ".txt"), gson.toJson(itemsList).getBytes());
+            OutputStream os = new FileOutputStream(CONFIG_PATH + "/" + fileName + ".xlsx");
+            ExcelWriter.exportData(itemsList).write(os);
+            os.flush();
+            os.close();
+        }
+        if(errorCarNo.length() > 0){
+            WriterUtils.overwrite(new File(CONFIG_PATH + "/errorCarNo" + fileName  + ".txt"), errorCarNo.toString().getBytes());
+        }
+        if(noItemCarNo.length() > 0){
+            WriterUtils.overwrite(new File(CONFIG_PATH + "/noItemCarNo" + fileName  + ".txt"), noItemCarNo.toString().getBytes());
+        }
     }
 
-    List<Map<String, String>> exce(String value){
+    List<Map<String, String>> filterItem(String value){
         List<Map<String, String>> itemsList = new ArrayList<>();
         this.search(value);
         String errorMsg = null;
         int i = 30;
-        i = 30;
         while (i -- > 0){
             try {
                 Thread.sleep(1000);
@@ -146,19 +220,33 @@ public class BrowserCabgov {
                         log.info("========== continue.6:{}", datas.get(6).getText());
                         continue;
                     }
-                    try{
-                        Thread.sleep(500);
-                        log.info("==========> click view.a");
-                        WebElementUtils.click(browser, datas.get(7).findElement(By.xpath("a")));
-                        log.info("==========< click view.a");
-                    }catch (Exception e){
-                        throw e;
+                    if(type == 0){
+                        try{
+                            Thread.sleep(500);
+                            log.info("==========> click view.a");
+                            WebElementUtils.click(browser, datas.get(7).findElement(By.xpath("a")));
+                            log.info("==========< click view.a");
+                        }catch (Exception e){
+                            throw e;
+                        }
+                        Thread.sleep(2000);
+                        i = 30;
+                        Map<String, String> item = this.getDetailInfo();
+                        item.put("状态", WebElementUtils.getValue(datas.get(4)) + "|" + WebElementUtils.getValue(datas.get(6)));
+                        itemsList.add(item);
+                    }else{
+                        Map<String, String> item = new HashMap<>();
+                        item.put("号牌号码", WebElementUtils.getValue(datas.get(0)));
+                        item.put("违法时间", WebElementUtils.getValue(datas.get(1)));
+                        item.put("违法地点", WebElementUtils.getValue(datas.get(2)));
+                        item.put("违法行为", WebElementUtils.getValue(datas.get(3)));
+                        item.put("采集单位", "");
+                        item.put("罚款金额", "");
+                        item.put("记分值", "");
+                        item.put("处理时间", WebElementUtils.getValue(datas.get(5)));
+                        item.put("状态", WebElementUtils.getValue(datas.get(4)) + "|" + WebElementUtils.getValue(datas.get(6)));
+                        itemsList.add(item);
                     }
-                    Thread.sleep(2000);
-                    i = 30;
-                    Map<String, String> item = this.view();
-                    item.put("状态", datas.get(4).getText() + "|" +datas.get(6).getText());
-                    itemsList.add(item);
                 }
                 try{
                     webElement = browser.getDriver().findElement(By.id("mypagination1"));
@@ -244,15 +332,6 @@ public class BrowserCabgov {
             try {
                 Thread.sleep(1000);
                 List<WebElement> webElements = null;
-//                try{
-//                    webElements = browser.getDriver().findElements(By.xpath("/html/body/div"));
-//                }catch (Exception e){}
-//                if(ValueUtils.isBlank(webElements)){
-//                    continue;
-//                }
-//                if(ValueUtils.isBlank(webElements) || webElements.size() < 2){
-//                    continue;
-//                }
                 WebElement webElement = null;
                 try{
                     webElement = browser.getDriver().findElement(By.className("pull-right"));
@@ -301,9 +380,9 @@ public class BrowserCabgov {
                 log.info("==========< click 交通违法查询");
                 Thread.sleep(1000);
                 break;
-            } catch (InterruptedException e) {
+            } catch (Exception e) {
                 e.printStackTrace();
-                throw new RuntimeException(e);
+                errorMsg = e.getMessage();
             }
         }
         if(i <= 0){
@@ -342,7 +421,7 @@ public class BrowserCabgov {
                     WebElementUtils.click(browser, webElements.get(0).findElements(By.className("add-on")).get(0));
                     Thread.sleep(1000);
                 }catch (Exception e){
-                    log.warn("========== not fund 违法查询 ele:{}", "add-on");
+                    log.warn("========== not fund 违法查询开始日期控件 ele:{}", "add-on");
                     continue;
                 }
 
@@ -355,7 +434,30 @@ public class BrowserCabgov {
                 }
 
                 try{
-                    WebElementUtils.click(browser, browser.getDriver().findElements(By.className("datetimepicker-years")).get(0).findElements(By.xpath("table/tbody/tr/td/span")).get(1));
+                    String curYear = DateUtils.formatDate(DateUtils.parseToDate(LocalDate.now().plusYears(-2)), "YYYY");
+                    List<WebElement> eles = browser.getDriver().findElements(By.className("datetimepicker-years")).get(0).findElements(By.xpath("table/tbody/tr/td/span"));
+                    WebElement curEle = null;
+                    for (WebElement ele : eles){
+                        String tag = WebElementUtils.getValue(ele);
+                        if(tag == null || !tag.equals(curYear)){
+                            continue;
+                        }
+                        curEle = ele;
+                        break;
+                    }
+                    if(curEle == null){
+                        for (WebElement ele : eles){
+                            if(!ele.getAttribute("class").contains("active")){
+                                continue;
+                            }
+                            curEle = ele;
+                            break;
+                        }
+                    }
+                    if(curEle == null){
+                        throw new BusinessException("没有找到当年年份按钮");
+                    }
+                    WebElementUtils.click(browser, curEle);
                     Thread.sleep(1000);
                 }catch (Exception e){
                     log.warn("========== not fund 违法查询 ele:{}", "datetimepicker-years");
@@ -363,7 +465,7 @@ public class BrowserCabgov {
                 }
 
                 try{
-                    WebElementUtils.click(browser,browser.getDriver().findElements(By.className("datetimepicker-months")).get(0).findElements(By.xpath("table/tbody/tr/td/span")).get(0));
+                    WebElementUtils.click(browser,browser.getDriver().findElements(By.className("datetimepicker-months")).get(0).findElements(By.xpath("table/tbody/tr/td/span")).get(5));
                     Thread.sleep(1000);
                 }catch (Exception e){
                     log.warn("========== not fund 违法查询 ele:{}", "datetimepicker-months");
@@ -395,6 +497,34 @@ public class BrowserCabgov {
                 }
 
                 try{
+                    WebElementUtils.click(browser, webElements.get(0).findElements(By.className("add-on")).get(1));
+                    Thread.sleep(1000);
+                }catch (Exception e){
+                    log.warn("========== not fund 违法查询结束日期控件 ele:{}", "add-on");
+                    continue;
+                }
+                try{
+                    WebElementUtils.click(browser, browser.getDriver().findElements(By.className("datetimepicker-months")).get(1).findElements(By.className("today")).get(0));
+                    Thread.sleep(1000);
+                }catch (Exception e){
+                    log.warn("========== not fund 违法查询结束日期控件 ele:{}", "tody");
+                    continue;
+                }
+                try{
+                    WebElement enDataInput = webElement.findElement(By.id("endDate2"));
+                    if(enDataInput == null){
+                        System.exit(0);
+                    }
+                    Long endDateL = Long.parseLong(WebElementUtils.getValue(enDataInput).toString());
+                    if(curDateL < endDateL){
+                        System.exit(0);
+                    }
+                }catch (Exception e){
+                    log.warn("========== not fund 违法查询结束日期控件 ele:{}", "tody");
+                    continue;
+                }
+
+                try{
                     WebElementUtils.click(browser, webElements.get(3).findElement(By.xpath("button")));
                     Thread.sleep(1000);
                 }catch (Exception e){
@@ -417,8 +547,8 @@ public class BrowserCabgov {
     }
 
     @SneakyThrows
-    Map<String, String> view(){
-        try{
+    Map<String, String> getDetailInfo() {
+        try {
 
             Map<String, String> itemMap = new HashMap<>();
             String errorMsg = null;
@@ -652,7 +782,7 @@ public class BrowserCabgov {
 //    }
 
     public static void main(String[] args) {
-        BrowserCabgov bc = new BrowserCabgov();
+        BrowserCabgov bc = new BrowserCabgov(args.length) ;
         bc.start();
     }
 }

@@ -35,3 +35,5 @@ openai/azure/target/*
 config/selenium/chromedriver.*
 lab/selenium/target/*
 log/
+config/selenium/chromedriver
+config/selenium/cur_date.dat

@@ -7,6 +7,7 @@
     <!--
     chromedriver download url:
     https://googlechromelabs.github.io/chrome-for-testing/#canary
+    https://googlechromelabs.github.io/chrome-for-testing/known-good-versions-with-downloads.json
     -->
     <parent>
         <groupId>org.wlpiaoyi.framework</groupId>

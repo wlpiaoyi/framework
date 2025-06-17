@@ -75,6 +75,22 @@ public class PatternUtils {
         return Pattern.matches(CHINESE_PATTERN, text);
     }
 
+    /**
+     * <p><b>{@code @description:}</b>
+     * 正则表达式检查字符串是否为16进制格式
+     * </p>
+     *
+     * <p><b>@param</b> <b>s</b>
+     * {@link String}
+     * </p>
+     *
+     * <p><b>{@code @date:}</b>2025/1/31 11:53</p>
+     * <p><b>{@code @return:}</b>{@link boolean}</p>
+     * <p><b>{@code @author:}</b>wlpiaoyi</p>
+     */
+    public static boolean isHexadecimal(String value) {
+        return value != null && value.matches("^[0-9a-fA-F]+$");
+    }
 
 //    public static void main(String[] args) {
 //        String pattern = "^([a-zA-Z0-9]{4,6})$";

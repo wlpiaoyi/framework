@@ -21,7 +21,10 @@ public class BrowserTesGabgov {
     @SneakyThrows
     @Test
     public void test() {
-        BrowserCabgov bc = new BrowserCabgov();
+        for (int i = 0; i < 8; i++) {
+            System.out.println(i);
+        }
+        BrowserCabgov bc = new BrowserCabgov(1);
         bc.start();
     }
 

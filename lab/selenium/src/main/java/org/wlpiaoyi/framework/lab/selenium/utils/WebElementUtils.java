@@ -4,6 +4,7 @@ import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.Keys;
 import org.openqa.selenium.WebElement;
 import org.wlpiaoyi.framework.lab.selenium.Browser;
+import org.wlpiaoyi.framework.utils.ValueUtils;
 
 /**
  * <p><b>{@code @author:}</b>         wlpiaoyi</p>
@@ -53,9 +54,7 @@ public class WebElementUtils {
      */
     public static String getValue(WebElement element){
         String value = element.getText();
-        if(value == null){
-            value = element.getAttribute("value");
-        }
+        if(ValueUtils.isBlank(value)) value = element.getAttribute("value");
         return value;
     }
 

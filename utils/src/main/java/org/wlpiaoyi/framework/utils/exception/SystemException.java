@@ -3,28 +3,42 @@ package org.wlpiaoyi.framework.utils.exception;
 import lombok.Getter;
 
 /**
- * {@code @author:}         wlpiaoyi
- * {@code @description:}    系统异常 必须catch
- * {@code @date:}           2022/11/18 18:48
- * {@code @version:}:       1.0
+ * <p<b>{@code @author:}</b>wlpiaoyi</p>
+ * <p><b>{@code @description:}</b>
+ * 系统异常 需要catch
+ * </p>
+ * <p><b>{@code @date:}</b>2022/11/18 18:48</p>
+ * <p><b>{@code @version:}</b>1.0</p>
  */
 @Getter
 public class SystemException extends Exception{
 
     protected int code;
-
+    
     protected String message;
 
-    public SystemException(String message) {
-        super(message);
-        this.code = 502;
+    public SystemException(int code, String message, Throwable throwable, Object... params) {
+        super(throwable);
+        this.code = code;
+        this.message = String.format(message, params);
+    }
+
+    public SystemException(String message, Throwable throwable, Object... params) {
+        super(throwable);
+        this.code = ErrorDefine.SYS_BASE_ERROR_CODE;
+        this.message = String.format(message, params);
+    }
+
+    public SystemException(int code, String message, Throwable cause) {
+        super(message, cause);
+        this.code = code;
         this.message = message;
     }
 
-    public SystemException(String message, Throwable cause) {
-        super(message, cause);
-        this.code = 502;
-        this.message = message;
+    public SystemException(ErrorDefine errorDefine, Throwable cause) {
+        super(errorDefine.getMessage(), cause);
+        this.code = errorDefine.getCode();
+        this.message = errorDefine.getMessage();
     }
 
     public SystemException(int code, String message) {
@@ -33,9 +47,26 @@ public class SystemException extends Exception{
         this.message = message;
     }
 
-    public SystemException(int code, String message, Throwable cause) {
+    public SystemException(ErrorDefine errorDefine) {
+        super(errorDefine.getMessage());
+        this.code = errorDefine.getCode();
+        this.message = errorDefine.getMessage();
+    }
+
+    public SystemException(String message, Throwable cause) {
         super(message, cause);
-        this.code = code;
+        this.code = ErrorDefine.SYS_BASE_ERROR_CODE;
+        this.message = message;
+    }
+
+    public SystemException(Throwable throwable) {
+        super(throwable);
+        this.code = ErrorDefine.SYS_BASE_ERROR_CODE;
+    }
+
+    public SystemException(String message) {
+        super(message);
+        this.code = ErrorDefine.SYS_BASE_ERROR_CODE;
         this.message = message;
     }
 }

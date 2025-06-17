@@ -23,6 +23,7 @@ public class ExcelWriter {
         CELL_HEADS.add("采集单位");
         CELL_HEADS.add("罚款金额");
         CELL_HEADS.add("记分值");
+        CELL_HEADS.add("处理时间");
         CELL_HEADS.add("状态");
     }
 
