@@ -12,7 +12,7 @@
     <parent>
         <groupId>org.wlpiaoyi.framework</groupId>
         <artifactId>lab</artifactId>
-        <version>1.0.2-BATA-JDK21</version>
+        <version>1.0.2-JDK21</version>
     </parent>
 
     <groupId>org.wlpiaoyi.framework.lab</groupId>
@@ -106,7 +106,7 @@
 <!--                            &lt;!&ndash;运行方式，控制台&ndash;&gt;-->
 <!--                            <headerType>console</headerType>-->
 <!--                            &lt;!&ndash;输出的exe文件&ndash;&gt;-->
-<!--                            <outfile>target/selenium-1.0.2-BATA-JDK21.exe</outfile>-->
+<!--                            <outfile>target/selenium-1.0.2-JDK21.exe</outfile>-->
 <!--                            &lt;!&ndash;输出的jar&ndash;&gt;-->
 <!--                            <jar>${project.build.directory}/${artifactId}-${version}.jar</jar>-->
 <!--                            &lt;!&ndash;错误标题&ndash;&gt;-->
