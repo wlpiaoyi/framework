@@ -25,11 +25,20 @@ public class CodeUtils {
 
         for (int i = 0; i < 12; i++) {
             int index = (int) (Math.random() * 100);
-            index = switch (i) {
-                case 0 -> index % 15 + 1;
-                case 1 -> index % 14 + 2;
-                default -> index % 16;
-            };
+            switch (i) {
+                case 0 : {
+                    index = index % 15 + 1;
+                }
+                break;
+                case 1 : {
+                    index = index % 14 + 2;
+                }
+                break;
+                default : {
+                    index = index % 16;
+                }
+                break;
+            }
             macAddress[i] = ADRS[index];
         }
         return macAddress;

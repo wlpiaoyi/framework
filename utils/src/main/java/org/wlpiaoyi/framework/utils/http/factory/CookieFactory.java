@@ -1,6 +1,5 @@
 package org.wlpiaoyi.framework.utils.http.factory;
 
-import jakarta.annotation.Nullable;
 import lombok.NonNull;
 import org.apache.hc.client5.http.cookie.BasicCookieStore;
 import org.apache.hc.client5.http.cookie.Cookie;

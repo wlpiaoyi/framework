@@ -173,7 +173,7 @@ public class HttpUtils {
             return null;
         }
         String[] patternsStr = url.substring(index).split("&");
-        Map<String, String> patterns = HashMap.newHashMap(patternsStr.length);
+        Map<String, String> patterns = new HashMap(patternsStr.length);
         for (String item : patternsStr){
             String[] args = item.split("=");
             String name = args[0];

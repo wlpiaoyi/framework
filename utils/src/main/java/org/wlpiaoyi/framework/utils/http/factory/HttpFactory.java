@@ -35,7 +35,7 @@ public class HttpFactory {
 
     public static <T> Response<T> handleResponse(ClassicHttpResponse res, Class<T> tClass) throws IOException {
         Header[] hds = res.getHeaders();
-        Map<String, String> headers = HashMap.newHashMap(hds.length);
+        Map<String, String> headers = new HashMap(hds.length);
         for (Header header : hds) {
             headers.put(header.getName(), header.getValue());
         }
@@ -46,25 +46,30 @@ public class HttpFactory {
     public static ClassicHttpRequest getHttpRequest(String executeUrl, Request<?> request) throws UnsupportedEncodingException {
         HttpUriRequestBase httpRequest;
         switch (request.getMethod()){
-            case Get -> {
+            case Get : {
                 httpRequest = new HttpGet(executeUrl);
             }
-            case Put -> {
+            break;
+            case Put : {
                 HttpPut httpPut = new HttpPut(executeUrl);
                 httpPut.setEntity(bodyEntity(request, null, null));
                 httpRequest = httpPut;
             }
-            case Post -> {
+            break;
+            case Post : {
                 HttpPost httpPost = new HttpPost(executeUrl);
                 httpPost.setEntity(bodyEntity(request, null, null));
                 httpRequest = httpPost;
             }
-            case Delete -> {
+            break;
+            case Delete : {
                 httpRequest = new HttpDelete(executeUrl);
             }
-            default -> {
+            break;
+            default : {
                 httpRequest = new HttpPatch(executeUrl);
             }
+            break;
         }
         RequestConfig requestConfig = RequestConfig.custom()
                 .setConnectionRequestTimeout(TIME_OUT_MS, TimeUnit.MILLISECONDS)
@@ -95,8 +100,8 @@ public class HttpFactory {
         byte[] buffer;
         if(request.getBody() == null){
             buffer = null;
-        }else if(request.getBody() instanceof String parameter){
-            buffer = parameter.getBytes(charset);
+        }else if(request.getBody() instanceof String){
+            buffer = ((String) request.getBody()).getBytes(charset);
         }else if(request.getBody() instanceof Map){
             String parameter = GSON.toJson(request.getBody(), Map.class);
             buffer = parameter.getBytes(charset);
