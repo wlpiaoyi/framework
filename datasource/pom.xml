@@ -12,7 +12,7 @@
     <groupId>org.wlpiaoyi.framework</groupId>
     <artifactId>datasource</artifactId>
     <name>${project.artifactId}</name>
-    <version>${fw.project.version}</version>
+    <version>1.0.2-BATA-JDK21</version>
     <packaging>pom</packaging>
     <description>数据库相关</description>
 

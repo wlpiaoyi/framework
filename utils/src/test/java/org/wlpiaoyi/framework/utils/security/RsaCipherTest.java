@@ -56,7 +56,7 @@ public class RsaCipherTest {
         RsaCipher RSACipher = RsaCipher.build(0).setPrivateKey(this.privateKey).setPublicKey(this.publicKey).loadConfig();
         System.out.println("privateKey:\n" + RSACipher.getPrivateKey());
         System.out.println("publicKey:\n" + RSACipher.getPublicKey());
-        String text = "20250810";
+        String text = "20251110";
         System.out.println("text:" + text);
         String eText = new String(
                 DataUtils.base64Encode(
