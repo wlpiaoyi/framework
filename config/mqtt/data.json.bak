@@ -1,0 +1,452 @@
+{
+  "superTemplateId": "CDS-SD-YHZHSD-TDG",
+  "superDeviceId": "CDS-SD-YHZHSD-TDG",
+  "mqtt": {
+    "broker": "tcp://120.46.79.247:1883",
+    "clientId": "CDS-SD-YHZHSD-TDG",
+    "username": "admin",
+    "password": "admin"
+  },
+  "devices": [
+    {
+      "nodeCode": "JHC1-212",
+      "deviceId": "FD-COV-1-1",
+      "models": [
+        {
+          "abilityCode": "covi",
+          "reportProperties": {
+            "vi": 100.1,
+            "no2": 101.2,
+            "co": 103.1
+          }
+        }
+      ]
+    },
+    {
+      "nodeCode": "JHC1-101",
+      "deviceId": "FD-ZSQ-1-3",
+      "models": [
+        {
+          "abilityCode": "laneIndicatorControl",
+          "reportProperties": {
+            "laneIndicator": 6,
+            "backGreenLight": true,
+            "backRedLight": false,
+            "frontGreenLight": true,
+            "frontRedLight": false
+          },
+          "reportEvents": [
+            {
+              "code": "laneIndicatorDisplayError",
+              "data": {
+                "faultStatus": 1,
+                "backGreenLight": false,
+                "backRedLight": false,
+                "frontGreenLight": false,
+                "frontRedLight": false,
+                "eventClassic": 1
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "nodeCode": "JHC7-233",
+      "deviceId": "BDS-JFWSD-1-1",
+      "models": [
+        {
+          "abilityCode": "temperatureHumiditySensor",
+          "reportProperties": {
+            "humidity": 66.88,
+            "temperature": 59.1
+          }
+        }
+      ]
+    },
+    {
+      "nodeCode": "JHC1-402",
+      "deviceId": "CD1-KZX-1-1",
+      "models": [
+        {
+          "abilityCode": "deviceSwitch",
+          "reportProperties": {
+            "workStatus": true
+          }
+        }
+      ]
+    },
+    {
+      "nodeCode": "JHC4-520",
+      "deviceId": "BF-DRP-1-1",
+      "models": [
+        {
+          "abilityCode": "electricTracing",
+          "reportProperties": {
+            "electricTracingSwitch-1": true,
+            "electricTracingSwitch-2": false,
+            "electricTracingSwitch-3": true
+          }
+        }
+      ]
+    },
+    {
+      "nodeCode": "JHC3-4-3",
+      "deviceId": "DF-DRP-1-1",
+      "models": [
+        {
+          "abilityCode": "electricTracing",
+          "reportProperties": {
+            "electricTracingSwitch-1": true,
+            "electricTracingSwitch-2": true,
+            "electricTracingSwitch-3": true
+          }
+        },
+        {
+          "abilityCode": "operationMode",
+          "reportProperties": {
+            "operationMode": true
+          }
+        }
+      ]
+    },
+    {
+      "nodeCode": "JHC4-520",
+      "deviceId": "BF-DRP-1-1",
+      "models": [
+        {
+          "abilityCode": "electricTracing",
+          "reportProperties": {
+            "electricTracingSwitch-1": true,
+            "electricTracingSwitch-2": true,
+            "electricTracingSwitch-3": true
+          }
+        }
+      ]
+    },
+    {
+      "nodeCode": "JHC5-413",
+      "deviceId": "BF-DJSB-2-1",
+      "models": [
+        {
+          "abilityCode": "motorProtector",
+          "reportProperties": {
+            "phaseL1Current": 100.1,
+            "phaseL2Current": 101.2,
+            "phaseL3Current": 103.1,
+            "voltage": 220,
+            "leakageCurrent": 0.1,
+            "leakageAlarmCurrent": 0.2
+          }
+        }
+      ]
+    },
+    {
+      "nodeCode": "JHC5-405",
+      "deviceId": "FD-COV-1-1",
+      "models": [
+        {
+          "abilityCode": "liquidLevelMeter",
+          "reportProperties": {
+            "waterLevel": 100.1,
+            "lowLevelThreshold": 101.2,
+            "highLevelThreshold": 103.1
+          }
+        }
+      ]
+    },
+    {
+      "nodeCode": "JHC5-401",
+      "deviceId": "BF-XBKZ-1-1",
+      "models": [
+        {
+          "abilityCode": "doublePumpControl",
+          "reportProperties": {
+            "pump2Working": true,
+            "pump1Work": true,
+            "pump1FaultDetect": false,
+            "pump2FaultDetect": false
+          }
+        }
+      ]
+    },
+    {
+      "nodeCode": "JHC7-102",
+      "deviceId": "FD-BXB-1-1",
+      "models": [
+        {
+          "abilityCode": "variableMessageBoardControl",
+          "reportProperties": {
+            "currentProgram": {
+              "index": 1,
+              "contentpublishing": "雨天路滑，注意安全",
+              "delay": 5000
+            }
+          }
+        }
+      ]
+    },
+    {
+      "nodeCode": "JHC7-203",
+      "deviceId": "DF-SFJ-1-3",
+      "models": [
+        {
+          "abilityCode": "jetFanControl",
+          "reportProperties": {
+            "workSwitch": 1
+          }
+        }
+      ]
+    },
+    {
+      "nodeCode": "JHC3-202",
+      "deviceId": "DF-WZCG-1-2",
+      "models": [
+        {
+          "abilityCode": "subDeviceAddress",
+          "reportProperties": {
+            "temperature": 150,
+            "temperatureChangeRate": 0.1,
+            "highVibration": 1,
+            "highTemperatureThreshold": 100,
+            "lowTemperatureThreshold": 20,
+            "z_axisWave": 0.1,
+            "x_axisWave": 0.1,
+            "y_axisWave": 0.1
+          }
+        }
+      ]
+    },
+    {
+      "nodeCode": "JHC1-401",
+      "deviceId": "FD-COV-1-1",
+      "models": [
+        {
+          "abilityCode": "shutterControl",
+          "reportProperties": {
+            "shutterWorkstatus": 1,
+            "limitSwitch": 1
+          }
+        }
+      ]
+    },
+    {
+      "nodeCode": "JHC1-402",
+      "deviceId": "CD1-KZX-1-1",
+      "models": [
+        {
+          "abilityCode": "deviceSwitch",
+          "reportProperties": {
+            "workStatus": true
+          }
+        }
+      ]
+    },
+    {
+      "nodeCode": "JHC5-406",
+      "deviceId": "BF-QYGDB-1-1",
+      "models": [
+        {
+          "abilityCode": "electricPressureMeter",
+          "reportProperties": {
+            "status": 2,
+            "lowerLimit": false,
+            "upperLimit": true
+          }
+        }
+      ]
+    },
+    {
+      "nodeCode": "JHC5-412",
+      "deviceId": "BF-DJSB-1-2",
+      "models": [
+        {
+          "abilityCode": "motorProtector",
+          "reportProperties": {
+            "phaseL1Current": 100.1,
+            "phaseL2Current": 101.2,
+            "phaseL3Current": 103.1,
+            "voltage": 220,
+            "leakageCurrent": 0.1,
+            "leakageAlarmCurrent": 0.2
+          }
+        }
+      ]
+    },
+    {
+      "nodeCode": "JdjSgmOC",
+      "deviceId": "BF-WBKZ-1-1",
+      "models": [
+        {
+          "abilityCode": "doublePumpControl",
+          "reportProperties": {
+            "pump1Work": true,
+            "pump2Work": true,
+            "pump1FaultDetect": false,
+            "pump2FaultDetect": false
+          }
+        }
+      ]
+    },
+    {
+      "nodeCode": "JHC1-101",
+      "deviceId": "FD-ZSQ-1-3",
+      "models": [
+        {
+          "abilityCode": "laneIndicatorControl",
+          "reportProperties": {
+            "frontRedLight": false,
+            "frontGreenLight": true,
+            "backRedLight": true,
+            "backGreenLight": false,
+            "laneIndicator": 0
+          }
+        }
+      ]
+    },
+    {
+      "nodeCode": "JHC1-102",
+      "deviceId": "FD-ZSQ-1-2",
+      "models": [
+        {
+          "abilityCode": "laneIndicatorControl",
+          "reportProperties": {
+            "frontRedLight": false,
+            "frontGreenLight": true,
+            "backRedLight": true,
+            "backGreenLight": false,
+            "laneIndicator": 0
+          }
+        }
+      ]
+    },
+    {
+      "nodeCode": "JHC3-107",
+      "deviceId": "DF-ZZSQ-1-1",
+      "models": [
+        {
+          "abilityCode": "laneTurnLeftIndicator",
+          "reportProperties": {
+            "frontRedLight": false,
+            "frontGreenLight": true,
+            "backRedLight": true,
+            "backGreenLight": false,
+            "laneIndicator": 0
+          }
+        }
+      ]
+    },
+    {
+      "nodeCode": "JHC6-103",
+      "deviceId": "DF-XHD-1-1",
+      "models": [
+        {
+          "abilityCode": "trafficSignalLight",
+          "reportProperties": {
+            "leftLight": true,
+            "redLight": false,
+            "yellowLight": false,
+            "greenLight": true
+          }
+        }
+      ]
+    },
+    {
+      "nodeCode": "JHC5-404",
+      "deviceId": "BF-PWB-1-1",
+      "models": [
+        {
+          "abilityCode": "deviceSwitch",
+          "reportProperties": {
+            "workStatus": true
+          }
+        }
+      ]
+    },
+    {
+      "nodeCode": "JHC5-414",
+      "deviceId": "BF-DJSB-2-2",
+      "models": [
+        {
+          "abilityCode": "motorProtector",
+          "reportProperties": {
+            "phaseL1Current": 100.1,
+            "phaseL2Current": 101.2,
+            "phaseL3Current": 103.1,
+            "voltage": 220,
+            "leakageCurrent": 0.1,
+            "leakageAlarmCurrent": 0.2
+          }
+        }
+      ]
+    },
+    {
+      "nodeCode": "JHC5-407",
+      "deviceId": "BF-WSJYW-1-1",
+      "models": [
+        {
+          "abilityCode": "floatingBallUnit",
+          "reportProperties": {
+            "floatingBallLowLevel": true,
+            "floatingBallHighLevel": false,
+            "waterLimitDetection": 100
+          }
+        }
+      ]
+    },
+    {
+      "nodeCode": "JHC7-206",
+      "deviceId": "DF-SFJ-2-3",
+      "models": [
+        {
+          "abilityCode": "operationMode",
+          "reportProperties": {
+            "operationMode": true
+          }
+        },
+        {
+          "abilityCode": "jetFanControl",
+          "reportProperties": {
+            "workSwitch": 1
+          }
+        }
+      ]
+    },
+    {
+      "nodeCode": "JHC3-206",
+      "deviceId": "DF-WZCG-2-3",
+      "models": [
+        {
+          "abilityCode": "temperatureVibrationSensor",
+          "reportProperties": {
+            "temperature": 50,
+            "lowTemperatureThreshold": 40,
+            "highTemperatureThreshold": 80,
+            "highVibration": 0.2,
+            "x_axisWave": 0.1,
+            "y_axisWave": 0.1,
+            "z_axisWave": 0.1
+          }
+        }
+      ]
+    },
+    {
+      "nodeCode": "JHC7-226",
+      "deviceId": "DF-DJBHQ-2-3",
+      "models": [
+        {
+          "abilityCode": "temperatureVibrationSensor",
+          "reportProperties": {
+            "phaseL1Current": 100.1,
+            "phaseL2Current": 101.2,
+            "phaseL3Current": 103.1,
+            "voltage": 220,
+            "leakageCurrent": 0.1,
+            "leakageAlarmCurrent": 0.7,
+            "leakageCurrentMaskValue": 0.2
+          }
+        }
+      ]
+    }
+  ]
+}

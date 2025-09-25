@@ -401,6 +401,25 @@ class ValueParseUtils extends ValueBlankUtils{
         }
     }
 
+    public static Double[] toDoubleArray(String str){
+        return toDoubleArray(",", str);
+    }
+    public static Double[] toDoubleArray(String split, String str) {
+        if (isBlank(str)) {
+            return new Double[0];
+        } else {
+            String[] arr = str.split(split);
+            Double[] longs = new Double[arr.length];
+
+            for(int i = 0; i < arr.length; ++i) {
+                Double v = Double.valueOf(arr[i]);
+                longs[i] = v;
+            }
+
+            return longs;
+        }
+    }
+
     public static String toStrings(Collection values) {
         return toStrings(values, ",");
     }

@@ -1,0 +1,31 @@
+{
+  "superTemplateId": "CDS-SD-YHZHSD-TDG",
+  "superDeviceId": "CDS-SD-YHZHSD-TDG",
+  "mqtt": {
+    "broker": "tcp://120.46.79.247:1883",
+    "clientId": "CDS-SD-YHZHSD-TDG",
+    "username": "admin",
+    "password": "admin"
+  },
+  "devices": [
+    {
+      "nodeCode": "JH_CAR_CHECK_001",
+      "deviceId": "JH-CAR_CHECK_001",
+      "models": [
+        {
+          "abilityCode": "JH-VehicleRadar",
+          "reportProperties": {
+            "heavyNumber": 2,
+            "bigsizeNumber": 5,
+            "midsizeNumber": 8,
+            "carNumber": 23,
+            "averageSpace": 12.7,
+            "laneOccupancy": 20.12,
+            "averageSpeed": 34.8,
+            "trafficVolume": 12
+          }
+        }
+      ]
+    }
+  ]
+}

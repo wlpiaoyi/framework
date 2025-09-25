@@ -3,10 +3,13 @@ package org.wlpiaoyi.framework.utils;
 import com.google.gson.Gson;
 import org.wlpiaoyi.framework.utils.gson.GsonBuilder;
 
+import java.lang.reflect.Array;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.format.DateTimeParseException;
 import java.util.*;
 import java.util.regex.Pattern;
 
@@ -65,46 +68,234 @@ public class MapUtils {
             return  defaultValue;
         }
         String keys[] = keyPath.split("\\.");
-        Map valueMap = map;
+        Object valueData = map;
         int ki = 0;
         int ksl = keys.length;
         for (String key : keys){
             ki ++;
+            if (!(valueData instanceof Map<?,?>)){
+                throw new IllegalArgumentException("valueData is not a Map type: " + valueData.getClass().getName());
+            }
+            int index;
+            if((index = key.indexOf("[")) > 0 && key.endsWith("]")){
+                String k = key.substring(0, index);
+                index = Integer.parseInt(key.substring(index + 1, key.length() - 1));
+                key = k;
+            }else index = -1;
+            if(index > 0){
+                Object value = ((Map) valueData).get(key);
+                if (value == null) {
+                    throw new NullPointerException("Value for key '" + key + "' is null");
+                }
+                if (value instanceof List) {
+                    List<?> list = (List<?>) value;
+                    if (index < 0 || index >= list.size()) {
+                        throw new IndexOutOfBoundsException("Index " + index + " out of bounds for list size " + list.size());
+                    }
+                    valueData = list.get(index);
+                } else if (value instanceof Collection) {
+                    Collection<?> collection = (Collection<?>) value;
+                    if (index < 0 || index >= collection.size()) {
+                        throw new IndexOutOfBoundsException("Index " + index + " out of bounds for collection size " + collection.size());
+                    }
+                    // 转换为List以便通过索引访问
+                    valueData = new ArrayList<>(collection).get(index);
+                } else if (value != null && value.getClass().isArray()) {
+                    int length = Array.getLength(value);
+                    if (index < 0 || index >= length) {
+                        throw new IndexOutOfBoundsException("Index " + index + " out of bounds for array length " + length);
+                    }
+                    valueData = Array.get(value, index);
+                } else if (value instanceof Iterable) {
+                    // 对于其他Iterable类型，转换为List
+                    List<Object> list = new ArrayList<>();
+                    for (Object item : (Iterable<?>) value) {
+                        list.add(item);
+                    }
+                    if (index < 0 || index >= list.size()) {
+                        throw new IndexOutOfBoundsException("Index " + index + " out of bounds for iterable size " + list.size());
+                    }
+                    valueData = list.get(index);
+                } else {
+                    throw new IllegalArgumentException("Value is not a collection or array type: " + value.getClass().getName());
+                }
+            }else {
+                valueData = ((Map) valueData).get(key);
+            }
+            if(valueData == null){
+                return defaultValue;
+            }
             if(ki == ksl){
-                if(clazz == Boolean.class){
-                    return (T) MapUtils.getBoolean(valueMap, key, (Boolean) defaultValue);
+                if (clazz == Boolean.class) {
+                    if (valueData instanceof String) {
+                        valueData = Boolean.valueOf(valueData.toString());
+                    } else if (valueData instanceof Number) {
+                        valueData = ((Number) valueData).intValue() != 0;
+                    } else if (valueData instanceof Boolean) {
+                        // 已经是Boolean类型，无需转换
+                        valueData = (Boolean) valueData;
+                    } else {
+                        throw new IllegalArgumentException("Boolean conversion failed - valueData is not a String, Number or Boolean: " +
+                                (valueData != null ? valueData.getClass().getName() : "null"));
+                    }
+                } else if (clazz == Integer.class) {
+                    if (valueData instanceof Number) {
+                        valueData = ((Number) valueData).intValue();
+                    } else if (valueData instanceof String) {
+                        try {
+                            valueData = Integer.parseInt(valueData.toString().trim());
+                        } catch (NumberFormatException e) {
+                            throw new IllegalArgumentException("Integer conversion failed - invalid string format: " + valueData, e);
+                        }
+                    } else {
+                        throw new IllegalArgumentException("Integer conversion failed - valueData is not a Number or String: " +
+                                (valueData != null ? valueData.getClass().getName() : "null"));
+                    }
+                } else if (clazz == Long.class) {
+                    if (valueData instanceof Number) {
+                        valueData = ((Number) valueData).longValue();
+                    } else if (valueData instanceof String) {
+                        try {
+                            valueData = Long.parseLong(valueData.toString().trim());
+                        } catch (NumberFormatException e) {
+                            throw new IllegalArgumentException("Long conversion failed - invalid string format: " + valueData, e);
+                        }
+                    } else {
+                        throw new IllegalArgumentException("Long conversion failed - valueData is not a Number or String: " +
+                                (valueData != null ? valueData.getClass().getName() : "null"));
+                    }
+                } else if (clazz == Float.class) {
+                    if (valueData instanceof Number) {
+                        valueData = ((Number) valueData).floatValue();
+                    } else if (valueData instanceof String) {
+                        try {
+                            valueData = Float.parseFloat(valueData.toString().trim());
+                        } catch (NumberFormatException e) {
+                            throw new IllegalArgumentException("Float conversion failed - invalid string format: " + valueData, e);
+                        }
+                    } else {
+                        throw new IllegalArgumentException("Float conversion failed - valueData is not a Number or String: " +
+                                (valueData != null ? valueData.getClass().getName() : "null"));
+                    }
+                } else if (clazz == Double.class) {
+                    if (valueData instanceof Number) {
+                        valueData = ((Number) valueData).doubleValue();
+                    } else if (valueData instanceof String) {
+                        try {
+                            valueData = Double.parseDouble(valueData.toString().trim());
+                        } catch (NumberFormatException e) {
+                            throw new IllegalArgumentException("Double conversion failed - invalid string format: " + valueData, e);
+                        }
+                    } else {
+                        throw new IllegalArgumentException("Double conversion failed - valueData is not a Number or String: " +
+                                (valueData != null ? valueData.getClass().getName() : "null"));
+                    }
+                } else if (clazz == String.class) {
+                    valueData = valueData.toString();
+                } else if (clazz == BigDecimal.class) {
+                    if (valueData instanceof Number) {
+                        valueData = BigDecimal.valueOf(((Number) valueData).doubleValue());
+                    } else if (valueData instanceof String) {
+                        try {
+                            valueData = new BigDecimal(valueData.toString().trim());
+                        } catch (NumberFormatException e) {
+                            throw new IllegalArgumentException("BigDecimal conversion failed - invalid string format: " + valueData, e);
+                        }
+                    } else {
+                        throw new IllegalArgumentException("BigDecimal conversion failed - valueData is not a Number or String: " +
+                                (valueData != null ? valueData.getClass().getName() : "null"));
+                    }
+                } else if (clazz == Map.class) {
+                    if (valueData instanceof Map) {
+                        // 已经是Map类型，无需转换
+                        valueData = (Map<?, ?>) valueData;
+                    } else if (valueData instanceof String) {
+                        try {
+                            Gson gson = GsonBuilder.gsonDefault();
+                            // 尝试解析JSON字符串为Map
+                            valueData = gson.fromJson(valueData.toString(), Map.class);
+                        } catch (Exception e) {
+                            throw new IllegalArgumentException("Map conversion failed - invalid JSON string: " + valueData, e);
+                        }
+                    } else {
+                        throw new IllegalArgumentException("Map conversion failed - valueData is not a Map or JSON String: " +
+                                (valueData != null ? valueData.getClass().getName() : "null"));
+                    }
+                } else if (clazz == List.class) {
+                    if (valueData instanceof List) {
+                        // 已经是List类型，无需转换
+                        valueData = (List<?>) valueData;
+                    } else if (valueData instanceof Collection) {
+                        // 其他Collection类型转换为List
+                        valueData = new ArrayList<>((Collection<?>) valueData);
+                    } else if (valueData.getClass().isArray()) {
+                        // 数组转换为List
+                        valueData = Arrays.asList((Object[]) valueData);
+                    } else if (valueData instanceof String) {
+                        try {
+                            Gson gson = GsonBuilder.gsonDefault();
+                            // 尝试解析JSON字符串为Map
+                            valueData = gson.fromJson(valueData.toString(), List.class);
+                        } catch (Exception e) {
+                            throw new IllegalArgumentException("List conversion failed - invalid JSON string: " + valueData, e);
+                        }
+                    } else {
+                        throw new IllegalArgumentException("List conversion failed - valueData is not a Collection, Array or JSON String: " +
+                                (valueData != null ? valueData.getClass().getName() : "null"));
+                    }
+                } else if (clazz == Set.class) {
+                    if (valueData instanceof Set) {
+                        // 已经是Set类型，无需转换
+                        valueData = (Set<?>) valueData;
+                    } else if (valueData instanceof Collection) {
+                        // 其他Collection类型转换为Set
+                        valueData = new HashSet<>((Collection<?>) valueData);
+                    } else if (valueData.getClass().isArray()) {
+                        // 数组转换为Set
+                        valueData = new HashSet<>(Arrays.asList((Object[]) valueData));
+                    } else if (valueData instanceof String) {
+                        try {
+                            Gson gson = GsonBuilder.gsonDefault();
+                            // 尝试解析JSON字符串为Map
+                            valueData = gson.fromJson(valueData.toString(), Set.class);
+                        } catch (Exception e) {
+                            throw new IllegalArgumentException("Set conversion failed - invalid JSON string: " + valueData, e);
+                        }
+                    } else {
+                        throw new IllegalArgumentException("Set conversion failed - valueData is not a Collection, Array or JSON String: " +
+                                (valueData != null ? valueData.getClass().getName() : "null"));
+                    }
+                } else if (clazz == LocalDate.class) {
+                    if (valueData instanceof String) {
+                        try {
+                            valueData = LocalDate.parse(valueData.toString());
+                        } catch (DateTimeParseException e) {
+                            throw new IllegalArgumentException("LocalDate conversion failed - invalid date format: " + valueData, e);
+                        }
+                    } else if (valueData instanceof java.util.Date) {
+                        valueData = ((java.util.Date) valueData).toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
+                    } else {
+                        throw new IllegalArgumentException("LocalDate conversion failed - valueData is not a String or Date: " +
+                                (valueData != null ? valueData.getClass().getName() : "null"));
+                    }
+                } else if (clazz == LocalDateTime.class) {
+                    if (valueData instanceof String) {
+                        try {
+                            valueData = LocalDateTime.parse(valueData.toString());
+                        } catch (DateTimeParseException e) {
+                            throw new IllegalArgumentException("LocalDateTime conversion failed - invalid datetime format: " + valueData, e);
+                        }
+                    } else if (valueData instanceof java.util.Date) {
+                        valueData = ((java.util.Date) valueData).toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime();
+                    } else {
+                        throw new IllegalArgumentException("LocalDateTime conversion failed - valueData is not a String or Date: " +
+                                (valueData != null ? valueData.getClass().getName() : "null"));
+                    }
+                } else {
+                    throw new IllegalArgumentException("Unsupported target type: " + clazz.getName());
                 }
-                if(clazz == Integer.class){
-                    return (T) MapUtils.getInteger(valueMap, key, (Integer) defaultValue);
-                }
-                if(clazz == Long.class){
-                    return (T) MapUtils.getLong(valueMap, key, (Long) defaultValue);
-                }
-                if(clazz == Float.class){
-                    return (T) MapUtils.getFloat(valueMap, key, (Float) defaultValue);
-                }
-                if(clazz == Double.class){
-                    return (T) MapUtils.getDouble(valueMap, key, (Double) defaultValue);
-                }
-                if(clazz == Map.class){
-                    return (T) MapUtils.getMap(valueMap, key, (Map) defaultValue);
-                }
-                if(clazz == List.class){
-                    return (T) MapUtils.getList(valueMap, key, (List) defaultValue);
-                }
-                if(clazz == Set.class){
-                    return (T) MapUtils.getSet(valueMap, key, (Set) defaultValue);
-                }
-                return MapUtils.get(valueMap, key, defaultValue);
+                return (T) valueData;
             }
-            Object value = MapUtils.get(valueMap, key, null);
-            if(value == null){
-                return defaultValue;
-            }
-            if(!(value instanceof Map)){
-                return defaultValue;
-            }
-            valueMap = (Map) value;
         }
         return defaultValue;
     }
@@ -552,12 +743,27 @@ public class MapUtils {
         return items;
     }
 
-//    public static void main(String[] args) {
-//        Map map = new HashMap(){{
-//           put("dateTime", String.valueOf(DateUtils.toTimestamp(LocalDateTime.now())));
-//        }};
-//        LocalDateTime dateTime = MapUtils.getLocalDateTime(map, "dateTime");
-//        MapUtils.checkValueType(map, "dateTime", LocalDateTime.class);
-//        System.out.println();
-//    }
+    public static void main(String[] args) {
+        Map map = new HashMap(){{
+                put("dateTime", String.valueOf(DateUtils.parseToTimestamp(LocalDateTime.now())));
+                put("dict", new HashMap() {{
+                    put("list", new ArrayList() {{
+                        add("1");
+                        add("2");
+                    }});
+                    put("array", new Map[]{new HashMap() {{
+                        put("a", "1");
+                        put("b", "2");
+                    }}, new HashMap() {{
+                        put("a", "3");
+                        put("b", "4");
+                    }} });
+                }});
+            }};
+        LocalDateTime dateTime = MapUtils.getLocalDateTime(map, "dateTime");
+        MapUtils.checkValueType(map, "dateTime", LocalDateTime.class);
+        Integer a =  MapUtils.getValueByKeyPath(map, "dict.list[1]", -1, Integer.class);
+        Integer b =  MapUtils.getValueByKeyPath(map, "dict.array[1].a", -1, Integer.class);
+        System.out.println();
+    }
 }
