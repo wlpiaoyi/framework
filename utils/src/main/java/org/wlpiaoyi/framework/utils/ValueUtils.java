@@ -74,6 +74,19 @@ class ValueParseUtils extends ValueBlankUtils{
 
     final protected static char[] HEX_ARRAY = "0123456789ABCDEF".toCharArray();
 
+    /**
+     * <p><b>{@code @description:}</b>
+     * 字节数组转十六进制字符串
+     * </p>
+     *
+     * <p><b>{@code @param}</b> <b>bytes</b>
+     * {@link byte[]}
+     * </p>
+     *
+     * <p><b>{@code @date:}</b>2025/11/4 15:59</p>
+     * <p><b>{@code @return:}</b>{@link String}</p>
+     * <p><b>{@code @author:}</b>wlpiaoyi</p>
+     */
     public static String bytesToHex(byte[] bytes) {
         char[] hexChars = new char[bytes.length * 2];
         for (int j = 0; j < bytes.length; j++) {
@@ -84,6 +97,23 @@ class ValueParseUtils extends ValueBlankUtils{
         return new String(hexChars);
     }
 
+    /**
+     * <p><b>{@code @description:}</b>
+     * 字节数组转十六进制字符串
+     * </p>
+     *
+     * <p><b>{@code @param}</b> <b>bytes</b>
+     * {@link byte[]}
+     * </p>
+     *
+     * <p><b>{@code @param}</b> <b>startIndex</b>
+     * {@link int}
+     * </p>
+     *
+     * <p><b>{@code @param}</b> <b>len</b>
+     * {@link int}
+     * </p>
+     */
     public static String bytesToHex(byte[] bytes, int startIndex, int len) {
         char[] hexChars = new char[bytes.length * 2];
         for (int j = 0; j < bytes.length; j++) {
@@ -99,16 +129,136 @@ class ValueParseUtils extends ValueBlankUtils{
         }
         return new String(hexChars);
     }
-
-    public static byte[] hexToBytes(String s) {
-        String us = s.toUpperCase(Locale.ROOT);
-        int len = us.length();
-        byte[] b = new byte[len / 2];
-        for (int i = 0; i < len; i += 2) {
-            b[i / 2] = (byte) ((Character.digit(us.charAt(i), 16) << 4) + Character
-                    .digit(us.charAt(i + 1), 16));
+    /**
+     * <p><b>{@code @description:}</b>
+     * 字节数组转二进制字符串
+     * </p>
+     *
+     * <p><b>{@code @param}</b> <b>bytes</b>
+     * {@link byte[]}
+     * </p>
+     *
+     * <p><b>{@code @date:}</b>2025/11/4 15:59</p>
+     * <p><b>{@code @return:}</b>{@link String}</p>
+     * <p><b>{@code @author:}</b>wlpiaoyi</p>
+     */
+    public static String bytesToBin(byte[] bytes) {
+        if (bytes == null || bytes.length == 0) {
+            return "";
         }
-        return b;
+
+        char[] binChars = new char[bytes.length * 8];
+        for (int j = 0; j < bytes.length; j++) {
+            int v = bytes[j] & 0xFF;
+
+            for (int i = 0; i < 8; i++) {
+                int bit = (v >> (7 - i)) & 0x01;
+                binChars[j * 8 + i] = (bit == 1) ? '1' : '0';
+            }
+        }
+
+        return new String(binChars);
+    }
+
+    /**
+     * <p><b>{@code @description:}</b>
+     * 十六进制字符串转字节数组
+     * </p>
+     *
+     * <p><b>{@code @param}</b> <b>s</b>
+     * {@link String}
+     * </p>
+     *
+     * <p><b>{@code @date:}</b>2025/11/4 15:59</p>
+     * <p><b>{@code @return:}</b>{@link byte[]}</p>
+     * <p><b>{@code @author:}</b>wlpiaoyi</p>
+     */
+    public static byte[] hexToBytes(String s) {
+        if (s == null || s.isEmpty()) {
+            return new byte[0];
+        }
+
+        // 去除可能的 "0x" 前缀
+        String hexString = s.startsWith("0x") ? s.substring(2) : s;
+
+        // 确保十六进制字符串长度为偶数
+        if (hexString.length() % 2 != 0) {
+            hexString = "0" + hexString;
+        }
+
+        int len = hexString.length();
+        byte[] data = new byte[len / 2];
+
+        for (int i = 0; i < len; i += 2) {
+            // 每两个字符转换为一个字节
+            int high = Character.digit(hexString.charAt(i), 16);
+            int low = Character.digit(hexString.charAt(i + 1), 16);
+
+            if (high == -1 || low == -1) {
+                throw new IllegalArgumentException("无效的十六进制字符串: " + s);
+            }
+
+            data[i / 2] = (byte) ((high << 4) + low);
+        }
+
+        return data;
+    }
+
+    /**
+     * <p><b>{@code @description:}</b>
+     * 二进制字符串转字节数组
+     * </p>
+     *
+     * <p><b>{@code @param}</b> <b>s</b>
+     * {@link String}
+     * </p>
+     *
+     * <p><b>{@code @date:}</b>2025/11/4 15:59</p>
+     * <p><b>{@code @return:}</b>{@link byte[]}</p>
+     * <p><b>{@code @author:}</b>wlpiaoyi</p>
+     */
+    public static byte[] binToBytes(String s) {
+        if (s == null || s.isEmpty()) {
+            return new byte[0];
+        }
+
+        // 去除可能的 "0b" 前缀
+        String binString = s.startsWith("0b") ? s.substring(2) : s;
+
+        if (binString.isEmpty()) {
+            return new byte[0];
+        }
+
+        // 验证二进制字符串（只包含0和1）
+        if (!binString.matches("[01]+")) {
+            throw new IllegalArgumentException("无效的二进制字符串: " + s);
+        }
+
+        // 补齐到8的倍数（一个字节8位）
+        int padding = (8 - binString.length() % 8) % 8;
+        StringBuilder paddedBuilder = new StringBuilder();
+        for (int i = 0; i < padding; i++) {
+            paddedBuilder.append('0');
+        }
+        paddedBuilder.append(binString);
+        String paddedString = paddedBuilder.toString();
+
+        int len = paddedString.length();
+        byte[] data = new byte[len / 8];
+
+        for (int i = 0; i < len; i += 8) {
+            byte b = 0;
+            // 每8个二进制位转换为一个字节
+            for (int j = 0; j < 8; j++) {
+                char c = paddedString.charAt(i + j);
+                if (c == '1') {
+                    b |= (1 << (7 - j));  // 设置对应位
+                }
+            }
+            data[i / 8] = b;
+        }
+
+        return data;
     }
 
     /**
