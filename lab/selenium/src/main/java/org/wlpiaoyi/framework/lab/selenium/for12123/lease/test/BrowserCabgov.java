@@ -1,4 +1,4 @@
-package org.wlpiaoyi.framework.lab.selenium.for12123.violate.test;
+package org.wlpiaoyi.framework.lab.selenium.for12123.lease.test;
 
 import com.google.gson.Gson;
 import lombok.SneakyThrows;
@@ -6,8 +6,9 @@ import lombok.extern.slf4j.Slf4j;
 import org.openqa.selenium.By;
 import org.openqa.selenium.Cookie;
 import org.openqa.selenium.WebElement;
+import org.openqa.selenium.support.ui.Select;
 import org.wlpiaoyi.framework.lab.selenium.Browser;
-import org.wlpiaoyi.framework.lab.selenium.for12123.violate.excel.ExcelWriter;
+import org.wlpiaoyi.framework.lab.selenium.for12123.lease.excel.ExcelWriter;
 import org.wlpiaoyi.framework.lab.selenium.utils.WebElementUtils;
 import org.wlpiaoyi.framework.utils.DateUtils;
 import org.wlpiaoyi.framework.utils.ValueUtils;
@@ -331,10 +332,16 @@ public class BrowserCabgov {
         while (i-- > 0){
             try {
                 Thread.sleep(1000);
-                List<WebElement> webElements = null;
                 WebElement webElement = null;
                 try{
-                    webElement = browser.getDriver().findElement(By.className("pull-right"));
+                    webElement = browser.getDriver().findElement(By.id("hello"));
+                }catch (Exception e){}
+                if(webElement == null){
+                    log.warn("========== not fund 请选择服务类型base ele:{}", "hello");
+                    continue;
+                }
+                try{
+                    webElement = webElement.findElement(By.className("pull-right"));
                 }catch (Exception e){}
                 if(webElement == null){
                     log.warn("========== not fund 请选择服务类型 ele:{}", "pull-right");
@@ -345,16 +352,6 @@ public class BrowserCabgov {
                 }catch (Exception e){}
                 if(webElement == null){
                     log.warn("========== not fund 请选择服务类型 ele:{}", "select");
-                    continue;
-                }
-                try{
-                    webElements = webElement.findElements(By.xpath("option"));
-                }catch (Exception e){}
-                if(ValueUtils.isBlank(webElements)){
-                    log.warn("========== not fund 请选择服务类型 ele:{}", "option");
-                    continue;
-                }
-                if(ValueUtils.isBlank(webElements) || webElements.size() < 1){
                     continue;
                 }
 
@@ -371,13 +368,11 @@ public class BrowserCabgov {
                         }catch (Exception e){}
                     }
                 }
-                log.info("==========> click 请选择服务类型:{}", "非营运机动车信息服务");
-                WebElementUtils.click(browser, webElements.get(0));
-                log.info("==========< click 请选择服务类型:{}", "非营运机动车信息服务");
+                new Select(webElement).selectByIndex(1);
+                log.info("==========< click 请选择服务类型:{}", "业务办理");
                 Thread.sleep(1000);
-                log.info("==========> click 交通违法查询");
-                WebElementUtils.click(browser, browser.getDriver().findElement(By.id("sidebar_menu_5")));
-                log.info("==========< click 交通违法查询");
+                WebElementUtils.click(browser, browser.getDriver().findElement(By.id("sidebar_menu_93")));
+                log.info("==========< click 租赁合同");
                 Thread.sleep(1000);
                 break;
             } catch (Exception e) {

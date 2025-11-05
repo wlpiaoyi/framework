@@ -78,7 +78,7 @@
                     <archive>
                         <manifest>
                             <!--换成自己的主类-->
-                            <mainClass>org.wlpiaoyi.framework.lab.selenium.for12123.test.BrowserCabgov</mainClass>
+                            <mainClass>org.wlpiaoyi.framework.lab.selenium.for12123.violate.test.BrowserCabgov</mainClass>
                         </manifest>
                     </archive>
                 </configuration>
@@ -113,7 +113,7 @@
 <!--                            <errTitle>cmd</errTitle>-->
 <!--                            <classPath>-->
 <!--                                &lt;!&ndash;换成自己的主类&ndash;&gt;-->
-<!--                                <mainClass>org.wlpiaoyi.framework.lab.selenium.for12123.test.BrowserCabgov</mainClass>-->
+<!--                                <mainClass>test.org.wlpiaoyi.framework.lab.selenium.for12123.violate.BrowserCabgov</mainClass>-->
 <!--                                <addDependencies>true</addDependencies>-->
 <!--                                <preCp>anything</preCp>-->
 <!--                            </classPath>-->

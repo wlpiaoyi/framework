@@ -1,4 +1,4 @@
-package org.wlpiaoyi.framework.lab.selenium.for12123.test;
+package org.wlpiaoyi.framework.lab.selenium.for12123.violate.test;
 
 import lombok.SneakyThrows;
 import org.junit.After;
