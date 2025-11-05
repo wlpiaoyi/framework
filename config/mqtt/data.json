@@ -2,28 +2,52 @@
   "superTemplateId": "CDS-SD-YHZHSD-TDG",
   "superDeviceId": "CDS-SD-YHZHSD-TDG",
   "mqtt": {
-    "broker": "tcp://120.46.79.247:1883",
+    "broker": "tcp://aiggit.com:30015",
     "clientId": "CDS-SD-YHZHSD-TDG",
     "username": "admin",
     "password": "admin"
   },
   "devices": [
     {
-      "nodeCode": "JH_CAR_CHECK_001",
-      "deviceId": "JH-CAR_CHECK_001",
+      "nodeCode": "JHC1-212",
+      "deviceId": "FD-COV-1-1",
       "models": [
         {
-          "abilityCode": "JH-VehicleRadar",
+          "abilityCode": "covi",
           "reportProperties": {
-            "heavyNumber": 2,
-            "bigsizeNumber": 5,
-            "midsizeNumber": 8,
-            "carNumber": 23,
-            "averageSpace": 12.7,
-            "laneOccupancy": 20.12,
-            "averageSpeed": 34.8,
-            "trafficVolume": 12
+            "vi": 100.1,
+            "no2": 101.2,
+            "co": 103.1
           }
+        }
+      ]
+    },
+    {
+      "nodeCode": "JHC1-101",
+      "deviceId": "FD-ZSQ-1-3",
+      "models": [
+        {
+          "abilityCode": "laneIndicatorControl",
+          "reportProperties": {
+            "laneIndicator": 6,
+            "backGreenLight": true,
+            "backRedLight": false,
+            "frontGreenLight": true,
+            "frontRedLight": false
+          },
+          "reportEvents": [
+            {
+              "code": "laneIndicatorDisplayError",
+              "data": {
+                "faultStatus": 1,
+                "backGreenLight": false,
+                "backRedLight": false,
+                "frontGreenLight": false,
+                "frontRedLight": false,
+                "eventClassic": 1
+              }
+            }
+          ]
         }
       ]
     }
