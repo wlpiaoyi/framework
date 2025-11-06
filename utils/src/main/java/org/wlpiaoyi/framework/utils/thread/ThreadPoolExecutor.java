@@ -1,9 +1,12 @@
 package org.wlpiaoyi.framework.utils.thread;
 
+import org.wlpiaoyi.framework.utils.ValueUtils;
+
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicLong;
+import java.util.concurrent.atomic.AtomicStampedReference;
 
 /**
  * <p><b>{@code @author:}</b>         wlpiaoyi</p>
@@ -19,7 +22,7 @@ public class ThreadPoolExecutor {
     private final java.util.concurrent.ThreadPoolExecutor threadPool;
 
     /** 任务ID与Future的映射关系，用于任务管理 */
-    private final Map<Long, Future<?>> futureMap = new ConcurrentHashMap<>();
+    private final Map<String, Future<?>> futureMap = new ConcurrentHashMap<>();
 
     /**
      * <p><b>{@code @description:}</b>
@@ -93,9 +96,9 @@ public class ThreadPoolExecutor {
      * <p><b>{@code @throws}</b> <b>RuntimeException</b> 当taskId为0时抛出异常</p>
      */
     public <P, R> Future<R> submit(TaskParams taskParams, Runnable<P, R> runnable, P param) {
-        long taskId = taskParams.getTaskId();
-        if(taskId == 0){
-            throw new RuntimeException("taskId can not be 0");
+        String taskId = taskParams.getTaskId();
+        if(ValueUtils.isBlank(taskId)){
+            throw new RuntimeException("taskId can not be empty");
         }
         // 如果存在相同taskId的未完成任务，先取消
         if(futureMap.containsKey(taskId)){
@@ -107,17 +110,17 @@ public class ThreadPoolExecutor {
                 futureMap.remove(taskId);
             }
         }
-        final AtomicLong atomicTaskId = new AtomicLong(taskId);
+        final String[] atomicTaskId = new String[]{taskId};
         // 提交任务，并设置完成回调
         Future<R> future = this.pSubmit(runnable, param, taskParams, tId -> {
             synchronized (atomicTaskId){
-                atomicTaskId.set(0);
+                atomicTaskId[0] = null;
                 futureMap.remove(tId);
             }
         });
         // 将任务添加到管理映射中
         synchronized (atomicTaskId){
-            if(atomicTaskId.get() != 0){
+            if(ValueUtils.isNotBlank(atomicTaskId[0])){
                 futureMap.put(taskId, future);
             }
         }
@@ -246,7 +249,7 @@ public class ThreadPoolExecutor {
      *
      * <p><b>{@code @return:}</b>{@link boolean} true-取消成功，false-任务不存在或已完成</p>
      */
-    public boolean cancelTask(long taskId) {
+    public boolean cancelTask(String taskId) {
         Future<?> future = futureMap.get(taskId);
         if (future != null && !future.isDone()) {
             boolean cancelled = future.cancel(true);
@@ -285,10 +288,10 @@ public class ThreadPoolExecutor {
          * </p>
          *
          * <p><b>{@code @param}</b> <b>taskId</b>
-         * {@link long} 任务ID
+         * {@link String} 任务ID
          * </p>
          */
-        void run(long taskId);
+        void run(String taskId);
     }
 
     /**
@@ -354,7 +357,7 @@ public class ThreadPoolExecutor {
         public R call() throws Exception {
             // 如果没有任务参数，直接执行任务
             if(this.taskParams == null){
-                return this.runnable.run(0L, this.param);
+                return this.runnable.run(null, this.param);
             }
             try {
                 // 如果设置了延迟执行时间，先休眠

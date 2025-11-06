@@ -7,10 +7,8 @@ import org.junit.Test;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
-import java.util.Optional;
 import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicInteger;
-import java.util.concurrent.atomic.AtomicLong;
 
 import static org.junit.Assert.*;
 
@@ -91,7 +89,7 @@ public class ThreadPoolExecutorTest {
         };
 
         TaskParams taskParams = TaskParams.builder()
-                .taskId(1001L)
+                .taskId("1001")
                 .durationSecond(1) // 延迟1秒执行
                 .build();
 
@@ -172,12 +170,10 @@ public class ThreadPoolExecutorTest {
     public void testTaskCancellation() throws Exception {
         log("=== 开始测试任务取消功能 ===");
 
-        AtomicLong runningTaskId = new AtomicLong(0);
         CountDownLatch taskStarted = new CountDownLatch(1);
         CountDownLatch taskCancelled = new CountDownLatch(1);
 
         Runnable<String, String> longRunningTask = (taskId, param) -> {
-            runningTaskId.set(taskId);
             log("长时任务[" + taskId + "]开始执行，参数: " + param);
             taskStarted.countDown();
             try {
@@ -193,7 +189,7 @@ public class ThreadPoolExecutorTest {
         };
 
         TaskParams taskParams = TaskParams.builder()
-                .taskId(2001L)
+                .taskId("2001")
                 .durationSecond(0)
                 .build();
 
@@ -209,7 +205,7 @@ public class ThreadPoolExecutorTest {
         log("任务已开始执行，准备取消任务...");
 
         long cancelStartTime = System.currentTimeMillis();
-        boolean cancelled = threadPool.cancelTask(2001L);
+        boolean cancelled = threadPool.cancelTask("2001");
         long cancelEndTime = System.currentTimeMillis();
 
         log("取消操作完成，结果: " + cancelled + ", 耗时: " + (cancelEndTime - cancelStartTime) + "ms");
@@ -229,13 +225,13 @@ public class ThreadPoolExecutorTest {
     public void testTaskIdManagement() throws Exception {
         log("=== 开始测试任务ID管理功能 ===");
 
-        AtomicLong executedTaskId = new AtomicLong(0);
+        String[] executedTaskId = new String[]{null};
         CountDownLatch firstTaskStarted = new CountDownLatch(1);
         CountDownLatch firstTaskBlocked = new CountDownLatch(1);
 
-        Runnable<String, Long> task = (taskId, param) -> {
-            executedTaskId.set(taskId);
-            if (taskId == 3001L && firstTaskStarted.getCount() > 0) {
+        Runnable<String, String> task = (taskId, param) -> {
+            executedTaskId[0] = taskId;
+            if ("3001".equals(taskId) && firstTaskStarted.getCount() > 0) {
                 log("第一个任务开始执行");
                 firstTaskStarted.countDown();
                 try {
@@ -253,27 +249,27 @@ public class ThreadPoolExecutorTest {
         };
 
         // 提交相同taskId的任务，前一个应该被取消
-        TaskParams params1 = TaskParams.builder().taskId(3001L).durationSecond(0).build();
-        TaskParams params2 = TaskParams.builder().taskId(3001L).durationSecond(0).build();
+        TaskParams params1 = TaskParams.builder().taskId("3001").durationSecond(0).build();
+        TaskParams params2 = TaskParams.builder().taskId("3001").durationSecond(0).build();
 
         log("提交第一个任务，taskId: " + params1.getTaskId());
-        Future<Long> future1 = threadPool.submit(params1, task, "first");
+        Future<String> future1 = threadPool.submit(params1, task, "first");
 
         // 等待第一个任务开始
         assertTrue("第一个任务应该启动", firstTaskStarted.await(2, TimeUnit.SECONDS));
         Thread.sleep(100);
 
         log("提交第二个相同taskId的任务，预期第一个任务会被取消");
-        Future<Long> future2 = threadPool.submit(params2, task, "second");
+        Future<String> future2 = threadPool.submit(params2, task, "second");
 
-        Long result = future2.get(5, TimeUnit.SECONDS);
+        String result = future2.get(5, TimeUnit.SECONDS);
         log("第二个任务执行完成，结果: " + result);
 
         // 释放第一个任务的阻塞
         firstTaskBlocked.countDown();
 
-        assertEquals(Long.valueOf(3001L), result);
-        assertEquals(3001L, executedTaskId.get());
+        assertEquals("3001", result);
+        assertEquals("3001", executedTaskId[0]);
 
         // 第一个任务应该被取消
         assertTrue("第一个任务应该完成", future1.isDone());
@@ -285,7 +281,7 @@ public class ThreadPoolExecutorTest {
         log("=== 开始测试无效任务ID ===");
 
         TaskParams invalidParams = TaskParams.builder()
-                .taskId(0L) // 无效的taskId
+                .taskId("") // 无效的taskId
                 .durationSecond(0)
                 .build();
 

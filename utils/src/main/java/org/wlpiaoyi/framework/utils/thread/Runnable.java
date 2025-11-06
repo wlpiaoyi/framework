@@ -19,7 +19,7 @@ public interface Runnable<P,R> {
      * </p>
      *
      * <p><b>{@code @param}</b> <b>taskId</b>
-     * {@link Long} 任务唯一标识符
+     * {@link String} 任务唯一标识符
      * <ul>
      *   <li>当使用{@link TaskParams}提交任务时，为实际的任务ID</li>
      *   <li>当使用简单提交方式时，为0L</li>
@@ -61,5 +61,5 @@ public interface Runnable<P,R> {
      * }</pre>
      * </p>
      */
-    R run(Long taskId, P param) throws Exception;
+    R run(String taskId, P param) throws Exception;
 }

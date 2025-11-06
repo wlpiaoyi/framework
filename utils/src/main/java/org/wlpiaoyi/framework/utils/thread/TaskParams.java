@@ -22,7 +22,7 @@ public class TaskParams {
      * 不能为0，确保任务的可识别性
      * </p>
      */
-    private long taskId;
+    private String taskId;
 
     /**
      * <p><b>{@code @description:}</b>
