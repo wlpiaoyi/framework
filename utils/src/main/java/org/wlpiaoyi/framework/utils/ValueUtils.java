@@ -37,7 +37,7 @@ class ValueEqualsUtils extends ValueParseUtils{
             if (o1.equals(o2)) {
                 return true;
             } else {
-                return o1.getClass().isArray() && o2.getClass().isArray() ? arrayEquals(o1, o2) : false;
+                return o1.getClass().isArray() && o2.getClass().isArray() && arrayEquals(o1, o2);
             }
         } else {
             return false;
@@ -61,7 +61,7 @@ class ValueEqualsUtils extends ValueParseUtils{
         } else if (o1 instanceof long[] && o2 instanceof long[]) {
             return Arrays.equals((long[])o1, (long[])o2);
         } else {
-            return o1 instanceof short[] && o2 instanceof short[] ? Arrays.equals((short[])o1, (short[])o2) : false;
+            return o1 instanceof short[] && o2 instanceof short[] && Arrays.equals((short[]) o1, (short[]) o2);
         }
     }
 }
@@ -94,7 +94,7 @@ class ValueParseUtils extends ValueBlankUtils{
             hexChars[j * 2] = HEX_ARRAY[v >>> 4];
             hexChars[j * 2 + 1] = HEX_ARRAY[v & 0x0F];
         }
-        return new String(hexChars);
+        return "0x" + new String(hexChars);
     }
 
     /**
@@ -127,7 +127,7 @@ class ValueParseUtils extends ValueBlankUtils{
             hexChars[j * 2] = HEX_ARRAY[v >>> 4];
             hexChars[j * 2 + 1] = HEX_ARRAY[v & 0x0F];
         }
-        return new String(hexChars);
+        return "0x" + new String(hexChars);
     }
     /**
      * <p><b>{@code @description:}</b>
@@ -157,7 +157,7 @@ class ValueParseUtils extends ValueBlankUtils{
             }
         }
 
-        return new String(binChars);
+        return "0b" + new String(binChars);
     }
 
     /**
