@@ -434,7 +434,7 @@ public class BrowserCabgov {
                 }
 
                 try{
-                    String curYear = DateUtils.formatDate(DateUtils.parseToDate(LocalDate.now().plusYears(-2)), "YYYY");
+                    String curYear = DateUtils.formatDate(DateUtils.parseToDate(LocalDate.now().plusYears(-1)), "YYYY");
                     List<WebElement> eles = browser.getDriver().findElements(By.className("datetimepicker-years")).get(0).findElements(By.xpath("table/tbody/tr/td/span"));
                     WebElement curEle = null;
                     for (WebElement ele : eles){

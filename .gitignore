@@ -37,3 +37,4 @@ lab/selenium/target/*
 log/
 config/selenium/chromedriver
 config/selenium/cur_date.dat
+lab/space/target/*
