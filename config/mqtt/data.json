@@ -2,7 +2,7 @@
   "superTemplateId": "CDS-SD-YHZHSD-TDG",
   "superDeviceId": "CDS-SD-YHZHSD-TDG",
   "mqtt": {
-    "broker": "tcp://120.46.79.247:1883",
+    "broker": "tcp://10.28.136.215:1883",
     "clientId": "CDS-SD-YHZHSD-TDG",
     "username": "admin",
     "password": "admin"
@@ -10,20 +10,30 @@
   "devices": [
     {
       "nodeCode": "JH_CAR_CHECK_001",
-      "deviceId": "JH-CAR_CHECK_001",
+      "deviceId": "p-test-leida-cjc",
       "models": [
         {
           "abilityCode": "JH-VehicleRadar",
           "reportProperties": {
-            "heavyNumber": 2,
-            "bigsizeNumber": 5,
-            "midsizeNumber": 8,
-            "carNumber": 23,
-            "averageSpace": 12.7,
-            "laneOccupancy": 20.12,
-            "averageSpeed": 34.8,
-            "trafficVolume": 12
+            "trafficVolume": 6
           }
+        }
+      ]
+    },
+    {
+      "nodeCode": "JHC4-505",
+      "deviceId": "FD-QXJ-7-1",
+      "models": [
+        {
+          "abilityCode": "JH-AI-RECOGNITION",
+          "reportEvents": [
+            {
+              "code": "traffic_flow_detect_event",
+              "data": {
+                "traffic_flow_number": 6
+              }
+            }
+          ]
         }
       ]
     }

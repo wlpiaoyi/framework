@@ -5,6 +5,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
+import org.wlpiaoyi.framework.utils.ValueUtils;
 import org.wlpiaoyi.framework.utils.encrypt.rsa.Coder;
 
 import java.io.File;
@@ -27,6 +28,10 @@ public class CoderTest {
 
     @Test
     public void encryptMD5() throws Exception {
+        ValueUtils.bytesToBin(ValueUtils.toBytes(0b10001010101010101010));
+        ValueUtils.bytesToHex(ValueUtils.toBytes(0xFFAACC));
+        ValueUtils.toLong(ValueUtils.hexToBytes("0xFF"));
+        ValueUtils.toLong(ValueUtils.binToBytes("0b10001010101010101010"));
         String path = DataUtils.USER_DIR + "/target/test/reader.txt";
         File file = new File(path);
         FileInputStream fileIO = new FileInputStream(file);

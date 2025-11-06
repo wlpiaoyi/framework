@@ -1,0 +1,783 @@
+package org.wlpiaoyi.framework.lab.selenium.for12123.lease.test;
+
+import com.google.gson.Gson;
+import lombok.SneakyThrows;
+import lombok.extern.slf4j.Slf4j;
+import org.openqa.selenium.By;
+import org.openqa.selenium.Cookie;
+import org.openqa.selenium.WebElement;
+import org.openqa.selenium.support.ui.Select;
+import org.wlpiaoyi.framework.lab.selenium.Browser;
+import org.wlpiaoyi.framework.lab.selenium.for12123.lease.excel.ExcelWriter;
+import org.wlpiaoyi.framework.lab.selenium.utils.WebElementUtils;
+import org.wlpiaoyi.framework.utils.DateUtils;
+import org.wlpiaoyi.framework.utils.ValueUtils;
+import org.wlpiaoyi.framework.utils.data.DataUtils;
+import org.wlpiaoyi.framework.utils.data.ReaderUtils;
+import org.wlpiaoyi.framework.utils.data.WriterUtils;
+import org.wlpiaoyi.framework.utils.exception.BusinessException;
+import org.wlpiaoyi.framework.utils.gson.GsonBuilder;
+import org.wlpiaoyi.framework.utils.security.RsaCipher;
+
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.OutputStream;
+import java.nio.charset.StandardCharsets;
+import java.time.LocalDate;
+import java.util.*;
+
+@Slf4j
+public class BrowserCabgov {
+
+    private String privateKey = "MIICdQIBADANBgkqhkiG9w0BAQEFAASCAl8wggJbAgEAAoGBAIwgd+H2N2wAAPEHEi8ypKdwaB2I\n" +
+            "ouHQGfI/oXpA8hJFBnq7h/OF/xVm2TN+i5Y4GOCK2TdfgtGa10ed0xwUb13eu6oFtuo1VHCAiSzC\n" +
+            "CbIVutyVysY4l7HvhAJvH1KlHRLRQU4sFNNgdrdYJwSV4hcUU62pgBGIyDFadTetVnW/AgMBAAEC\n" +
+            "gYAziVd+IEe27XNrMl4SRM6BFJr+TbwWUCrSyWtS4uMFLCTba/Bu9Nfh368/vKmLCLvBjd+g+XxM\n" +
+            "KeZGnTnBKJTihnKw4AwqmVN1Sr1RTnXwJ6eNGSitNEqaYhGU4aEwr+714ZkVsVY5v7vTjZJ2hTDr\n" +
+            "ksdZd0llGHG1umy7CYyE0QJBAMVPc6813nJ6rF/v8KQqVfIhO1qChb4BH47zaegMGOS4NYEgdNjK\n" +
+            "YmOIHh47+GvVQj5aTbmPScXZySEJ4Z5eYQ8CQQC1zqzDaPTN4Ts46JfrpNJhUjJOFr/dqAUfifln\n" +
+            "UsGYrPtthviDrMzemnT+hq9HIXRM+fYsWn8QN0/teainakBRAkBYvty0kNElwoFngT9GR3hyuHm+\n" +
+            "wvgutsif/mHDKjXEIgqGsrd7jsPkKqQJS0X4EmqCKxHMhWNUJxmsz4n4NlEHAkA09qR1uNm4MGkk\n" +
+            "Rv4a88Ul/OASx6XVWOFFMtipNP6ZD6ufWLaFBY4ZOz3h+DKPsjtDQX5ppWNmwfZS5CIxw05BAkAn\n" +
+            "HGet1e6kl9bGv+8LXsE2/JHHr97dS52I6xWkdW5yp5/OmV0X90NF4P7Fb5zE870lWG3/orBdRqgp\n" +
+            "4JTodTCj";
+    private String publicKey = "MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQCMIHfh9jdsAADxBxIvMqSncGgdiKLh0BnyP6F6\n" +
+            "QPISRQZ6u4fzhf8VZtkzfouWOBjgitk3X4LRmtdHndMcFG9d3ruqBbbqNVRwgIkswgmyFbrclcrG\n" +
+            "OJex74QCbx9SpR0S0UFOLBTTYHa3WCcEleIXFFOtqYARiMgxWnU3rVZ1vwIDAQAB";
+
+    private int type = 0;
+    private final String CONFIG_PATH = System.getProperty("user.dir") + "/config/selenium";
+    private final Browser browser;
+    private String cookies = null;
+    private Long curDateL = 0L;
+
+    private void loadCurDateValue(){
+        log.info("in. 读取到期配置文件");
+        try {
+            byte[] value = ReaderUtils.loadBytes(new File(CONFIG_PATH + "/cur_date.dat"));
+            RsaCipher cipher = RsaCipher.build(0).setPrivateKey(this.privateKey).setPublicKey(this.publicKey).loadConfig();
+            String dText = new String(
+                    cipher.decrypt(
+                            DataUtils.base64Decode(value)
+                    ),
+                    StandardCharsets.UTF_8
+            );
+            this.curDateL = Long.parseLong(dText);
+        } catch (IOException e) {
+            log.error("读取配置文件错误", e);
+        }
+        log.info("end. 读取到期配置文件");
+    }
+
+    public BrowserCabgov(int type){
+        this.type = type;
+        this.loadCurDateValue();
+        log.warn("charles type:{}", type);
+        browser = new Browser().setOptionHeadless(false).setUrl("https://sc.122.gov.cn/views/memrent/vehlist.html");
+//        this.browser.setOptionHeadless(true);
+        this.browser.setOptionLoadimg(true);
+        this.browser.setDriverPath(CONFIG_PATH +"/chromedriver");
+//        Runtime.getRuntime().addShutdownHook(new RTMServer(this.browser));
+        // 添加一个shutdown hook
+        Runtime.getRuntime().addShutdownHook(new Thread(() -> {
+            log.info("检测到程序即将关闭...");
+            log.warn("browser start quit");
+            try {
+                this.browser.getDriver().close();
+            }catch (Exception e){}
+            try {
+                this.browser.getDriver().quit();
+            }catch (Exception e){}
+            try {
+                this.browser.quit();
+            }catch (Exception e){}
+            log.warn("browser quit success");
+        }));
+
+    }
+    @SneakyThrows
+    public boolean start(){
+        log.info("prepare charles data");
+        this.cookies = ReaderUtils.loadString(CONFIG_PATH + "/cookies.txt", null).replaceAll("\n","").replaceAll("\r","");
+        try{
+            browser.openChromeDriver();
+            browser.openDriver();
+            if(ValueUtils.isNotBlank(this.cookies)){
+                String args[] = this.cookies.split("; ");
+                Set<Cookie> cookies = new HashSet<>();
+                for (String arg : args){
+                    String as[] = arg.split("=");
+                    cookies.add(new Cookie(as[0], as[1]));
+                }
+                this.browser.setCookies(cookies);;
+                browser.openDriver();
+            }else {
+                log.info("cookies is null");
+                this.cookies = null;
+            }
+        }catch (Exception e) {
+            log.error("set cookies error", e);
+            browser.quit();
+            return false;
+        }
+        this.openAndLogin();
+        String[] args = ReaderUtils.loadString(CONFIG_PATH + "/car_no.txt", null).split("\n");
+        log.info("start charles data");
+        List<Map<String, String>> itemsList = new ArrayList<>();
+        StringBuffer errorCarNo = new StringBuffer();
+        StringBuffer noItemCarNo = new StringBuffer();
+        try{
+            for(String arg : args){
+                arg = arg.replaceAll("\r", "");
+                arg = arg.replaceAll("\n", "");
+                log.info(">charles data by car_no:{} ==================>", arg);
+                try{
+                    List<Map<String, String>> items = this.filterItem(arg);
+                    log.info("<charles data by car_no:{} {} <==================", arg, items.size());
+                    if(ValueUtils.isBlank(items)){
+                        log.info("has no items not write data:{}", arg);
+                        noItemCarNo.append(arg + "\n");
+                        continue;
+                    }
+                    itemsList.addAll(items);
+                }catch (Exception e){
+                    log.error("<charles data error by car_no:{} <==================", arg, e);
+                    errorCarNo.append(arg + "\n");
+                }
+                writeExcel(itemsList, errorCarNo, noItemCarNo);
+            }
+            itemsList.clear();
+            errorCarNo = new StringBuffer();
+        }finally {
+            try{
+                this.browser.quit();
+            }catch (Exception e){};
+            try{
+                writeExcel(itemsList, errorCarNo, noItemCarNo);
+            }catch (Exception e){}
+        }
+        return true;
+    }
+
+
+    @SneakyThrows
+    public void writeExcel(List<Map<String, String>> itemsList, StringBuffer errorCarNo, StringBuffer noItemCarNo){
+        String fileName = DateUtils.formatDate(new Date(), "YYMMDDHHmmss");
+        if(itemsList.size() > 0){
+            Gson gson = GsonBuilder.gsonDefault();
+            WriterUtils.overwrite(new File(CONFIG_PATH + "/" + fileName  + ".txt"), gson.toJson(itemsList).getBytes());
+            OutputStream os = new FileOutputStream(CONFIG_PATH + "/" + fileName + ".xlsx");
+            ExcelWriter.exportData(itemsList).write(os);
+            os.flush();
+            os.close();
+        }
+        if(errorCarNo.length() > 0){
+            WriterUtils.overwrite(new File(CONFIG_PATH + "/errorCarNo" + fileName  + ".txt"), errorCarNo.toString().getBytes());
+        }
+        if(noItemCarNo.length() > 0){
+            WriterUtils.overwrite(new File(CONFIG_PATH + "/noItemCarNo" + fileName  + ".txt"), noItemCarNo.toString().getBytes());
+        }
+    }
+
+    List<Map<String, String>> filterItem(String value){
+        List<Map<String, String>> itemsList = new ArrayList<>();
+        this.search(value);
+        String errorMsg = null;
+        int i = 30;
+        while (i -- > 0){
+            try {
+                Thread.sleep(1000);
+                List<WebElement> webElements = null;
+                WebElement webElement = null;
+                try{
+                    webElement = browser.getDriver().findElement(By.id("violationveh"));
+                    Thread.sleep(1000);
+                }catch (Exception e){
+                    log.warn("========== not fund 车辆列表 ele:{}", "violationveh");
+                    continue;
+                }
+                if(webElement == null){
+                    log.warn("========== not fund 车辆列表 ele:{}", "violationveh");
+                    continue;
+                }
+
+
+                try{
+                    webElements = webElement.findElements(By.xpath("table/tbody/tr"));
+                    Thread.sleep(1000);
+                }catch (Exception e){
+                    log.warn("========== not fund 车辆列表 ele.ex:{}", "table/tbody/tr");
+                    continue;
+                }
+
+                if(ValueUtils.isBlank(webElements)){
+                    log.warn("========== not fund 车辆列表 ele:{}", "table/tbody/tr");
+                    continue;
+                }
+                for(WebElement trEle : webElements){
+                    List<WebElement> datas = trEle.findElements(By.xpath("td"));
+                    if(!"未交款".equals(datas.get(6).getText())){
+                        log.info("========== continue.6:{}", datas.get(6).getText());
+                        continue;
+                    }
+                    if(type == 0){
+                        try{
+                            Thread.sleep(500);
+                            log.info("==========> click view.a");
+                            WebElementUtils.click(browser, datas.get(7).findElement(By.xpath("a")));
+                            log.info("==========< click view.a");
+                        }catch (Exception e){
+                            throw e;
+                        }
+                        Thread.sleep(2000);
+                        i = 30;
+                        Map<String, String> item = this.getDetailInfo();
+                        item.put("状态", WebElementUtils.getValue(datas.get(4)) + "|" + WebElementUtils.getValue(datas.get(6)));
+                        itemsList.add(item);
+                    }else{
+                        Map<String, String> item = new HashMap<>();
+                        item.put("号牌号码", WebElementUtils.getValue(datas.get(0)));
+                        item.put("违法时间", WebElementUtils.getValue(datas.get(1)));
+                        item.put("违法地点", WebElementUtils.getValue(datas.get(2)));
+                        item.put("违法行为", WebElementUtils.getValue(datas.get(3)));
+                        item.put("采集单位", "");
+                        item.put("罚款金额", "");
+                        item.put("记分值", "");
+                        item.put("处理时间", WebElementUtils.getValue(datas.get(5)));
+                        item.put("状态", WebElementUtils.getValue(datas.get(4)) + "|" + WebElementUtils.getValue(datas.get(6)));
+                        itemsList.add(item);
+                    }
+                }
+                try{
+                    webElement = browser.getDriver().findElement(By.id("mypagination1"));
+                    Thread.sleep(1000);
+                }catch (Exception e){
+                    log.info("========== page is null.1");
+                    break;
+                }
+                if(webElement == null){
+                    log.info("========== page is null.2");
+                    break;
+                }
+
+                try{
+                    webElements = webElement.findElements(By.xpath("ul/li"));
+                    Thread.sleep(1000);
+                }catch (Exception e){
+                    log.warn("========== not fund 车辆列表 ele:{}", "ul/li");
+                    continue;
+                }
+                if(ValueUtils.isBlank(webElements) || webElements.size() <= 5){
+                    log.info("========== page is null.3");
+                    break;
+                }
+                webElements.remove(0);
+                webElements.remove(0);
+                webElements.remove(webElements.size() - 1);
+                webElements.remove(webElements.size() - 1);
+
+                if(webElements.size() <= 1){
+                    break;
+                }
+                List<WebElement> removes = new ArrayList<>();
+                for(WebElement ele : webElements){
+                    removes.add(ele);
+                    if("active".equals(ele.getAttribute("class"))){
+                        log.info("========== page is null.4");
+                        break;
+                    }
+                }
+                webElements.removeAll(removes);
+                if(webElements.size() == 0){
+                    break;
+                }
+                log.info("==========> click next page");
+                WebElementUtils.click(browser, webElements.get(0).findElement(By.xpath("a")));
+                log.info("==========< click next page");
+                Thread.sleep(2000);
+                i = 30;
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+                throw new RuntimeException(e);
+            }
+        }
+        if(i <= 0){
+            throw new BusinessException("没有找到事故处理业务右上Tab");
+        }
+        if(ValueUtils.isNotBlank(errorMsg)){
+            throw new BusinessException(errorMsg);
+        }
+        return itemsList;
+    }
+
+    boolean clickFeed(){
+        try{
+            WebElement webElement = browser.getDriver().findElement(By.className("aui_state_highlight"));
+            if(webElement != null){
+                WebElementUtils.click(browser, webElement);
+                return true;
+            }
+        }catch (Exception e){
+            log.warn("click feed error:{}", e.getMessage());
+        }
+        return false;
+
+    }
+
+    void openAndLogin(){
+
+        String errorMsg = null;
+        int i = 300;
+        while (i-- > 0){
+            try {
+                Thread.sleep(1000);
+                WebElement webElement = null;
+                try{
+                    webElement = browser.getDriver().findElement(By.id("hello"));
+                }catch (Exception e){}
+                if(webElement == null){
+                    log.warn("========== not fund 请选择服务类型base ele:{}", "hello");
+                    continue;
+                }
+                try{
+                    webElement = webElement.findElement(By.className("pull-right"));
+                }catch (Exception e){}
+                if(webElement == null){
+                    log.warn("========== not fund 请选择服务类型 ele:{}", "pull-right");
+                    continue;
+                }
+                try{
+                    webElement = webElement.findElement(By.xpath("select"));
+                }catch (Exception e){}
+                if(webElement == null){
+                    log.warn("========== not fund 请选择服务类型 ele:{}", "select");
+                    continue;
+                }
+
+                if (ValueUtils.isBlank(this.cookies)){
+                    int ti = 10;
+                    while (ti -- > 0){
+                        try{
+                            Thread.sleep(1000);
+                            if(clickFeed()){
+                                break;
+                            }else if(ti > 5){
+                                break;
+                            }
+                        }catch (Exception e){}
+                    }
+                }
+                new Select(webElement).selectByIndex(1);
+                log.info("==========< click 请选择服务类型:{}", "业务办理");
+                Thread.sleep(1000);
+                WebElementUtils.click(browser, browser.getDriver().findElement(By.id("sidebar_menu_93")));
+                log.info("==========< click 租赁合同");
+                Thread.sleep(1000);
+                break;
+            } catch (Exception e) {
+                e.printStackTrace();
+                errorMsg = e.getMessage();
+            }
+        }
+        if(i <= 0){
+            throw new BusinessException("没有找到事故处理业务左边目录");
+        }
+        if(ValueUtils.isNotBlank(errorMsg)){
+            throw new BusinessException(errorMsg);
+        }
+    }
+
+    void search(String text){
+
+        String errorMsg = null;
+        int i = 30;
+        while (i -- > 0){
+            try {
+                Thread.sleep(1000);
+                List<WebElement> webElements = null;
+                WebElement webElement = null;
+                try{
+                    webElement = browser.getDriver().findElement(By.id("mem-content")).findElement(By.id("vehSearchForm"));
+                }catch (Exception e){}
+                if(webElement == null){
+                    log.warn("========== not fund 违法查询 ele:{}", "mem-content.vehSearchForm");
+                    continue;
+                }
+                try{
+                    webElements = webElement.findElements(By.xpath("div"));
+                }catch (Exception e){}
+                if(ValueUtils.isBlank(webElements) || webElements.size() < 4){
+                    continue;
+                }
+                Thread.sleep(1000);
+
+                try{
+                    WebElementUtils.click(browser, webElements.get(0).findElements(By.className("add-on")).get(0));
+                    Thread.sleep(1000);
+                }catch (Exception e){
+                    log.warn("========== not fund 违法查询开始日期控件 ele:{}", "add-on");
+                    continue;
+                }
+
+                try{
+                    WebElementUtils.click(browser, browser.getDriver().findElements(By.className("datetimepicker-months")).get(0).findElements(By.xpath("table/thead/tr/th")).get(1));
+                    Thread.sleep(1000);
+                }catch (Exception e){
+                    log.warn("========== not fund 违法查询 ele:{}", "datetimepicker-months-option");
+                    continue;
+                }
+
+                try{
+                    String curYear = DateUtils.formatDate(DateUtils.parseToDate(LocalDate.now().plusYears(-2)), "YYYY");
+                    List<WebElement> eles = browser.getDriver().findElements(By.className("datetimepicker-years")).get(0).findElements(By.xpath("table/tbody/tr/td/span"));
+                    WebElement curEle = null;
+                    for (WebElement ele : eles){
+                        String tag = WebElementUtils.getValue(ele);
+                        if(tag == null || !tag.equals(curYear)){
+                            continue;
+                        }
+                        curEle = ele;
+                        break;
+                    }
+                    if(curEle == null){
+                        for (WebElement ele : eles){
+                            if(!ele.getAttribute("class").contains("active")){
+                                continue;
+                            }
+                            curEle = ele;
+                            break;
+                        }
+                    }
+                    if(curEle == null){
+                        throw new BusinessException("没有找到当年年份按钮");
+                    }
+                    WebElementUtils.click(browser, curEle);
+                    Thread.sleep(1000);
+                }catch (Exception e){
+                    log.warn("========== not fund 违法查询 ele:{}", "datetimepicker-years");
+                    continue;
+                }
+
+                try{
+                    WebElementUtils.click(browser,browser.getDriver().findElements(By.className("datetimepicker-months")).get(0).findElements(By.xpath("table/tbody/tr/td/span")).get(5));
+                    Thread.sleep(1000);
+                }catch (Exception e){
+                    log.warn("========== not fund 违法查询 ele:{}", "datetimepicker-months");
+                    continue;
+                }
+
+                try{
+                    WebElementUtils.click(browser, browser.getDriver().findElements(By.className("datetimepicker-days")).get(0).findElements(By.xpath("table/tbody/tr/td")).get(6));
+                    Thread.sleep(1000);
+                }catch (Exception e){
+                    log.warn("========== not fund 违法查询 ele:{}", "datetimepicker-days");
+                    continue;
+                }
+
+                try{
+                    WebElementUtils.click(browser, webElements.get(1).findElement(By.id("hpzl")).findElements(By.xpath("option")).get(3));
+                    Thread.sleep(1000);
+                }catch (Exception e){
+                    log.warn("========== not fund 违法查询 ele:{}", "hpzl.option");
+                    continue;
+                }
+
+                try{
+                    WebElementUtils.setValue(webElements.get(2).findElement(By.id("hphm")), text);
+                    Thread.sleep(1000);
+                }catch (Exception e){
+                    log.warn("========== not fund 违法查询 ele:{}", "hphm");
+                    continue;
+                }
+
+                try{
+                    WebElementUtils.click(browser, webElements.get(0).findElements(By.className("add-on")).get(1));
+                    Thread.sleep(1000);
+                }catch (Exception e){
+                    log.warn("========== not fund 违法查询结束日期控件 ele:{}", "add-on");
+                    continue;
+                }
+                try{
+                    WebElementUtils.click(browser, browser.getDriver().findElements(By.className("datetimepicker-months")).get(1).findElements(By.className("today")).get(0));
+                    Thread.sleep(1000);
+                }catch (Exception e){
+                    log.warn("========== not fund 违法查询结束日期控件 ele:{}", "tody");
+                    continue;
+                }
+                try{
+                    WebElement enDataInput = webElement.findElement(By.id("endDate2"));
+                    if(enDataInput == null){
+                        System.exit(0);
+                    }
+                    Long endDateL = Long.parseLong(WebElementUtils.getValue(enDataInput).toString());
+                    if(curDateL < endDateL){
+                        System.exit(0);
+                    }
+                }catch (Exception e){
+                    log.warn("========== not fund 违法查询结束日期控件 ele:{}", "tody");
+                    continue;
+                }
+
+                try{
+                    WebElementUtils.click(browser, webElements.get(3).findElement(By.xpath("button")));
+                    Thread.sleep(1000);
+                }catch (Exception e){
+                    log.warn("========== not fund 违法查询 ele:{}", "button");
+                    continue;
+                }
+                errorMsg = null;
+                break;
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+                throw new RuntimeException(e);
+            }
+        }
+        if(i <= 0){
+            throw new BusinessException("没有找到事故处理业务右上Tab");
+        }
+        if(ValueUtils.isNotBlank(errorMsg)){
+            throw new BusinessException(errorMsg);
+        }
+    }
+
+    @SneakyThrows
+    Map<String, String> getDetailInfo() {
+        try {
+
+            Map<String, String> itemMap = new HashMap<>();
+            String errorMsg = null;
+            int i = 30;
+            while (i -- > 0){
+                try {
+                    Thread.sleep(1000);
+                    List<WebElement> webElements = null;
+                    WebElement webElement = null;
+                    try{
+                        webElement = browser.getDriver().findElement(By.id("view"));
+                    }catch (Exception e){}
+                    if(webElement == null){
+                        continue;
+                    }
+
+                    try{
+                        webElement = webElement.findElement(By.className("modal-body"));
+                    }catch (Exception e){}
+                    if(webElement == null){
+                        log.warn("========== not fund 查看详情 ele:{}", "modal-body");
+                        continue;
+                    }
+
+                    try{
+                        webElement = webElement.findElement(By.className("xqInfo"));
+                    }catch (Exception e){}
+                    if(webElement == null){
+                        log.warn("========== not fund 查看详情 ele:{}", "xqInfo");
+                        continue;
+                    }
+                    try{
+                        webElements = webElement.findElements(By.xpath("form/div"));
+                    }catch (Exception e){}
+                    if(ValueUtils.isBlank(webElements) || webElements.size() < 1){
+                        log.warn("========== not fund 查看详情 ele:{}", "form/div");
+                        continue;
+                    }
+                    Thread.sleep(1000);
+                    while (true){
+                        Map<String, String> data = new HashMap<>();
+                        boolean isGoon = false;
+                        for (WebElement ele : webElements){
+                            if(ele.findElements(By.xpath("span")).size() < 2){
+                                continue;
+                            }
+                            List<WebElement> spans = ele.findElements(By.xpath("span"));
+                            String name = spans.get(0).getText();
+                            String value = spans.get(1).getText();
+                            if(ValueUtils.isBlank(name) || ValueUtils.isBlank(value)){
+                                log.info("charles data field null, waiting ==================");
+                                isGoon = true;
+                                break;
+                            }
+                            data.put(name, value);
+                        }
+                        if(isGoon){
+                            Thread.sleep(1000);
+                            continue;
+                        }
+                        log.info("charles data success:{}", GsonBuilder.gsonDefault().toJson(data));
+                        itemMap.putAll(data);
+                        break;
+                    }
+                    errorMsg = null;
+                    break;
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                    throw new RuntimeException(e);
+                }
+            }
+            if(i <= 0){
+                throw new BusinessException("没有找到事故处理业务右上Tab");
+            }
+            if(ValueUtils.isNotBlank(errorMsg)){
+                throw new BusinessException(errorMsg);
+            }
+            return itemMap;
+        }finally {
+            log.info("==========> click 查看详情: close");
+            WebElement webElement = browser.getDriver().findElement(By.id("view"));
+            WebElementUtils.click(browser, webElement.findElement(By.id("bind_close")));
+            log.info("==========< click 查看详情: close");
+            Thread.sleep(1000);
+        }
+    }
+//
+//    public Map<String, String> querySurvielDetail(String hphm, String xh, String cjjg, String cookies) throws IOException, InterruptedException {
+//        Thread.sleep(5000);
+//        String url = "https://sc.122.gov.cn/user/m/tsc/vio/querySurvielDetail";
+//        Response<Map> response = HttpClient.instance(
+//                        Request.initJson(url)
+//                                .setHeader("Host","sc.122.gov.cn")
+//                                .setHeader("Origin","https://sc.122.gov.cn")
+//                                .setHeader("Referer","https://sc.122.gov.cn/views/memfyy/violation.html")
+//                                .setHeader("Sec-Ch-Ua","\"Not/A)Brand\";v=\"8\", \"Chromium\";v=\"126\", \"Google Chrome\";v=\"126\"")
+//                                .setHeader("Sec-Ch-Ua-Mobile","?0")
+//                                .setHeader("Sec-Ch-Ua-Platform:","\"Windows\"")
+//                                .setHeader("Sec-Fetch-Dest","empty")
+//                                .setHeader("Sec-Fetch-Mode","cors")
+//                                .setHeader("Sec-Fetch-Site","same-origin")
+//                                .setHeader("User-Agent","Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/123.0.0.0 Safari/537.36")
+//                                .setHeader("X-Requested-With", "XMLHttpRequest")
+//                                .setHeader("Content-Type", "application/x-www-form-urlencoded; charset=UTF-8")
+//                                .setHeader("Cookie", cookies)
+//                                .setMethod(Request.Method.Post)
+//                                .setParam("hpzl","52")
+//                                .setParam("hphm","川" + hphm)
+//                                .setParam("xh", xh)
+//                                .setParam("cjjg",cjjg)
+//                )
+//                .setRpClazz(Map.class)
+//                .response();
+//        System.out.println(url + "?" + hphm + "," + xh);
+//        Gson gson = GsonBuilder.gsonDefault();
+//        if(response.getStatusCode() != 200){
+//            throw new BusinessException("列表请求错误：" + gson.toJson(response.getBody()));
+//        }
+//        Map<String, String> dict = new HashMap(){{
+//            put("hpzlStr","号牌种类");
+//            put("hphm", "号牌号码");
+//            put("wfsj", "违法时间");
+//            put("wfdz", "违法地点");
+//            put("wfms", "违法行为");
+//            put("cjjgmc", "采集单位");
+//            put("fkje", "罚款金额");
+//            put("wfjfs", "记分值");
+//        }};
+//        Map<String, String> item = new HashMap<>();;
+//        for (String key : dict.keySet()){
+//            item.put(dict.get(key), MapUtils.getValueByKeyPath(response.getBody(), "data." + key, "", String.class));
+//        }
+//        return item;
+//    }
+//
+//
+//    public int suriquery(String hphm, int page, String cookies, List<Map<String, String>> itemsList) throws IOException, InterruptedException {
+//        String url = "https://sc.122.gov.cn/user/m/uservio/suriquery";
+//        Response<Map> response = HttpClient.instance(
+//                        Request.initJson(url)
+//                                .setHeader("Host","sc.122.gov.cn")
+//                                .setHeader("Origin","https://sc.122.gov.cn")
+//                                .setHeader("Referer","https://sc.122.gov.cn/views/memfyy/violation.html")
+//                                .setHeader("Sec-Ch-Ua","\"Not/A)Brand\";v=\"8\", \"Chromium\";v=\"126\", \"Google Chrome\";v=\"126\"")
+//                                .setHeader("Sec-Ch-Ua-Mobile","?0")
+//                                .setHeader("Sec-Ch-Ua-Platform:","\"Windows\"")
+//                                .setHeader("Sec-Fetch-Dest","empty")
+//                                .setHeader("Sec-Fetch-Mode","cors")
+//                                .setHeader("Sec-Fetch-Site","same-origin")
+//                                .setHeader("User-Agent","Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/123.0.0.0 Safari/537.36")
+//                                .setHeader("X-Requested-With", "XMLHttpRequest")
+//                                .setHeader("Content-Type", "application/x-www-form-urlencoded; charset=UTF-8")
+//                                .setHeader("Cookie", cookies)
+//                                .setMethod(Request.Method.Post)
+//                                .setParam("startDate","20200105")
+//                                .setParam("endDate","20240709")
+//                                .setParam("hpzl","52")
+//                                .setParam("hphm","川" + hphm)
+//                                .setParam("page",page + "")
+//                                .setParam("type","0")
+//                )
+//                .setRpClazz(Map.class)
+//                .response();
+//        System.out.println(url + "?"+ hphm + "," + page);
+//        Gson gson = GsonBuilder.gsonDefault();
+//        if(response.getStatusCode() != 200){
+//            throw new BusinessException("列表请求错误：" + gson.toJson(response.getBody()));
+//        }
+//        Integer totalPages = MapUtils.getValueByKeyPath(response.getBody(),"data.totalPages", -1, Integer.class);
+//        List<Map> content = MapUtils.getValueByKeyPath(response.getBody(),"data.content", null, List.class);
+//        if(ValueUtils.isBlank(content)){
+//            System.out.printf("没有数据了：" + hphm);
+//            return 0;
+//        }
+//        for (Map item : content){
+//            Integer isHandle = MapUtils.getInteger(item, "clbj", 0);
+//            Integer isPay = MapUtils.getInteger(item, "jkbj", 0);
+//            if(isHandle == 0 || isPay == 0){
+//                this.querySurvielDetail(hphm, MapUtils.getString(item, "xh"), MapUtils.getString(item, "cjjg"), isHandle, isPay, cookies, itemsList);
+//            }
+//        }
+//        return totalPages - page;
+//    }
+//    public void querySurvielDetail(String hphm, String xh, String cjjg, Integer isHandle, Integer isPay, String cookies, List<Map<String, String>> itemsList) throws IOException, InterruptedException {
+//        Thread.sleep(5000);
+//        String url = "https://sc.122.gov.cn/user/m/tsc/vio/querySurvielDetail";
+//        Response<Map> response = HttpClient.instance(
+//                        Request.initJson(url)
+//                                .setHeader("Host","sc.122.gov.cn")
+//                                .setHeader("Origin","https://sc.122.gov.cn")
+//                                .setHeader("Referer","https://sc.122.gov.cn/views/memfyy/violation.html")
+//                                .setHeader("Sec-Ch-Ua","\"Not/A)Brand\";v=\"8\", \"Chromium\";v=\"126\", \"Google Chrome\";v=\"126\"")
+//                                .setHeader("Sec-Ch-Ua-Mobile","?0")
+//                                .setHeader("Sec-Ch-Ua-Platform:","\"Windows\"")
+//                                .setHeader("Sec-Fetch-Dest","empty")
+//                                .setHeader("Sec-Fetch-Mode","cors")
+//                                .setHeader("Sec-Fetch-Site","same-origin")
+//                                .setHeader("User-Agent","Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/123.0.0.0 Safari/537.36")
+//                                .setHeader("X-Requested-With", "XMLHttpRequest")
+//                                .setHeader("Content-Type", "application/x-www-form-urlencoded; charset=UTF-8")
+//                                .setHeader("Cookie", cookies)
+//                                .setMethod(Request.Method.Post)
+//                                .setParam("hpzl","52")
+//                                .setParam("hphm","川" + hphm)
+//                                .setParam("xh", xh)
+//                                .setParam("cjjg",cjjg)
+//                )
+//                .setRpClazz(Map.class)
+//                .response();
+//        System.out.println(url + "?" + hphm + "," + xh);
+//        Gson gson = GsonBuilder.gsonDefault();
+//        if(response.getStatusCode() != 200){
+//            throw new BusinessException("列表请求错误：" + gson.toJson(response.getBody()));
+//        }
+//        Map<String, String> dict = new HashMap(){{
+//            put("hpzlStr","号牌种类");
+//            put("hphm", "号牌号码");
+//            put("wfsj", "违法时间");
+//            put("wfdz", "违法地点");
+//            put("wfms", "违法行为");
+//            put("cjjgmc", "采集单位");
+//            put("fkje", "罚款金额");
+//            put("wfjfs", "记分值");
+//        }};
+//        Map<String, String> item = new HashMap<>();
+//        item.put("状态", (isHandle == 1 ? "已处理" : "未处理") + "|" + (isPay == 1 ? "已交款" : "未交款"));
+//        for (String key : dict.keySet()){
+//            item.put(dict.get(key), MapUtils.getValueByKeyPath(response.getBody(), "data." + key, "", String.class));
+//        }
+//        itemsList.add(item);
+//    }
+
+    public static void main(String[] args) {
+        BrowserCabgov bc = new BrowserCabgov(args.length) ;
+        bc.start();
+    }
+}
