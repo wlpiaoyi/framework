@@ -124,17 +124,35 @@ public class BrowserCabgov {
         }
         this.openAndLogin();
         try{
-            WebElement addBoxEle = this.openAddBox();
-            SubmitHT submitHT = SubmitHT.builder()
-                    .carNo("川ADG3769")
-                    .htNo("123123")
-                    .name("刘海燕")
-                    .cardId("622322198408253422")
-                    .htSignTime(LocalDateTime.now())
-                    .leaseStartTime(LocalDateTime.now().plusDays(1))
-                    .leaseEndTime(LocalDateTime.now().plusDays(2))
-                    .build();
-            this.submitHT(submitHT, addBoxEle);
+            String sjhtStr = ReaderUtils.loadString(CONFIG_PATH + "/sjht.txt", null);
+            if(ValueUtils.isBlank(sjhtStr)){
+                log.info("没有读取到数据");
+            }
+            String sjht[] = sjhtStr.split("\r\n");
+            for (String sjhtItem : sjht) {
+                try {
+                    String arg[] = sjhtItem.split(",");
+                    if(arg.length != 6){
+                        log.info("数据格式错误:{}", sjhtItem);
+                        continue;
+                    }
+                    WebElement addBoxEle = this.openAddBox();
+                    SubmitHT submitHT = SubmitHT.builder()
+                            .carNo(arg[0])
+                            .htNo(arg[1])
+//                            .name("刘海燕")
+                            .cardId(arg[2])
+                            .htSignTime(DateUtils.formatToLoaTolDateTime(arg[3]))
+                            .leaseStartTime(DateUtils.formatToLoaTolDateTime(arg[4]))
+                            .leaseEndTime(DateUtils.formatToLoaTolDateTime(arg[5]))
+                            .build();
+                    this.submitHT(submitHT, addBoxEle);
+                }catch (Exception e){
+                    log.error("提交合同信息失败:{}", sjhtItem, e);
+                }
+            }
+        }catch (Exception e){
+            log.error("error", e);
         }finally {
             try{
                 this.browser.quit();
@@ -144,21 +162,198 @@ public class BrowserCabgov {
     }
 
     void submitHT(SubmitHT submitHT, WebElement addBoxEle){
+
         WebElement cardNoEle = addBoxEle.findElement(By.id("hphm_lr"));
         WebElement htNoEle = addBoxEle.findElement(By.id("htbh_lr"));
         WebElement htSignTimeEle = addBoxEle.findElement(By.id("htqdsj_lr"));
+        WebElement leaseStartTimeEle = addBoxEle.findElement(By.id("zlkssj_lr"));
+        WebElement leaseEndTimeEle = addBoxEle.findElement(By.id("zljssj_lr"));
+        WebElement cardIdEle = addBoxEle.findElement(By.id("sfzmhm_lr"));
+        WebElement saveEle = addBoxEle.findElement(By.id("htlrSave"));
 
         WebElementUtils.setValue(cardNoEle, submitHT.getCarNo());
         WebElementUtils.setValue(htNoEle, submitHT.getHtNo());
-        List<WebElement> addOnEles = WebElementUtils.getChildrenByClass(WebElementUtils.getParentSafely(htSignTimeEle), "add-on");
-        WebElementUtils.click(browser, addOnEles.get(0));
-        WebElement yearMonthEle = browser.getDriver().findElements(By.className("datetimepicker-months")).get(2);
-        List<WebElement> yearMonthTableEle = WebElementUtils.getChildrenByTag(yearMonthEle, "table");
-        List<WebElement> yearMonthTableTHeadEle = WebElementUtils.getChildrenByTag(yearMonthTableEle.get(0), "thead");
-        List<WebElement> yearMonthTableTBodyEle = WebElementUtils.getChildrenByTag(yearMonthTableEle.get(0), "tbody");
-        List<WebElement> yearMonthTableTFootEle = WebElementUtils.getChildrenByTag(yearMonthTableEle.get(0), "tfoot");
+        {
+            List<WebElement> addOnEles = WebElementUtils.getChildrenByClass(WebElementUtils.getParentSafely(htSignTimeEle), "add-on");
+            if(ValueUtils.isBlank(addOnEles)){
+                throw new RuntimeException("未找到时间触发器");
+            }
+            WebElementUtils.click(browser, addOnEles.get(0));
+            WebElement yearMonthEle = browser.getDriver().findElements(By.className("datetimepicker-months")).get(2);
+            if(yearMonthEle == null){
+                throw new RuntimeException("未找到时间选择器");
+            }
+            if(submitHT.getHtSignTime() == null){
+                this.selectedNow(yearMonthEle);
+            }else{
+                this.selectedYearMonth(2, submitHT.getHtSignTime());
+            }
 
+        }
+        {
+            List<WebElement> addOnEles = WebElementUtils.getChildrenByClass(WebElementUtils.getParentSafely(leaseStartTimeEle), "add-on");
+            if(ValueUtils.isBlank(addOnEles)){
+                throw new RuntimeException("未找到时间触发器");
+            }
+            WebElementUtils.click(browser, addOnEles.get(0));
+            this.selectedYearMonth(3, submitHT.getLeaseStartTime());
+        }
+        {
+            List<WebElement> addOnEles = WebElementUtils.getChildrenByClass(WebElementUtils.getParentSafely(leaseEndTimeEle), "add-on");
+            if(ValueUtils.isBlank(addOnEles)){
+                throw new RuntimeException("未找到时间触发器");
+            }
+            WebElementUtils.click(browser, addOnEles.get(0));
+            this.selectedYearMonth(4, submitHT.getLeaseEndTime());
+        }
+        WebElementUtils.setValue(cardIdEle, submitHT.getCardId());
+        WebElementUtils.click(browser, saveEle);
         System.out.println();
+    }
+
+    void selectedYearMonth(int index, LocalDateTime dateTime){
+        {
+            WebElement yearMonthEle = browser.getDriver().findElements(By.className("datetimepicker-months")).get(index);
+            if(yearMonthEle == null){
+                throw new RuntimeException("未找到时间选择器");
+            }
+            List<WebElement> yearMonthTableEle = WebElementUtils.getChildrenByTag(yearMonthEle, "table");
+            if(ValueUtils.isBlank(yearMonthTableEle)){
+                throw new RuntimeException("未找到日历Table");
+            }
+            List<WebElement> yearMonthTableTHeadEle = WebElementUtils.getChildrenByTag(yearMonthTableEle.get(0), "thead");
+            List<WebElement> yearMonthTableTBodyEle = WebElementUtils.getChildrenByTag(yearMonthTableEle.get(0), "tbody");
+            if (ValueUtils.isBlank(yearMonthTableTHeadEle)){
+                throw new RuntimeException("未找到日历TableHead");
+            }
+            if (ValueUtils.isBlank(yearMonthTableTBodyEle)){
+                throw new RuntimeException("未找到日历TableBody");
+            }
+            {
+                List<WebElement> elements = WebElementUtils.getVisibleChildren(yearMonthTableTHeadEle.get(0));
+                if (ValueUtils.isBlank(elements)){
+                    throw new RuntimeException("未找到日历TableHeadElement");
+                }
+                String yearEleValueStr = WebElementUtils.getValue(WebElementUtils.getChildrenByClass(elements.get(0), "switch").get(0));
+                if(ValueUtils.isBlank(yearEleValueStr)){
+                    throw new RuntimeException("未找到日历YearValue");
+                }
+                Long yearEleValueSuffix = Long.parseLong(yearEleValueStr) - dateTime.getYear();
+                if(yearEleValueSuffix != 0){
+                    WebElement skipEle;
+                    if(yearEleValueSuffix > 0){
+                        skipEle = WebElementUtils.getChildrenByClass(elements.get(0), "prev").get(0);
+                    }else{
+                        skipEle = WebElementUtils.getChildrenByClass(elements.get(0), "next").get(0);
+                    }
+                    for (int i = 0; i < Math.abs(yearEleValueSuffix); i++) {
+                        WebElementUtils.click(this.browser, skipEle);
+                    }
+                }
+            }
+            {
+                List<WebElement> elements = WebElementUtils.getVisibleChildren(WebElementUtils.getVisibleChildren(WebElementUtils.getVisibleChildren(yearMonthTableTBodyEle.get(0)).get(0)).get(0));
+                if (ValueUtils.isBlank(elements)){
+                    throw new RuntimeException("未找到日历TableBodyElement");
+                }
+                if(elements.size() != 12){
+                    throw new RuntimeException("日历TableBodyElement数量不对");
+                }
+                WebElementUtils.click(this.browser, elements.get(dateTime.getMonth().getValue() - 1));
+            }
+        }
+        {
+            WebElement monthDayEle = browser.getDriver().findElements(By.className("datetimepicker-days")).get(index);
+            List<WebElement> monthDayTableEle = WebElementUtils.getChildrenByTag(monthDayEle, "table");
+            if(ValueUtils.isBlank(monthDayTableEle)){
+                throw new RuntimeException("未找到日历月Table");
+            }
+            List<WebElement> monthDayTableTBodyEle = WebElementUtils.getChildrenByTag(monthDayTableEle.get(0), "tbody");
+            if (ValueUtils.isBlank(monthDayTableTBodyEle)){
+                throw new RuntimeException("未找到日历约TableBody");
+            }
+            List<WebElement> dayBodyTrEle = WebElementUtils.getVisibleChildren(monthDayTableTBodyEle.get(0));
+            if (ValueUtils.isBlank(dayBodyTrEle)){
+                throw new RuntimeException("未找到日历月DayBodyTrElement");
+            }
+            List<WebElement> dayEles = new ArrayList<>();
+            for (WebElement ele : dayBodyTrEle) {
+                List<WebElement> dayBodyTrTdEle = WebElementUtils.getVisibleChildren(ele);
+                for (WebElement tdEle : dayBodyTrTdEle){
+                    if(!"day".equals(tdEle.getAttribute("class"))){
+                        continue;
+                    }
+                    dayEles.add(tdEle);
+                }
+            }
+            if(dayEles.size() < dateTime.getDayOfMonth()){
+                throw new RuntimeException("日历天数不对:" + dateTime.getMonth());
+            }
+            WebElementUtils.click(this.browser, dayEles.get(dateTime.getDayOfMonth() + 1));
+        }
+
+        {
+            WebElement monthDayEle = browser.getDriver().findElements(By.className("datetimepicker-hours")).get(index);
+            List<WebElement> dayHoursTableEle = WebElementUtils.getChildrenByTag(monthDayEle, "table");
+            if(ValueUtils.isBlank(dayHoursTableEle)){
+                throw new RuntimeException("未找到日历天Table");
+            }
+            List<WebElement> dayHoursTBodyEle = WebElementUtils.getChildrenByTag(dayHoursTableEle.get(0), "tbody");
+            if (ValueUtils.isBlank(dayHoursTBodyEle)){
+                throw new RuntimeException("未找到日历天TableBody");
+            }
+            List<WebElement> hoursBodyTrEle = WebElementUtils.getVisibleChildren(dayHoursTBodyEle.get(0));
+            if (ValueUtils.isBlank(hoursBodyTrEle)){
+                throw new RuntimeException("未找到日历天HoursBodyTrElement");
+            }
+            List<WebElement> hoursBodyTdEle = WebElementUtils.getVisibleChildren(hoursBodyTrEle.get(0));
+            if (ValueUtils.isBlank(hoursBodyTdEle)){
+                throw new RuntimeException("未找到日历天HoursBodyTdElement");
+            }
+            List<WebElement> hourEles = WebElementUtils.getVisibleChildren(hoursBodyTdEle.get(0));
+            if(ValueUtils.isBlank(hourEles) || hourEles.size() != 24){
+                throw new RuntimeException("日历小时数不对:" + dateTime.getMonth());
+            }
+            WebElementUtils.click(this.browser, hourEles.get(dateTime.getHour()));
+        }
+
+
+        {
+            WebElement monthDayEle = browser.getDriver().findElements(By.className("datetimepicker-minutes")).get(index);
+            List<WebElement> hoursMinutesTableEle = WebElementUtils.getChildrenByTag(monthDayEle, "table");
+            if(ValueUtils.isBlank(hoursMinutesTableEle)){
+                throw new RuntimeException("未找到日历天小时Table");
+            }
+            List<WebElement> hoursMinutesTBodyEle = WebElementUtils.getChildrenByTag(hoursMinutesTableEle.get(0), "tbody");
+            if (ValueUtils.isBlank(hoursMinutesTBodyEle)){
+                throw new RuntimeException("未找到日历天小时TableBody");
+            }
+            List<WebElement> minutesBodyTrEle = WebElementUtils.getVisibleChildren(hoursMinutesTBodyEle.get(0));
+            if (ValueUtils.isBlank(minutesBodyTrEle)){
+                throw new RuntimeException("未找到日历天小时minutesBodyTrEle");
+            }
+            List<WebElement> minutesBodyTdEle = WebElementUtils.getVisibleChildren(minutesBodyTrEle.get(0));
+            if (ValueUtils.isBlank(minutesBodyTdEle)){
+                throw new RuntimeException("未找到日历天小时MinutesBodyTdElement");
+            }
+            List<WebElement> minuteEles = WebElementUtils.getVisibleChildren(minutesBodyTdEle.get(0));
+            if(ValueUtils.isBlank(minuteEles) || minuteEles.size() != 60){
+                throw new RuntimeException("日历分钟数不对:" + dateTime.getMonth());
+            }
+            WebElementUtils.click(this.browser, minuteEles.get(dateTime.getMinute()));
+        }
+    }
+
+    void selectedNow(WebElement yearMonthEle){
+        List<WebElement> yearMonthTableEle = WebElementUtils.getChildrenByTag(yearMonthEle, "table");
+        if(ValueUtils.isBlank(yearMonthTableEle)){
+            throw new RuntimeException("未找到日历Table");
+        }
+        List<WebElement> yearMonthTableTFootEle = WebElementUtils.getChildrenByTag(yearMonthTableEle.get(0), "tfoot");
+        if(ValueUtils.isBlank(yearMonthTableTFootEle)){
+            throw new RuntimeException("未找到日历TableFoot");
+        }
+        WebElementUtils.click(this.browser, yearMonthTableTFootEle.get(0));
     }
 
     WebElement openAddBox(){

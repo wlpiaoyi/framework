@@ -13,12 +13,19 @@ import java.util.concurrent.TimeUnit;
  */
 public class ThreadPoolExecutorBuilder {
 
+    // 线程池参数
     private int corePoolSize = 5;
+    // 最大线程数
     private int maximumPoolSize = 50;
+    // 线程空闲存活时间
     private long keepAliveTime = 300;
+    // 时间单位
     private TimeUnit unit = TimeUnit.SECONDS;
+    // 工作队列容量
     private int workQueueCount = 50;
+    // 线程名前缀
     private String threadNamePrefix = "custom-thread-";
+    // 拒绝策略
     private RejectedExecutionHandler handler = new java.util.concurrent.ThreadPoolExecutor.AbortPolicy();
 
     /**

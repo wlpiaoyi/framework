@@ -5,6 +5,7 @@ import org.wlpiaoyi.framework.lab.selenium.Browser;
 import org.wlpiaoyi.framework.utils.ValueUtils;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * <p><b>{@code @author:}</b>         wlpiaoyi</p>
@@ -14,6 +15,52 @@ import java.util.List;
  */
 
 public class WebElementUtils {
+
+
+    /**
+     * <p><b>{@code @description:}</b>
+     * <div style='border-radius: 12px; border: 1px solid #e74c3c; padding: 5px; margin-left: 5px; margin-bottom: 5px;'>
+     * 获取可见的子元素
+     * </div>
+     * </p>
+     *
+     * <p><b>{@code @param}</b> <b>parentElement</b>
+     * {@link WebElement}
+     * </p>
+     *
+     * <p><b>{@code @date:}</b>2025/11/8 15:15</p>
+     * <p><b>{@code @return:}</b>{@link List< WebElement>}</p>
+     * <p><b>{@code @author:}</b>wlpia</p>
+     */
+    public static List<WebElement> getVisibleChildren(WebElement parentElement) {
+        List<WebElement> allChildren = parentElement.findElements(By.xpath("./*"));
+        return allChildren.stream()
+                .filter(WebElement::isDisplayed)
+                .collect(Collectors.toList());
+    }
+
+    /**
+     * <p><b>{@code @description:}</b>
+     * <div style='border-radius: 12px; border: 1px solid #e74c3c; padding: 5px; margin-left: 5px; margin-bottom: 5px;'>
+     * 获取可点击的子元素
+     * </div>
+     * </p>
+     *
+     * <p><b>{@code @param}</b> <b>parentElement</b>
+     * {@link WebElement}
+     * </p>
+     *
+     * <p><b>{@code @date:}</b>2025/11/8 15:16</p>
+     * <p><b>{@code @return:}</b>{@link List< WebElement>}</p>
+     * <p><b>{@code @author:}</b>wlpia</p>
+     */
+    public static List<WebElement> getClickableChildren(WebElement parentElement) {
+        List<WebElement> allChildren = parentElement.findElements(By.xpath("./*"));
+        return allChildren.stream()
+                .filter(WebElement::isDisplayed)
+                .filter(WebElement::isEnabled)
+                .collect(Collectors.toList());
+    }
 
     /**
      * <p><b>{@code @description:}</b>
