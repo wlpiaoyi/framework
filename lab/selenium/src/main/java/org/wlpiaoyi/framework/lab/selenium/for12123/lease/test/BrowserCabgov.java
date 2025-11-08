@@ -163,6 +163,13 @@ public class BrowserCabgov {
 
     void submitHT(SubmitHT submitHT, WebElement addBoxEle){
 
+        var webElements = addBoxEle.findElement(By.id("hpzl_lr")).findElements(By.xpath("option"));
+        WebElementUtils.click(browser, webElements.getLast());
+        try {
+            Thread.sleep(1000);
+        } catch (InterruptedException e) {
+        }
+
         WebElement cardNoEle = addBoxEle.findElement(By.id("hphm_lr"));
         WebElement htNoEle = addBoxEle.findElement(By.id("htbh_lr"));
         WebElement htSignTimeEle = addBoxEle.findElement(By.id("htqdsj_lr"));
@@ -208,7 +215,10 @@ public class BrowserCabgov {
         }
         WebElementUtils.setValue(cardIdEle, submitHT.getCardId());
         WebElementUtils.click(browser, saveEle);
-        System.out.println();
+        try {
+            Thread.sleep(1000);
+        } catch (InterruptedException e) {
+        }
     }
 
     void selectedYearMonth(int index, LocalDateTime dateTime){
@@ -277,11 +287,21 @@ public class BrowserCabgov {
                 throw new RuntimeException("未找到日历月DayBodyTrElement");
             }
             List<WebElement> dayEles = new ArrayList<>();
+            int tagi = -1;
             for (WebElement ele : dayBodyTrEle) {
                 List<WebElement> dayBodyTrTdEle = WebElementUtils.getVisibleChildren(ele);
                 for (WebElement tdEle : dayBodyTrTdEle){
-                    if(!"day".equals(tdEle.getAttribute("class"))){
-                        continue;
+                    int value = Integer.parseInt(WebElementUtils.getValue(tdEle));
+                    if(tagi == -1){
+                        if(value != 1){
+                            continue;
+                        }
+                        tagi = 0;
+                    }else if(tagi == 0){
+                        if(value == 1){
+                            tagi = 1;
+                            break;
+                        }
                     }
                     dayEles.add(tdEle);
                 }
@@ -289,7 +309,7 @@ public class BrowserCabgov {
             if(dayEles.size() < dateTime.getDayOfMonth()){
                 throw new RuntimeException("日历天数不对:" + dateTime.getMonth());
             }
-            WebElementUtils.click(this.browser, dayEles.get(dateTime.getDayOfMonth() + 1));
+            WebElementUtils.click(this.browser, dayEles.get(dateTime.getDayOfMonth() - 1));
         }
 
         {
