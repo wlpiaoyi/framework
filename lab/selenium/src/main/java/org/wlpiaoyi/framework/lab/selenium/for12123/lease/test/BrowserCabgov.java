@@ -1,14 +1,14 @@
 package org.wlpiaoyi.framework.lab.selenium.for12123.lease.test;
 
-import com.google.gson.Gson;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
+import org.openqa.selenium.Alert;
 import org.openqa.selenium.By;
 import org.openqa.selenium.Cookie;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.Select;
 import org.wlpiaoyi.framework.lab.selenium.Browser;
-import org.wlpiaoyi.framework.lab.selenium.for12123.lease.excel.ExcelWriter;
+import org.wlpiaoyi.framework.lab.selenium.for12123.lease.excel.ExcelReaderUtil;
 import org.wlpiaoyi.framework.lab.selenium.utils.WebElementUtils;
 import org.wlpiaoyi.framework.utils.DateUtils;
 import org.wlpiaoyi.framework.utils.ValueUtils;
@@ -16,16 +16,14 @@ import org.wlpiaoyi.framework.utils.data.DataUtils;
 import org.wlpiaoyi.framework.utils.data.ReaderUtils;
 import org.wlpiaoyi.framework.utils.data.WriterUtils;
 import org.wlpiaoyi.framework.utils.exception.BusinessException;
-import org.wlpiaoyi.framework.utils.gson.GsonBuilder;
 import org.wlpiaoyi.framework.utils.security.RsaCipher;
 
 import java.io.File;
-import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.OutputStream;
+import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
-import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.*;
 
 @Slf4j
@@ -124,31 +122,36 @@ public class BrowserCabgov {
         }
         this.openAndLogin();
         try{
-            String sjhtStr = ReaderUtils.loadString(CONFIG_PATH + "/sjht.txt", null);
-            if(ValueUtils.isBlank(sjhtStr)){
-                log.info("没有读取到数据");
-            }
-            String sjht[] = sjhtStr.split("\r\n");
-            for (String sjhtItem : sjht) {
+            String filePath = CONFIG_PATH + "\\12123司机信息表.xlsx";
+            List<SubmitHT> submitHTList = ExcelReaderUtil.readExcelToSubmitHTList(filePath);
+            log.info("已经读取到Excel数据:{}条", submitHTList.size());
+            String curTimeName = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMMdd"));
+            File erroFile = new File(CONFIG_PATH + "\\12123司机信息错误-" + curTimeName + ".txt");
+            for (SubmitHT submitHT : submitHTList) {
                 try {
-                    String arg[] = sjhtItem.split(",");
-                    if(arg.length != 6){
-                        log.info("数据格式错误:{}", sjhtItem);
-                        continue;
-                    }
+                    log.info("准备打开绑定窗口,绑定数据:{}", submitHT.toString());
                     WebElement addBoxEle = this.openAddBox();
-                    SubmitHT submitHT = SubmitHT.builder()
-                            .carNo(arg[0])
-                            .htNo(arg[1])
-//                            .name("刘海燕")
-                            .cardId(arg[2])
-                            .htSignTime(DateUtils.formatToLoaTolDateTime(arg[3]))
-                            .leaseStartTime(DateUtils.formatToLoaTolDateTime(arg[4]))
-                            .leaseEndTime(DateUtils.formatToLoaTolDateTime(arg[5]))
-                            .build();
+                    log.info("打开绑定窗口成功, 准备提交数据");
                     this.submitHT(submitHT, addBoxEle);
+                    log.info("提交数据成功, 确认提交");
                 }catch (Exception e){
-                    log.error("提交合同信息失败:{}", sjhtItem, e);
+                    log.error("提交合同信息失败:{}", submitHT.toString(), e);
+                    // 检查父目录是否存在，不存在则创建
+                    File parentDir = erroFile.getParentFile();
+                    if (parentDir != null && !parentDir.exists()) {
+                        boolean dirsCreated = parentDir.mkdirs();
+                        if (!dirsCreated) {
+                            throw new IOException("创建目录失败: " + parentDir.getAbsolutePath());
+                        }
+                    }
+                    // 检查文件是否存在，不存在则创建
+                    if (!erroFile.exists()) {
+                        boolean fileCreated = erroFile.createNewFile();
+                        if (!fileCreated) {
+                            throw new IOException("创建文件失败: " + erroFile.getAbsolutePath());
+                        }
+                    }
+                    WriterUtils.append(erroFile, submitHT.toString() + "[" + e.getMessage() + "]\r\n=================================\r\n", StandardCharsets.UTF_8);
                 }
             }
         }catch (Exception e){
@@ -163,24 +166,38 @@ public class BrowserCabgov {
 
     void submitHT(SubmitHT submitHT, WebElement addBoxEle){
 
+        log.info("准备选择车辆类型");
         var webElements = addBoxEle.findElement(By.id("hpzl_lr")).findElements(By.xpath("option"));
         WebElementUtils.click(browser, webElements.getLast());
+        log.info("选择车辆类型成功");
         try {
             Thread.sleep(1000);
         } catch (InterruptedException e) {
         }
 
-        WebElement cardNoEle = addBoxEle.findElement(By.id("hphm_lr"));
+        log.info("获取填写车牌号组件");
+        WebElement carNoEle = addBoxEle.findElement(By.id("hphm_lr"));
+        log.info("获取合同号组件");
         WebElement htNoEle = addBoxEle.findElement(By.id("htbh_lr"));
+        log.info("获取合同签订时间组件");
         WebElement htSignTimeEle = addBoxEle.findElement(By.id("htqdsj_lr"));
+        log.info("获取租借开始时间组件");
         WebElement leaseStartTimeEle = addBoxEle.findElement(By.id("zlkssj_lr"));
+        log.info("获取租借结束时间组件");
         WebElement leaseEndTimeEle = addBoxEle.findElement(By.id("zljssj_lr"));
+        log.info("获取身份证号码组件");
         WebElement cardIdEle = addBoxEle.findElement(By.id("sfzmhm_lr"));
+        log.info("获取保存按钮组件");
         WebElement saveEle = addBoxEle.findElement(By.id("htlrSave"));
 
-        WebElementUtils.setValue(cardNoEle, submitHT.getCarNo());
+        log.info("开始填写车牌号");
+        WebElementUtils.setValue(carNoEle, submitHT.getCarNo());
+        log.info("填写车牌号成功");
+        log.info("开始填写合同号");
         WebElementUtils.setValue(htNoEle, submitHT.getHtNo());
+        log.info("填写合同号成功");
         {
+            log.info("开始填写合同签订时间");
             List<WebElement> addOnEles = WebElementUtils.getChildrenByClass(WebElementUtils.getParentSafely(htSignTimeEle), "add-on");
             if(ValueUtils.isBlank(addOnEles)){
                 throw new RuntimeException("未找到时间触发器");
@@ -195,30 +212,56 @@ public class BrowserCabgov {
             }else{
                 this.selectedYearMonth(2, submitHT.getHtSignTime());
             }
+            log.info("填写合同签订时间成功");
 
         }
         {
+            log.info("开始填写租借开始时间");
             List<WebElement> addOnEles = WebElementUtils.getChildrenByClass(WebElementUtils.getParentSafely(leaseStartTimeEle), "add-on");
             if(ValueUtils.isBlank(addOnEles)){
                 throw new RuntimeException("未找到时间触发器");
             }
             WebElementUtils.click(browser, addOnEles.get(0));
             this.selectedYearMonth(3, submitHT.getLeaseStartTime());
+            log.info("填写租借开始时间成功");
         }
         {
+            log.info("开始填写租借结束时间");
             List<WebElement> addOnEles = WebElementUtils.getChildrenByClass(WebElementUtils.getParentSafely(leaseEndTimeEle), "add-on");
             if(ValueUtils.isBlank(addOnEles)){
                 throw new RuntimeException("未找到时间触发器");
             }
             WebElementUtils.click(browser, addOnEles.get(0));
             this.selectedYearMonth(4, submitHT.getLeaseEndTime());
+            log.info("填写租借结束时间成功");
         }
+        log.info("开始填写身份证号码");
         WebElementUtils.setValue(cardIdEle, submitHT.getCardId());
+        log.info("填写身份证号码成功");
+        log.info("开始点击保存按钮");
         WebElementUtils.click(browser, saveEle);
-        try {
-            Thread.sleep(1000);
-        } catch (InterruptedException e) {
+        log.info("点击保存按钮成功");
+        int i = 30;
+        Alert alert = null;
+        while (i -- > 0){
+            try {
+                Thread.sleep(1000);
+            } catch (InterruptedException e) {}
+            try {
+                alert = this.browser.getDriver().switchTo().alert();
+                break;
+            } catch (Exception e) {
+            }
         }
+        if(alert == null){
+            throw new RuntimeException("保存失败,未知错误");
+        }
+        String alertText = alert.getText();
+        alert.accept();
+        if(alertText.equals("保存成功")){
+            return;
+        }
+        throw new RuntimeException("保存失败:" + alertText);
     }
 
     void selectedYearMonth(int index, LocalDateTime dateTime){
