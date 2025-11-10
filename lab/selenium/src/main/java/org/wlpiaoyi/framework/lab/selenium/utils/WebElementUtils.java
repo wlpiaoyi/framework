@@ -1,10 +1,11 @@
 package org.wlpiaoyi.framework.lab.selenium.utils;
 
-import org.openqa.selenium.JavascriptExecutor;
-import org.openqa.selenium.Keys;
-import org.openqa.selenium.WebElement;
+import org.openqa.selenium.*;
 import org.wlpiaoyi.framework.lab.selenium.Browser;
 import org.wlpiaoyi.framework.utils.ValueUtils;
+
+import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * <p><b>{@code @author:}</b>         wlpiaoyi</p>
@@ -14,6 +15,181 @@ import org.wlpiaoyi.framework.utils.ValueUtils;
  */
 
 public class WebElementUtils {
+
+
+    /**
+     * <p><b>{@code @description:}</b>
+     * <div style='border-radius: 12px; border: 1px solid #e74c3c; padding: 5px; margin-left: 5px; margin-bottom: 5px;'>
+     * 获取可见的子元素
+     * </div>
+     * </p>
+     *
+     * <p><b>{@code @param}</b> <b>parentElement</b>
+     * {@link WebElement}
+     * </p>
+     *
+     * <p><b>{@code @date:}</b>2025/11/8 15:15</p>
+     * <p><b>{@code @return:}</b>{@link List< WebElement>}</p>
+     * <p><b>{@code @author:}</b>wlpia</p>
+     */
+    public static List<WebElement> getVisibleChildren(WebElement parentElement) {
+        List<WebElement> allChildren = parentElement.findElements(By.xpath("./*"));
+        return allChildren.stream()
+                .filter(WebElement::isDisplayed)
+                .collect(Collectors.toList());
+    }
+
+    /**
+     * <p><b>{@code @description:}</b>
+     * <div style='border-radius: 12px; border: 1px solid #e74c3c; padding: 5px; margin-left: 5px; margin-bottom: 5px;'>
+     * 获取可点击的子元素
+     * </div>
+     * </p>
+     *
+     * <p><b>{@code @param}</b> <b>parentElement</b>
+     * {@link WebElement}
+     * </p>
+     *
+     * <p><b>{@code @date:}</b>2025/11/8 15:16</p>
+     * <p><b>{@code @return:}</b>{@link List< WebElement>}</p>
+     * <p><b>{@code @author:}</b>wlpia</p>
+     */
+    public static List<WebElement> getClickableChildren(WebElement parentElement) {
+        List<WebElement> allChildren = parentElement.findElements(By.xpath("./*"));
+        return allChildren.stream()
+                .filter(WebElement::isDisplayed)
+                .filter(WebElement::isEnabled)
+                .collect(Collectors.toList());
+    }
+
+    /**
+     * <p><b>{@code @description:}</b>
+     * 获取所有直接子元素
+     * </p>
+     *
+     * <p><b>{@code @param:}</b> <b>parentElement</b>
+     * {@link WebElement}
+     * </p>
+     *
+     * <p><b>{@code @date:}</b>2025/11/7 16:40</p>
+     * <p><b>{@code @return:}</b>{@link List<WebElement>}</p>
+     * <p><b>{@code @author:}</b>wlpiaoyi</p>
+     */
+    public static List<WebElement> getDirectChildren(WebElement parentElement) {
+        return parentElement.findElements(By.xpath("./*"));
+    }
+
+    /**
+     * <p><b>{@code @description:}</b>
+     * 获取特定标签的直接子元素
+     * </p>
+     *
+     * <p><b>{@code @param:}</b> <b>parentElement</b>
+     * {@link WebElement}
+     * </p>
+     *
+     * <p><b>{@code @param:}</b> <b>tagName</b>
+     * {@link String}
+     * </p>
+     *
+     * <p><b>{@code @date:}</b>2025/11/7 16:43</p>
+     * <p><b>{@code @return:}</b>{@link List<WebElement>}</p>
+     * <p><b>{@code @author:}</b>wlpiaoyi</p>
+     */
+    public static List<WebElement> getChildrenByTag(WebElement parentElement, String tagName) {
+        return parentElement.findElements(By.xpath("./" + tagName));
+    }
+    /**
+     * <p><b>{@code @description:}</b>
+     * 获取具有特定class的子元素
+     * </p>
+     *
+     * <p><b>{@code @param:}</b> <b>parentElement</b>
+     * {@link WebElement}
+     * </p>
+     *
+     * <p><b>{@code @param:}</b> <b>className</b>
+     * {@link String}
+     * </p>
+     *
+     * <p><b>{@code @date:}</b>2025/11/7 16:44</p>
+     * <p><b>{@code @return:}</b>{@link List<WebElement>}</p>
+     * <p><b>{@code @author:}</b>wlpiaoyi</p>
+     */
+    public static List<WebElement> getChildrenByClass(WebElement parentElement, String className) {
+        return parentElement.findElements(By.cssSelector(":scope > ." + className));
+    }
+
+    /**
+     * <p><b>{@code @description:}</b>
+     * 获取具有特定属性的子元素
+     * </p>
+     *
+     * <p><b>{@code @param:}</b> <b>parentElement</b>
+     * {@link WebElement}
+     * </p>
+     *
+     * <p><b>{@code @param:}</b> <b>attribute</b>
+     * {@link String}
+     * </p>
+     *
+     * <p><b>{@code @param:}</b> <b>value</b>
+     * {@link String}
+     * </p>
+     *
+     * <p><b>{@code @date:}</b>2025/11/7 16:44</p>
+     * <p><b>{@code @return:}</b>{@link List<WebElement>}</p>
+     * <p><b>{@code @author:}</b>wlpiaoyi</p>
+     */
+    public static List<WebElement> getChildrenByAttribute(WebElement parentElement,
+                                                          String attribute, String value) {
+        String xpath = String.format("./*[@%s='%s']", attribute, value);
+        return parentElement.findElements(By.xpath(xpath));
+    }
+
+    /**
+     * <p><b>{@code @description:}</b>
+     * 检查元素是否有父元素
+     * </p>
+     *
+     * <p><b>{@code @param:}</b> <b>childElement</b>
+     * {@link WebElement}
+     * </p>
+     *
+     * <p><b>{@code @date:}</b>2025/11/7 16:39</p>
+     * <p><b>{@code @return:}</b>{@link boolean}</p>
+     * <p><b>{@code @author:}</b>wlpiaoyi</p>
+     */
+    public static boolean hasParent(WebElement childElement) {
+        try {
+            childElement.findElement(By.xpath("parent::*"));
+            return true;
+        } catch (NoSuchElementException e) {
+            return false;
+        }
+    }
+
+    /**
+     * <p><b>{@code @description:}</b>
+     * 获取上级节点
+     * </p>
+     *
+     * <p><b>{@code @param:}</b> <b>ele</b>
+     * {@link WebElement}
+     * </p>
+     *
+     * <p><b>{@code @date:}</b>2025/11/7 16:37</p>
+     * <p><b>{@code @return:}</b>{@link WebElement}</p>
+     * <p><b>{@code @author:}</b>wlpiaoyi</p>
+     */
+    public static WebElement getParentSafely(WebElement childElement) {
+        try {
+            return childElement.findElement(By.xpath("parent::*"));
+        } catch (NoSuchElementException e) {
+            System.out.println("父元素不存在");
+            return null;
+        }
+    }
 
     /**
      * <p><b>{@code @description:}</b>
