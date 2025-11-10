@@ -175,6 +175,16 @@ public class BrowserCabgov {
         } catch (InterruptedException e) {
         }
 
+        log.info("准备选择租赁类型");
+        webElements = addBoxEle.findElement(By.id("zllx_lr")).findElements(By.xpath("option"));
+        WebElementUtils.click(browser, webElements.getLast());
+        log.info("选择租赁类型成功");
+        try {
+            Thread.sleep(1000);
+        } catch (InterruptedException e) {
+        }
+
+
         log.info("获取填写车牌号组件");
         WebElement carNoEle = addBoxEle.findElement(By.id("hphm_lr"));
         log.info("获取合同号组件");
