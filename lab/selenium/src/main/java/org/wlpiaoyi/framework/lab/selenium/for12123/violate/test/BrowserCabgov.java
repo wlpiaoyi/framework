@@ -91,10 +91,10 @@ public class BrowserCabgov extends BrowserBase {
             os.close();
         }
         if(errorCarNo.length() > 0){
-            WriterUtils.overwrite(new File(CONFIG_PATH + "/errorCarNo" + fileName  + ".txt"), errorCarNo.toString().getBytes());
+            WriterUtils.overwrite(new File(CONFIG_PATH + "/列表无数据-" + fileName  + ".txt"), errorCarNo.toString().getBytes());
         }
         if(noItemCarNo.length() > 0){
-            WriterUtils.overwrite(new File(CONFIG_PATH + "/noItemCarNo" + fileName  + ".txt"), noItemCarNo.toString().getBytes());
+            WriterUtils.overwrite(new File(CONFIG_PATH + "/为找到违法记录-" + fileName  + ".txt"), noItemCarNo.toString().getBytes());
         }
     }
 
