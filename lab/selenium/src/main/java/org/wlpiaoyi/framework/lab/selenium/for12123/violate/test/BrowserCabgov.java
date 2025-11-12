@@ -7,6 +7,7 @@ import org.openqa.selenium.By;
 import org.openqa.selenium.Cookie;
 import org.openqa.selenium.WebElement;
 import org.wlpiaoyi.framework.lab.selenium.Browser;
+import org.wlpiaoyi.framework.lab.selenium.for12123.BrowserBase;
 import org.wlpiaoyi.framework.lab.selenium.for12123.violate.excel.ExcelWriter;
 import org.wlpiaoyi.framework.lab.selenium.utils.WebElementUtils;
 import org.wlpiaoyi.framework.utils.DateUtils;
@@ -27,99 +28,17 @@ import java.time.LocalDate;
 import java.util.*;
 
 @Slf4j
-public class BrowserCabgov {
+public class BrowserCabgov extends BrowserBase {
 
-    private String privateKey = "MIICdQIBADANBgkqhkiG9w0BAQEFAASCAl8wggJbAgEAAoGBAIwgd+H2N2wAAPEHEi8ypKdwaB2I\n" +
-            "ouHQGfI/oXpA8hJFBnq7h/OF/xVm2TN+i5Y4GOCK2TdfgtGa10ed0xwUb13eu6oFtuo1VHCAiSzC\n" +
-            "CbIVutyVysY4l7HvhAJvH1KlHRLRQU4sFNNgdrdYJwSV4hcUU62pgBGIyDFadTetVnW/AgMBAAEC\n" +
-            "gYAziVd+IEe27XNrMl4SRM6BFJr+TbwWUCrSyWtS4uMFLCTba/Bu9Nfh368/vKmLCLvBjd+g+XxM\n" +
-            "KeZGnTnBKJTihnKw4AwqmVN1Sr1RTnXwJ6eNGSitNEqaYhGU4aEwr+714ZkVsVY5v7vTjZJ2hTDr\n" +
-            "ksdZd0llGHG1umy7CYyE0QJBAMVPc6813nJ6rF/v8KQqVfIhO1qChb4BH47zaegMGOS4NYEgdNjK\n" +
-            "YmOIHh47+GvVQj5aTbmPScXZySEJ4Z5eYQ8CQQC1zqzDaPTN4Ts46JfrpNJhUjJOFr/dqAUfifln\n" +
-            "UsGYrPtthviDrMzemnT+hq9HIXRM+fYsWn8QN0/teainakBRAkBYvty0kNElwoFngT9GR3hyuHm+\n" +
-            "wvgutsif/mHDKjXEIgqGsrd7jsPkKqQJS0X4EmqCKxHMhWNUJxmsz4n4NlEHAkA09qR1uNm4MGkk\n" +
-            "Rv4a88Ul/OASx6XVWOFFMtipNP6ZD6ufWLaFBY4ZOz3h+DKPsjtDQX5ppWNmwfZS5CIxw05BAkAn\n" +
-            "HGet1e6kl9bGv+8LXsE2/JHHr97dS52I6xWkdW5yp5/OmV0X90NF4P7Fb5zE870lWG3/orBdRqgp\n" +
-            "4JTodTCj";
-    private String publicKey = "MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQCMIHfh9jdsAADxBxIvMqSncGgdiKLh0BnyP6F6\n" +
-            "QPISRQZ6u4fzhf8VZtkzfouWOBjgitk3X4LRmtdHndMcFG9d3ruqBbbqNVRwgIkswgmyFbrclcrG\n" +
-            "OJex74QCbx9SpR0S0UFOLBTTYHa3WCcEleIXFFOtqYARiMgxWnU3rVZ1vwIDAQAB";
-
-    private int type = 0;
-    private final String CONFIG_PATH = System.getProperty("user.dir") + "/config/selenium";
-    private final Browser browser;
-    private String cookies = null;
-    private Long curDateL = 0L;
-
-    private void loadCurDateValue(){
-        log.info("in. 读取到期配置文件");
-        try {
-            byte[] value = ReaderUtils.loadBytes(new File(CONFIG_PATH + "/cur_date.dat"));
-            RsaCipher cipher = RsaCipher.build(0).setPrivateKey(this.privateKey).setPublicKey(this.publicKey).loadConfig();
-            String dText = new String(
-                    cipher.decrypt(
-                            DataUtils.base64Decode(value)
-                    ),
-                    StandardCharsets.UTF_8
-            );
-            this.curDateL = Long.parseLong(dText);
-        } catch (IOException e) {
-            log.error("读取配置文件错误", e);
-        }
-        log.info("end. 读取到期配置文件");
-    }
 
     public BrowserCabgov(int type){
-        this.type = type;
-        this.loadCurDateValue();
-        log.warn("charles type:{}", type);
-        browser = new Browser().setOptionHeadless(false).setUrl("https://sc.122.gov.cn/views/memrent/vehlist.html");
-//        this.browser.setOptionHeadless(true);
-        this.browser.setOptionLoadimg(true);
-        this.browser.setDriverPath(CONFIG_PATH +"/chromedriver");
-//        Runtime.getRuntime().addShutdownHook(new RTMServer(this.browser));
-        // 添加一个shutdown hook
-        Runtime.getRuntime().addShutdownHook(new Thread(() -> {
-            log.info("检测到程序即将关闭...");
-            log.warn("browser start quit");
-            try {
-                this.browser.getDriver().close();
-            }catch (Exception e){}
-            try {
-                this.browser.getDriver().quit();
-            }catch (Exception e){}
-            try {
-                this.browser.quit();
-            }catch (Exception e){}
-            log.warn("browser quit success");
-        }));
+        super(type);
 
     }
     @SneakyThrows
     public boolean start(){
-        log.info("prepare charles data");
-        this.cookies = ReaderUtils.loadString(CONFIG_PATH + "/cookies.txt", null).replaceAll("\n","").replaceAll("\r","");
-        try{
-            browser.openChromeDriver();
-            browser.openDriver();
-            if(ValueUtils.isNotBlank(this.cookies)){
-                String args[] = this.cookies.split("; ");
-                Set<Cookie> cookies = new HashSet<>();
-                for (String arg : args){
-                    String as[] = arg.split("=");
-                    cookies.add(new Cookie(as[0], as[1]));
-                }
-                this.browser.setCookies(cookies);;
-                browser.openDriver();
-            }else {
-                log.info("cookies is null");
-                this.cookies = null;
-            }
-        }catch (Exception e) {
-            log.error("set cookies error", e);
-            browser.quit();
-            return false;
-        }
+        log.info("BrowserCabgov.start in. 启动浏览器");
+        if(!super.start()) return false;
         this.openAndLogin();
         String[] args = ReaderUtils.loadString(CONFIG_PATH + "/car_no.txt", null).split("\n");
         log.info("start charles data");
@@ -308,20 +227,6 @@ public class BrowserCabgov {
             throw new BusinessException(errorMsg);
         }
         return itemsList;
-    }
-
-    boolean clickFeed(){
-        try{
-            WebElement webElement = browser.getDriver().findElement(By.className("aui_state_highlight"));
-            if(webElement != null){
-                WebElementUtils.click(browser, webElement);
-                return true;
-            }
-        }catch (Exception e){
-            log.warn("click feed error:{}", e.getMessage());
-        }
-        return false;
-
     }
 
     void openAndLogin(){
