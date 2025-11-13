@@ -14,15 +14,15 @@ import java.util.concurrent.TimeUnit;
 public class ThreadPoolExecutorBuilder {
 
     // 线程池参数
-    private int corePoolSize = 5;
+    private int corePoolSize = ThreadPoolExecutor.CORE_POOL_SIZE;
     // 最大线程数
-    private int maximumPoolSize = 50;
+    private int maximumPoolSize = ThreadPoolExecutor.MAXIMUM_POOL_SIZE;
     // 线程空闲存活时间
-    private long keepAliveTime = 300;
+    private long keepAliveTime = ThreadPoolExecutor.KEEP_ALIVE_TIME;
     // 时间单位
     private TimeUnit unit = TimeUnit.SECONDS;
     // 工作队列容量
-    private int workQueueCount = 50;
+    private int workQueueCount = ThreadPoolExecutor.WORK_QUEUE_COUNT;
     // 线程名前缀
     private String threadNamePrefix = "custom-thread-";
     // 拒绝策略

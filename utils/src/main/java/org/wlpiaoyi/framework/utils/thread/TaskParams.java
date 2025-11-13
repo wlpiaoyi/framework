@@ -3,6 +3,8 @@ package org.wlpiaoyi.framework.utils.thread;
 import lombok.Builder;
 import lombok.Getter;
 
+import java.time.LocalDateTime;
+
 /**
  * <p><b>{@code @author:}</b>         wlpiaoyi</p>
  * <p><b>{@code @description:}</b>
@@ -32,4 +34,5 @@ public class TaskParams {
      * </p>
      */
     private double durationSecond;
+
 }

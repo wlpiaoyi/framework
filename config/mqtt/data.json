@@ -34,6 +34,36 @@
               }
             }
           ]
+        },
+        {
+          "abilityCode": "JH-HWPTZControl",
+          "reportProperties": {
+            "channelNo": 6
+          }
+        }
+      ]
+    },
+    {
+      "nodeCode": "KH_CONTROL_01",
+      "deviceId": "54ad32b9547f6b32",
+      "models": [
+        {
+          "abilityCode": "bandDeviceCode1",
+          "reportProperties": {
+            "bandDeviceCode1": "JH-JHC72-POWERRESTART"
+          }
+        }
+      ]
+    },
+    {
+      "nodeCode": "JH-JHC72-CQKG",
+      "deviceId": "JH-JHC72-POWERRESTART",
+      "models": [
+        {
+          "abilityCode": "restartIC808",
+          "reportProperties": {
+            "PowerRestartStatus": "false"
+          }
         }
       ]
     }

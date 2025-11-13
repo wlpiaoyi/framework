@@ -5,8 +5,6 @@ import org.wlpiaoyi.framework.utils.ValueUtils;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.*;
-import java.util.concurrent.atomic.AtomicLong;
-import java.util.concurrent.atomic.AtomicStampedReference;
 
 /**
  * <p><b>{@code @author:}</b>         wlpiaoyi</p>
@@ -17,6 +15,18 @@ import java.util.concurrent.atomic.AtomicStampedReference;
  * <p><b>{@code @version:}</b>       1.0</p>
  */
 public class ThreadPoolExecutor {
+
+    /** 默认核心线程数 */
+    public static final int CORE_POOL_SIZE = 5;
+
+    /** 默认最大线程数 */
+    public static final int MAXIMUM_POOL_SIZE = 50;
+
+    /** 默认线程空闲存活时间 */
+    public static final long KEEP_ALIVE_TIME = 300;
+
+    /** 默认工作队列容量 */
+    public static final int WORK_QUEUE_COUNT = 50;
 
     /** 底层线程池执行器 */
     private final java.util.concurrent.ThreadPoolExecutor threadPool;
@@ -62,10 +72,10 @@ public class ThreadPoolExecutor {
      */
     ThreadPoolExecutor(int corePoolSize, int maximumPoolSize, long keepAliveTime, TimeUnit unit,
                        int workQueueCount, String threadNamePrefix, RejectedExecutionHandler handler) {
-        if(corePoolSize < 1) corePoolSize = 5;
-        if(maximumPoolSize < 1) maximumPoolSize = 50;
-        if(keepAliveTime < 1) keepAliveTime = 300;
-        if(workQueueCount < 1) workQueueCount = 50;
+        if(corePoolSize < 1) corePoolSize = CORE_POOL_SIZE;
+        if(maximumPoolSize < 1) maximumPoolSize = MAXIMUM_POOL_SIZE;
+        if(keepAliveTime < 1) keepAliveTime = KEEP_ALIVE_TIME;
+        if(workQueueCount < 1) workQueueCount = WORK_QUEUE_COUNT;
         ThreadFactory threadFactory = r -> new Thread(r, threadNamePrefix + "_" + r.hashCode());
         this.threadPool = new java.util.concurrent.ThreadPoolExecutor(
                 corePoolSize, maximumPoolSize, keepAliveTime, unit,
@@ -337,7 +347,7 @@ public class ThreadPoolExecutor {
          * {@link RunEnd} 任务结束回调
          * </p>
          */
-        public ParamCallable(Runnable<P, R> runnable, TaskParams taskParams, P param, RunEnd runEnd) {
+        ParamCallable(Runnable<P, R> runnable, TaskParams taskParams, P param, RunEnd runEnd) {
             this.runnable = runnable;
             this.taskParams = taskParams;
             this.param = param;

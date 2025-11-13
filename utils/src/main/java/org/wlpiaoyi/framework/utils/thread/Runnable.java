@@ -3,7 +3,7 @@ package org.wlpiaoyi.framework.utils.thread;
 /**
  * <p><b>{@code @author:}</b>         wlpiaoyi</p>
  * <p><b>{@code @description:}</b>
- * <div style='border-radius: 12px; border: 1px solid #e74c3c; padding: 5px; margin-left: 5px; margin-bottom: 5px;'>
+ * <div style='border: 1px solid #888; padding: 5px; margin-left: 5px; margin-bottom: 5px;'>
  * 支持参数和返回值的可运行任务接口
  * <br/>函数式接口，用于定义可在线程池中执行的带参数任务
  * <br/>P: 任务执行所需的业务参数
@@ -18,7 +18,7 @@ public interface Runnable<P,R> {
 
     /**
      * <p><b>{@code @description:}</b>
-     * <div style='border-radius: 12px; border: 1px solid #e74c3c; padding: 5px; margin-left: 5px; margin-bottom: 5px;'>
+     * <div style='border: 1px solid #888; padding: 5px; margin-left: 5px; margin-bottom: 5px;'>
      * 执行任务的核心方法，支持任务ID和自定义参数，并返回执行结果
      * 此方法将在线程池的工作线程中异步执行
      * </div>
