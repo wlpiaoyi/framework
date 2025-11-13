@@ -20,22 +20,24 @@ import java.util.Set;
 @Slf4j
 public class BrowserBase {
 
-    protected String privateKey = "MIICdQIBADANBgkqhkiG9w0BAQEFAASCAl8wggJbAgEAAoGBAIwgd+H2N2wAAPEHEi8ypKdwaB2I\n" +
-            "ouHQGfI/oXpA8hJFBnq7h/OF/xVm2TN+i5Y4GOCK2TdfgtGa10ed0xwUb13eu6oFtuo1VHCAiSzC\n" +
-            "CbIVutyVysY4l7HvhAJvH1KlHRLRQU4sFNNgdrdYJwSV4hcUU62pgBGIyDFadTetVnW/AgMBAAEC\n" +
-            "gYAziVd+IEe27XNrMl4SRM6BFJr+TbwWUCrSyWtS4uMFLCTba/Bu9Nfh368/vKmLCLvBjd+g+XxM\n" +
-            "KeZGnTnBKJTihnKw4AwqmVN1Sr1RTnXwJ6eNGSitNEqaYhGU4aEwr+714ZkVsVY5v7vTjZJ2hTDr\n" +
-            "ksdZd0llGHG1umy7CYyE0QJBAMVPc6813nJ6rF/v8KQqVfIhO1qChb4BH47zaegMGOS4NYEgdNjK\n" +
-            "YmOIHh47+GvVQj5aTbmPScXZySEJ4Z5eYQ8CQQC1zqzDaPTN4Ts46JfrpNJhUjJOFr/dqAUfifln\n" +
-            "UsGYrPtthviDrMzemnT+hq9HIXRM+fYsWn8QN0/teainakBRAkBYvty0kNElwoFngT9GR3hyuHm+\n" +
-            "wvgutsif/mHDKjXEIgqGsrd7jsPkKqQJS0X4EmqCKxHMhWNUJxmsz4n4NlEHAkA09qR1uNm4MGkk\n" +
-            "Rv4a88Ul/OASx6XVWOFFMtipNP6ZD6ufWLaFBY4ZOz3h+DKPsjtDQX5ppWNmwfZS5CIxw05BAkAn\n" +
-            "HGet1e6kl9bGv+8LXsE2/JHHr97dS52I6xWkdW5yp5/OmV0X90NF4P7Fb5zE870lWG3/orBdRqgp\n" +
-            "4JTodTCj";
-    protected String publicKey = "MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQCMIHfh9jdsAADxBxIvMqSncGgdiKLh0BnyP6F6\n" +
-            "QPISRQZ6u4fzhf8VZtkzfouWOBjgitk3X4LRmtdHndMcFG9d3ruqBbbqNVRwgIkswgmyFbrclcrG\n" +
-            "OJex74QCbx9SpR0S0UFOLBTTYHa3WCcEleIXFFOtqYARiMgxWnU3rVZ1vwIDAQAB";
+    private String privateKey = "MIICdQIBADANBgkqhkiG9w0BAQEFAASCAl8wggJbAgEAAoGBAJ+8wUIHMZHsdSJKfXkBaYRHKzuN\n" +
+            "SP23Q6Jvsi0X/GVN3320ylAvs7QSwRWS+FEXMRqpzMcpivjUarz7q/Qw58WFH0aMzmx2pmxhlkUs\n" +
+            "Y/LxUVAtM1DfPKPohZ+a06D9tk4+hnGwVQGEwX9oBwp78VZzMzdAY5KdbceD2oQS/qP7AgMBAAEC\n" +
+            "gYBF2FLofBzAoZPWGpwifOuWW0gcEfsIdUmtjQlrjkFeSl6eqJ6N0U3SPyEOPeU2D934uqY/r3qE\n" +
+            "sty5JZJag8fTdP8StHJzUm2b2Mr6Sfb/ROTBhx6mdN5+S0wr8M3I6918ZZ1qAiIFuAkKWsQGxbvU\n" +
+            "FUwQVrHEtDJNjXeS4miiAQJBANTNwdPRIBzw0w5kakWPRYQ9HoWE3TSXdf9rxNpDcgpFftsR7QbF\n" +
+            "6SSBIKl7xGLqaxQFbAmZdQNt4WEfEwpBJOsCQQDAKW1kd7nL6FtgSLKMoEexFLVWNLD0f9g0MTtC\n" +
+            "+kxz4jprqGhdaLfNwJAqnmnjQm+4p/Ra7wjSij8LYz8PWvkxAkBnivYUqlyFuGf5SMKstdmNTm/b\n" +
+            "Z5p6THgNn9JYoRiMBuSCk2ZRNVsLeAj8bkxQFN+lDj5TLWfSE1TmfMg25RuhAkBvEkMJ1G5PX3IZ\n" +
+            "uEuEH0zxHTAnsPMrkA3vNRm1ACpavUPZYJFalKHRSuHJ0KER3B/pkyMZwJrP31rLgUU84e+xAkA4\n" +
+            "mpZ88Vn8vDbOZY35DbgH6hipcIh09tN/V03v/TBsfD/pDbEaiU8LIvK8jm1Z9qhl4rahXj4XdImv\n" +
+            "FmkVhTLy";
+    private String publicKey = "MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQCfvMFCBzGR7HUiSn15AWmERys7jUj9t0Oib7It\n" +
+            "F/xlTd99tMpQL7O0EsEVkvhRFzEaqczHKYr41Gq8+6v0MOfFhR9GjM5sdqZsYZZFLGPy8VFQLTNQ\n" +
+            "3zyj6IWfmtOg/bZOPoZxsFUBhMF/aAcKe/FWczM3QGOSnW3Hg9qEEv6j+wIDAQAB";
 
+    protected final String localName = "海南省";
+    protected final String DATA_PATH = System.getProperty("user.dir") + "/data";
     protected final String CONFIG_PATH = System.getProperty("user.dir") + "/config/selenium";
     protected final Browser browser;
     protected final String cookies;
@@ -60,6 +62,30 @@ public class BrowserBase {
         }
         log.info("BrowserBase.loadCurDateValue end. 读取到期配置文件");
         return 0L;
+    }
+
+    protected boolean checkLocal(){
+        int i = 10;
+        while (i -- > 0){
+            try {
+                Thread.sleep(1000);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+                throw new RuntimeException(e);
+            }
+            try{
+                WebElement ele = this.browser.getDriver().findElement(By.id("district-name"));
+                if(ele == null){
+                    continue;
+                }
+                String text = WebElementUtils.getValue(ele);
+                if(text.equals(localName)){
+                    return true;
+                }
+            }catch (Exception e){
+            }
+        }
+        return false;
     }
 
     protected BrowserBase(int type){
@@ -101,7 +127,7 @@ public class BrowserBase {
     }
 
 
-    protected boolean start(){
+    public boolean start(){
         log.info("BrowserBase.start in. 启动浏览器");
         try{
             browser.openChromeDriver();

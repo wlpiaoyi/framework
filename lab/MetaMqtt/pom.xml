@@ -64,7 +64,7 @@
                     <archive>
                         <manifest>
                             <!--换成自己的主类-->
-                            <mainClass>org.wlpiaoyi.framework.meta.mqtt.AppRun</mainClass>
+                            <mainClass>org.wlpiaoyi.framework.meta.mqtt.org.wlpiaoyi.framework.lab.selenium.AppRun</mainClass>
                         </manifest>
                     </archive>
                 </configuration>

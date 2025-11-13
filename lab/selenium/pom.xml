@@ -78,7 +78,7 @@
                     <archive>
                         <manifest>
                             <!--换成自己的主类-->
-                            <mainClass>org.wlpiaoyi.framework.lab.selenium.for12123.lease.test.BrowserCabgov</mainClass>
+                            <mainClass>org.wlpiaoyi.framework.lab.selenium.AppRun</mainClass>
                         </manifest>
                     </archive>
                 </configuration>

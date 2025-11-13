@@ -34,12 +34,13 @@ public class BrowserCabgov extends BrowserBase {
         log.info("BrowserCabgov.start in. 启动浏览器");
         if(!super.start()) return false;
         this.openAndLogin();
+        this.checkLocal();
         try{
             String filePath = CONFIG_PATH + "\\12123司机信息表.xlsx";
             List<SubmitHT> submitHTList = ExcelReaderUtil.readExcelToSubmitHTList(filePath);
             log.info("BrowserCabgov.start 已经读取到Excel数据:{}条", submitHTList.size());
             String curTimeName = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMMdd"));
-            File erroFile = new File(CONFIG_PATH + "\\12123司机信息错误-" + curTimeName + ".txt");
+            File erroFile = new File(DATA_PATH + "\\12123司机信息错误-" + curTimeName + ".txt");
             for (SubmitHT submitHT : submitHTList) {
                 try {
                     log.info("BrowserCabgov.start 准备打开绑定窗口,绑定数据:{}", submitHT.toString());
@@ -475,11 +476,5 @@ public class BrowserCabgov extends BrowserBase {
         if(ValueUtils.isNotBlank(errorMsg)){
             throw new BusinessException(errorMsg);
         }
-    }
-
-
-    public static void main(String[] args) {
-        BrowserCabgov bc = new BrowserCabgov(args.length) ;
-        bc.start();
     }
 }

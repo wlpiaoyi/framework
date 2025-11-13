@@ -40,7 +40,8 @@ public class BrowserCabgov extends BrowserBase {
         log.info("BrowserCabgov.start in. 启动浏览器");
         if(!super.start()) return false;
         this.openAndLogin();
-        String[] args = ReaderUtils.loadString(CONFIG_PATH + "/car_no.txt", null).split("\n");
+        this.checkLocal();
+        String[] args = ReaderUtils.loadString(CONFIG_PATH + "/12123违章车牌号.txt", null).split("\n");
         log.info("start charles data");
         List<Map<String, String>> itemsList = new ArrayList<>();
         StringBuffer errorCarNo = new StringBuffer();
@@ -49,10 +50,10 @@ public class BrowserCabgov extends BrowserBase {
             for(String arg : args){
                 arg = arg.replaceAll("\r", "");
                 arg = arg.replaceAll("\n", "");
-                log.info(">charles data by car_no:{} ==================>", arg);
+                log.info(">charles data by 12123违章车牌号:{} ==================>", arg);
                 try{
                     List<Map<String, String>> items = this.filterItem(arg);
-                    log.info("<charles data by car_no:{} {} <==================", arg, items.size());
+                    log.info("<charles data by 12123违章车牌号:{} {} <==================", arg, items.size());
                     if(ValueUtils.isBlank(items)){
                         log.info("has no items not write data:{}", arg);
                         noItemCarNo.append(arg + "\n");
@@ -60,7 +61,7 @@ public class BrowserCabgov extends BrowserBase {
                     }
                     itemsList.addAll(items);
                 }catch (Exception e){
-                    log.error("<charles data error by car_no:{} <==================", arg, e);
+                    log.error("<charles data error by 12123违章车牌号:{} <==================", arg, e);
                     errorCarNo.append(arg + "\n");
                 }
                 writeExcel(itemsList, errorCarNo, noItemCarNo);
@@ -82,19 +83,22 @@ public class BrowserCabgov extends BrowserBase {
     @SneakyThrows
     public void writeExcel(List<Map<String, String>> itemsList, StringBuffer errorCarNo, StringBuffer noItemCarNo){
         String fileName = DateUtils.formatDate(new Date(), "YYMMDDHHmmss");
+        File dataPath = new File(DATA_PATH );
+        if(!dataPath.exists())
+            dataPath.mkdirs();
         if(itemsList.size() > 0){
             Gson gson = GsonBuilder.gsonDefault();
-            WriterUtils.overwrite(new File(CONFIG_PATH + "/" + fileName  + ".txt"), gson.toJson(itemsList).getBytes());
-            OutputStream os = new FileOutputStream(CONFIG_PATH + "/" + fileName + ".xlsx");
+            WriterUtils.overwrite(new File(DATA_PATH + "/" + fileName  + ".txt"), gson.toJson(itemsList).getBytes());
+            OutputStream os = new FileOutputStream(DATA_PATH + "/" + fileName + ".xlsx");
             ExcelWriter.exportData(itemsList).write(os);
             os.flush();
             os.close();
         }
         if(errorCarNo.length() > 0){
-            WriterUtils.overwrite(new File(CONFIG_PATH + "/列表无数据-" + fileName  + ".txt"), errorCarNo.toString().getBytes());
+            WriterUtils.overwrite(new File(DATA_PATH + "/列表无数据-" + fileName  + ".txt"), errorCarNo.toString().getBytes());
         }
         if(noItemCarNo.length() > 0){
-            WriterUtils.overwrite(new File(CONFIG_PATH + "/为找到违法记录-" + fileName  + ".txt"), noItemCarNo.toString().getBytes());
+            WriterUtils.overwrite(new File(DATA_PATH + "/为找到违法记录-" + fileName  + ".txt"), noItemCarNo.toString().getBytes());
         }
     }
 
@@ -686,8 +690,4 @@ public class BrowserCabgov extends BrowserBase {
 //        itemsList.add(item);
 //    }
 
-    public static void main(String[] args) {
-        BrowserCabgov bc = new BrowserCabgov(args.length) ;
-        bc.start();
-    }
 }
