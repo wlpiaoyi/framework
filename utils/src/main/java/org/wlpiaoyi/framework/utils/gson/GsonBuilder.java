@@ -1,9 +1,6 @@
 package org.wlpiaoyi.framework.utils.gson;
 
-import com.google.gson.ExclusionStrategy;
-import com.google.gson.FieldAttributes;
-import com.google.gson.Gson;
-import com.google.gson.TypeAdapterFactory;
+import com.google.gson.*;
 import com.google.gson.annotations.Expose;
 import lombok.NonNull;
 import lombok.SneakyThrows;
@@ -123,6 +120,7 @@ public class GsonBuilder  {
         };
         gsonBuilder.setExclusionStrategies(myExclusionStrategy);
 
+
         for (TypeAdapterFactory factory : this.factories) {
             gsonBuilder.registerTypeAdapterFactory(factory);
         }
@@ -131,7 +129,9 @@ public class GsonBuilder  {
             Class clazz = (Class) method.invoke(null);
             gsonBuilder.registerTypeAdapter(clazz, jsonSerializer);
         }
-        Gson gson = gsonBuilder.create();
+        Gson gson = gsonBuilder
+                .setObjectToNumberStrategy(ToNumberPolicy.LONG_OR_DOUBLE)
+                .create();
         return gson;
     }
 

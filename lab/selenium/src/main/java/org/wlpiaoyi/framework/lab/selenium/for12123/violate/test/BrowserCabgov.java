@@ -42,7 +42,7 @@ public class BrowserCabgov extends BrowserBase {
         this.openAndLogin();
         this.checkLocal();
         String[] args = ReaderUtils.loadString(CONFIG_PATH + "/12123违章车牌号.txt", null).split("\n");
-        log.info("start charles data");
+        log.info("BrowserCabgov.start prepare. args:{}", args);
         List<Map<String, String>> itemsList = new ArrayList<>();
         StringBuffer errorCarNo = new StringBuffer();
         StringBuffer noItemCarNo = new StringBuffer();
@@ -50,18 +50,18 @@ public class BrowserCabgov extends BrowserBase {
             for(String arg : args){
                 arg = arg.replaceAll("\r", "");
                 arg = arg.replaceAll("\n", "");
-                log.info(">charles data by 12123违章车牌号:{} ==================>", arg);
+                log.info("BrowserCabgov.start for. 获取车牌号:{}", arg);
                 try{
                     List<Map<String, String>> items = this.filterItem(arg);
-                    log.info("<charles data by 12123违章车牌号:{} {} <==================", arg, items.size());
+                    log.info("BrowserCabgov.start for. 获取车牌号:{} {} <==================", arg, items.size());
                     if(ValueUtils.isBlank(items)){
-                        log.info("has no items not write data:{}", arg);
+                        log.info("BrowserCabgov.start for continue. has no items not write data:{}", arg);
                         noItemCarNo.append(arg + "\n");
                         continue;
                     }
                     itemsList.addAll(items);
                 }catch (Exception e){
-                    log.error("<charles data error by 12123违章车牌号:{} <==================", arg, e);
+                    log.error("BrowserCabgov.start for error. 12123违章车牌号:{}", arg, e);
                     errorCarNo.append(arg + "\n");
                 }
                 writeExcel(itemsList, errorCarNo, noItemCarNo);
@@ -75,6 +75,7 @@ public class BrowserCabgov extends BrowserBase {
             try{
                 writeExcel(itemsList, errorCarNo, noItemCarNo);
             }catch (Exception e){}
+            log.info("BrowserCabgov.start out");
         }
         return true;
     }
@@ -82,6 +83,7 @@ public class BrowserCabgov extends BrowserBase {
 
     @SneakyThrows
     public void writeExcel(List<Map<String, String>> itemsList, StringBuffer errorCarNo, StringBuffer noItemCarNo){
+        log.info("BrowserCabgov.writeExcel in. 输出数据：itemsList.Size:{}", itemsList.size());
         String fileName = DateUtils.formatDate(new Date(), "YYMMDDHHmmss");
         File dataPath = new File(DATA_PATH );
         if(!dataPath.exists())
@@ -95,17 +97,20 @@ public class BrowserCabgov extends BrowserBase {
             os.close();
         }
         if(errorCarNo.length() > 0){
+            log.info("BrowserCabgov.writeExcel error. 输出数据：errorCarNo{}", errorCarNo);
             WriterUtils.overwrite(new File(DATA_PATH + "/列表无数据-" + fileName  + ".txt"), errorCarNo.toString().getBytes());
         }
         if(noItemCarNo.length() > 0){
-            WriterUtils.overwrite(new File(DATA_PATH + "/为找到违法记录-" + fileName  + ".txt"), noItemCarNo.toString().getBytes());
+            log.info("BrowserCabgov.writeExcel.noItem. 输出数据：noItemCarNo{}", noItemCarNo);
+            WriterUtils.overwrite(new File(DATA_PATH + "/未找到违法记录-" + fileName  + ".txt"), noItemCarNo.toString().getBytes());
         }
+        log.info("writeExcel.end. 输出数据：itemsList.Size:{}", itemsList.size());
     }
 
     List<Map<String, String>> filterItem(String value){
+        log.info("BrowserCabgov.filterItem.start. 获取车牌号:{}", value);
         List<Map<String, String>> itemsList = new ArrayList<>();
         this.search(value);
-        String errorMsg = null;
         int i = 30;
         while (i -- > 0){
             try {
@@ -116,11 +121,11 @@ public class BrowserCabgov extends BrowserBase {
                     webElement = browser.getDriver().findElement(By.id("violationveh"));
                     Thread.sleep(1000);
                 }catch (Exception e){
-                    log.warn("========== not fund 车辆列表 ele:{}", "violationveh");
+                    log.warn("BrowserCabgov.filterItem.while. exception 车辆列表 ele:{}", "violationveh");
                     continue;
                 }
                 if(webElement == null){
-                    log.warn("========== not fund 车辆列表 ele:{}", "violationveh");
+                    log.warn("BrowserCabgov.filterItem.while. not fund 车辆列表 ele:{}", "violationveh");
                     continue;
                 }
 
@@ -129,36 +134,38 @@ public class BrowserCabgov extends BrowserBase {
                     webElements = webElement.findElements(By.xpath("table/tbody/tr"));
                     Thread.sleep(1000);
                 }catch (Exception e){
-                    log.warn("========== not fund 车辆列表 ele.ex:{}", "table/tbody/tr");
+                    log.warn("BrowserCabgov.filterItem.while. not fund 车辆列表 ele.ex:{}", "table/tbody/tr");
                     continue;
                 }
 
                 if(ValueUtils.isBlank(webElements)){
-                    log.warn("========== not fund 车辆列表 ele:{}", "table/tbody/tr");
+                    log.warn("BrowserCabgov.filterItem.while. not fund 车辆列表 ele:{}", "table/tbody/tr");
                     continue;
                 }
                 for(WebElement trEle : webElements){
                     List<WebElement> datas = trEle.findElements(By.xpath("td"));
                     if(!"未交款".equals(datas.get(6).getText())){
-                        log.info("========== continue.6:{}", datas.get(6).getText());
+                        log.info("BrowserCabgov.filterItem.while. continue.6:{}", datas.get(6).getText());
                         continue;
                     }
+
+                    Map<String, String> item;
                     if(type == 0){
                         try{
                             Thread.sleep(500);
-                            log.info("==========> click view.a");
+                            log.info("BrowserCabgov.filterItem.while. click detail view.a.begin");
                             WebElementUtils.click(browser, datas.get(7).findElement(By.xpath("a")));
-                            log.info("==========< click view.a");
+                            log.info("BrowserCabgov.filterItem.while. click detail view.a.end");
                         }catch (Exception e){
                             throw e;
                         }
                         Thread.sleep(2000);
                         i = 30;
-                        Map<String, String> item = this.getDetailInfo();
+                        item = this.getDetailInfo();
                         item.put("状态", WebElementUtils.getValue(datas.get(4)) + "|" + WebElementUtils.getValue(datas.get(6)));
-                        itemsList.add(item);
                     }else{
-                        Map<String, String> item = new HashMap<>();
+                        log.info("BrowserCabgov.filterItem.while. set list item begin");
+                        item = new HashMap<>();
                         item.put("号牌号码", WebElementUtils.getValue(datas.get(0)));
                         item.put("违法时间", WebElementUtils.getValue(datas.get(1)));
                         item.put("违法地点", WebElementUtils.getValue(datas.get(2)));
@@ -168,18 +175,19 @@ public class BrowserCabgov extends BrowserBase {
                         item.put("记分值", "");
                         item.put("处理时间", WebElementUtils.getValue(datas.get(5)));
                         item.put("状态", WebElementUtils.getValue(datas.get(4)) + "|" + WebElementUtils.getValue(datas.get(6)));
-                        itemsList.add(item);
                     }
+                    itemsList.add(item);
+                    log.info("BrowserCabgov.filterItem.while. set list item end:{}", item);
                 }
                 try{
                     webElement = browser.getDriver().findElement(By.id("mypagination1"));
                     Thread.sleep(1000);
                 }catch (Exception e){
-                    log.info("========== page is null.1");
+                    log.warn("BrowserCabgov.filterItem.while error. 获取翻页控件异常", e);
                     break;
                 }
                 if(webElement == null){
-                    log.info("========== page is null.2");
+                    log.warn("BrowserCabgov.filterItem.while error. 未获取翻页控件");
                     break;
                 }
 
@@ -187,11 +195,11 @@ public class BrowserCabgov extends BrowserBase {
                     webElements = webElement.findElements(By.xpath("ul/li"));
                     Thread.sleep(1000);
                 }catch (Exception e){
-                    log.warn("========== not fund 车辆列表 ele:{}", "ul/li");
+                    log.warn("BrowserCabgov.filterItem.while warn. ele:ul/li", e);
                     continue;
                 }
                 if(ValueUtils.isBlank(webElements) || webElements.size() <= 5){
-                    log.info("========== page is null.3");
+                    log.warn("BrowserCabgov.filterItem.while error. 获取翻页控件分页异常");
                     break;
                 }
                 webElements.remove(0);
@@ -206,7 +214,7 @@ public class BrowserCabgov extends BrowserBase {
                 for(WebElement ele : webElements){
                     removes.add(ele);
                     if("active".equals(ele.getAttribute("class"))){
-                        log.info("========== page is null.4");
+                        log.warn("BrowserCabgov.filterItem.while.while error. 获取翻页控件分页Active异常");
                         break;
                     }
                 }
@@ -214,27 +222,25 @@ public class BrowserCabgov extends BrowserBase {
                 if(webElements.size() == 0){
                     break;
                 }
-                log.info("==========> click next page");
+                log.info("BrowserCabgov.filterItem.while.click.start. next page");
                 WebElementUtils.click(browser, webElements.get(0).findElement(By.xpath("a")));
-                log.info("==========< click next page");
+                log.info("BrowserCabgov.filterItem.while.click.end. next page");
                 Thread.sleep(2000);
                 i = 30;
             } catch (InterruptedException e) {
-                e.printStackTrace();
+                log.warn("BrowserCabgov.filterItem.while error. i:{}", i);
                 throw new RuntimeException(e);
             }
         }
+        log.info("BrowserCabgov.filterItem.while.out. i:{}", i);
         if(i <= 0){
             throw new BusinessException("没有找到事故处理业务右上Tab");
-        }
-        if(ValueUtils.isNotBlank(errorMsg)){
-            throw new BusinessException(errorMsg);
         }
         return itemsList;
     }
 
     void openAndLogin(){
-
+        log.info("BrowserCabgov.openAndLogin in. 启动浏览器");
         String errorMsg = null;
         int i = 300;
         while (i-- > 0){
@@ -246,21 +252,21 @@ public class BrowserCabgov extends BrowserBase {
                     webElement = browser.getDriver().findElement(By.className("pull-right"));
                 }catch (Exception e){}
                 if(webElement == null){
-                    log.warn("========== not fund 请选择服务类型 ele:{}", "pull-right");
+                    log.warn("BrowserCabgov.openAndLogin.while not fund 请选择服务类型 ele:{}", "pull-right");
                     continue;
                 }
                 try{
                     webElement = webElement.findElement(By.xpath("select"));
                 }catch (Exception e){}
                 if(webElement == null){
-                    log.warn("========== not fund 请选择服务类型 ele:{}", "select");
+                    log.warn("BrowserCabgov.openAndLogin.while not fund 请选择服务类型 ele:{}", "select");
                     continue;
                 }
                 try{
                     webElements = webElement.findElements(By.xpath("option"));
                 }catch (Exception e){}
                 if(ValueUtils.isBlank(webElements)){
-                    log.warn("========== not fund 请选择服务类型 ele:{}", "option");
+                    log.warn("BrowserCabgov.openAndLogin.while not fund 请选择服务类型 ele:{}", "option");
                     continue;
                 }
                 if(ValueUtils.isBlank(webElements) || webElements.size() < 1){
@@ -280,30 +286,31 @@ public class BrowserCabgov extends BrowserBase {
                         }catch (Exception e){}
                     }
                 }
-                log.info("==========> click 请选择服务类型:{}", "非营运机动车信息服务");
+                log.info("BrowserCabgov.openAndLogin.while.click.start 请选择服务类型:{}", "非营运机动车信息服务");
                 WebElementUtils.click(browser, webElements.get(0));
-                log.info("==========< click 请选择服务类型:{}", "非营运机动车信息服务");
+                log.info("BrowserCabgov.openAndLogin.while.click.end 请选择服务类型:{}", "非营运机动车信息服务");
                 Thread.sleep(1000);
-                log.info("==========> click 交通违法查询");
+                log.info("BrowserCabgov.openAndLogin.while.click.start 交通违法查询");
                 WebElementUtils.click(browser, browser.getDriver().findElement(By.id("sidebar_menu_5")));
-                log.info("==========< click 交通违法查询");
+                log.info("BrowserCabgov.openAndLogin.while.click.end 交通违法查询");
                 Thread.sleep(1000);
                 break;
             } catch (Exception e) {
-                e.printStackTrace();
+                log.info("BrowserCabgov.openAndLogin.while error. i:{}", i);
                 errorMsg = e.getMessage();
             }
         }
         if(i <= 0){
             throw new BusinessException("没有找到事故处理业务左边目录");
         }
+        log.info("BrowserCabgov.openAndLogin out. 启动浏览器");
         if(ValueUtils.isNotBlank(errorMsg)){
             throw new BusinessException(errorMsg);
         }
     }
 
     void search(String text){
-
+        log.info("BrowserCabgov.search in. 搜索：{}", text);
         String errorMsg = null;
         int i = 30;
         while (i -- > 0){
@@ -315,7 +322,7 @@ public class BrowserCabgov extends BrowserBase {
                     webElement = browser.getDriver().findElement(By.id("mem-content")).findElement(By.id("vehSearchForm"));
                 }catch (Exception e){}
                 if(webElement == null){
-                    log.warn("========== not fund 违法查询 ele:{}", "mem-content.vehSearchForm");
+                    log.warn("BrowserCabgov.search while. not fund 违法查询 ele:{}", "mem-content.vehSearchForm");
                     continue;
                 }
                 try{
@@ -330,7 +337,7 @@ public class BrowserCabgov extends BrowserBase {
                     WebElementUtils.click(browser, webElements.get(0).findElements(By.className("add-on")).get(0));
                     Thread.sleep(1000);
                 }catch (Exception e){
-                    log.warn("========== not fund 违法查询开始日期控件 ele:{}", "add-on");
+                    log.warn("BrowserCabgov.search while. not fund 违法查询开始日期控件 ele:{}", "add-on");
                     continue;
                 }
 
@@ -338,7 +345,7 @@ public class BrowserCabgov extends BrowserBase {
                     WebElementUtils.click(browser, browser.getDriver().findElements(By.className("datetimepicker-months")).get(0).findElements(By.xpath("table/thead/tr/th")).get(1));
                     Thread.sleep(1000);
                 }catch (Exception e){
-                    log.warn("========== not fund 违法查询 ele:{}", "datetimepicker-months-option");
+                    log.warn("BrowserCabgov.search while. 违法查询 ele:{}", "datetimepicker-months-option");
                     continue;
                 }
 
@@ -369,7 +376,7 @@ public class BrowserCabgov extends BrowserBase {
                     WebElementUtils.click(browser, curEle);
                     Thread.sleep(1000);
                 }catch (Exception e){
-                    log.warn("========== not fund 违法查询 ele:{}", "datetimepicker-years");
+                    log.warn("BrowserCabgov.search while error. not fund 违法查询 ele:datetimepicker-years", e);
                     continue;
                 }
 
@@ -377,7 +384,7 @@ public class BrowserCabgov extends BrowserBase {
                     WebElementUtils.click(browser,browser.getDriver().findElements(By.className("datetimepicker-months")).get(0).findElements(By.xpath("table/tbody/tr/td/span")).get(5));
                     Thread.sleep(1000);
                 }catch (Exception e){
-                    log.warn("========== not fund 违法查询 ele:{}", "datetimepicker-months");
+                    log.warn("BrowserCabgov.search while error. not fund 违法查询 ele:datetimepicker-months", e);
                     continue;
                 }
 
@@ -385,7 +392,7 @@ public class BrowserCabgov extends BrowserBase {
                     WebElementUtils.click(browser, browser.getDriver().findElements(By.className("datetimepicker-days")).get(0).findElements(By.xpath("table/tbody/tr/td")).get(6));
                     Thread.sleep(1000);
                 }catch (Exception e){
-                    log.warn("========== not fund 违法查询 ele:{}", "datetimepicker-days");
+                    log.warn("BrowserCabgov.search while error. not fund 违法查询 ele:datetimepicker-days", e);
                     continue;
                 }
 
@@ -393,7 +400,7 @@ public class BrowserCabgov extends BrowserBase {
                     WebElementUtils.click(browser, webElements.get(1).findElement(By.id("hpzl")).findElements(By.xpath("option")).get(3));
                     Thread.sleep(1000);
                 }catch (Exception e){
-                    log.warn("========== not fund 违法查询 ele:{}", "hpzl.option");
+                    log.warn("BrowserCabgov.search while error. not fund 违法查询 ele:hpzl.option", e);
                     continue;
                 }
 
@@ -401,7 +408,7 @@ public class BrowserCabgov extends BrowserBase {
                     WebElementUtils.setValue(webElements.get(2).findElement(By.id("hphm")), text);
                     Thread.sleep(1000);
                 }catch (Exception e){
-                    log.warn("========== not fund 违法查询 ele:{}", "hphm");
+                    log.warn("BrowserCabgov.search while error. not fund 违法查询 ele:hphm", e);
                     continue;
                 }
 
@@ -409,14 +416,14 @@ public class BrowserCabgov extends BrowserBase {
                     WebElementUtils.click(browser, webElements.get(0).findElements(By.className("add-on")).get(1));
                     Thread.sleep(1000);
                 }catch (Exception e){
-                    log.warn("========== not fund 违法查询结束日期控件 ele:{}", "add-on");
+                    log.warn("BrowserCabgov.search while error. not fund 违法查询结束日期控件 ele:add-on", e);
                     continue;
                 }
                 try{
                     WebElementUtils.click(browser, browser.getDriver().findElements(By.className("datetimepicker-months")).get(1).findElements(By.className("today")).get(0));
                     Thread.sleep(1000);
                 }catch (Exception e){
-                    log.warn("========== not fund 违法查询结束日期控件 ele:{}", "tody");
+                    log.warn("BrowserCabgov.search while error. not fund 违法查询结束日期控件 ele:tody", e);
                     continue;
                 }
                 try{
@@ -429,7 +436,7 @@ public class BrowserCabgov extends BrowserBase {
                         System.exit(0);
                     }
                 }catch (Exception e){
-                    log.warn("========== not fund 违法查询结束日期控件 ele:{}", "tody");
+                    log.warn("BrowserCabgov.search while error. not fund 违法查询结束日期控件 ele:tody", e);
                     continue;
                 }
 
@@ -437,16 +444,17 @@ public class BrowserCabgov extends BrowserBase {
                     WebElementUtils.click(browser, webElements.get(3).findElement(By.xpath("button")));
                     Thread.sleep(1000);
                 }catch (Exception e){
-                    log.warn("========== not fund 违法查询 ele:{}", "button");
+                    log.warn("BrowserCabgov.search while error. not fund 违法查询 ele:button", e);
                     continue;
                 }
                 errorMsg = null;
                 break;
             } catch (InterruptedException e) {
-                e.printStackTrace();
+                log.warn("BrowserCabgov.search while error. i:{}", i);
                 throw new RuntimeException(e);
             }
         }
+        log.info("BrowserCabgov.search out. {}", text);
         if(i <= 0){
             throw new BusinessException("没有找到事故处理业务右上Tab");
         }
@@ -457,8 +465,8 @@ public class BrowserCabgov extends BrowserBase {
 
     @SneakyThrows
     Map<String, String> getDetailInfo() {
+        log.info("BrowserCabgov.getDetailInfo in.");
         try {
-
             Map<String, String> itemMap = new HashMap<>();
             String errorMsg = null;
             int i = 30;
@@ -478,7 +486,7 @@ public class BrowserCabgov extends BrowserBase {
                         webElement = webElement.findElement(By.className("modal-body"));
                     }catch (Exception e){}
                     if(webElement == null){
-                        log.warn("========== not fund 查看详情 ele:{}", "modal-body");
+                        log.warn("BrowserCabgov.getDetailInfo while. not fund 查看详情 ele:modal-body");
                         continue;
                     }
 
@@ -486,14 +494,14 @@ public class BrowserCabgov extends BrowserBase {
                         webElement = webElement.findElement(By.className("xqInfo"));
                     }catch (Exception e){}
                     if(webElement == null){
-                        log.warn("========== not fund 查看详情 ele:{}", "xqInfo");
+                        log.warn("BrowserCabgov.getDetailInfo while. not fund 查看详情 ele:xqInfo");
                         continue;
                     }
                     try{
                         webElements = webElement.findElements(By.xpath("form/div"));
                     }catch (Exception e){}
                     if(ValueUtils.isBlank(webElements) || webElements.size() < 1){
-                        log.warn("========== not fund 查看详情 ele:{}", "form/div");
+                        log.warn("BrowserCabgov.getDetailInfo while. not fund 查看详情 ele:form/div");
                         continue;
                     }
                     Thread.sleep(1000);
@@ -508,7 +516,7 @@ public class BrowserCabgov extends BrowserBase {
                             String name = spans.get(0).getText();
                             String value = spans.get(1).getText();
                             if(ValueUtils.isBlank(name) || ValueUtils.isBlank(value)){
-                                log.info("charles data field null, waiting ==================");
+                                log.info("BrowserCabgov.getDetailInfo while. charles data field null, waiting ==================");
                                 isGoon = true;
                                 break;
                             }
@@ -518,17 +526,18 @@ public class BrowserCabgov extends BrowserBase {
                             Thread.sleep(1000);
                             continue;
                         }
-                        log.info("charles data success:{}", GsonBuilder.gsonDefault().toJson(data));
+                        log.info("BrowserCabgov.getDetailInfo while. charles data success:{}", GsonBuilder.gsonDefault().toJson(data));
                         itemMap.putAll(data);
                         break;
                     }
                     errorMsg = null;
                     break;
                 } catch (InterruptedException e) {
-                    e.printStackTrace();
+                    log.warn("BrowserCabgov.getDetailInfo while error. i:{}", i);
                     throw new RuntimeException(e);
                 }
             }
+            log.info("BrowserCabgov.getDetailInfo out. {}", itemMap);
             if(i <= 0){
                 throw new BusinessException("没有找到事故处理业务右上Tab");
             }
@@ -537,10 +546,10 @@ public class BrowserCabgov extends BrowserBase {
             }
             return itemMap;
         }finally {
-            log.info("==========> click 查看详情: close");
+            log.info("BrowserCabgov.getDetailInfo click.start 查看详情: close");
             WebElement webElement = browser.getDriver().findElement(By.id("view"));
             WebElementUtils.click(browser, webElement.findElement(By.id("bind_close")));
-            log.info("==========< click 查看详情: close");
+            log.info("=BrowserCabgov.getDetailInfo click.end 查看详情: close");
             Thread.sleep(1000);
         }
     }

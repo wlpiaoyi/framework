@@ -53,7 +53,9 @@ public class PluginMojo extends AbstractMojo {
                         Field field = PluginUtils.class.getDeclaredField(key.toString());
                         Map value = MapUtils.get(pluginMap, key);
                         field.set(null, value);
-                    }catch (Exception e){}
+                    }catch (Exception e){
+                        log.error("插件运行失败", e);
+                    }
                 }
             }
             Properties properties = ReaderUtils.loadProperties(this.basePath + this.configDir);

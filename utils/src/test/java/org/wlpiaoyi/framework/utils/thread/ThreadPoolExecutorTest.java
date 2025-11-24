@@ -249,8 +249,8 @@ public class ThreadPoolExecutorTest {
         };
 
         // 提交相同taskId的任务，前一个应该被取消
-        TaskParams params1 = TaskParams.builder().taskId("3001").durationSecond(0).build();
-        TaskParams params2 = TaskParams.builder().taskId("3001").durationSecond(0).build();
+        TaskParams params1 = TaskParams.builder().taskId("3001").forcible(false).durationSecond(0).build();
+        TaskParams params2 = TaskParams.builder().taskId("3001").forcible(true).durationSecond(0).build();
 
         log("提交第一个任务，taskId: " + params1.getTaskId());
         Future<String> future1 = threadPool.submit(params1, task, "first");

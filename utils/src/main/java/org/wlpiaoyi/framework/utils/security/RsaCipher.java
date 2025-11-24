@@ -16,6 +16,10 @@ import javax.crypto.Cipher;
  */
 public class RsaCipher extends Security{
 
+    /** 加密解密类型
+     * 0: 私钥加密，公钥解密
+     * 1: 私钥解密，公钥加密
+     * **/
     @Getter
     private final int type;
 
@@ -39,9 +43,46 @@ public class RsaCipher extends Security{
     /** 解密 **/
     private Cipher dCipher;
 
+    /**
+     * <p><b>{@code @description:}</b>
+     * <div style='padding: 5px; margin-left: 5px; margin-bottom: 5px;'>
+     * 创建RSA密钥对
+     * <br/>
+     * type默认0: 私钥加密，公钥解密
+     * </div>
+     * </p>
+     *
+     * <p><b>{@code @param}</b> <b></b>
+     * {@link }
+     * </p>
+     *
+     * <p><b>{@code @date:}</b>2025/11/21 16:22</p>
+     * <p><b>{@code @return:}</b>{@link RsaCipher}</p>
+     * <p><b>{@code @author:}</b>wlpiaoyi</p>
+     * <hr/>
+     */
     public static RsaCipher build(){
         return new RsaCipher(0, 1024);
     }
+
+    /**
+     * <p><b>{@code @description:}</b>
+     * <div style='padding: 5px; margin-left: 5px; margin-bottom: 5px;'>
+     * 创建RSA密钥对
+     * </div>
+     * </p>
+     *
+     * <p><b>{@code @param}</b> <b>type</b>
+     * {@link int}
+     * type=0: 私钥加密，公钥解密,
+     * type=1: 私钥解密，公钥加密
+     * </p>
+     *
+     * <p><b>{@code @date:}</b>2025/11/21 16:23</p>
+     * <p><b>{@code @return:}</b>{@link RsaCipher}</p>
+     * <p><b>{@code @author:}</b>wlpiaoyi</p>
+     * <hr/>
+     */
     public static RsaCipher build(int type){
         return new RsaCipher(type, 1024);
     }

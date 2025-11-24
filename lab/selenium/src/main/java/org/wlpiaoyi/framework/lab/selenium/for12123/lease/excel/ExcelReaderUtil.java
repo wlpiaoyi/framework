@@ -1,4 +1,5 @@
 package org.wlpiaoyi.framework.lab.selenium.for12123.lease.excel;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.wlpiaoyi.framework.lab.selenium.for12123.lease.test.SubmitHT;
@@ -112,8 +113,7 @@ public class ExcelReaderUtil {
                     .build();
 
         } catch (Exception e) {
-            System.err.println("解析第 " + (row.getRowNum() + 1) + " 行数据失败: " + e.getMessage());
-            return null;
+            throw new RuntimeException("解析Excel第 " + (row.getRowNum() + 1) + " 行数据失败: " + e.getMessage(), e);
         }
     }
 
@@ -184,8 +184,7 @@ public class ExcelReaderUtil {
         try {
             return LocalDateTime.parse(dateTimeStr, DATE_TIME_FORMATTER);
         } catch (Exception e) {
-            System.err.println("日期时间解析失败: " + dateTimeStr);
-            return null;
+            throw new RuntimeException("日期时间解析失败: " + dateTimeStr, e);
         }
     }
 

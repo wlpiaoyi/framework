@@ -28,7 +28,6 @@ public class BrowserCabgov extends BrowserBase {
         super(type);
     }
 
-
     @SneakyThrows
     public boolean start(){
         log.info("BrowserCabgov.start in. 启动浏览器");

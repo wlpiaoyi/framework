@@ -6,13 +6,17 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.*;
 
+
 /**
  * <p><b>{@code @author:}</b>         wlpiaoyi</p>
  * <p><b>{@code @description:}</b>
+ * <div style='padding: 5px; margin-left: 5px; margin-bottom: 5px;'>
  * 自定义线程池执行器，支持任务管理、参数传递和任务生命周期回调
+ * </div>
  * </p>
- * <p><b>{@code @date:}</b>           2025/11/6 11:25</p>
+ * <p><b>{@code @date:}</b>           2025/11/17 14:53</p>
  * <p><b>{@code @version:}</b>       1.0</p>
+ * <hr/>
  */
 public class ThreadPoolExecutor {
 
@@ -112,6 +116,9 @@ public class ThreadPoolExecutor {
         }
         // 如果存在相同taskId的未完成任务，先取消
         if(futureMap.containsKey(taskId)){
+            if(!taskParams.isForcible()){
+                throw new RuntimeException("taskId " + taskId + " is already exists");
+            }
             Future<?> future = futureMap.get(taskId);
             if(future != null){
                 if(!future.isDone()){

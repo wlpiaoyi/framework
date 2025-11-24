@@ -28,6 +28,15 @@ public class TaskParams {
 
     /**
      * <p><b>{@code @description:}</b>
+     * 是否强制执行任务
+     * true表示强制执行，即使任务正在执行中，也会立即执行
+     * false表示非强制执行，任务正在执行中时，将忽略任务并抛出异常
+     * </p>
+     */
+    private boolean forcible;
+
+    /**
+     * <p><b>{@code @description:}</b>
      * 任务延迟执行时间（单位：秒）
      * 大于0时表示需要延迟执行，任务提交后会先休眠指定时间再执行
      * 等于0时表示立即执行
