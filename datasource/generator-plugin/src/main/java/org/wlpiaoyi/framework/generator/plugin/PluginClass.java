@@ -85,7 +85,7 @@ public class PluginClass {
         classText = classText.replaceAll(StructureConstant.CLASS_NAME, table.get("className"));
         classText = classText.replaceAll(StructureConstant.VAR_CLASS_NAME, table.get("varClassName"));
         classText = classText.replaceAll(StructureConstant.PACKAGE, this.configModel.getPackagePath());
-        classText = classText.replaceAll(StructureConstant.BIZ_TAG, this.configModel.getTablePrefix());
+        classText = classText.replaceAll(StructureConstant.BIZ_TAG, this.configModel.getBusinessTag());
         return classText;
     }
 
