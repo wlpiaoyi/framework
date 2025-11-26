@@ -14,6 +14,8 @@ import java.io.File;
 import java.sql.SQLException;
 import java.time.LocalDateTime;
 import java.util.*;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import static org.wlpiaoyi.framework.generator.plugin.utils.PluginUtils.*;
 
@@ -92,9 +94,12 @@ public class PluginClass {
         boolean excludeFlag = true;
         private int startIndex;
         private int endIndex;
+        String separator;
         private List<String> lines = new ArrayList<>();
     }
 
+    private static final Pattern FOREACH_COLUMN_ATTRIBUTE_SEPARATOR_PATTERN = Pattern.compile(
+            "separator=\"[0-9a-zA-Z,.:;%&*(){}\\[\\]=+\\-\\\"\\' ]*");
 
     private String replaceForeachColumn(List<Map<String, Object>> columns, List<String> imports, int tabNum, String classText){
         List<String> lines = new ArrayList(){{
@@ -115,6 +120,16 @@ public class PluginClass {
                 range.setStartIndex(i);
                 if(line.contains("excludeFlag=false")){
                     range.excludeFlag = false;
+                }
+                range.separator = null;
+                if(line.contains("separator=\"")){
+                    Matcher matcher = FOREACH_COLUMN_ATTRIBUTE_SEPARATOR_PATTERN.matcher(line);
+                    while (matcher.find()) {
+                        int start = matcher.start() + 11;
+                        int end = matcher.end() - 1;
+                        range.separator = line.substring(start, end);
+                        break;
+                    }
                 }
                 continue;
             }
@@ -144,6 +159,11 @@ public class PluginClass {
                 if(r.excludeFlag && excludeColumn.contains(columnName))
                     continue;
                 for (String line : r.getLines()){
+                    String vLine = line.trim();
+                    if(columns.getLast() != colMap && r.getLines().getLast() == line){
+                        if(ValueUtils.isNotBlank(r.getSeparator()))
+                            line = line.replace(vLine, vLine + r.getSeparator());
+                    }
                     String v = getFieldText(colMap, imports, line);
                     if(v == null){
                         continue;
@@ -151,7 +171,6 @@ public class PluginClass {
                     cIndex ++;
                     lines.add(r.getStartIndex() + cIndex, v);
                 }
-
             }
             lines.remove(r.getStartIndex());
         }

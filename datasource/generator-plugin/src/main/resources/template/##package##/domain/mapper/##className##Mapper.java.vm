@@ -2,6 +2,7 @@ package ##package##.##bizTag##.domain.mapper;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
+import org.apache.ibatis.annotations.Param;
 import ##package##.##bizTag##.domain.entity.##className##;
 import ##package##.##bizTag##.domain.ro.##className##Ro;
 import ##package##.##bizTag##.domain.vo.##className##Vo;
@@ -16,5 +17,39 @@ import java.util.List;
  */
 public interface ##className##Mapper extends BaseMapper<##className##> {
 
+    /**
+     * 单次插入所有字段
+     * @param entity
+     * @return
+     */
+    int insertAll(@Param("item") ##className## entity);
+
+	/**
+	 * 批量插入所有字段
+	 * @param list
+	 * @return
+	 */
+	int insertAllBatch(@Param("items") List<##className##> list);
+
+	/**
+	 * 单次更新所有字段
+	 * @param entity
+	 * @return
+	 */
+	int updateAll(@Param("item") ##className## entity);
+
+	/**
+	 * 批量更新所有字段
+	 * @param list
+	 * @return
+	 */
+	int updateAllBatch(@Param("items") List<##className##> list);
+
+	/**
+	 * 批量物理删除
+	 * @param ids
+	 * @return
+	 */
+	int deleteAllBatch(@Param("items") List<Long> ids);
 
 }

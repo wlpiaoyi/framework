@@ -10,9 +10,74 @@
         <id column="id" property="id"/>
         <foreach-column excludeFlag=false>
         <!-- ##columnComment## -->
-        <result column="##columnNamet##" property="##propertyName##"/>
+        <result column="##columnName##" property="##propertyName##"/>
         </foreach-column>
     </resultMap>
+
+    <!-- 单次插入所有字段 -->
+    <insert id="insertAll">
+        INSERT INTO `##tableName##`
+        (
+        `id`,
+        <foreach-column excludeFlag=false separator=", ">
+        `##columnName##`
+        </foreach-column>
+        )
+        VALUES (
+        #{item.id},
+        <foreach-column excludeFlag=false separator=", ">
+        #{item.##propertyName##}
+        </foreach-column>
+        )
+    </insert>
+
+    <!-- 批量插入所有字段 -->
+    <insert id="insertAllBatch" parameterType="java.util.List">
+        <foreach collection="items" item="item" index="index" open="" close="" separator=";">
+            INSERT INTO `##tableName##`
+            (
+            `id`,
+            <foreach-column excludeFlag=false separator=", ">
+            `##columnName##`
+            </foreach-column>
+            )
+            VALUES (
+            #{item.id},
+            <foreach-column excludeFlag=false separator=", ">
+            #{item.##propertyName##}
+            </foreach-column>
+            )
+        </foreach>
+    </insert>
+
+    <!-- 单次更新所有字段 -->
+    <update id="updateAll">
+        UPDATE `##tableName##`
+        SET
+        <foreach-column excludeFlag=false separator=", ">
+        `##columnName##` = #{item.##propertyName##}
+        </foreach-column>
+        WHERE (`id` = '${item.id}')
+    </update>
+
+    <!-- 批量更新所有字段 -->
+    <update id="updateAllBatch" parameterType="java.util.List">
+        <foreach collection="items" item="item" index="index" open="" close="" separator=";">
+            UPDATE `##tableName##`
+            SET
+                <foreach-column excludeFlag=false separator=", ">
+                `##columnName##` = #{item.##propertyName##}
+                </foreach-column>
+            WHERE (`id` = 'item.id')
+        </foreach>
+    </update>
+
+    <!-- 批量物理删除 -->
+    <delete id="deleteAllBatch" parameterType="java.util.List">
+        <foreach collection="items" item="item" separator=";">
+            DELETE FROM `##tableName##` WHERE (`id` = '${item}')
+        </foreach>
+    </delete>
 
 
 </mapper>

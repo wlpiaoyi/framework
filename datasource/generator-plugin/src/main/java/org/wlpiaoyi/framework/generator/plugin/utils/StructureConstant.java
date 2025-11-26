@@ -25,7 +25,7 @@ public interface StructureConstant {
     String PROPERTY_NAME = "##propertyName##";
     String COLUMN_COMMENT = "##columnComment##";
     String PROPERTY_ANNOTATIONS = "##propertyAnnotationst##";
-    String COLUMN_NAME = "##columnNamet##";
+    String COLUMN_NAME = "##columnName##";
 
 
 }
