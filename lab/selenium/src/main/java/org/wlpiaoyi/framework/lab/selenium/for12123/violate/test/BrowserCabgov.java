@@ -30,11 +30,15 @@ import java.util.*;
 @Slf4j
 public class BrowserCabgov extends BrowserBase {
 
+    public static final List<String> itemTypes = new ArrayList(){{
+        add("未处理");
+        add("未交款");
+    }};
 
     public BrowserCabgov(int type){
         super(type);
-
     }
+
     @SneakyThrows
     public boolean start(){
         log.info("BrowserCabgov.start in. 启动浏览器");
@@ -53,13 +57,13 @@ public class BrowserCabgov extends BrowserBase {
                 log.info("BrowserCabgov.start for. 获取车牌号:{}", arg);
                 try{
                     List<Map<String, String>> items = this.filterItem(arg);
-                    log.info("BrowserCabgov.start for. 获取车牌号:{} {} <==================", arg, items.size());
+                    log.info("BrowserCabgov.start for try. 获取车牌号:{} {} <==================", arg, items.size());
                     if(ValueUtils.isBlank(items)){
                         log.info("BrowserCabgov.start for continue. has no items not write data:{}", arg);
                         noItemCarNo.append(arg + "\n");
-                        continue;
+                    }else{
+                        itemsList.addAll(items);
                     }
-                    itemsList.addAll(items);
                 }catch (Exception e){
                     log.error("BrowserCabgov.start for error. 12123违章车牌号:{}", arg, e);
                     errorCarNo.append(arg + "\n");
@@ -129,6 +133,14 @@ public class BrowserCabgov extends BrowserBase {
                     continue;
                 }
 
+                try{
+                    WebElement dataNumEle = webElement.findElement(By.className("data-nums"));
+                    WebElement temp = dataNumEle.findElement(By.xpath("p/span"));
+                    int pageTotal = Integer.parseInt(temp.getText());
+                    log.info("BrowserCabgov.filterItem.while. 获取车辆列表数据总数:{}", pageTotal);
+                }catch (Exception e){
+                    log.warn("BrowserCabgov.filterItem.while. not fund 车辆列表数据总数");
+                }
 
                 try{
                     webElements = webElement.findElements(By.xpath("table/tbody/tr"));
@@ -144,9 +156,21 @@ public class BrowserCabgov extends BrowserBase {
                 }
                 for(WebElement trEle : webElements){
                     List<WebElement> datas = trEle.findElements(By.xpath("td"));
-                    if(!"未交款".equals(datas.get(6).getText())){
-                        log.info("BrowserCabgov.filterItem.while. continue.6:{}", datas.get(6).getText());
-                        continue;
+                    String items = "";
+                    for (WebElement data : datas){
+                        try{
+                            items += data.getText() + "|";
+                        }catch (Exception e){
+                            items += "|";
+                        }
+                    }
+                    {
+                        String dtype = datas.get(6).getText();
+                        if(!itemTypes.contains(dtype)){
+                            log.info("BrowserCabgov.filterItem.while. continue-{}.:{}", dtype, items);
+                            continue;
+                        }
+                        log.info("BrowserCabgov.filterItem.while. doing-{}.:{}", dtype, items);
                     }
 
                     Map<String, String> item;
