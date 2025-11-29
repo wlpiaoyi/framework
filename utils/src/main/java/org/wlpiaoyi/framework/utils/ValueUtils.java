@@ -384,7 +384,12 @@ class ValueParseUtils extends ValueBlankUtils{
 
         if(value instanceof String) {
             return (String) value;
-        } else {
+        }else if(value instanceof Collection<?>){
+            Collection<?> collection = (Collection<?>) value;
+            return "[" + ValueParseUtils.toStrings(collection) + "]";
+        }else if(value instanceof Arrays){
+            return "[" + ValueParseUtils.toStrings((Object[]) value) + "]";
+        }else{
             return value.toString();
         }
     }

@@ -4,28 +4,23 @@ import com.google.gson.Gson;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.openqa.selenium.By;
-import org.openqa.selenium.Cookie;
 import org.openqa.selenium.WebElement;
-import org.wlpiaoyi.framework.lab.selenium.Browser;
 import org.wlpiaoyi.framework.lab.selenium.for12123.BrowserBase;
 import org.wlpiaoyi.framework.lab.selenium.for12123.violate.excel.ExcelWriter;
 import org.wlpiaoyi.framework.lab.selenium.utils.WebElementUtils;
 import org.wlpiaoyi.framework.utils.DateUtils;
 import org.wlpiaoyi.framework.utils.ValueUtils;
-import org.wlpiaoyi.framework.utils.data.DataUtils;
 import org.wlpiaoyi.framework.utils.data.ReaderUtils;
 import org.wlpiaoyi.framework.utils.data.WriterUtils;
 import org.wlpiaoyi.framework.utils.exception.BusinessException;
 import org.wlpiaoyi.framework.utils.gson.GsonBuilder;
-import org.wlpiaoyi.framework.utils.security.RsaCipher;
 
 import java.io.File;
 import java.io.FileOutputStream;
-import java.io.IOException;
 import java.io.OutputStream;
-import java.nio.charset.StandardCharsets;
 import java.time.LocalDate;
 import java.util.*;
+import java.util.concurrent.atomic.AtomicReference;
 
 @Slf4j
 public class BrowserCabgov extends BrowserBase {
@@ -39,6 +34,31 @@ public class BrowserCabgov extends BrowserBase {
         super(type);
     }
 
+
+    public void runBiz(String[] args, List<Map<String, String>> itemsList, List<String> errorCarNos, List<String> noItemCarNos, List<String> unRunCarNos){
+        unRunCarNos.clear();
+        unRunCarNos.addAll(Arrays.asList(args));
+        for(String arg : args){
+            unRunCarNos.remove(arg);
+            arg = arg.trim();
+            log.info("BrowserCabgov.start for. 获取车牌号:{}", arg);
+            try{
+                List<Map<String, String>> items = this.filterItem(arg);
+                log.info("BrowserCabgov.start for try. 获取车牌号:{} {} <==================", arg, items.size());
+                if(ValueUtils.isBlank(items)){
+                    log.info("BrowserCabgov.start for continue. has no items not write data:{}", arg);
+                    errorCarNos.add(arg);
+                }else{
+                    itemsList.addAll(items);
+                }
+            }catch (Exception e){
+                log.error("BrowserCabgov.start for error. 12123违章车牌号:{}", arg, e);
+                noItemCarNos.add(arg);
+            }
+            writeExcel(itemsList, errorCarNos, noItemCarNos);
+        }
+    }
+
     @SneakyThrows
     public boolean start(){
         log.info("BrowserCabgov.start in. 启动浏览器");
@@ -48,36 +68,37 @@ public class BrowserCabgov extends BrowserBase {
         String[] args = ReaderUtils.loadString(CONFIG_PATH + "/12123违章车牌号.txt", null).split("\n");
         log.info("BrowserCabgov.start prepare. args:{}", args);
         List<Map<String, String>> itemsList = new ArrayList<>();
-        StringBuffer errorCarNo = new StringBuffer();
-        StringBuffer noItemCarNo = new StringBuffer();
+        List<String> errorCarNos = new ArrayList<>();
+        List<String> noItemCarNos = new ArrayList<>();
+        List<String> unRunCarNos = new ArrayList<>();
         try{
-            for(String arg : args){
-                arg = arg.replaceAll("\r", "");
-                arg = arg.replaceAll("\n", "");
-                log.info("BrowserCabgov.start for. 获取车牌号:{}", arg);
-                try{
-                    List<Map<String, String>> items = this.filterItem(arg);
-                    log.info("BrowserCabgov.start for try. 获取车牌号:{} {} <==================", arg, items.size());
-                    if(ValueUtils.isBlank(items)){
-                        log.info("BrowserCabgov.start for continue. has no items not write data:{}", arg);
-                        noItemCarNo.append(arg + "\n");
-                    }else{
-                        itemsList.addAll(items);
-                    }
-                }catch (Exception e){
-                    log.error("BrowserCabgov.start for error. 12123违章车牌号:{}", arg, e);
-                    errorCarNo.append(arg + "\n");
+            runBiz(args, itemsList, errorCarNos, noItemCarNos, unRunCarNos);
+            int unDoNum = errorCarNos.size() + noItemCarNos.size() + unRunCarNos.size();
+            log.info("BrowserCabgov.doing check. {}/{}", unDoNum, args.length);
+            if(Float.valueOf(unDoNum) / Float.valueOf(args.length) > 0.35){
+                args = new String[unDoNum];
+                for (int i = 0; i < errorCarNos.size(); i++) {
+                    args[i] = errorCarNos.get(i);
                 }
-                writeExcel(itemsList, errorCarNo, noItemCarNo);
+                for (int i = 0; i < noItemCarNos.size(); i++) {
+                    args[i + errorCarNos.size()] = noItemCarNos.get(i);
+                }
+                for (int i = 0; i < unRunCarNos.size(); i++) {
+                    args[i + errorCarNos.size()] = unRunCarNos.get(i);
+                }
+                errorCarNos.clear();
+                noItemCarNos.clear();
+                log.info("BrowserCabgov.agin alert. begin:{}", args);
+                runBiz(args, itemsList, errorCarNos, noItemCarNos, unRunCarNos);
+                log.info("BrowserCabgov.agin alert. end");
             }
             itemsList.clear();
-            errorCarNo = new StringBuffer();
         }finally {
             try{
                 this.browser.quit();
             }catch (Exception e){};
             try{
-                writeExcel(itemsList, errorCarNo, noItemCarNo);
+                writeExcel(itemsList, errorCarNos, noItemCarNos);
             }catch (Exception e){}
             log.info("BrowserCabgov.start out");
         }
@@ -86,27 +107,28 @@ public class BrowserCabgov extends BrowserBase {
 
 
     @SneakyThrows
-    public void writeExcel(List<Map<String, String>> itemsList, StringBuffer errorCarNo, StringBuffer noItemCarNo){
+    public void writeExcel(List<Map<String, String>> itemsList, List<String> errorCarNos, List<String> noItemCarNos){
         log.info("BrowserCabgov.writeExcel in. 输出数据：itemsList.Size:{}", itemsList.size());
-        String fileName = DateUtils.formatDate(new Date(), "YYMMDDHHmmss");
-        File dataPath = new File(DATA_PATH );
+        String pathDateName = DateUtils.formatDate(new Date(), "YY年MM月dd日");
+        String fileTimeName = DateUtils.formatDate(new Date(), "HHmmss");
+        File dataPath = new File(DATA_PATH + "/" + pathDateName);
         if(!dataPath.exists())
             dataPath.mkdirs();
         if(itemsList.size() > 0){
             Gson gson = GsonBuilder.gsonDefault();
-            WriterUtils.overwrite(new File(DATA_PATH + "/" + fileName  + ".txt"), gson.toJson(itemsList).getBytes());
-            OutputStream os = new FileOutputStream(DATA_PATH + "/" + fileName + ".xlsx");
+            WriterUtils.overwrite(new File(dataPath.getPath() + "/违法记录" + fileTimeName + ".txt"), gson.toJson(itemsList).getBytes());
+            OutputStream os = new FileOutputStream(dataPath.getPath() + "/违法记录" + fileTimeName + ".xlsx");
             ExcelWriter.exportData(itemsList).write(os);
             os.flush();
             os.close();
         }
-        if(errorCarNo.length() > 0){
-            log.info("BrowserCabgov.writeExcel error. 输出数据：errorCarNo{}", errorCarNo);
-            WriterUtils.overwrite(new File(DATA_PATH + "/列表无数据-" + fileName  + ".txt"), errorCarNo.toString().getBytes());
+        if(ValueUtils.isNotBlank(errorCarNos)){
+            log.info("BrowserCabgov.writeExcel error. 输出数据：警告-无违法记录:{}", ValueUtils.toString(errorCarNos));
+            WriterUtils.overwrite(new File(dataPath.getPath() + "/警告-无违法记录-" + fileTimeName  + ".txt"), ValueUtils.toString(errorCarNos).getBytes());
         }
-        if(noItemCarNo.length() > 0){
-            log.info("BrowserCabgov.writeExcel.noItem. 输出数据：noItemCarNo{}", noItemCarNo);
-            WriterUtils.overwrite(new File(DATA_PATH + "/未找到违法记录-" + fileName  + ".txt"), noItemCarNo.toString().getBytes());
+        if((ValueUtils.isNotBlank(noItemCarNos))){
+            log.info("BrowserCabgov.writeExcel.noItem. 输出数据：异常-列表无数据:{}", ValueUtils.toString(noItemCarNos));
+            WriterUtils.overwrite(new File(dataPath.getPath() + "/异常-列表无数据-" + fileTimeName  + ".txt"), ValueUtils.toString(noItemCarNos).toString().getBytes());
         }
         log.info("writeExcel.end. 输出数据：itemsList.Size:{}", itemsList.size());
     }
@@ -116,34 +138,38 @@ public class BrowserCabgov extends BrowserBase {
         List<Map<String, String>> itemsList = new ArrayList<>();
         this.search(value);
         int i = 30;
+        int pageTotal = 0;
+        int pageIndex = 0;
+        int itemTotal = 0;
         while (i -- > 0){
             try {
                 Thread.sleep(1000);
-                List<WebElement> webElements = null;
-                WebElement webElement = null;
+                AtomicReference<List<WebElement>> webElements = new AtomicReference<>();
+                AtomicReference<WebElement> webElement = new AtomicReference<>();
                 try{
-                    webElement = browser.getDriver().findElement(By.id("violationveh"));
+                    webElement.set(browser.getDriver().findElement(By.id("violationveh")));
                     Thread.sleep(1000);
                 }catch (Exception e){
                     log.warn("BrowserCabgov.filterItem.while. exception 车辆列表 ele:{}", "violationveh");
                     continue;
                 }
-                if(webElement == null){
+                if(webElement.get() == null){
                     log.warn("BrowserCabgov.filterItem.while. not fund 车辆列表 ele:{}", "violationveh");
                     continue;
                 }
 
                 try{
-                    WebElement dataNumEle = webElement.findElement(By.className("data-nums"));
+                    WebElement dataNumEle = webElement.get().findElement(By.className("data-nums"));
                     WebElement temp = dataNumEle.findElement(By.xpath("p/span"));
-                    int pageTotal = Integer.parseInt(temp.getText());
+                    pageTotal = Integer.parseInt(temp.getText());
                     log.info("BrowserCabgov.filterItem.while. 获取车辆列表数据总数:{}", pageTotal);
                 }catch (Exception e){
                     log.warn("BrowserCabgov.filterItem.while. not fund 车辆列表数据总数");
+                    pageTotal = -1;
                 }
 
                 try{
-                    webElements = webElement.findElements(By.xpath("table/tbody/tr"));
+                    webElements.set(webElement.get().findElements(By.xpath("table/tbody/tr")));
                     Thread.sleep(1000);
                 }catch (Exception e){
                     log.warn("BrowserCabgov.filterItem.while. not fund 车辆列表 ele.ex:{}", "table/tbody/tr");
@@ -154,8 +180,54 @@ public class BrowserCabgov extends BrowserBase {
                     log.warn("BrowserCabgov.filterItem.while. not fund 车辆列表 ele:{}", "table/tbody/tr");
                     continue;
                 }
-                for(WebElement trEle : webElements){
+//                WebElement pageNextEle = null;
+                if(pageTotal < 1 || pageTotal > 10){
+                    AtomicReference<List<WebElement>> pageEles = new AtomicReference();
+                    AtomicReference<WebElement> pageELe = new AtomicReference<>();
+                    WebElementUtils.whileDo(() -> {
+                        try{
+                            pageELe.set(browser.getDriver().findElement(By.id("mypagination1")));
+                            Thread.sleep(1000);
+                        }catch (Exception e){
+                            log.warn("BrowserCabgov.filterItem.while in pages error. 获取翻页控件异常", e);
+                            return false;
+                        }
+                        if(pageELe.get() == null){
+                            log.warn("BrowserCabgov.filterItem.while in pages error. 未获取翻页控件");
+                        }
+                        try{
+                            pageEles.set(pageELe.get().findElements(By.xpath("ul/li")));
+                            Thread.sleep(1000);
+                        }catch (Exception e){
+                            log.warn("BrowserCabgov.filterItem.while in pages warn. ele:ul/li", e);
+                            return false;
+                        }
+                        return true;
+                    }, 10);
+
+                    if(ValueUtils.isBlank(pageEles) || pageEles.get().size() <= 5){
+                        log.warn("BrowserCabgov.filterItem.while in pages warn. 获取翻页控件分页异常");
+                        continue;
+                    }
+                    int curPageNum = -1;
+                    for(WebElement ele : pageEles.get()){
+                        if("active".equals(ele.getAttribute("class"))){
+                            curPageNum = Integer.parseInt(ele.getText());
+                            break;
+                        }
+                    }
+                    if(curPageNum != pageIndex + 1){
+                        log.warn("BrowserCabgov.filterItem.while warn. 翻页拉取数据失败");
+                        continue;
+                    }
+                }
+                for(WebElement trEle : webElements.get()){
+                    itemTotal ++;
                     List<WebElement> datas = trEle.findElements(By.xpath("td"));
+                    String plateNo = WebElementUtils.getValue(datas.get(0));
+                    if(!value.equals(plateNo.substring(1))){
+                        throw new BusinessException("车牌号不一致");
+                    }
                     String items = "";
                     for (WebElement data : datas){
                         try{
@@ -203,58 +275,77 @@ public class BrowserCabgov extends BrowserBase {
                     itemsList.add(item);
                     log.info("BrowserCabgov.filterItem.while. set list item end:{}", item);
                 }
-                try{
-                    webElement = browser.getDriver().findElement(By.id("mypagination1"));
-                    Thread.sleep(1000);
-                }catch (Exception e){
-                    log.warn("BrowserCabgov.filterItem.while error. 获取翻页控件异常", e);
-                    break;
-                }
-                if(webElement == null){
-                    log.warn("BrowserCabgov.filterItem.while error. 未获取翻页控件");
-                    break;
-                }
 
-                try{
-                    webElements = webElement.findElements(By.xpath("ul/li"));
-                    Thread.sleep(1000);
-                }catch (Exception e){
-                    log.warn("BrowserCabgov.filterItem.while warn. ele:ul/li", e);
-                    continue;
-                }
-                if(ValueUtils.isBlank(webElements) || webElements.size() <= 5){
-                    log.warn("BrowserCabgov.filterItem.while error. 获取翻页控件分页异常");
-                    break;
-                }
-                webElements.remove(0);
-                webElements.remove(0);
-                webElements.remove(webElements.size() - 1);
-                webElements.remove(webElements.size() - 1);
+                if(pageTotal < 1 || pageTotal > 10){
+                    WebElementUtils.whileDo(() -> {
+                        try{
+                            webElement.set(browser.getDriver().findElement(By.id("mypagination1")));
+                            Thread.sleep(1000);
+                        }catch (Exception e){
+                            log.warn("BrowserCabgov.filterItem.while error. 获取翻页控件异常", e);
+                            return false;
+                        }
+                        if(webElement.get() == null){
+                            log.warn("BrowserCabgov.filterItem.while error. 未获取翻页控件");
+                            return false;
+                        }
+                        try{
+                            webElements.set(webElement.get().findElements(By.xpath("ul/li")));
+                            Thread.sleep(1000);
+                        }catch (Exception e){
+                            log.warn("BrowserCabgov.filterItem.while warn. ele:ul/li", e);
+                            return false;
+                        }
+                        return true;
+                    }, 10);
 
-                if(webElements.size() <= 1){
-                    break;
-                }
-                List<WebElement> removes = new ArrayList<>();
-                for(WebElement ele : webElements){
-                    removes.add(ele);
-                    if("active".equals(ele.getAttribute("class"))){
-                        log.warn("BrowserCabgov.filterItem.while.while error. 获取翻页控件分页Active异常");
+
+                    if(ValueUtils.isBlank(webElements.get()) || webElements.get().size() <= 5){
+                        log.warn("BrowserCabgov.filterItem.while error. 获取翻页控件分页异常");
                         break;
                     }
-                }
-                webElements.removeAll(removes);
-                if(webElements.size() == 0){
+                    webElements.get().remove(0);
+                    webElements.get().remove(0);
+                    webElements.get().remove(webElements.get().size() - 1);
+                    webElements.get().remove(webElements.get().size() - 1);
+
+                    if(webElements.get().size() <= 1){
+                        break;
+                    }
+                    List<WebElement> removes = new ArrayList<>();
+                    for(WebElement ele : webElements.get()){
+                        removes.add(ele);
+                        if("active".equals(ele.getAttribute("class"))){
+                            log.warn("BrowserCabgov.filterItem.while.while error. 获取翻页控件分页Active异常");
+                            break;
+                        }
+                    }
+                    webElements.get().removeAll(removes);
+                    if(webElements.get().size() == 0){
+                        break;
+                    }
+                    log.info("BrowserCabgov.filterItem.while.click.start. next page");
+                    WebElementUtils.click(browser, webElements.get().get(0).findElement(By.xpath("a")));
+                    log.info("BrowserCabgov.filterItem.while.click.end. next page");
+                    pageIndex ++;
+                    Thread.sleep(2000);
+                }else{
                     break;
                 }
-                log.info("BrowserCabgov.filterItem.while.click.start. next page");
-                WebElementUtils.click(browser, webElements.get(0).findElement(By.xpath("a")));
-                log.info("BrowserCabgov.filterItem.while.click.end. next page");
-                Thread.sleep(2000);
                 i = 30;
-            } catch (InterruptedException e) {
-                log.warn("BrowserCabgov.filterItem.while error. i:{}", i);
+            }catch (BusinessException e){
+                log.warn("BrowserCabgov.filterItem.while warn. i:{}", i, e);
+            }catch (Exception e) {
+                log.error("BrowserCabgov.filterItem.while error. i:{}", i);
                 throw new RuntimeException(e);
             }
+        }
+        if(pageTotal <= 0){
+            log.warn("BrowserCabgov.filterItem.while.end. alert pageTotal:{}", pageTotal);
+        }else if(pageTotal != itemTotal){
+            log.warn("BrowserCabgov.filterItem.while.end. alert pageTotal:{} != itemTotal:{}", pageTotal, itemTotal);
+        }else {
+            log.info("BrowserCabgov.filterItem.while.end. success pageTotal:{} == itemTotal:{}", pageTotal, itemTotal);
         }
         log.info("BrowserCabgov.filterItem.while.out. i:{}", i);
         if(i <= 0){
