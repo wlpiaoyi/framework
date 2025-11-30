@@ -1,10 +1,12 @@
 package org.wlpiaoyi.framework.lab.selenium.utils;
 
+import lombok.SneakyThrows;
 import org.openqa.selenium.*;
 import org.wlpiaoyi.framework.lab.selenium.Browser;
 import org.wlpiaoyi.framework.utils.ValueUtils;
 
 import java.util.List;
+import java.util.Random;
 import java.util.stream.Collectors;
 
 /**
@@ -281,5 +283,47 @@ public class WebElementUtils {
         element.sendKeys(value);
 
         return length == 0;
+    }
+    public interface Runnable {
+        /**
+         * Runs this operation.
+         */
+        boolean run();
+    }
+
+
+    /**
+     * <p><b>{@code @description:}</b>
+     * <div style=' padding: 5px; margin-left: 5px; margin-bottom: 5px;'>
+     * 循环执行
+     * </div>
+     * </p>
+     *
+     * <p><b>{@code @param}</b> <b>runnable</b>
+     * {@link Runnable}
+     * </p>
+     *
+     * <p><b>{@code @param}</b> <b>times</b>
+     * {@link int}
+     * </p>
+     *
+     * <p><b>{@code @date:}</b>2025/11/29 12:43</p>
+     * <p><b>{@code @author:}</b>wlpiaoyi</p>
+     * <hr/>
+     */
+    public static void whileDo(Runnable runnable, int times) {
+        Random random = new Random();
+        int i = times;
+        while (i-- > 0){
+            try {
+                int sleep = random.nextInt(400) + 100;
+                Thread.sleep(sleep);
+                if(runnable.run()) break;
+                sleep = random.nextInt(200) + 500;
+                Thread.sleep(sleep);
+            } catch (Exception e) {
+                throw new RuntimeException(e);
+            }
+        }
     }
 }
