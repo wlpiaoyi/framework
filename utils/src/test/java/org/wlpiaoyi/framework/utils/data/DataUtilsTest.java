@@ -68,6 +68,35 @@ public class DataUtilsTest {
         System.out.println(readInText.equals(writOut.toString()));
     }
 
+
+    /**
+     * 测试Base64编解码功能
+     */
+    @Test
+    public void testBase92EncodeDecode() {
+        String testData = "Hello World! This is a test string for Base92 encoding.";
+        byte[] originalBytes = testData.getBytes(StandardCharsets.UTF_8);
+
+        // 测试byte[]编解码
+        byte[] encodedBytes = DataUtils.base92Encode(originalBytes);
+        System.out.println("byte[]编码解码结果：\n" + new String(encodedBytes, StandardCharsets.UTF_8));
+        byte[] decodedBytes = DataUtils.base92Decode(encodedBytes);
+        System.out.println("byte[]编解码结果：\n" + new String(decodedBytes, StandardCharsets.UTF_8));
+        for (int i = 0; i < encodedBytes.length; i++) {
+            encodedBytes[i] = (byte) 0xFF;
+        }
+        decodedBytes = DataUtils.base92Encode(encodedBytes);
+        System.out.println("byte[]test结果：\n" + new String(decodedBytes, StandardCharsets.UTF_8));
+        for (int i = 0; i < encodedBytes.length; i++) {
+            encodedBytes[i] = (byte) 0x0;
+        }
+        encodedBytes[0] = (byte) 0x1;
+        decodedBytes = DataUtils.base92Encode(encodedBytes);
+        System.out.println("byte[]test结果：\n" + new String(decodedBytes, StandardCharsets.UTF_8));
+
+    }
+
+
     @After
     public void tearDown() throws Exception {
 

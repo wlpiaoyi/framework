@@ -10,13 +10,14 @@ import org.wlpiaoyi.framework.utils.ValueUtils;
 import org.wlpiaoyi.framework.utils.exception.BusinessException;
 
 import java.io.*;
+import java.math.BigInteger;
 import java.nio.ByteBuffer;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
-import java.util.Base64;
+import java.util.*;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 import java.util.zip.ZipOutputStream;
@@ -440,5 +441,30 @@ public class DataUtils {
     }
 
 //base64转码解码<================================================================
+
+    private static final char[] CHAR_ARRAY = "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ~!@#$%^&*()_+`-={}|:<>?[];',.".toCharArray();
+    /**
+     * Base92编码
+     * @param bytes 需要编码的字节数组
+     * @return 编码后的Base92字节数组
+     */
+    public static byte[] base92Encode(byte[] bytes) {
+        if (bytes == null || bytes.length == 0) {
+            return new byte[0];
+        }
+        return DataBaseXUtils.conversionToBaseX(bytes, null, CHAR_ARRAY);
+    }
+
+    /**
+     * Base92解码
+     * @param bytes 需要解码的Base92字节数组
+     * @return 解码后的原始字节数组
+     */
+    public static byte[] base92Decode(byte[] bytes) {
+        if (bytes == null || bytes.length == 0) {
+            return new byte[0];
+        }
+        return DataBaseXUtils.conversionToBaseX(bytes, CHAR_ARRAY, null);
+    }
 
 }
