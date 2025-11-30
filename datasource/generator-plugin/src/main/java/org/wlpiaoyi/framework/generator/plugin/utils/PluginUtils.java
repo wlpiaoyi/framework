@@ -14,82 +14,17 @@ import java.util.Map;
  */
 public class PluginUtils {
 
-    public static Map<String, String> columnTypeDict = new HashMap(){{
-        put("CHAR", "String");
-//        put("VARCHAR", "String");
-//        put("TEXT", "String");
-//        put("LONGTEXT", "String");
-//        put("BLOB", "String");
-//        put("TINYINT", "Byte");
-//        put("TINYINT UNSIGNED", "Byte");
-//        put("SMALLINT", "Short");
-//        put("SMALLINT UNSIGNED", "Short");
-//        put("MEDIUMINT", "Short");
-//        put("MEDIUMINT UNSIGNED", "Short");
-//        put("INT", "Integer");
-//        put("INT UNSIGNED", "Integer");
-//        put("BIGINT", "Long");
-//        put("BIGINT UNSIGNED", "Long");
-//        put("DECIMAL", "Double");
-//        put("DATETIME", "Date");
-    }};
-
-    public static Map<String, String> implTypeDict = new HashMap(){{
-        put("DATETIME", "java.util.Date");
-    }};
+    // 字段类型
+    public static Map<String, String> columnTypeDict = new HashMap();
+    // 引入类型
+    public static Map<String, String> implTypeDict = new HashMap();
 
 
-    public static Map<String, String> implDecorateDict = new HashMap(){{
-//        put("BIGINT", "com.fasterxml.jackson.databind.annotation.JsonSerialize," +
-//                "com.fasterxml.jackson.databind.ser.std.ToStringSerializer");
-//        put("BIGINT UNSIGNED", "com.fasterxml.jackson.databind.annotation.JsonSerialize," +
-//                "com.fasterxml.jackson.databind.ser.std.ToStringSerializer");
-//        put("DATETIME", "com.fasterxml.jackson.annotation.JsonFormat," +
-//                "org.springframework.format.annotation.DateTimeFormat");
-    }};
-    public static Map<String, String> fieldDecorateDict = new HashMap(){{
-//        put("BIGINT", "@JsonSerialize(using = ToStringSerializer.class)");
-//        put("BIGINT UNSIGNED", "@JsonSerialize(using = ToStringSerializer.class)");
-//        put("DATETIME", "@DateTimeFormat(pattern = \"yyyy-MM-dd HH:mm:ss\")" +
-//                "##tabArgs##@JsonFormat(pattern = \"yyyy-MM-dd HH:mm:ss\", timezone = BaseEntity.ZONE)");
-    }};
+    public static Map<String, String> implDecorateDict = new HashMap();
+    public static Map<String, String> fieldDecorateDict = new HashMap();
 
-    public static Map<String, String> implValidDict = new HashMap(){{
-//        put("CHAR", "jakarta.validation.constraints.NotBlank");
-//        put("VARCHAR", "jakarta.validation.constraints.NotBlank");
-//        put("BLOB", "jakarta.validation.constraints.NotBlank");
-//        put("LONGTEXT", "jakarta.validation.constraints.NotBlank");
-//        put("TINYINT", "jakarta.validation.constraints.NotNull");
-//        put("TINYINT UNSIGNED", "jakarta.validation.constraints.NotNull");
-//        put("SMALLINT", "jakarta.validation.constraints.NotNull");
-//        put("SMALLINT UNSIGNED", "jakarta.validation.constraints.NotNull");
-//        put("MEDIUMINT", "jakarta.validation.constraints.NotNull");
-//        put("MEDIUMINT UNSIGNED", "jakarta.validation.constraints.NotNull");
-//        put("INT", "jakarta.validation.constraints.NotNull");
-//        put("INT UNSIGNED", "jakarta.validation.constraints.NotNull");
-//        put("BIGINT", "jakarta.validation.constraints.NotNull");
-//        put("BIGINT UNSIGNED", "jakarta.validation.constraints.NotNull");
-//        put("DECIMAL", "jakarta.validation.constraints.NotNull");
-//        put("DATETIME", "jakarta.validation.constraints.NotNull");
-    }};
-    public static Map<String, String> msgValidDict = new HashMap(){{
-//        put("CHAR", "@NotBlank(message = \"__comment__不能为空\")");
-//        put("VARCHAR", "@NotBlank(message = \"__comment__不能为空\")");
-//        put("BLOB", "@NotBlank(message = \"__comment__不能为空\")");
-//        put("LONGTEXT", "@NotBlank(message = \"__comment__不能为空\")");
-//        put("TINYINT", "@NotNull(message = \"__comment__不能为空\")");
-//        put("TINYINT UNSIGNED", "@NotNull(message = \"__comment__不能为空\")");
-//        put("SMALLINT", "@NotNull(message = \"__comment__不能为空\"");
-//        put("SMALLINT UNSIGNED", "@NotNull(message = \"__comment__不能为空\"");
-//        put("MEDIUMINT", "@NotNull(message = \"__comment__不能为空\"");
-//        put("MEDIUMINT UNSIGNED", "@NotNull(message = \"__comment__不能为空\"");
-//        put("INT", "@NotNull(message = \"__comment__不能为空\")");
-//        put("INT UNSIGNED", "@NotNull(message = \"__comment__不能为空\")");
-//        put("BIGINT", "@NotNull(message = \"__comment__不能为空\")");
-//        put("BIGINT UNSIGNED", "@NotNull(message = \"__comment__不能为空\")");
-//        put("DECIMAL", "@NotNull(message = \"__comment__不能为空\")");
-//        put("DATETIME", "@NotNull(message = \"__comment__不能为空\")");
-    }};
+    public static Map<String, String> implValidDict = new HashMap();
+    public static Map<String, String> msgValidDict = new HashMap();
 
 
     public static Map patternComment(String comment){
