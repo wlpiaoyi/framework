@@ -73,20 +73,13 @@ public class BrowserCabgov extends BrowserBase {
         List<String> unRunCarNos = new ArrayList<>();
         try{
             runBiz(args, itemsList, errorCarNos, noItemCarNos, unRunCarNos);
-            int unDoNum = errorCarNos.size() + noItemCarNos.size() + unRunCarNos.size();
+            int unDoNum = noItemCarNos.size();
             log.info("BrowserCabgov.doing check. {}/{}", unDoNum, args.length);
             if(Float.valueOf(unDoNum) / Float.valueOf(args.length) > 0.35){
                 args = new String[unDoNum];
-                for (int i = 0; i < errorCarNos.size(); i++) {
-                    args[i] = errorCarNos.get(i);
-                }
                 for (int i = 0; i < noItemCarNos.size(); i++) {
                     args[i + errorCarNos.size()] = noItemCarNos.get(i);
                 }
-                for (int i = 0; i < unRunCarNos.size(); i++) {
-                    args[i + errorCarNos.size()] = unRunCarNos.get(i);
-                }
-                errorCarNos.clear();
                 noItemCarNos.clear();
                 log.info("BrowserCabgov.agin alert. begin:{}", args);
                 runBiz(args, itemsList, errorCarNos, noItemCarNos, unRunCarNos);

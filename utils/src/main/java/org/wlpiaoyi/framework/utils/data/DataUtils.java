@@ -442,29 +442,257 @@ public class DataUtils {
 
 //base64转码解码<================================================================
 
-    private static final char[] CHAR_ARRAY = "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ~!@#$%^&*()_+`-={}|:<>?[];',.".toCharArray();
+//    private static final char[] CHAR_ARRAY = "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ~!@#$%^&*()_+`-={}|:<>?[];',.".toCharArray();
+    private static final char[] CHAR_ARRAY = "!#$%&'()*+,-.0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[]^_`abcdefghijklmnopqrstuvwxyz{|}~".toCharArray();
+
     /**
+     * <p><b>{@code @description:}</b>
+     * <div style='padding: 5px; margin-left: 5px; margin-bottom: 5px;'>
      * Base92编码
-     * @param bytes 需要编码的字节数组
-     * @return 编码后的Base92字节数组
+     * </div>
+     * </p>
+     *
+     * <p><b>{@code @param}</b> <b>encodeBytes</b>
+     * {@link byte}
+     * 需要编码的字节数组
+     * </p>
+     *
+     * <p><b>{@code @param}</b> <b>encodeOffset</b>
+     * {@link int}
+     * 待编码字节数组的起始索引
+     * </p>
+     *
+     * <p><b>{@code @param}</b> <b>encodeLen</b>
+     * {@link int}
+     * 待编码字节数组的长度
+     * </p>
+     *
+     * <p><b>{@code @date:}</b>2025/11/30 19:57</p>
+     * <p><b>{@code @return:}</b>
+     * {@link byte[]}
+     * 编码后的Base92字节数组
+     * </p>
+     * <p><b>{@code @author:}</b>wlpiaoyi</p>
+     * <hr/>
      */
-    public static byte[] base92Encode(byte[] bytes) {
-        if (bytes == null || bytes.length == 0) {
+    public static byte[] base92Encode(byte[] encodeBytes, int encodeOffset, int encodeLen) {
+        if (encodeBytes == null || encodeBytes.length == 0) {
             return new byte[0];
         }
-        return DataBaseXUtils.conversionToBaseX(bytes, null, CHAR_ARRAY);
+        return DataBaseXUtils.conversionToBaseX(encodeBytes, encodeOffset, encodeLen, null, CHAR_ARRAY);
+    }
+    public static byte[] base92Encode(byte[] encodeBytes) {
+        return base92Encode(encodeBytes, -1, -1);
     }
 
     /**
-     * Base92解码
-     * @param bytes 需要解码的Base92字节数组
-     * @return 解码后的原始字节数组
+     * <p><b>{@code @description:}</b>
+     * <div style='padding: 5px; margin-left: 5px; margin-bottom: 5px;'>
+     * Base92编码
+     * </div>
+     * </p>
+     *
+     * <p><b>{@code @param}</b> <b>encodeStr</b>
+     * {@link String}
+     * 需要编码的字符串
+     * </p>
+     *
+     * <p><b>{@code @date:}</b>2025/11/30 19:59</p>
+     * <p><b>{@code @return:}</b>
+     * {@link String}
+     * 编码后的Base92字符串
+     * </p>
+     * <p><b>{@code @author:}</b>wlpiaoyi</p>
+     * <hr/>
      */
-    public static byte[] base92Decode(byte[] bytes) {
-        if (bytes == null || bytes.length == 0) {
+    public static String base92Encode(String encodeStr) {
+        return new String(base92Encode(encodeStr.getBytes(StandardCharsets.UTF_8)), StandardCharsets.UTF_8);
+    }
+
+    /**
+     * <p><b>{@code @description:}</b>
+     * <div style='padding: 5px; margin-left: 5px; margin-bottom: 5px;'>
+     * Base92编码
+     * </div>
+     * </p>
+     *
+     * <p><b>{@code @param}</b> <b>encodeIn</b>
+     * {@link InputStream}
+     * 需要编码的输入流
+     * </p>
+     *
+     * <p><b>{@code @param}</b> <b>encodeOut</b>
+     * {@link OutputStream}
+     * 待编码的输出流
+     * </p>
+     *
+     * <p><b>{@code @date:}</b>2025/11/30 21:51</p>
+     * <p><b>{@code @author:}</b>wlpiaoyi</p>
+     * <hr/>
+     */
+    public static void base92Encode(InputStream encodeIn, OutputStream encodeOut) throws IOException {
+        byte[] bytes = new byte[100];
+        try {
+            int bFLen = 0;
+            int bLen;
+            while (true) {
+                if(bFLen != 0){
+                    encodeOut.write('\n');
+                    bLen = encodeIn.read(bytes, bFLen,99);
+                }else{
+                    bLen = encodeIn.read(bytes);
+                }
+                if(bLen < 0) bLen = 0;
+                byte[] encodeBytes = base92Encode(bytes, 0, bFLen + bLen);
+                encodeOut.write(encodeBytes);
+
+                if(bLen == 0) break;
+                bFLen = encodeIn.read(bytes,0, 1);
+                if(bFLen <= 0) break;
+
+                switch (encodeBytes.length){
+                    case 123:{} break;
+                    case 122:{
+                        encodeOut.write('/');
+                    } break;
+                    default: throw new RuntimeException("编码错误");
+                }
+            }
+        }finally {
+            try {
+                encodeOut.flush();
+            } catch (IOException e) {}
+            try {
+                encodeIn.close();
+            }catch (IOException e){}
+            try {
+                encodeOut.close();
+            }catch (IOException e){}
+        }
+    }
+
+    /**
+     * <p><b>{@code @description:}</b>
+     * <div style='padding: 5px; margin-left: 5px; margin-bottom: 5px;'>
+     * Base92解码
+     * </div>
+     * </p>
+     *
+     * <p><b>{@code @param}</b> <b>decodeBytes</b>
+     * {@link byte}
+     * 需要解码的字节数组
+     * </p>
+     *
+     * <p><b>{@code @param}</b> <b>decodeOffset</b>
+     * {@link int}
+     * 待解码字节数组的起始索引
+     * </p>
+     * <p><b>{@code @param}</b> <b>decodeLen</b>
+     * {@link int}
+     * 待解码字节数组的长度
+     * </p>
+     *
+     * <p><b>{@code @date:}</b>2025/11/30 20:05</p>
+     * <p><b>{@code @author:}</b>wlpiaoyi</p>
+     * <hr/>
+     */
+    public static void base92Decode(InputStream decodeIn, OutputStream decodeOut) throws IOException {
+        byte[] bytes = new byte[123];
+        try {
+            int rLen = 0;
+            while (true){
+                int i = decodeIn.read();
+                if(i < 0) break;
+                if(rLen == 123 || i == '/' || i == '\n'){
+                    if(rLen == 0) continue;
+                    byte[] decodeBytes = base92Decode(bytes, 0, rLen);
+                    decodeOut.write(decodeBytes);
+                    rLen = 0;
+                    if(i == '/' || i == '\n') continue;
+                }
+                bytes[rLen++] = (byte) i;
+            }
+            if (rLen > 0){
+                byte[] decodeBytes = base92Decode(bytes, 0, rLen);
+                decodeOut.write(decodeBytes);
+            }
+        }finally {
+            try {
+                decodeOut.flush();
+            } catch (IOException e) {}
+            try {
+                decodeIn.close();
+            }catch (IOException e){}
+            try {
+                decodeOut.close();
+            }catch (IOException e){}
+        }
+
+    }
+
+    /**
+     * <p><b>{@code @description:}</b>
+     * <div style='padding: 5px; margin-left: 5px; margin-bottom: 5px;'>
+     * Base92解码
+     * </div>
+     * </p>
+     *
+     * <p><b>{@code @param}</b> <b>decodeBytes</b>
+     * {@link byte}
+     * 需要解码的Base92字节数组
+     * </p>
+     *
+     * <p><b>{@code @param}</b> <b>decodeOffset</b>
+     * {@link int}
+     * 待解码字节数组的起始索引
+     * </p>
+     *
+     * <p><b>{@code @param}</b> <b>decodeLen</b>
+     * {@link int}
+     * 待解码字节数组的长度
+     * </p>
+     *
+     * <p><b>{@code @date:}</b>2025/11/30 19:58</p>
+     * <p><b>{@code @return:}</b>
+     * {@link byte[]}
+     * 解码后的原始字节数组
+     * </p>
+     * <p><b>{@code @author:}</b>wlpiaoyi</p>
+     * <hr/>
+     */
+    public static byte[] base92Decode(byte[] decodeBytes, int decodeOffset, int decodeLen) {
+        if (decodeBytes == null || decodeBytes.length == 0) {
             return new byte[0];
         }
-        return DataBaseXUtils.conversionToBaseX(bytes, CHAR_ARRAY, null);
+        return DataBaseXUtils.conversionToBaseX(decodeBytes, decodeOffset, decodeLen, CHAR_ARRAY, null);
+    }
+
+    public static byte[] base92Decode(byte[] decodeBytes) {
+        return base92Decode(decodeBytes, -1, -1);
+    }
+
+    /**
+     * <p><b>{@code @description:}</b>
+     * <div style='padding: 5px; margin-left: 5px; margin-bottom: 5px;'>
+     * Base92解码
+     * </div>
+     * </p>
+     *
+     * <p><b>{@code @param}</b> <b>decodeStr</b>
+     * {@link String}
+     * 需要解码的Base92字符串
+     * </p>
+     *
+     * <p><b>{@code @date:}</b>2025/11/30 19:59</p>
+     * <p><b>{@code @return:}</b>
+     * {@link String}
+     * 解码后的原始字符串
+     * </p>
+     * <p><b>{@code @author:}</b>wlpiaoyi</p>
+     * <hr/>
+     */
+    public static String base92Decode(String decodeStr) {
+        return new String(base92Decode(decodeStr.getBytes(StandardCharsets.UTF_8)), StandardCharsets.UTF_8);
     }
 
 }
