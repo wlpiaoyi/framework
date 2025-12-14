@@ -106,11 +106,8 @@ public class BrowserBase {
         }
         log.warn("BrowserBase.create cookies:{}", cookies);
 
-        browser = Browser.createDefault().setHeadless(false)
-                .setDriverPath(CONFIG_PATH +"/chromedriver")
-                .setLoadImages(true)
-                .setStealthMode(true)
-                .setTimeoutMs(60000);
+        browser = Browser.createDefault()
+                .setDriverPath(CONFIG_PATH +"/chromedriver");
         browser.init();
         log.info("BrowserBase.create");
 

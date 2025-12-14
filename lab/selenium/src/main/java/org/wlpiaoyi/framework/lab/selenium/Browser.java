@@ -11,7 +11,6 @@ import org.wlpiaoyi.framework.utils.ValueUtils;
 import org.wlpiaoyi.framework.utils.exception.BusinessException;
 
 import java.io.File;
-import java.time.Duration;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
 
@@ -1017,7 +1016,11 @@ public class Browser {
      * @return 默认配置的Browser实例
      */
     public static Browser createDefault() {
-        return new Browser();
+        return new Browser()
+                .setHeadless(false)
+                .setLoadImages(true)
+                .setStealthMode(true)
+                .setTimeoutMs(60000);
     }
 
     /**
@@ -1028,7 +1031,9 @@ public class Browser {
     public static Browser createHeadless() {
         return new Browser()
                 .setHeadless(true)
-                .setLoadImages(false);
+                .setLoadImages(true)
+                .setStealthMode(true)
+                .setTimeoutMs(60000);
     }
 
     /**
@@ -1040,6 +1045,9 @@ public class Browser {
     public static Browser createWithProxy(String proxyServer) {
         return new Browser()
                 .setProxyServer(proxyServer)
-                .setStealthMode(true);
+                .setHeadless(false)
+                .setLoadImages(true)
+                .setStealthMode(true)
+                .setTimeoutMs(60000);
     }
 }
