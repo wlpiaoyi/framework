@@ -40,7 +40,7 @@ public class BrowserBase {
     protected final String browserUlr = "https://sc.122.gov.cn/views/memrent/vehlist.html";
 
 //    protected final String localName = "海南省";
-//    protected final String browserUlr = "https://hi.122.gov.cn/views/memrent/vehlist.html";;
+//    protected final String browserUlr = "https://hi.122.gov.cn/views/memrent/vehlist.html";
 
     protected final String DATA_PATH = System.getProperty("user.dir") + "/data";
     protected final String CONFIG_PATH = System.getProperty("user.dir") + "/config/selenium";
@@ -105,28 +105,15 @@ public class BrowserBase {
             throw new RuntimeException(e);
         }
         log.warn("BrowserBase.create cookies:{}", cookies);
-        browser = new Browser().setOptionHeadless(false).setUrl(this.browserUlr);
-        log.info("BrowserBase.create  创建浏览器实例:{}", this.browser.getUrl());
 
-//        this.browser.setOptionHeadless(true);
-        this.browser.setOptionLoadimg(true);
-        this.browser.setDriverPath(CONFIG_PATH +"/chromedriver");
-//        Runtime.getRuntime().addShutdownHook(new RTMServer(this.browser));
-        // 添加一个shutdown hook
-        Runtime.getRuntime().addShutdownHook(new Thread(() -> {
-            log.info("检测到程序即将关闭...");
-            log.warn("browser start quit");
-            try {
-                this.browser.getDriver().close();
-            }catch (Exception e){}
-            try {
-                this.browser.getDriver().quit();
-            }catch (Exception e){}
-            try {
-                this.browser.quit();
-            }catch (Exception e){}
-            log.warn("browser quit success");
-        }));
+        browser = Browser.createDefault().setHeadless(false)
+                .setDriverPath(CONFIG_PATH +"/chromedriver")
+                .setLoadImages(true)
+                .setStealthMode(true)
+                .setTimeoutMs(60000);
+        browser.init();
+        log.info("BrowserBase.create");
+
 
     }
 
@@ -134,8 +121,7 @@ public class BrowserBase {
     public boolean start(){
         log.info("BrowserBase.start in. 启动浏览器");
         try{
-            browser.openChromeDriver();
-            browser.openDriver();
+            browser.navigateTo(browserUlr);
             if(ValueUtils.isNotBlank(this.cookies)){
                 String args[] = this.cookies.split("; ");
                 Set<Cookie> cookies = new HashSet<>();
@@ -143,8 +129,8 @@ public class BrowserBase {
                     String as[] = arg.split("=");
                     cookies.add(new Cookie(as[0], as[1]));
                 }
-                this.browser.setCookies(cookies);;
-                browser.openDriver();
+                this.browser.setCookies(cookies);
+                browser.navigateTo(browserUlr);
             }else {
                 log.info("BrowserBase.start cookies is null");
             }
