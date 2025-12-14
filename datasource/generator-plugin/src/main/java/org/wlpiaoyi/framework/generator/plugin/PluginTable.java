@@ -1,8 +1,6 @@
 package org.wlpiaoyi.framework.generator.plugin;
 
-import com.mysql.cj.jdbc.result.ResultSetImpl;
 import org.wlpiaoyi.framework.generator.plugin.model.ConfigModel;
-import org.wlpiaoyi.framework.utils.ValueUtils;
 
 import java.sql.*;
 import java.util.*;

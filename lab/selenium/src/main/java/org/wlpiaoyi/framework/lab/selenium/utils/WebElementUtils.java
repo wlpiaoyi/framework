@@ -1,6 +1,5 @@
 package org.wlpiaoyi.framework.lab.selenium.utils;
 
-import lombok.SneakyThrows;
 import org.openqa.selenium.*;
 import org.wlpiaoyi.framework.lab.selenium.Browser;
 import org.wlpiaoyi.framework.utils.ValueUtils;
@@ -31,7 +30,7 @@ public class WebElementUtils {
      * </p>
      *
      * <p><b>{@code @date:}</b>2025/11/8 15:15</p>
-     * <p><b>{@code @return:}</b>{@link List< WebElement>}</p>
+     * <p><b>{@code @return:}</b>{@link List<WebElement>}</p>
      * <p><b>{@code @author:}</b>wlpia</p>
      */
     public static List<WebElement> getVisibleChildren(WebElement parentElement) {

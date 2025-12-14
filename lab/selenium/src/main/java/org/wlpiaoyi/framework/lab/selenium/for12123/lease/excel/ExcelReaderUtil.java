@@ -10,6 +10,8 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * <p><b>{@code @author:}</b>         wlpia</p>
@@ -180,9 +182,25 @@ public class ExcelReaderUtil {
         if (dateTimeStr == null || dateTimeStr.trim().isEmpty()) {
             return null;
         }
-
         try {
-            return LocalDateTime.parse(dateTimeStr, DATE_TIME_FORMATTER);
+            String regex = "(\\d{4})-(\\d{1,2})-(\\d{1,2})";
+            Pattern pattern = Pattern.compile(regex);
+            Matcher matcher = pattern.matcher(dateTimeStr);
+            // 使用Matcher的replaceAll方法，传入一个函数来处理匹配到的部分
+            String result = matcher.replaceAll(match -> {
+                String year = match.group(1);
+                String month = match.group(2);
+                String day = match.group(3);
+                // 补零操作
+                if (month.length() == 1) {
+                    month = "0" + month;
+                }
+                if (day.length() == 1) {
+                    day = "0" + day;
+                }
+                return year + "-" + month + "-" + day;
+            });
+            return LocalDateTime.parse(result, DATE_TIME_FORMATTER);
         } catch (Exception e) {
             throw new RuntimeException("日期时间解析失败: " + dateTimeStr, e);
         }
