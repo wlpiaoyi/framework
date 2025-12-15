@@ -8,11 +8,13 @@ import org.openqa.selenium.chrome.ChromeDriverService;
 import org.openqa.selenium.chrome.ChromeOptions;
 import org.openqa.selenium.support.ui.WebDriverWait;
 import org.wlpiaoyi.framework.utils.ValueUtils;
+import org.wlpiaoyi.framework.utils.data.DataUtils;
 import org.wlpiaoyi.framework.utils.exception.BusinessException;
 
 import java.io.File;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
 
 /**
  * <p><b>{@code @author:}</b>         wlpiaoyi</p>
@@ -638,6 +640,43 @@ public class Browser {
      * @throws BusinessException 如果浏览器未初始化
      */
     public void setCookies(Set<Cookie> cookies) {
+        if (cookies == null || cookies.isEmpty()) {
+            log.info("没有cookies需要设置");
+            return;
+        }
+
+        // 过滤无效的cookies
+        Set<Cookie> validCookies = cookies.stream()
+                .filter(this::isValidCookie)
+                .collect(Collectors.toSet());
+
+        if (validCookies.size() != cookies.size()) {
+            log.warn("过滤了 {} 个无效的cookie", cookies.size() - validCookies.size());
+        }
+
+        setAllCookies(validCookies);
+    }
+    /**
+     * 验证Cookie对象是否有效
+     */
+    public boolean isValidCookie(Cookie cookie) {
+        if (cookie == null) {
+            return false;
+        }
+
+        // 检查必需字段
+        if (cookie.getName() == null || cookie.getName().isEmpty()) {
+            return false;
+        }
+
+        // value可以为空，但通常应该有值
+        if (cookie.getValue() == null) {
+            log.debug("Cookie [{}] 的value为空", cookie.getName());
+        }
+
+        return true;
+    }
+    private void setAllCookies(Set<Cookie> cookies) {
         if (driver == null) {
             throw new BusinessException("Browser not initialized");
         }

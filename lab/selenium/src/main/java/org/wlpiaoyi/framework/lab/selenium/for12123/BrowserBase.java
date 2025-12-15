@@ -1,5 +1,6 @@
 package org.wlpiaoyi.framework.lab.selenium.for12123;
 
+import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import org.openqa.selenium.By;
 import org.openqa.selenium.Cookie;
@@ -42,8 +43,9 @@ public class BrowserBase {
 //    protected final String localName = "海南省";
 //    protected final String browserUlr = "https://hi.122.gov.cn/views/memrent/vehlist.html";
 
-    protected final String DATA_PATH = System.getProperty("user.dir") + "/data";
-    protected final String CONFIG_PATH = System.getProperty("user.dir") + "/config/selenium";
+    protected final String DATA_PATH = System.getProperty("user.dir") + "/fw_config/data";
+    protected final String CONFIG_PATH = System.getProperty("user.dir") + "/fw_config/selenium";
+    @Getter
     protected final Browser browser;
     protected final String cookies;
     protected final Long curDateL;
@@ -51,7 +53,7 @@ public class BrowserBase {
     protected final int type;
 
     private Long loadCurDateValue(){
-        log.info("BrowserBase.loadCurDateValue in. 读取到期配置文件");
+        log.info("BrowserBase.loadCurDateValue in. 读取到期配置文件:{}", CONFIG_PATH + "/cur_date.dat");
         try {
             byte[] value = ReaderUtils.loadBytes(new File(CONFIG_PATH + "/cur_date.dat"));
             RsaCipher cipher = RsaCipher.build(0).setPrivateKey(this.privateKey).setPublicKey(this.publicKey).loadConfig();
@@ -108,6 +110,7 @@ public class BrowserBase {
 
         browser = Browser.createDefault()
                 .setDriverPath(CONFIG_PATH +"/chromedriver");
+        log.info("BrowserBase.create chromedriver:{}", CONFIG_PATH +"/chromedriver");
         browser.init();
         log.info("BrowserBase.create");
 

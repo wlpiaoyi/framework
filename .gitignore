@@ -32,11 +32,11 @@ openai/target/*
 openai/azure/target/*
 .idea .jdk21/
 .idea .jdk8/
-config/selenium/chromedriver.*
-config/selenium/chromedriver
+fw_config/selenium/chromedriver.*
+fw_config/selenium/chromedriver
 lab/selenium/target/*
 log/
 
-config/selenium/cur_date.dat
+fw_config/selenium/cur_date.dat
 lab/space/target/*
 lab/MetaMqtt/target/*
