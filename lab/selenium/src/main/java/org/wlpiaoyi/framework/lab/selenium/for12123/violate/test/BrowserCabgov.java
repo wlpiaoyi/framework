@@ -43,6 +43,7 @@ public class BrowserCabgov extends BrowserBase {
             arg = arg.trim();
             log.info("BrowserCabgov.start for. 获取车牌号:{}", arg);
             try{
+                this.browser.getDriver().navigate().refresh();
                 List<Map<String, String>> items = this.filterItem(arg);
                 log.info("BrowserCabgov.start for try. 获取车牌号:{} {} <==================", arg, items.size());
                 if(ValueUtils.isBlank(items)){
