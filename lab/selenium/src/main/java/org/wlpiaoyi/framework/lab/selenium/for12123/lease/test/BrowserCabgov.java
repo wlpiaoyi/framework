@@ -41,6 +41,10 @@ public class BrowserCabgov extends BrowserBase {
             String curTimeName = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMMdd"));
             File erroFile = new File(DATA_PATH + "\\12123司机信息错误-" + curTimeName + ".txt");
             for (SubmitHT submitHT : submitHTList) {
+                if(this.getBrowser().getDriver() == null){
+                    log.warn("BrowserCabgov.start 浏览器已关闭");
+                    break;
+                }
                 try {
                     log.info("BrowserCabgov.start 准备打开绑定窗口,绑定数据:{}", submitHT.toString());
                     WebElement addBoxEle = this.openAddBox();

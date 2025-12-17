@@ -750,7 +750,7 @@ public class Browser {
      */
     public void refresh() {
         if (driver == null) {
-            throw new BusinessException("Browser not initialized");
+            throw new NullPointerException("Browser not initialized");
         }
         driver.navigate().refresh();
     }

@@ -43,6 +43,11 @@ public class BrowserCabgov extends BrowserBase {
             arg = arg.trim();
             log.info("BrowserCabgov.start for. 获取车牌号:{}", arg);
             try{
+                if(this.getBrowser().getDriver() == null){
+                    log.warn("BrowserCabgov.start 浏览器已关闭");
+                    break;
+                }
+                this.browser.refresh();
                 List<Map<String, String>> items = this.filterItem(arg);
                 log.info("BrowserCabgov.start for try. 获取车牌号:{} {} <==================", arg, items.size());
                 if(ValueUtils.isBlank(items)){
@@ -51,6 +56,9 @@ public class BrowserCabgov extends BrowserBase {
                 }else{
                     itemsList.addAll(items);
                 }
+            }catch (NullPointerException npe){
+                log.error("BrowserCabgov.start for error. 浏览器已关闭:{}", arg, npe);
+                break;
             }catch (Exception e){
                 log.error("BrowserCabgov.start for error. 12123违章车牌号:{}", arg, e);
                 noItemCarNos.add(arg);

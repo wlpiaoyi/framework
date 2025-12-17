@@ -38,6 +38,8 @@ public class AppRun {
                             throw new RuntimeException(e);
                         }
                         bc.getBrowser().quit();
+                        try { Thread.sleep(1000); } catch (InterruptedException e) {}
+                        bc.getBrowser().quit();
                     }
                     try {
                         Thread.sleep((long) (1000));
@@ -45,7 +47,7 @@ public class AppRun {
                         throw new RuntimeException(e);
                     }
                     {
-                        bc = new org.wlpiaoyi.framework.lab.selenium.for12123.lease.test.BrowserCabgov(type);
+                        bc = new org.wlpiaoyi.framework.lab.selenium.for12123.violate.test.BrowserCabgov(1);
                         new Thread(() -> {
                             bc.start();
                         }).start();
@@ -55,6 +57,8 @@ public class AppRun {
                             throw new RuntimeException(e);
                         }
                         bc.getBrowser().quit();
+                        try { Thread.sleep(1000); } catch (InterruptedException e) {}
+                        bc.getBrowser().quit();
                     }
                     try {
                         Thread.sleep((long) (1000));
@@ -62,7 +66,7 @@ public class AppRun {
                         throw new RuntimeException(e);
                     }
                     {
-                        bc = new org.wlpiaoyi.framework.lab.selenium.for12123.lease.test.BrowserCabgov(1);
+                        bc = new org.wlpiaoyi.framework.lab.selenium.for12123.lease.test.BrowserCabgov(2);
                         BrowserBase finalBc = bc;
                         new Thread(() -> {
                             finalBc.start();
@@ -73,6 +77,11 @@ public class AppRun {
                             throw new RuntimeException(e);
                         }
                         bc.getBrowser().quit();
+                        try {
+                            Thread.sleep((long) (1000));
+                        } catch (InterruptedException e) {
+                            throw new RuntimeException(e);
+                        }
                     }
 
                 }
