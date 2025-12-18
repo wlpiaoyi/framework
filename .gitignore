@@ -40,3 +40,4 @@ log/
 fw_config/selenium/cur_date.dat
 lab/space/target/*
 lab/MetaMqtt/target/*
+fw_config/selenium/chrome-app/

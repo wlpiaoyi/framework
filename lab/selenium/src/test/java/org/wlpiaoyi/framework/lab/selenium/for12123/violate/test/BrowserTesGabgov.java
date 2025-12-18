@@ -4,6 +4,7 @@ import lombok.SneakyThrows;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
+import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.remote.RemoteWebElement;
 
@@ -31,7 +32,7 @@ public class BrowserTesGabgov {
 
     public WebElement getNearBy(WebElement ce, Integer[] ui){
         int maxV = Integer.MAX_VALUE;
-        List<WebElement> elements = ((RemoteWebElement) ce).findElementsByXPath("./*");
+        List<WebElement> elements = ((RemoteWebElement) ce).findElements(By.xpath("./*"));
         if(elements == null){
             return null;
         }

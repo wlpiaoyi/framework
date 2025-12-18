@@ -12,7 +12,7 @@
             box-sizing: border-box;
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
         }
-        
+
         body {
             background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
             color: #e6e6e6;
@@ -20,7 +20,7 @@
             padding: 20px;
             line-height: 1.6;
         }
-        
+
         .container {
             max-width: 1200px;
             margin: 0 auto;
@@ -30,40 +30,40 @@
             overflow: hidden;
             border: 1px solid #3a3a5d;
         }
-        
+
         header {
             background: linear-gradient(to right, #0f3460, #1a1a2e);
             padding: 30px;
             text-align: center;
             border-bottom: 2px solid #3a3a5d;
         }
-        
+
         h1 {
             font-size: 2.5rem;
             margin-bottom: 10px;
             color: #4cc9f0;
             text-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
         }
-        
+
         .subtitle {
             font-size: 1.1rem;
             color: #a9a9b8;
             max-width: 800px;
             margin: 0 auto;
         }
-        
+
         .content {
             display: flex;
             flex-wrap: wrap;
             padding: 25px;
         }
-        
+
         .detection-section {
             flex: 1;
             min-width: 300px;
             padding: 20px;
         }
-        
+
         .control-section {
             flex: 0 0 300px;
             padding: 20px;
@@ -1210,20 +1210,20 @@
                 try {
                     // 尝试创建 AudioContext
                     context = new AudioContext();
-                    
+
                     // 检查基础属性和方法
                     const hasCreateOscillator = typeof context.createOscillator === 'function';
                     const hasCreateBuffer = typeof context.createBuffer === 'function';
                     const hasCreateGain = typeof context.createGain === 'function';
-                    
+
                     if (!hasCreateOscillator || !hasCreateBuffer || !hasCreateGain) {
                         addLog('AudioContext 缺少基础方法', 'warn');
                         return true; // 异常
                     }
-                    
+
                     // 创建 Oscillator 但不需要启动它
                     oscillator = context.createOscillator();
-                    
+
                     // 检查 Oscillator 的基本属性
                     const hasFrequency = oscillator.frequency !== undefined;
                     const hasType = oscillator.type !== undefined;
@@ -1231,14 +1231,14 @@
                     const hasStopMethod = typeof oscillator.stop === 'function';
                     const hasConnectMethod = typeof oscillator.connect === 'function';
                     const hasDisconnectMethod = typeof oscillator.disconnect === 'function';
-                    
+
                     // 自动化浏览器可能缺少这些方法或属性
-                    if (!hasFrequency || !hasType || !hasStartMethod || !hasStopMethod || 
+                    if (!hasFrequency || !hasType || !hasStartMethod || !hasStopMethod ||
                         !hasConnectMethod || !hasDisconnectMethod) {
                         addLog('OscillatorNode 缺少必要方法或属性', 'warn');
                         return true; // 异常
                     }
-                    
+
                     // 检查频率参数是否可设置
                     try {
                         oscillator.frequency.value = 440; // 尝试设置频率
@@ -1250,7 +1250,7 @@
                         addLog('设置频率失败: ' + e.message, 'warn');
                         return true; // 异常
                     }
-                    
+
                     // 检查 connect 方法是否正常工作
                     try {
                         const gainNode = context.createGain();
@@ -1260,7 +1260,7 @@
                         addLog('连接/断开节点失败: ' + e.message, 'warn');
                         return true; // 异常
                     }
-                    
+
                     // 额外检测：自动化浏览器可能在 AudioContext 上缺少某些方法
                     const requiredContextMethods = [
                         'createBufferSource',
@@ -1269,17 +1269,17 @@
                         'createAnalyser',
                         'createScriptProcessor'
                     ];
-                    
+
                     for (const methodName of requiredContextMethods) {
                         if (typeof context[methodName] !== 'function') {
                             addLog(`AudioContext 缺少 ${methodName} 方法`, 'warn');
                             return true; // 异常
                         }
                     }
-                    
+
                     addLog('AudioContext 正常', 'success');
                     return false; // 正常
-                    
+
                 } finally {
                     // 清理资源
                     try {
@@ -1295,7 +1295,7 @@
                         // 忽略清理错误
                     }
                 }
-                
+
             } catch (e) {
                 // 创建 AudioContext 失败可能是自动化环境
                 addLog(`AudioContext检测出错: ${e.message}`, 'error');
@@ -1455,7 +1455,6 @@
         }
 
         detectionResults.plugins = isSuspicious;
-
         if (detectionResults.plugins) {
             pluginsCheck.classList.add('detected');
             pluginsCheck.classList.remove('clean');

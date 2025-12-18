@@ -285,6 +285,9 @@ public class BrowserCabgov extends BrowserBase {
 
                 if(pageTotal < 1 || pageTotal > 10){
                     WebElementUtils.whileDo(() -> {
+                        if(this.browser.isClosed()){
+                            throw new BusinessException("浏览器已关闭");
+                        }
                         try{
                             webElement.set(browser.getDriver().findElement(By.id("mypagination1")));
                             Thread.sleep(1000);
@@ -366,12 +369,11 @@ public class BrowserCabgov extends BrowserBase {
         String errorMsg = null;
         int i = 300;
         while (i-- > 0){
+            if(this.browser.isClosed()){
+                throw new BusinessException("浏览器已关闭");
+            }
             try {
                 Thread.sleep(1000);
-                if(this.browser.isClosed()){
-                    log.warn("BrowserCabgov.openAndLogin.while warn. 浏览器已关闭");
-                    break;
-                }
                 List<WebElement> webElements = null;
                 WebElement webElement = null;
                 try{

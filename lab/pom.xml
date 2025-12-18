@@ -22,7 +22,7 @@
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <poi.version>4.1.2</poi.version>
-        <selenium.version>3.141.59</selenium.version>
+        <selenium.version>4.39.0</selenium.version>
     </properties>
 
     <dependencyManagement>

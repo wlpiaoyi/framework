@@ -12,6 +12,13 @@ import org.wlpiaoyi.framework.utils.data.DataUtils;
 import org.wlpiaoyi.framework.utils.exception.BusinessException;
 
 import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.time.Duration;
+import java.time.temporal.ChronoUnit;
+import java.time.temporal.TemporalUnit;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
@@ -174,7 +181,6 @@ public class Browser {
 
         // 实验性选项
         addExperimentalOptions(options);
-
         return options;
     }
 
@@ -201,7 +207,7 @@ public class Browser {
      */
     private void addBasicArguments(ChromeOptions options) {
         options.addArguments(
-                "--no-sandbox",                    // 禁用沙盒模式（在Docker等环境中需要）
+                "--no-sandbox",                   // 禁用沙盒模式（在Docker等环境中需要）
                 "--disable-popup-blocking",       // 禁用弹出窗口阻止
                 "--disable-gpu",                  // 禁用GPU加速（在无头模式下建议禁用）
                 "--disable-extensions",           // 禁用扩展程序
@@ -239,12 +245,45 @@ public class Browser {
 
         // 隐藏自动化特征
         if (disableAutomationFlag) {
-            // 排除自动化相关的switches
+            // 1. 禁用GPU黑名单
+            options.addArguments("--ignore-gpu-blacklist");
+            options.addArguments("--enable-webgl-draft-extensions");
+            options.addArguments("--enable-webgl-image-chromium");
+
+            // 2. 设置GPU供应商伪装（Chrome 91+）
+            options.addArguments("--use-gl=desktop");
+            options.addArguments("--use-angle=gl");
+            options.addArguments("--enable-features=Vulkan");
+
+            // 3. 禁用GPU沙箱
+            options.addArguments("--disable-gpu-sandbox");
+            options.addArguments("--gpu-no-context-lost");
+
+            // 4. 设置GPU信息伪装
+            options.addArguments("--gpu-vendor-id=0x10de");  // NVIDIA
+            options.addArguments("--gpu-device-id=0x2204");  // RTX 3080
+            options.addArguments("--gpu-driver-version=27.21.14.7000");
+
+            // 5. 禁用GPU相关日志
+            options.addArguments("--disable-logging");
+            options.addArguments("--disable-gpu-watchdog");
+            options.addArguments("--disable-software-rasterizer");
+
+            // 6. 启用硬件加速
+            options.addArguments("--enable-hardware-overlays");
+            options.addArguments("--enable-gpu-rasterization");
+            options.addArguments("--enable-zero-copy");
+
+            // 7. 设置WebGL参数
+            options.addArguments("--webgl-antialiasing-mode=msaa");
+            options.addArguments("--webgl-sample-count=4");
+
+            // 8. 禁用自动化标志
             options.setExperimentalOption("excludeSwitches",
                     Arrays.asList("enable-automation", "enable-logging"));
-            // 禁用自动化扩展
             options.setExperimentalOption("useAutomationExtension", false);
         }
+
     }
 
     /**
@@ -270,8 +309,8 @@ public class Browser {
         prefs.put("credentials_enable_service", false);
         prefs.put("profile.password_manager_enabled", false);
 
-        // 禁用内置PDF查看器，直接下载PDF文件
-        prefs.put("plugins.always_open_pdf_externally", true);
+//        // 禁用内置PDF查看器，直接下载PDF文件
+//        prefs.put("plugins.always_open_pdf_externally", true);
 
         // 如果有偏好设置，添加到选项
         if (!prefs.isEmpty()) {
@@ -311,7 +350,7 @@ public class Browser {
     private void addExperimentalOptions(ChromeOptions options) {
         Map<String, Object> experimentalOptions = new HashMap<>();
 
-        // 禁用密码保存提示（已在prefs中设置，这里为了兼容性保留）
+        // 禁用密码保存提示（已在press中设置，这里为了兼容性保留）
         experimentalOptions.put("credentials_enable_service", false);
         experimentalOptions.put("profile.password_manager_enabled", false);
 
@@ -364,13 +403,17 @@ public class Browser {
         try {
             // 1. 构建Chrome选项
             ChromeOptions options = buildChromeOptions();
-
+//            ChromeOptions options = new ChromeOptions();
             // 2. 创建ChromeDriver服务
-            ChromeDriverService service = createChromeDriverService();
-
-            // 3. 创建ChromeDriver实例
-            this.driver = new ChromeDriver(service, options);
-
+            if(ValueUtils.isBlank(this.driverPath)){
+                ChromeDriverService driverService = ChromeDriverService.createDefaultService();
+                this.driver = new ChromeDriver(driverService,options);
+            }else {
+                ChromeDriverService driverService = new ChromeDriverService.Builder()
+                        .usingDriverExecutable(new File(this.driverPath))
+                        .usingAnyFreePort().build();
+                this.driver = new ChromeDriver(driverService,options);
+            }
             // 4. 设置窗口大小
             if (dimension != null) {
                 driver.manage().window().setSize(dimension);
@@ -380,18 +423,11 @@ public class Browser {
 
             // 5. 设置各种超时
             driver.manage().timeouts()
-                    .pageLoadTimeout(timeoutMs, TimeUnit.MILLISECONDS)  // 页面加载超时
-                    .setScriptTimeout(timeoutMs, TimeUnit.MILLISECONDS) // 脚本执行超时
-                    .implicitlyWait(timeoutMs, TimeUnit.MILLISECONDS);  // 隐式等待超时
-
+                    .pageLoadTimeout(Duration.ofMillis(timeoutMs))  // 页面加载超时
+                    .scriptTimeout(Duration.ofMillis(timeoutMs))    // 脚本执行超时
+                    .implicitlyWait(Duration.ofMillis(timeoutMs));  // 隐式等待超时
             // 6. 创建WebDriverWait实例（用于显式等待）
-            this.wait = new WebDriverWait(driver, 60);
-
-            // 7. 应用反检测脚本
-            if (stealthMode) {
-                applyAntiDetectionScripts();
-            }
-
+            this.wait = new WebDriverWait(driver, Duration.ofSeconds(60));
             log.info("Browser initialized successfully");
 
             // 添加一个shutdown hook
@@ -1060,6 +1096,25 @@ public class Browser {
         }
         this.capabilities.put(key, value);
         return this;
+    }
+
+    /**
+     * 截图并保存到指定目录
+     * @param fileDir
+     * @param filename
+     * @return
+     */
+    private boolean takeScreenshot(String fileDir, String filename) {
+        try {
+            byte[] screenshot = this.takeScreenshot();
+            Path screenshotPath = Paths.get(fileDir, filename);
+            Files.createDirectories(screenshotPath.getParent());
+            Files.write(screenshotPath, screenshot);
+            return true;
+        }catch (IOException e) {
+            log.error("保存截图失败: {}", e.getMessage());
+            return false;
+        }
     }
 
     // ============ 静态工厂方法 ============

@@ -118,7 +118,14 @@ public class BrowserBase {
         log.warn("BrowserBase.create cookies:{}", cookies);
 
         browser = Browser.createDefault()
+                .setDisableAutomationFlag(true)
+                .setStealthMode(true)
+                .setTimeoutMs(60000)
                 .setDriverPath(CONFIG_PATH +"/chromedriver");
+        File file = new File(CONFIG_PATH +"/chrome-app/chrome.exe");
+        if(file.exists()){
+            browser.setBinaryPath(file.getAbsolutePath());
+        }
         log.info("BrowserBase.create chromedriver:{}", CONFIG_PATH +"/chromedriver");
         browser.init();
         log.info("BrowserBase.create");

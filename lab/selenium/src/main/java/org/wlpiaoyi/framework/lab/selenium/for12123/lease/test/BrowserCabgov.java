@@ -354,6 +354,9 @@ public class BrowserCabgov extends BrowserBase {
         String errorMsg = null;
         int i = 300;
         while (i-- > 0){
+            if(this.browser.isClosed()){
+                throw new BusinessException("浏览器已关闭");
+            }
             try {
                 Thread.sleep(1000);
                 WebElement webElement = null;
@@ -423,6 +426,9 @@ public class BrowserCabgov extends BrowserBase {
         String errorMsg = null;
         int i = 300;
         while (i-- > 0){
+            if(this.browser.isClosed()){
+                throw new BusinessException("浏览器已关闭");
+            }
             try {
                 Thread.sleep(1000);
                 if(this.getBrowser().isClosed()){
