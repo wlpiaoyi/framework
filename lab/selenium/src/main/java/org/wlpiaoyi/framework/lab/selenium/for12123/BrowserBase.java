@@ -7,52 +7,58 @@ import org.openqa.selenium.Cookie;
 import org.openqa.selenium.WebElement;
 import org.wlpiaoyi.framework.lab.selenium.Browser;
 import org.wlpiaoyi.framework.lab.selenium.utils.WebElementUtils;
+import org.wlpiaoyi.framework.utils.MapUtils;
 import org.wlpiaoyi.framework.utils.ValueUtils;
 import org.wlpiaoyi.framework.utils.data.DataUtils;
 import org.wlpiaoyi.framework.utils.data.ReaderUtils;
+import org.wlpiaoyi.framework.utils.gson.GsonBuilder;
 import org.wlpiaoyi.framework.utils.security.RsaCipher;
 
 import java.io.File;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
+import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
 
 @Slf4j
 public class BrowserBase {
 
-    private String privateKey = "MIICdQIBADANBgkqhkiG9w0BAQEFAASCAl8wggJbAgEAAoGBAJ+8wUIHMZHsdSJKfXkBaYRHKzuN\n" +
-            "SP23Q6Jvsi0X/GVN3320ylAvs7QSwRWS+FEXMRqpzMcpivjUarz7q/Qw58WFH0aMzmx2pmxhlkUs\n" +
-            "Y/LxUVAtM1DfPKPohZ+a06D9tk4+hnGwVQGEwX9oBwp78VZzMzdAY5KdbceD2oQS/qP7AgMBAAEC\n" +
-            "gYBF2FLofBzAoZPWGpwifOuWW0gcEfsIdUmtjQlrjkFeSl6eqJ6N0U3SPyEOPeU2D934uqY/r3qE\n" +
-            "sty5JZJag8fTdP8StHJzUm2b2Mr6Sfb/ROTBhx6mdN5+S0wr8M3I6918ZZ1qAiIFuAkKWsQGxbvU\n" +
-            "FUwQVrHEtDJNjXeS4miiAQJBANTNwdPRIBzw0w5kakWPRYQ9HoWE3TSXdf9rxNpDcgpFftsR7QbF\n" +
-            "6SSBIKl7xGLqaxQFbAmZdQNt4WEfEwpBJOsCQQDAKW1kd7nL6FtgSLKMoEexFLVWNLD0f9g0MTtC\n" +
-            "+kxz4jprqGhdaLfNwJAqnmnjQm+4p/Ra7wjSij8LYz8PWvkxAkBnivYUqlyFuGf5SMKstdmNTm/b\n" +
-            "Z5p6THgNn9JYoRiMBuSCk2ZRNVsLeAj8bkxQFN+lDj5TLWfSE1TmfMg25RuhAkBvEkMJ1G5PX3IZ\n" +
-            "uEuEH0zxHTAnsPMrkA3vNRm1ACpavUPZYJFalKHRSuHJ0KER3B/pkyMZwJrP31rLgUU84e+xAkA4\n" +
-            "mpZ88Vn8vDbOZY35DbgH6hipcIh09tN/V03v/TBsfD/pDbEaiU8LIvK8jm1Z9qhl4rahXj4XdImv\n" +
-            "FmkVhTLy";
-    private String publicKey = "MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQCfvMFCBzGR7HUiSn15AWmERys7jUj9t0Oib7It\n" +
-            "F/xlTd99tMpQL7O0EsEVkvhRFzEaqczHKYr41Gq8+6v0MOfFhR9GjM5sdqZsYZZFLGPy8VFQLTNQ\n" +
-            "3zyj6IWfmtOg/bZOPoZxsFUBhMF/aAcKe/FWczM3QGOSnW3Hg9qEEv6j+wIDAQAB";
 
-    protected final String localName = "四川省";
-    protected final String browserUlr = "https://sc.122.gov.cn/views/memrent/vehlist.html";
+    private String privateKey = "MIICdQIBADANBgkqhkiG9w0BAQEFAASCAl8wggJbAgEAAoGBAI1zh4zfLhks3J8aI8KNa6vqeMFo\n" +
+            "VE4w6k1iv3ehIR/I8EfnmxhyPMYtWp0Y3fo95Zn7kMqJPqetYPMM06f4iUclgZjP+FvMV7CxNVfM\n" +
+            "rXQhA/1XtM6hOA9PowCYHwWUIp8wgGGNtE/MZNjuCLvfvGqAfKPykky7b4ejwqD+xStHAgMBAAEC\n" +
+            "gYAHdnQURdq6tS8K0Su7s+Sy2aMMi2RkJpG8NVke/6803exYttHPqvpd92IKv96AckgbSJK2hMyX\n" +
+            "7/5gmal5scybyvucDukXv/bTHhkwpR97tWTz0emiv8K+cFUlp6MKqVJXg8ZzeOsmpvsIV2NQk9mf\n" +
+            "IAbFXH/07JjgN6lP/+x6pQJBANsPTgqWy3Zk0CWxaQe7DlyxtR2JFWOYsWUqnAd+HmCFcVTP0hjT\n" +
+            "Zx07e3n5wjLff/vDsupB9C3397WUiyNbWCUCQQClTeglDLLQOk+fUqZKS4IlOzxg6LsCRalQvtaa\n" +
+            "FCX24XfSv/iYGqE+JabNu8g1b0tMOcEFv48XUZ5LoMkQjxP7AkBlrFrai1bwIqaBeDB5iBaIa2rW\n" +
+            "xJOK4IolnHtC9wR+ZDFP3g1zvFs1tDABUy0Rk67BWfmmxOnilB8Cxmk2BeWJAkA3QO1BxRbYB0Wq\n" +
+            "CaRP3SFpdH1gHyqzPbm0pbVx1x5BgWfd6BEeNniDH268AfKP+d1/Yyaj1z3rG3r/6ISMpmaVAkA/\n" +
+            "8RLymj8PIJHvVtBkxP0pHsnhMmlKwKO4C1xu26HtQXu/GDwlKnayQGTqq2Oiuu0hki+HQBwmBLjF\n" +
+            "pRbgUsVd";
+    private String publicKey = "MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQCNc4eM3y4ZLNyfGiPCjWur6njBaFROMOpNYr93\n" +
+            "oSEfyPBH55sYcjzGLVqdGN36PeWZ+5DKiT6nrWDzDNOn+IlHJYGYz/hbzFewsTVXzK10IQP9V7TO\n" +
+            "oTgPT6MAmB8FlCKfMIBhjbRPzGTY7gi737xqgHyj8pJMu2+Ho8Kg/sUrRwIDAQAB";
 
-//    protected final String localName = "海南省";
-//    protected final String browserUlr = "https://hi.122.gov.cn/views/memrent/vehlist.html";
-
-    protected final String DATA_PATH = System.getProperty("user.dir") + "/fw_config/data";
+    protected final String DATA_PATH = System.getProperty("user.dir") + "/data";
     protected final String CONFIG_PATH = System.getProperty("user.dir") + "/fw_config/selenium";
     @Getter
     protected final Browser browser;
     protected final String cookies;
+
+//    protected final String localName = "海南省";
+//    protected final String browserUlr = "https://hi.122.gov.cn/views/memrent/vehlist.html";
+//    protected final String localName = "四川省";
+//    protected final String browserUlr = "https://sc.122.gov.cn/views/memrent/vehlist.html";
+    protected final String localName;
+    protected final String browserUlr;
     protected final Long curDateL;
 
     protected final int type;
 
-    private Long loadCurDateValue(){
+    private String[] loadCurDateValue(){
         log.info("BrowserBase.loadCurDateValue in. 读取到期配置文件:{}", CONFIG_PATH + "/cur_date.dat");
         try {
             byte[] value = ReaderUtils.loadBytes(new File(CONFIG_PATH + "/cur_date.dat"));
@@ -63,12 +69,12 @@ public class BrowserBase {
                     ),
                     StandardCharsets.UTF_8
             );
-            return Long.parseLong(dText);
+            log.info("BrowserBase.loadCurDateValue end. 读取到期配置文件");
+            return dText.split(",");
         } catch (IOException e) {
             log.error("BrowserBase.loadCurDateValue error. 读取配置文件错误", e);
+            throw new RuntimeException(e);
         }
-        log.info("BrowserBase.loadCurDateValue end. 读取到期配置文件");
-        return 0L;
     }
 
     protected boolean checkLocal(){
@@ -99,7 +105,10 @@ public class BrowserBase {
         log.info("BrowserBase.create in. 创建浏览器实例");
         this.type = type;
         log.warn("BrowserBase.create type:{}", type);
-        this.curDateL = this.loadCurDateValue();
+        String[] curDateValue = this.loadCurDateValue();
+        this.curDateL = Long.parseLong(curDateValue[0]);
+        this.localName = curDateValue[1];
+        this.browserUlr = curDateValue[2];
         try {
             this.cookies = ReaderUtils.loadString(CONFIG_PATH + "/cookies.txt", null).replaceAll("\n","").replaceAll("\r","");
         } catch (IOException e) {

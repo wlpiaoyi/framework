@@ -41,7 +41,7 @@ public class BrowserCabgov extends BrowserBase {
             String curTimeName = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMMdd"));
             File erroFile = new File(DATA_PATH + "\\12123司机信息错误-" + curTimeName + ".txt");
             for (SubmitHT submitHT : submitHTList) {
-                if(this.getBrowser().getDriver() == null){
+                if(this.browser.isClosed()){
                     log.warn("BrowserCabgov.start 浏览器已关闭");
                     break;
                 }
@@ -425,6 +425,10 @@ public class BrowserCabgov extends BrowserBase {
         while (i-- > 0){
             try {
                 Thread.sleep(1000);
+                if(this.getBrowser().isClosed()){
+                    log.warn("BrowserCabgov.openAndLogin.while warn. 浏览器已关闭");
+                    break;
+                }
                 WebElement webElement = null;
                 try{
                     webElement = browser.getDriver().findElement(By.id("hello"));

@@ -43,7 +43,7 @@ public class BrowserCabgov extends BrowserBase {
             arg = arg.trim();
             log.info("BrowserCabgov.start for. 获取车牌号:{}", arg);
             try{
-                if(this.getBrowser().getDriver() == null){
+                if(this.getBrowser().isClosed()){
                     log.warn("BrowserCabgov.start 浏览器已关闭");
                     break;
                 }
@@ -81,6 +81,9 @@ public class BrowserCabgov extends BrowserBase {
         List<String> unRunCarNos = new ArrayList<>();
         try{
             runBiz(args, itemsList, errorCarNos, noItemCarNos, unRunCarNos);
+            if(this.browser.isClosed()){
+                throw new BusinessException("浏览器已关闭");
+            }
             int unDoNum = noItemCarNos.size();
             log.info("BrowserCabgov.doing check. {}/{}", unDoNum, args.length);
             if(Float.valueOf(unDoNum) / Float.valueOf(args.length) > 0.35){
@@ -143,6 +146,9 @@ public class BrowserCabgov extends BrowserBase {
         int pageIndex = 0;
         int itemTotal = 0;
         while (i -- > 0){
+            if(this.browser.isClosed()){
+                throw new BusinessException("浏览器已关闭");
+            }
             try {
                 Thread.sleep(1000);
                 AtomicReference<List<WebElement>> webElements = new AtomicReference<>();
@@ -362,6 +368,10 @@ public class BrowserCabgov extends BrowserBase {
         while (i-- > 0){
             try {
                 Thread.sleep(1000);
+                if(this.browser.isClosed()){
+                    log.warn("BrowserCabgov.openAndLogin.while warn. 浏览器已关闭");
+                    break;
+                }
                 List<WebElement> webElements = null;
                 WebElement webElement = null;
                 try{
@@ -430,6 +440,9 @@ public class BrowserCabgov extends BrowserBase {
         String errorMsg = null;
         int i = 30;
         while (i -- > 0){
+            if(this.browser.isClosed()){
+                throw new BusinessException("浏览器已关闭");
+            }
             try {
                 Thread.sleep(1000);
                 List<WebElement> webElements = null;

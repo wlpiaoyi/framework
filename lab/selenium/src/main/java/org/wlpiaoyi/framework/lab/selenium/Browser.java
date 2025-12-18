@@ -179,6 +179,21 @@ public class Browser {
     }
 
     /**
+     * 获取所有窗口句柄，如果列表为空则浏览器已关闭
+     */
+    public boolean isClosed() {
+        try {
+            if(this.driver == null){
+                return true;
+            }
+            Set<String> windowHandles = this.driver.getWindowHandles();
+            return windowHandles.isEmpty();
+        } catch (Exception e) {
+            return true;
+        }
+    }
+
+    /**
      * 添加基本浏览器参数
      * 这些参数是Chrome浏览器启动时的命令行参数
      *
