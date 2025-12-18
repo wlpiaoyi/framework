@@ -362,7 +362,7 @@
             height: 100%;
             background: linear-gradient(to right, #4cc9f0, #f72585);
             border-radius: 5px;
-            transition: width 1s ease;
+            transition: width 0.5s cubic-bezier(0.4, 0, 0.2, 1);
         }
 
         .detection-progress {
@@ -500,13 +500,55 @@
         .method-item.behavior {
             border-left-color: #72efdd;
         }
+
+        /* 修复移动端显示 */
+        @media (max-width: 480px) {
+            .container {
+                padding: 10px;
+                border-radius: 10px;
+            }
+
+            header {
+                padding: 20px 15px;
+            }
+
+            h1 {
+                font-size: 1.8rem;
+            }
+
+            .detection-section, .control-section {
+                padding: 10px;
+            }
+
+            .result-box, .human-test-area, .log-panel {
+                padding: 15px;
+            }
+
+            .test-button {
+                width: 100%;
+            }
+        }
+
+        /* 动画效果优化 */
+        .detection-item:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+        }
+
+        /* 防止文本溢出 */
+        .detection-header {
+            display: flex;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
     </style>
 </head>
 <body>
 <div class="container">
     <header>
         <h1><i class="fas fa-robot detection-icon"></i>Selenium 检测工具 - 高级版</h1>
-        <p class="subtitle">使用17种检测技术识别Selenium、Puppeteer等自动化工具，包含基础、高级和行为检测方法</p>
+        <p class="subtitle">使用15种检测技术识别Selenium、Puppeteer等自动化工具，包含基础、高级和行为检测方法</p>
     </header>
 
     <div class="content">
@@ -577,16 +619,6 @@
                 <h2>高级自动化检测 <span class="counter">(检测隐藏的自动化特征)</span></h2>
 
                 <div class="result-box">
-                    <!-- <div class="detection-item advanced" id="chromeAutomationCheck">
-                        <div class="detection-header">
-                            <i class="fas fa-code detection-icon"></i>
-                            <strong>Chrome自动化扩展检测</strong>
-                            <span class="risk-level risk-high">高风险</span>
-                        </div>
-                        <p>检测Chrome自动化扩展和修改的API。</p>
-                        <div class="status" id="chromeAutomationStatus">检测中...</div>
-                    </div> -->
-
                     <div class="detection-item advanced" id="cdpCheck">
                         <div class="detection-header">
                             <i class="fas fa-tools detection-icon"></i>
@@ -616,16 +648,6 @@
                         <p>检测虚拟GPU和自动化环境特有的渲染器。</p>
                         <div class="status" id="webglStatus">检测中...</div>
                     </div>
-
-                    <!-- <div class="detection-item advanced" id="performanceCheck">
-                        <div class="detection-header">
-                            <i class="fas fa-tachometer-alt detection-icon"></i>
-                            <strong>性能指标异常检测</strong>
-                            <span class="risk-level risk-medium">中风险</span>
-                        </div>
-                        <p>检测异常的页面加载时间和性能数据。</p>
-                        <div class="status" id="performanceStatus">检测中...</div>
-                    </div> -->
 
                     <div class="detection-item advanced" id="iframeCheck">
                         <div class="detection-header">
@@ -721,13 +743,13 @@
 
     <div class="overall-result">
         <h2>总体检测结果</h2>
-        <p>基于17种检测方法，您的浏览器被判定为：</p>
+        <p>基于15种检测方法，您的浏览器被判定为：</p>
         <div class="result-text" id="overallResult">等待检测...</div>
         <div class="confidence-meter">
             <div class="confidence-fill" id="confidenceFill" style="width: 0%"></div>
         </div>
         <p id="resultExplanation">点击"开始检测"按钮开始分析浏览器特征</p>
-        <div class="counter" id="detectionCounter">检测进度: 0/17</div>
+        <div class="counter" id="detectionCounter">检测进度: 0/15</div>
     </div>
 
     <footer>
@@ -769,32 +791,22 @@
             <h3>高级检测方法 <span class="advanced-highlight">(检测隐藏的自动化特征)</span></h3>
 
             <div class="method-item advanced">
-                <strong>1. Chrome自动化扩展检测</strong>
-                <p>检测Chrome自动化扩展和修改的API，自动化浏览器经常修改Chrome API来隐藏自身。</p>
-            </div>
-
-            <div class="method-item advanced">
-                <strong>2. Chrome DevTools Protocol检测</strong>
+                <strong>1. Chrome DevTools Protocol检测</strong>
                 <p>检测CDP连接痕迹，这是大多数自动化工具使用的底层协议。</p>
             </div>
 
             <div class="method-item advanced">
-                <strong>3. DOM API补丁检测</strong>
+                <strong>2. DOM API补丁检测</strong>
                 <p>自动化工具经常重写DOM API来隐藏自己，检测这些修改可以识别自动化。</p>
             </div>
 
             <div class="method-item advanced">
-                <strong>4. WebGL供应商检测</strong>
+                <strong>3. WebGL供应商检测</strong>
                 <p>自动化环境通常使用虚拟GPU如 <span class="highlight">LLVMPipe</span>、<span class="highlight">SwiftShader</span>，而真实浏览器使用硬件GPU。</p>
             </div>
 
             <div class="method-item advanced">
-                <strong>5. 性能指标异常检测</strong>
-                <p>自动化工具模拟的页面加载时间往往异常，或缺少真实的性能时间戳。</p>
-            </div>
-
-            <div class="method-item advanced">
-                <strong>6. iframe沙箱检测</strong>
+                <strong>4. iframe沙箱检测</strong>
                 <p>自动化工具可能不会正确实现iframe的隔离，通过检测iframe异常行为识别自动化。</p>
             </div>
 
@@ -850,12 +862,10 @@
         permissions: false,
 
         // 高级检测
-        chromeAutomation: false,
         cdpDetected: false,
         automationPatch: false,
         iframeDetection: false,
         webglVendor: false,
-        performanceMetrics: false,
         audioContext: false,
         chromeRuntime: false,
 
@@ -871,7 +881,7 @@
     let mouseEvents = [];
     let mouseEventCount = 0;
     let completedDetections = 0;
-    const totalDetections = Object.keys(detectionResults).length - 2;
+    const totalDetections = 15; // 实际运行的检测项数量
     let detectionInProgress = false;
     let logEntries = [];
 
@@ -920,50 +930,6 @@
     // ============================================================================
 
     class AdvancedSeleniumDetector {
-
-        /**
-         * 检测Chrome自动化扩展
-         * @returns {boolean} 是否检测到自动化特征
-         */
-        detectChromeAutomation() {
-            try {
-                addLog('开始检测Chrome自动化扩展...', 'info');
-
-                // 检测Chrome自动化扩展
-                const isAutomationControlled =
-                    // 检查是否存在自动化相关属性
-                    window.chrome &&
-                    window.chrome.webstore &&
-                    typeof window.chrome.webstore.install === 'function' &&
-                    // 自动化浏览器中这个函数可能被修改
-                    window.chrome.webstore.install.toString().includes('[native code]') === false;
-                if (isAutomationControlled) {
-                    addLog('检测到Chrome自动化扩展特征', 'warn');
-                    return true;
-                }
-                // 检查Chrome的自动化标志
-                let automationFlag = window.navigator.webdriver === true;
-                if (automationFlag) {
-                    addLog('检测到Chrome自动化标识特征1', 'warn');
-                    return true;
-                }
-                automationFlag = Object.getOwnPropertyDescriptor(navigator.__proto__, 'webdriver') !== undefined;
-                if (automationFlag) {
-                    addLog('检测到Chrome自动化标识特征2', 'warn');
-                    return true;
-                }
-                automationFlag = window.navigator.__proto__.webdriver === true;
-                if (automationFlag) {
-                    addLog('检测到Chrome自动化标识特征3', 'warn');
-                    return true;
-                }
-                return result;
-            } catch (e) {
-                addLog(`Chrome自动化扩展检测出错: ${e.message}`, 'error');
-                return false;
-            }
-        }
-
         /**
          * 检测Chrome DevTools Protocol (CDP) 痕迹
          * @returns {boolean} 是否检测到CDP痕迹
@@ -1149,48 +1115,7 @@
         }
 
         /**
-         * 性能指标检测
-         * @returns {boolean} 是否检测到性能异常
-         */
-        detectPerformanceMetrics() {
-            try {
-                addLog('开始检测性能指标异常...', 'info');
-
-                if (!window.performance || !window.performance.timing) {
-                    addLog('浏览器不支持Performance API，跳过检测', 'info');
-                    return false;
-                }
-
-                const timing = performance.timing;
-
-                // 检查时间戳是否合理
-                const navigationStart = timing.navigationStart;
-                const loadEventEnd = timing.loadEventEnd;
-
-                // 如果时间戳为0或异常，可能是自动化环境
-                if (navigationStart === 0 || loadEventEnd === 0) {
-                    addLog('检测到异常性能时间戳', 'warn');
-                    return true;
-                }
-
-                // 检查页面加载时间是否异常短（自动化工具可能模拟快速加载）
-                const loadTime = loadEventEnd - navigationStart;
-                if (loadTime > 0 && loadTime < 100) {
-                    // 页面加载时间小于100ms，可能是自动化环境
-                    addLog(`检测到异常页面加载时间: ${loadTime}ms`, 'warn');
-                    return true;
-                }
-
-                addLog(`页面加载时间正常: ${loadTime}ms`, 'success');
-                return false;
-            } catch (e) {
-                addLog(`性能指标检测出错: ${e.message}`, 'error');
-                return false;
-            }
-        }
-
-       /**
-         * AudioContext检测
+         * AudioContext检测（优化版）
          * @returns {boolean} 是否检测到AudioContext异常
          */
         detectAudioContext() {
@@ -1205,89 +1130,40 @@
 
                 const AudioContext = window.AudioContext || window.webkitAudioContext;
                 let context = null;
-                let oscillator = null;
 
                 try {
-                    // 尝试创建 AudioContext
                     context = new AudioContext();
 
-                    // 检查基础属性和方法
-                    const hasCreateOscillator = typeof context.createOscillator === 'function';
-                    const hasCreateBuffer = typeof context.createBuffer === 'function';
-                    const hasCreateGain = typeof context.createGain === 'function';
+                    // 快速检查：尝试创建和连接节点
+                    const oscillator = context.createOscillator();
+                    const gainNode = context.createGain();
 
-                    if (!hasCreateOscillator || !hasCreateBuffer || !hasCreateGain) {
-                        addLog('AudioContext 缺少基础方法', 'warn');
-                        return true; // 异常
+                    // 测试属性和方法是否存在
+                    const hasRequiredProps =
+                        'frequency' in oscillator &&
+                        'type' in oscillator &&
+                        typeof oscillator.start === 'function' &&
+                        typeof oscillator.stop === 'function' &&
+                        typeof oscillator.connect === 'function';
+
+                    if (!hasRequiredProps) {
+                        addLog('AudioContext节点缺少必要属性和方法', 'warn');
+                        return true;
                     }
 
-                    // 创建 Oscillator 但不需要启动它
-                    oscillator = context.createOscillator();
+                    // 测试连接功能
+                    oscillator.connect(gainNode);
+                    oscillator.disconnect();
 
-                    // 检查 Oscillator 的基本属性
-                    const hasFrequency = oscillator.frequency !== undefined;
-                    const hasType = oscillator.type !== undefined;
-                    const hasStartMethod = typeof oscillator.start === 'function';
-                    const hasStopMethod = typeof oscillator.stop === 'function';
-                    const hasConnectMethod = typeof oscillator.connect === 'function';
-                    const hasDisconnectMethod = typeof oscillator.disconnect === 'function';
+                    addLog('AudioContext检测正常', 'success');
+                    return false;
 
-                    // 自动化浏览器可能缺少这些方法或属性
-                    if (!hasFrequency || !hasType || !hasStartMethod || !hasStopMethod ||
-                        !hasConnectMethod || !hasDisconnectMethod) {
-                        addLog('OscillatorNode 缺少必要方法或属性', 'warn');
-                        return true; // 异常
-                    }
-
-                    // 检查频率参数是否可设置
-                    try {
-                        oscillator.frequency.value = 440; // 尝试设置频率
-                        if (oscillator.frequency.value !== 440) {
-                            addLog('无法设置 Oscillator 频率', 'warn');
-                            return true; // 异常
-                        }
-                    } catch (e) {
-                        addLog('设置频率失败: ' + e.message, 'warn');
-                        return true; // 异常
-                    }
-
-                    // 检查 connect 方法是否正常工作
-                    try {
-                        const gainNode = context.createGain();
-                        oscillator.connect(gainNode);
-                        oscillator.disconnect();
-                    } catch (e) {
-                        addLog('连接/断开节点失败: ' + e.message, 'warn');
-                        return true; // 异常
-                    }
-
-                    // 额外检测：自动化浏览器可能在 AudioContext 上缺少某些方法
-                    const requiredContextMethods = [
-                        'createBufferSource',
-                        'createMediaElementSource',
-                        'createMediaStreamSource',
-                        'createAnalyser',
-                        'createScriptProcessor'
-                    ];
-
-                    for (const methodName of requiredContextMethods) {
-                        if (typeof context[methodName] !== 'function') {
-                            addLog(`AudioContext 缺少 ${methodName} 方法`, 'warn');
-                            return true; // 异常
-                        }
-                    }
-
-                    addLog('AudioContext 正常', 'success');
-                    return false; // 正常
-
+                } catch (error) {
+                    addLog(`AudioContext检测失败: ${error.message}`, 'error');
+                    return true;
                 } finally {
                     // 清理资源
                     try {
-                        if (oscillator) {
-                            // 如果已经调用了 start，才需要调用 stop
-                            // 但我们没有调用 start，所以不需要
-                            oscillator.disconnect();
-                        }
                         if (context && context.state !== 'closed') {
                             context.close();
                         }
@@ -1295,11 +1171,9 @@
                         // 忽略清理错误
                     }
                 }
-
-            } catch (e) {
-                // 创建 AudioContext 失败可能是自动化环境
-                addLog(`AudioContext检测出错: ${e.message}`, 'error');
-                return true; // 异常
+            } catch (error) {
+                addLog(`AudioContext检测出错: ${error.message}`, 'error');
+                return true;
             }
         }
 
@@ -1652,7 +1526,7 @@
     // ============================================================================
 
     /**
-     * 设置鼠标移动检测
+     * 设置鼠标移动检测（优化版）
      */
     function setupMouseDetection() {
         const mousePatternCheck = document.getElementById('mousePatternCheck');
@@ -1663,132 +1537,147 @@
 
         let startTime = Date.now();
         let lastMoveTime = startTime;
+        let throttleTimer = null;
+        let analysisTimeout = null;
 
-        const recordMouseEvent = (e) => {
-            const currentTime = Date.now();
-            const timeSinceLastMove = currentTime - lastMoveTime;
+        // 使用节流函数优化性能
+        const recordMouseEvent = (() => {
+            return (e) => {
+                if (throttleTimer) return;
 
-            mouseEvents.push({
-                type: e.type,
-                x: e.clientX,
-                y: e.clientY,
-                time: currentTime - startTime,
-                timeSinceLastMove: timeSinceLastMove
-            });
+                throttleTimer = setTimeout(() => {
+                    const currentTime = Date.now();
+                    const timeSinceLastMove = currentTime - lastMoveTime;
 
-            mouseEventCount++;
-            mouseEventCountElement.textContent = `已记录鼠标事件: ${mouseEventCount}`;
-            lastMoveTime = currentTime;
+                    mouseEvents.push({
+                        type: e.type,
+                        x: e.clientX,
+                        y: e.clientY,
+                        time: currentTime - startTime,
+                        timeSinceLastMove: timeSinceLastMove
+                    });
 
-            // 当收集到足够数据时进行分析
-            if (mouseEventCount >= 20) {
-                analyzeMousePattern();
-            }
-        };
+                    mouseEventCount++;
+                    mouseEventCountElement.textContent = `已记录鼠标事件: ${mouseEventCount}`;
+                    lastMoveTime = currentTime;
 
-        // 监听鼠标事件
-        document.addEventListener('mousemove', recordMouseEvent);
-        document.addEventListener('mousedown', recordMouseEvent);
-        document.addEventListener('mouseup', recordMouseEvent);
+                    // 当收集到足够数据时进行分析
+                    if (mouseEventCount >= 20) {
+                        analyzeMousePattern();
+                    }
+
+                    throttleTimer = null;
+                }, 16); // 约60fps
+            };
+        })();
 
         // 分析鼠标模式
         function analyzeMousePattern() {
-            if (mouseEventCount < 10) return;
+            if (analysisTimeout) clearTimeout(analysisTimeout);
 
-            addLog(`分析鼠标移动模式，已收集 ${mouseEvents.length} 个事件`, 'info');
+            analysisTimeout = setTimeout(() => {
+                if (mouseEventCount < 10) return;
 
-            let suspiciousPatterns = 0;
+                addLog(`分析鼠标移动模式，已收集 ${mouseEvents.length} 个事件`, 'info');
 
-            // 1. 检查移动轨迹是否过于直线
-            const moveEvents = mouseEvents.filter(e => e.type === 'mousemove');
-            if (moveEvents.length >= 3) {
-                let totalAngleChange = 0;
-                let angleChangeCount = 0;
+                let suspiciousPatterns = 0;
 
-                for (let i = 1; i < moveEvents.length - 1; i++) {
-                    const prev = moveEvents[i-1];
-                    const curr = moveEvents[i];
-                    const next = moveEvents[i+1];
+                // 1. 检查移动轨迹是否过于直线
+                const moveEvents = mouseEvents.filter(e => e.type === 'mousemove');
+                if (moveEvents.length >= 3) {
+                    let totalAngleChange = 0;
+                    let angleChangeCount = 0;
 
-                    const dx1 = curr.x - prev.x;
-                    const dy1 = curr.y - prev.y;
-                    const dx2 = next.x - curr.x;
-                    const dy2 = next.y - curr.y;
+                    for (let i = 1; i < moveEvents.length - 1; i++) {
+                        const prev = moveEvents[i-1];
+                        const curr = moveEvents[i];
+                        const next = moveEvents[i+1];
 
-                    // 计算角度变化
-                    if (Math.abs(dx1) > 1 || Math.abs(dy1) > 1) {
-                        const angle1 = Math.atan2(dy1, dx1);
-                        const angle2 = Math.atan2(dy2, dx2);
-                        let angleChange = Math.abs(angle2 - angle1);
+                        const dx1 = curr.x - prev.x;
+                        const dy1 = curr.y - prev.y;
+                        const dx2 = next.x - curr.x;
+                        const dy2 = next.y - curr.y;
 
-                        // 规范化角度变化到 0 到 π 之间
-                        if (angleChange > Math.PI) {
-                            angleChange = 2 * Math.PI - angleChange;
+                        // 计算角度变化
+                        if (Math.abs(dx1) > 1 || Math.abs(dy1) > 1) {
+                            const angle1 = Math.atan2(dy1, dx1);
+                            const angle2 = Math.atan2(dy2, dx2);
+                            let angleChange = Math.abs(angle2 - angle1);
+
+                            // 规范化角度变化到 0 到 π 之间
+                            if (angleChange > Math.PI) {
+                                angleChange = 2 * Math.PI - angleChange;
+                            }
+
+                            totalAngleChange += angleChange;
+                            angleChangeCount++;
                         }
+                    }
 
-                        totalAngleChange += angleChange;
-                        angleChangeCount++;
+                    if (angleChangeCount > 0) {
+                        const avgAngleChange = totalAngleChange / angleChangeCount;
+                        // 人类鼠标移动通常有角度变化，自动化工具可能移动过于直线
+                        if (avgAngleChange < 0.1) {
+                            suspiciousPatterns++;
+                            addLog(`鼠标移动角度变化过小: ${avgAngleChange.toFixed(4)}`, 'warn');
+                        } else {
+                            addLog(`鼠标移动角度变化正常: ${avgAngleChange.toFixed(4)}`, 'info');
+                        }
                     }
                 }
 
-                if (angleChangeCount > 0) {
-                    const avgAngleChange = totalAngleChange / angleChangeCount;
-                    // 人类鼠标移动通常有角度变化，自动化工具可能移动过于直线
-                    if (avgAngleChange < 0.1) {
+                // 2. 检查移动速度是否过于均匀
+                if (moveEvents.length >= 5) {
+                    let timeDiffs = [];
+                    for (let i = 1; i < moveEvents.length; i++) {
+                        timeDiffs.push(moveEvents[i].timeSinceLastMove);
+                    }
+
+                    // 计算时间差异的方差
+                    const mean = timeDiffs.reduce((a, b) => a + b) / timeDiffs.length;
+                    const variance = timeDiffs.reduce((a, b) => a + Math.pow(b - mean, 2), 0) / timeDiffs.length;
+
+                    addLog(`鼠标移动时间间隔方差: ${variance.toFixed(2)}`, 'info');
+
+                    // 人类鼠标移动的时间间隔通常有变化，自动化工具可能过于均匀
+                    if (variance < 10) {
                         suspiciousPatterns++;
-                        addLog(`鼠标移动角度变化过小: ${avgAngleChange.toFixed(4)}`, 'warn');
-                    } else {
-                        addLog(`鼠标移动角度变化正常: ${avgAngleChange.toFixed(4)}`, 'info');
+                        addLog('鼠标移动时间间隔过于均匀', 'warn');
                     }
                 }
-            }
 
-            // 2. 检查移动速度是否过于均匀
-            if (moveEvents.length >= 5) {
-                let timeDiffs = [];
-                for (let i = 1; i < moveEvents.length; i++) {
-                    timeDiffs.push(moveEvents[i].timeSinceLastMove);
+                detectionResults.mouseMovement = suspiciousPatterns >= 1;
+
+                if (detectionResults.mouseMovement) {
+                    mousePatternCheck.classList.add('detected');
+                    mousePatternCheck.classList.remove('clean');
+                    mousePatternStatus.textContent = '检测到自动化鼠标模式';
+                    mousePatternStatus.className = 'status detected';
+                    addLog('鼠标移动检测: 检测到自动化模式', 'warn');
+                } else {
+                    mousePatternCheck.classList.add('clean');
+                    mousePatternCheck.classList.remove('detected');
+                    mousePatternStatus.textContent = '鼠标移动模式正常';
+                    mousePatternStatus.className = 'status clean';
+                    addLog('鼠标移动检测: 正常人类模式', 'success');
                 }
 
-                // 计算时间差异的方差
-                const mean = timeDiffs.reduce((a, b) => a + b) / timeDiffs.length;
-                const variance = timeDiffs.reduce((a, b) => a + Math.pow(b - mean, 2), 0) / timeDiffs.length;
+                // 移除事件监听器
+                document.removeEventListener('mousemove', recordMouseEvent);
+                document.removeEventListener('mousedown', recordMouseEvent);
+                document.removeEventListener('mouseup', recordMouseEvent);
 
-                addLog(`鼠标移动时间间隔方差: ${variance.toFixed(2)}`, 'info');
-
-                // 人类鼠标移动的时间间隔通常有变化，自动化工具可能过于均匀
-                if (variance < 10) {
-                    suspiciousPatterns++;
-                    addLog('鼠标移动时间间隔过于均匀', 'warn');
-                }
-            }
-
-            detectionResults.mouseMovement = suspiciousPatterns >= 1;
-
-            if (detectionResults.mouseMovement) {
-                mousePatternCheck.classList.add('detected');
-                mousePatternCheck.classList.remove('clean');
-                mousePatternStatus.textContent = '检测到自动化鼠标模式';
-                mousePatternStatus.className = 'status detected';
-                addLog('鼠标移动检测: 检测到自动化模式', 'warn');
-            } else {
-                mousePatternCheck.classList.add('clean');
-                mousePatternCheck.classList.remove('detected');
-                mousePatternStatus.textContent = '鼠标移动模式正常';
-                mousePatternStatus.className = 'status clean';
-                addLog('鼠标移动检测: 正常人类模式', 'success');
-            }
-
-            // 移除事件监听器
-            document.removeEventListener('mousemove', recordMouseEvent);
-            document.removeEventListener('mousedown', recordMouseEvent);
-            document.removeEventListener('mouseup', recordMouseEvent);
-
-            updateDetectionProgress();
+                updateDetectionProgress();
+            }, 500);
         }
 
-        // 设置超时，如果用户没有移动鼠标，也进行分析
-        setTimeout(() => {
+        // 监听鼠标事件
+        document.addEventListener('mousemove', recordMouseEvent, { passive: true });
+        document.addEventListener('mousedown', recordMouseEvent, { passive: true });
+        document.addEventListener('mouseup', recordMouseEvent, { passive: true });
+
+        // 设置超时
+        analysisTimeout = setTimeout(() => {
             if (mouseEventCount < 5) {
                 // 几乎没有鼠标移动，可能是自动化
                 detectionResults.mouseMovement = true;
@@ -1799,6 +1688,11 @@
                 addLog('鼠标活动异常稀少，可能是自动化', 'warn');
                 updateDetectionProgress();
             }
+
+            // 移除事件监听器
+            document.removeEventListener('mousemove', recordMouseEvent);
+            document.removeEventListener('mousedown', recordMouseEvent);
+            document.removeEventListener('mouseup', recordMouseEvent);
         }, 5000);
     }
 
@@ -1876,6 +1770,19 @@
     // ============================================================================
 
     /**
+     * 安全的检测运行包装器
+     */
+    async function safeDetection(fn, name) {
+        try {
+            return await fn();
+        } catch (error) {
+            addLog(`${name} 检测时发生错误: ${error.message}`, 'error');
+            console.error(`${name} error:`, error);
+            return false; // 发生错误时不标记为检测到
+        }
+    }
+
+    /**
      * 更新检测进度
      */
     function updateDetectionProgress() {
@@ -1922,57 +1829,45 @@
     async function runAdvancedDetections() {
         const detector = new AdvancedSeleniumDetector();
 
-        // Chrome自动化检测
-        // detectionResults.chromeAutomation = detector.detectChromeAutomation();
-        // updateDetectionUI('chromeAutomationCheck', 'chromeAutomationStatus', detectionResults.chromeAutomation,
-        //     '检测到Chrome自动化扩展', '未检测到Chrome自动化扩展');
-        // updateDetectionProgress();
-
         // CDP检测
-        detectionResults.cdpDetected = detector.detectCDP();
+        detectionResults.cdpDetected = await safeDetection(() => detector.detectCDP(), 'CDP检测');
         updateDetectionUI('cdpCheck', 'cdpStatus', detectionResults.cdpDetected,
             '检测到CDP连接痕迹', '未检测到CDP痕迹');
         updateDetectionProgress();
 
         // DOM补丁检测
-        detectionResults.automationPatch = detector.detectPatchedDOM();
+        detectionResults.automationPatch = await safeDetection(() => detector.detectPatchedDOM(), 'DOM补丁检测');
         updateDetectionUI('domPatchCheck', 'domPatchStatus', detectionResults.automationPatch,
             '检测到被修改的DOM API', 'DOM API正常');
         updateDetectionProgress();
 
         // iframe检测
-        detectionResults.iframeDetection = await detector.detectIframeSandbox();
+        detectionResults.iframeDetection = await safeDetection(() => detector.detectIframeSandbox(), 'iframe检测');
         updateDetectionUI('iframeCheck', 'iframeStatus', detectionResults.iframeDetection,
             '检测到iframe沙箱异常', 'iframe沙箱正常');
         updateDetectionProgress();
 
         // WebGL检测
-        detectionResults.webglVendor = detector.detectWebGLVendor();
+        detectionResults.webglVendor = await safeDetection(() => detector.detectWebGLVendor(), 'WebGL检测');
         updateDetectionUI('webglCheck', 'webglStatus', detectionResults.webglVendor,
             '检测到虚拟GPU', 'WebGL供应商正常');
         updateDetectionProgress();
 
-        // // 性能指标检测
-        // detectionResults.performanceMetrics = detector.detectPerformanceMetrics();
-        // updateDetectionUI('performanceCheck', 'performanceStatus', detectionResults.performanceMetrics,
-        //     '检测到异常性能指标', '性能指标正常');
-        // updateDetectionProgress();
-
         // AudioContext检测
-        detectionResults.audioContext = detector.detectAudioContext();
+        detectionResults.audioContext = await safeDetection(() => detector.detectAudioContext(), 'AudioContext检测');
         updateDetectionUI('audioContextCheck', 'audioContextStatus', detectionResults.audioContext,
             '检测到AudioContext异常', 'AudioContext正常');
         updateDetectionProgress();
 
         // Chrome运行时检测
-        detectionResults.chromeRuntime = detector.detectChromeRuntime();
+        detectionResults.chromeRuntime = await safeDetection(() => detector.detectChromeRuntime(), 'Chrome运行时检测');
         updateDetectionUI('chromeRuntimeCheck', 'chromeRuntimeStatus', detectionResults.chromeRuntime,
             '检测到Chrome运行时异常', 'Chrome运行时正常');
         updateDetectionProgress();
     }
 
     /**
-     * 更新总体结果
+     * 更新总体结果（修复版）
      */
     function updateOverallResult() {
         const overallResult = document.getElementById('overallResult');
@@ -1980,7 +1875,7 @@
 
         // 计算检测到的可疑项目数
         const detectedCount = Object.values(detectionResults).filter(result => result === true).length;
-        const totalTests = Object.keys(detectionResults).length;
+        const totalTests = totalDetections; // 使用实际运行的检测项数
 
         // 根据检测数量确定置信度和结果
         let confidence = '低';
@@ -2027,9 +1922,9 @@
     }
 
     /**
-     * 初始化所有检测
+     * 安全的运行所有检测
      */
-    async function runAllDetections() {
+    async function runAllDetectionsSafely() {
         if (detectionInProgress) {
             addLog('检测正在进行中，请等待完成', 'warn');
             return;
@@ -2038,19 +1933,24 @@
         detectionInProgress = true;
         addLog('开始执行所有检测...', 'info');
 
-        // 运行基础检测
-        checkWebDriver();
-        checkPlugins();
-        checkLanguages();
-        checkWindowProperties();
-        await checkPermissions();
+        try {
+            // 运行基础检测
+            await safeDetection(checkWebDriver, 'WebDriver检测');
+            await safeDetection(checkPlugins, '插件检测');
+            await safeDetection(checkLanguages, '语言检测');
+            await safeDetection(checkWindowProperties, '窗口属性检测');
+            await safeDetection(checkPermissions, '权限检测');
 
-        // 运行高级检测
-        await runAdvancedDetections();
+            // 运行高级检测
+            await safeDetection(runAdvancedDetections, '高级检测');
 
-        // 设置行为检测
-        setupMouseDetection();
-        setupHumanTest();
+            // 设置行为检测
+            setupMouseDetection();
+            setupHumanTest();
+        } catch (error) {
+            addLog(`检测过程中发生未捕获的错误: ${error.message}`, 'error');
+            detectionInProgress = false;
+        }
     }
 
     /**
@@ -2074,7 +1974,7 @@
         document.getElementById('humanTestResult').textContent = '';
         document.getElementById('clickCounter').textContent = '点击次数: 0';
         document.getElementById('mouseEventCount').textContent = '已记录鼠标事件: 0';
-        document.getElementById('detectionCounter').textContent = '检测进度: 0/17';
+        document.getElementById('detectionCounter').textContent = '检测进度: 0/15';
         document.getElementById('confidenceFill').style.width = '0%';
         document.getElementById('overallResult').textContent = '等待检测...';
         document.getElementById('overallResult').className = 'result-text';
@@ -2095,40 +1995,47 @@
     }
 
     /**
-     * 导出日志
+     * 导出日志（增强版）
      */
     function exportLog() {
-        let logText = "Selenium检测工具 - 检测日志\n";
-        logText += "生成时间: " + new Date().toLocaleString() + "\n";
-        logText += "=".repeat(50) + "\n\n";
+        try {
+            let logText = "=".repeat(60) + "\n";
+            logText += "Selenium检测工具 - 检测日志\n";
+            logText += "生成时间: " + new Date().toLocaleString() + "\n";
+            logText += "用户代理: " + navigator.userAgent + "\n";
+            logText += "=".repeat(60) + "\n\n";
 
-        logEntries.forEach(entry => {
-            logText += `[${entry.time}] ${entry.message}\n`;
-        });
+            // 添加检测结果摘要
+            logText += "检测结果摘要:\n";
+            logText += "-".repeat(40) + "\n";
 
-        // 添加检测结果摘要
-        logText += "\n" + "=".repeat(50) + "\n";
-        logText += "检测结果摘要:\n";
+            Object.entries(detectionResults).forEach(([key, value]) => {
+                logText += `${key}: ${value ? '异常' : '正常'}\n`;
+            });
 
-        const detectedCount = Object.values(detectionResults).filter(result => result === true).length;
-        const totalTests = Object.keys(detectionResults).length;
+            logText += "\n" + "=".repeat(60) + "\n";
+            logText += "详细日志:\n";
+            logText += "=".repeat(60) + "\n\n";
 
-        logText += `检测项目总数: ${totalTests}\n`;
-        logText += `异常项目数: ${detectedCount}\n`;
-        logText += `检测完成率: ${completedDetections}/${totalTests}\n`;
+            logEntries.forEach(entry => {
+                logText += `[${entry.time}] ${entry.message}\n`;
+            });
 
-        // 创建下载链接
-        const blob = new Blob([logText], { type: 'text/plain' });
-        const url = URL.createObjectURL(blob);
-        const a = document.createElement('a');
-        a.href = url;
-        a.download = `selenium-detection-log-${new Date().toISOString().slice(0, 10)}.txt`;
-        document.body.appendChild(a);
-        a.click();
-        document.body.removeChild(a);
-        URL.revokeObjectURL(url);
+            // 创建下载链接
+            const blob = new Blob([logText], { type: 'text/plain;charset=utf-8' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `selenium-detection-${new Date().toISOString().replace(/[:.]/g, '-')}.log`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
 
-        addLog('日志已导出', 'success');
+            addLog('日志已导出', 'success');
+        } catch (error) {
+            addLog(`导出日志失败: ${error.message}`, 'error');
+        }
     }
 
     /**
@@ -2199,23 +2106,40 @@
      * 设置控制按钮事件
      */
     function setupControlButtons() {
-        document.getElementById('startDetectionBtn').addEventListener('click', runAllDetections);
+        document.getElementById('startDetectionBtn').addEventListener('click', runAllDetectionsSafely);
         document.getElementById('resetDetectionBtn').addEventListener('click', resetAllDetections);
         document.getElementById('exportLogBtn').addEventListener('click', exportLog);
         document.getElementById('clearLogBtn').addEventListener('click', clearLog);
     }
 
     /**
-     * 页面初始化
+     * 页面初始化（修复版）
      */
     function init() {
-        addLog('Selenium检测工具已初始化', 'success');
-        addLog('用户代理: ' + navigator.userAgent, 'info');
-        addLog('点击"开始检测"按钮开始分析', 'info');
+        try {
+            addLog('Selenium检测工具已初始化', 'success');
+            addLog('用户代理: ' + navigator.userAgent, 'info');
+            addLog(`平台: ${navigator.platform}`, 'info');
+            addLog(`语言: ${navigator.language}`, 'info');
+            addLog('点击"开始检测"按钮开始分析', 'info');
 
-        setupTabSwitching();
-        setupModal();
-        setupControlButtons();
+            setupTabSwitching();
+            setupModal();
+            setupControlButtons();
+
+            // 添加键盘快捷键支持
+            document.addEventListener('keydown', (e) => {
+                if (e.ctrlKey && e.key === 'r') {
+                    e.preventDefault();
+                    resetAllDetections();
+                    addLog('使用快捷键重置检测', 'info');
+                }
+            });
+
+        } catch (error) {
+            console.error('初始化失败:', error);
+            addLog(`初始化失败: ${error.message}`, 'error');
+        }
     }
 
     // 页面加载完成后初始化

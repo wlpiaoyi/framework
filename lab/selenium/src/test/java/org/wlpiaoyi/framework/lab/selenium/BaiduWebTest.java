@@ -32,10 +32,10 @@ public class BaiduWebTest {
         browser = Browser.createDefault()
                 .setHeadless(false)  // 设置为true可以在无头模式下运行
                 .setStealthMode(true)
-//                .setDisableAutomationFlag(false)
+                .setDisableAutomationFlag(true)
 //                .setUserDataPath("C:\\Users\\admin\\AppData\\Local\\Google\\Chrome\\User Data")
                 .setDriverPath("D:\\Object\\.Java\\framework\\fw_config/selenium/chromedriver")
-                .setBinaryPath("C:\\Users\\admin\\Downloads\\chrome-win64\\chrome-win64\\chrome.exe")
+//                .setBinaryPath("C:\\Users\\admin\\Downloads\\chrome-win64\\chrome-win64\\chrome.exe")
                 .setTimeoutMs(60000);  // 设置超时时间为60秒
 
         // 初始化浏览器
