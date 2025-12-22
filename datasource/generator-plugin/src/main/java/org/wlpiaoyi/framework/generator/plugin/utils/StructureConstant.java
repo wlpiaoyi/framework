@@ -44,5 +44,18 @@ public interface StructureConstant {
     // 列名
     String COLUMN_NAME = "##columnName##";
 
+    // 枚举名
+    String ENUM_NAME = "##enumName##";
+    // 枚举类型
+    String ENUM_TYPE = "##enumType##";
+    // 枚举注释
+    String ENUM_COMMENT = "##enumComment##";
+    // 枚举实例编码
+    String ENUM_INS_CODE = "##enumInsCode##";
+    // 枚举实例描述
+    String ENUM_INS_DESC = "##enumInsDesc##";
+    // 枚举实例值
+    String ENUM_INS_VALUE = "##enumInsValue##";
+
 
 }

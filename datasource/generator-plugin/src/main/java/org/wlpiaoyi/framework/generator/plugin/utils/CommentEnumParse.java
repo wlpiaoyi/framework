@@ -1,63 +1,52 @@
 package org.wlpiaoyi.framework.generator.plugin.utils;
 
+import lombok.Getter;
 import org.wlpiaoyi.framework.utils.ValueUtils;
 
 import java.util.*;
 import java.util.regex.*;
+
 /**
  * <p><b>{@code @author:}</b>         wlpiaoyi</p>
  * <p><b>{@code @description:}</b>
  * <div style='padding: 5px; margin-left: 5px; margin-bottom: 5px;'>
- * TODO
+ * 解析注释中的枚举定义，支持 int 和 boolean 两种键类型。
+ * <br/>示例：
+ * <br/>&emsp;- int:    "文件权限类型:FileRoleType(0:默认-Defalut, 1:向下继承-DownInherit)"
+ * <br/>&emsp;- boolean:"状态:Status(false:无效-Invalid, true:有效-Valid)"
  * </div>
  * </p>
  * <p><b>{@code @date:}</b>           2025/12/6 10:54</p>
  * <p><b>{@code @version:}</b>       1.0</p>
  * <hr/>
  */
-class CommentEnumParse {
+public class CommentEnumParse {
 
-    // 正则表达式，用于匹配注释信息头
-    private static final String REGEX_INFO_NAME = "([\\u4e00-\\u9fa5a-zA-Z0-9\\s/]+):([a-zA-Z0-9_]+)";
-    private static final String REGEX_PAIR_PATTERN = "(0b[01]+|0x[0-9a-fA-F]+|\\d+|true|false)\\s*:\\s*([\\u4e00-\\u9fa5a-zA-Z0-9\\s/]+)";
-
-    /**
-     * 表示解析后的数据结构
-     */
-    public static class ParseResult {
-
-        private String name;
-        private String code;
-        private Map<Integer, String> intPairs;        // key为Int类型的映射
-        private Map<String, String> stringPairs;      // 原始字符串key的映射
-
-        public ParseResult(String name, String code,
-                           Map<Integer, String> intPairs,
-                           Map<String, String> stringPairs) {
-            this.name = name;
-            this.code = code;
-            this.intPairs = intPairs;
-            this.stringPairs = stringPairs;
-        }
-
-        public String getName() { return name; }
-        public String getCode() { return code; }
-        public Map<Integer, String> getIntPairs() { return intPairs; }
-        public Map<String, String> getStringPairs() { return stringPairs; }
-
-        @Override
-        public String toString() {
-            return "ParseResult{name='" + name + "', code='" + code +
-                    "', intPairs=" + intPairs + ", stringPairs=" + stringPairs + "}";
-        }
-    }
+    private static final String REGEX_INFO_NAME = "([\\u4e00-\\u9fa5a-zA-Z0-9\\s/\\,_]+)\\s*[：:]{1}\\s*([a-zA-Z0-9_]+)";
+    private static final String REGEX_PAIR_PATTERN = "(0b[01]+|0x[0-9a-fA-F]+|\\d+|true|false)\\s*[：:]{1}\\s*([\\u4e00-\\u9fa5a-zA-Z0-9\\s/\\-_]+)";
 
     /**
-     * 主解析方法，返回包含Int类型key的ParseResult
+     * <p><b>{@code @description:}</b>
+     * <div style='padding: 5px; margin-left: 5px; margin-bottom: 5px;'>
+     * 解析输入字符串，返回对应的 ParseResult 子类
+     * </div>
+     * </p>
+     *
+     * <p><b>{@code @param}</b> <b>input</b>
+     * {@link String}
+     * </p>
+     *
+     * <p><b>{@code @date:}</b>2025/12/22 12:57</p>
+     * <p><b>{@code @return:}</b>{@link ParseResult}</p>
+     * <p><b>{@code @author:}</b>wlpiaoyi</p>
+     * <hr/>
      */
     public static ParseResult parse(String input) {
-        // 主正则表达式
-        String mainPattern = "^" + REGEX_INFO_NAME + "\\((.+)\\)$";
+        if (ValueUtils.isBlank(input)) {
+            throw new IllegalArgumentException("输入不能为空");
+        }
+
+        String mainPattern = "^" + REGEX_INFO_NAME + "\\s*\\((.+)\\)$";
         Pattern pattern = Pattern.compile(mainPattern);
         Matcher matcher = pattern.matcher(input.trim());
 
@@ -65,81 +54,89 @@ class CommentEnumParse {
             throw new IllegalArgumentException("输入格式不正确: " + input);
         }
 
-        // 提取三个部分
-        String name = matcher.group(1).trim();
-        String code = matcher.group(2).trim();
+        String desc = matcher.group(1).trim();
+        String name = matcher.group(2).trim();
         String pairsStr = matcher.group(3).trim();
 
-        // 解析键值对，同时获取Int类型和String类型的映射
         KeyValueResult kvResult = parseKeyValuePairs(pairsStr);
 
-        return new ParseResult(name, code, kvResult.intPairs, kvResult.stringPairs);
-    }
+        // 判断类型：只要有一个 boolean key，就视为 boolean 枚举（不允许混合）
+        boolean hasBool = !kvResult.boolInfoPairs.isEmpty();
+        boolean hasInt = !kvResult.intInfoPairs.isEmpty();
 
-    /**
-     * 键值对解析结果
-     */
-    private static class KeyValueResult {
-        Map<Integer, String> intPairs;
-        Map<String, String> stringPairs;
+        if (hasBool && hasInt) {
+            throw new IllegalArgumentException("不支持混合 int 和 boolean 键: " + input);
+        }
 
-        KeyValueResult(Map<Integer, String> intPairs, Map<String, String> stringPairs) {
-            this.intPairs = intPairs;
-            this.stringPairs = stringPairs;
+        if (hasBool) {
+            return new BooleanParseResult(
+                    desc, name,
+                    kvResult.stringInfoPairs, kvResult.stringCodePairs,
+                    kvResult.boolInfoPairs, kvResult.boolCodePairs
+            );
+        } else if (hasInt) {
+            return new IntParseResult(
+                    desc, name,
+                    kvResult.stringInfoPairs, kvResult.stringCodePairs,
+                    kvResult.intInfoPairs, kvResult.intCodePairs
+            );
+        } else {
+            throw new IllegalArgumentException("未识别到有效的键值对: " + input);
         }
     }
 
-    /**
-     * 解析键值对，返回包含Int类型key和原始String类型key的两个映射
-     */
     private static KeyValueResult parseKeyValuePairs(String pairsStr) {
-        Map<Integer, String> intPairs = new LinkedHashMap<>();
-        Map<String, String> stringPairs = new LinkedHashMap<>();
+        KeyValueResult result = new KeyValueResult();
 
-        // 使用正则匹配键值对
         Pattern pattern = Pattern.compile(REGEX_PAIR_PATTERN);
         Matcher matcher = pattern.matcher(pairsStr);
 
         while (matcher.find()) {
-            String keyStr = matcher.group(1).trim();
-            String value = matcher.group(2).trim();
+            String kStr = matcher.group(1).trim();
+            String valuePart = matcher.group(2).trim();
 
-            // 将key转换为Int类型
-            int intKey = convertKeyToInt(keyStr);
+            if (!valuePart.contains("-")) {
+                throw new IllegalArgumentException("键值对格式不正确: " + pairsStr);
+            }
+            String[] parts = valuePart.split("-", 2);
+            if (parts.length != 2) {
+                throw new IllegalArgumentException("键值对必须恰好包含一个 '-' 分隔符: " + valuePart);
+            }
+            String vInfo = parts[0].trim();
+            String vCode = parts[1].trim();
+            if (vInfo.isEmpty() || vCode.isEmpty()) {
+                throw new IllegalArgumentException("描述或编码不能为空: " + valuePart);
+            }
 
-            // 同时存储两种类型的映射
-            intPairs.put(intKey, value);
-            stringPairs.put(keyStr, value);
+            // 区分 boolean 和 int
+            if ("true".equalsIgnoreCase(kStr) || "false".equalsIgnoreCase(kStr)) {
+                Boolean kBool = Boolean.parseBoolean(kStr.toLowerCase());
+                result.boolInfoPairs.put(kBool, vInfo);
+                result.boolCodePairs.put(kBool, vCode);
+            } else {
+                Integer kInt = convertKeyToInt(kStr);
+                result.intInfoPairs.put(kInt, vInfo);
+                result.intCodePairs.put(kInt, vCode);
+            }
+
+            result.stringInfoPairs.put(kStr, vInfo);
+            result.stringCodePairs.put(kStr, vCode);
         }
 
-        if (intPairs.isEmpty()) {
-            throw new IllegalArgumentException("键值对格式不正确: " + pairsStr);
+        if (result.stringInfoPairs.isEmpty()) {
+            throw new IllegalArgumentException("未找到有效的键值对: " + pairsStr);
         }
 
-        return new KeyValueResult(intPairs, stringPairs);
+        return result;
     }
 
-    /**
-     * 将各种格式的key转换为Int类型
-     */
     static int convertKeyToInt(String keyStr) {
         try {
             if (keyStr.startsWith("0b")) {
-                // 二进制转十进制
-                String binaryStr = keyStr.substring(2);
-                return Integer.parseInt(binaryStr, 2);
+                return Integer.parseInt(keyStr.substring(2), 2);
             } else if (keyStr.startsWith("0x")) {
-                // 十六进制转十进制
-                String hexStr = keyStr.substring(2);
-                return Integer.parseInt(hexStr, 16);
-            } else if (keyStr.equalsIgnoreCase("true")) {
-                // true转换为1
-                return 1;
-            } else if (keyStr.equalsIgnoreCase("false")) {
-                // false转换为0
-                return 0;
+                return Integer.parseInt(keyStr.substring(2), 16);
             } else {
-                // 十进制直接转换
                 return Integer.parseInt(keyStr);
             }
         } catch (NumberFormatException e) {
@@ -147,163 +144,192 @@ class CommentEnumParse {
         }
     }
 
-    /**
-     * 将Int类型的key转换回原始字符串格式
-     */
-    private static String convertIntToKey(int intKey, String originalKeyStr) {
-        // 根据原始字符串的格式来决定返回什么格式
-        if (originalKeyStr.startsWith("0b")) {
-            // 保持二进制格式
-            return "0b" + Integer.toBinaryString(intKey);
-        } else if (originalKeyStr.startsWith("0x")) {
-            // 保持十六进制格式
-            return "0x" + Integer.toHexString(intKey).toUpperCase();
-        } else if (originalKeyStr.equalsIgnoreCase("true") || originalKeyStr.equalsIgnoreCase("false")) {
-            // 保持布尔格式
-            return intKey == 0 ? "false" : "true";
-        } else {
-            // 保持十进制格式
-            return String.valueOf(intKey);
-        }
-    }
+    // ==================== 工具方法 ====================
 
-    /**
-     * 将ParseResult格式化为字符串
-     */
     public static String format(ParseResult result) {
-        return format(result.getName(), result.getCode(), result.getStringPairs());
+        if (ValueUtils.isBlank(result)) {
+            throw new IllegalArgumentException("输入不能为空");
+        }
+        return format(result.getDesc(), result.getName(), result.getStringDescPairs(), result.getStringCodePairs());
     }
 
-    /**
-     * 使用原始字符串key进行格式化
-     */
-    public static String format(String name, String code, Map<String, String> stringPairs) {
+    public static String format(String desc, String name,
+                                Map<String, String> stringInfoPairs,
+                                Map<String, String> stringCodePairs) {
         StringBuilder sb = new StringBuilder();
-
-        sb.append(name).append(":").append(code).append("(");
+        sb.append(desc).append(":").append(name).append("(");
 
         List<String> pairStrs = new ArrayList<>();
-        for (Map.Entry<String, String> entry : stringPairs.entrySet()) {
-            pairStrs.add(entry.getKey() + ":" + entry.getValue());
+        for (Map.Entry<String, String> entry : stringInfoPairs.entrySet()) {
+            String key = entry.getKey();
+            String info = entry.getValue();
+            String codeVal = stringCodePairs.get(key);
+            if (codeVal == null) {
+                throw new IllegalStateException("Missing code for key: " + key);
+            }
+            pairStrs.add(key + ":" + info + "-" + codeVal);
         }
 
         sb.append(String.join(", ", pairStrs));
         sb.append(")");
-
         return sb.toString();
     }
 
-    /**
-     * 使用Int类型key进行格式化（默认为十进制格式）
-     */
-    public static String formatWithIntKeys(String name, String code, Map<Integer, String> intPairs) {
-        StringBuilder sb = new StringBuilder();
-
-        sb.append(name).append(":").append(code).append("(");
-
-        List<String> pairStrs = new ArrayList<>();
-        for (Map.Entry<Integer, String> entry : intPairs.entrySet()) {
-            pairStrs.add(entry.getKey() + ":" + entry.getValue());
-        }
-
-        sb.append(String.join(", ", pairStrs));
-        sb.append(")");
-
-        return sb.toString();
-    }
-
-    /**
-     * 验证输入是否匹配格式的正则表达式
-     */
     public static boolean validate(String input) {
-        String mainPattern = "^" + REGEX_INFO_NAME + "\\((.+)\\)$";
-        if(!Pattern.matches(mainPattern, input.trim())) return  false;
+        if (ValueUtils.isBlank(input)) return false;
 
-        // 使用正则匹配键值对
-        Pattern pattern = Pattern.compile(REGEX_PAIR_PATTERN);
-        Matcher matcher = pattern.matcher(input);
+        String mainPattern = "^\\s*" + REGEX_INFO_NAME + "\\s*[（(]\\s*(.+)\\s*[）)]\\s*$";
+        Matcher mainMatcher = Pattern.compile(mainPattern).matcher(input.trim());
+        if (!mainMatcher.matches()) return false;
 
-        while (matcher.find()) {
-            String keyStr = matcher.group(1).trim();
-            String value = matcher.group(2).trim();
-            if(ValueUtils.isNotBlank(keyStr) && ValueUtils.isNotBlank(value))
-                return true;
-        }
-        return false;
-    }
+        String pairsStr = mainMatcher.group(3).trim();
+        if (pairsStr.isEmpty()) return false;
 
-    /**
-     * 测试方法
-     */
-    public static void test() {
-        // 测试用例
-        String[] testCases = {
-                "对外数据权限/二进制:Data_Index(0b1:查看, 0b10:下载, 0b100:修改/删除)",
-                "数据权限类型:FileRole1(0:默认, 1:向下继承, 2:被动向下继承)",
-                "状态:Status(false:无效, true:有效)",
-                "用户角色:UserRole(0b001:游客, 0b010:普通用户, 0b100:管理员)",
-                "权限等级:AuthLevel(0x1:一级, 0x2:二级, 0x4:三级)",
-                "测试混合格式:Mixed(0b1:A, 2:B, 0xC:C, true:D)"
-        };
+        Pattern pairPattern = Pattern.compile(REGEX_PAIR_PATTERN);
+        Matcher pairMatcher = pairPattern.matcher(pairsStr);
 
-        System.out.println("=== 测试解析功能 ===");
-        for (String testCase : testCases) {
-            try {
-                System.out.println("\n输入: " + testCase);
-                ParseResult result = parse(testCase);
-                System.out.println("解析结果:");
-                System.out.println("  名称: " + result.getName());
-                System.out.println("  代码: " + result.getCode());
-                System.out.println("  Int类型键值对: " + result.getIntPairs());
-                System.out.println("  字符串类型键值对: " + result.getStringPairs());
-
-                // 测试格式化回原格式
-                String formatted = format(result);
-                System.out.println("  格式化回原格式: " + formatted);
-
-                // 测试使用Int类型key格式化
-                String formattedWithInt = formatWithIntKeys(
-                        result.getName(), result.getCode(), result.getIntPairs());
-                System.out.println("  使用Int类型key格式化: " + formattedWithInt);
-            } catch (Exception e) {
-                System.out.println("  解析失败: " + e.getMessage());
-                e.printStackTrace();
+        boolean hasPair = false;
+        while (pairMatcher.find()) {
+            hasPair = true;
+            String valuePart = pairMatcher.group(2).trim();
+            if (!valuePart.contains("-")) return false;
+            String[] parts = valuePart.split("-", 2);
+            if (parts.length != 2 || parts[0].isEmpty() || parts[1].isEmpty()) {
+                return false;
             }
         }
+        return hasPair;
     }
-    /**
-     * 提取所有键值对中的Int类型键
-     */
-    public static List<Integer> extractIntKeys(String input) {
-        List<Integer> keys = new ArrayList<>();
 
-        // 匹配键部分的正则
-        String keyPattern = "(0b[01]+|0x[0-9a-fA-F]+|\\d+|true|false)(?=\\s*:)";
-        Pattern pattern = Pattern.compile(keyPattern);
-        Matcher matcher = pattern.matcher(input);
-
-        while (matcher.find()) {
-            String keyStr = matcher.group();
-            keys.add(convertKeyToInt(keyStr));
+    public static List<Object> extractKeys(String input) {
+        String mainPattern = "^" + REGEX_INFO_NAME + "\\((.+)\\)$";
+        Matcher mainMatcher = Pattern.compile(mainPattern).matcher(input.trim());
+        if (!mainMatcher.matches()) {
+            return Collections.emptyList();
         }
 
+        String pairsStr = mainMatcher.group(3).trim();
+        List<Object> keys = new ArrayList<>();
+        Pattern keyPattern = Pattern.compile("(0b[01]+|0x[0-9a-fA-F]+|\\d+|true|false)(?=\\s*:)");
+
+        Matcher matcher = keyPattern.matcher(pairsStr);
+        while (matcher.find()) {
+            String keyStr = matcher.group().trim();
+            if ("true".equalsIgnoreCase(keyStr) || "false".equalsIgnoreCase(keyStr)) {
+                keys.add(Boolean.parseBoolean(keyStr.toLowerCase()));
+            } else {
+                try {
+                    keys.add(convertKeyToInt(keyStr));
+                } catch (Exception ignored) {}
+            }
+        }
         return keys;
     }
 
+
     /**
-     * 查找指定Int值对应的描述
+     * 抽象解析结果基类
      */
-    public static String findValueByIntKey(String input, int intKey) {
-        ParseResult result = parse(input);
-        return result.getIntPairs().get(intKey);
+    @Getter
+    public abstract static class ParseResult {
+        protected final String desc;
+        protected final String name;
+        protected final Map<String, String> stringDescPairs;
+        protected final Map<String, String> stringCodePairs;
+
+        protected ParseResult(String desc, String name,
+                              Map<String, String> stringDescPairs,
+                              Map<String, String> stringCodePairs) {
+            this.desc = desc;
+            this.name = name;
+            this.stringDescPairs = new LinkedHashMap<>(stringDescPairs);
+            this.stringCodePairs = new LinkedHashMap<>(stringCodePairs);
+        }
+
+        public abstract boolean isBooleanType();
+        public abstract boolean isIntType();
+
+        @Override
+        public String toString() {
+            return getClass().getSimpleName() + "{desc='" + desc + "', name='" + name +
+                    "', stringInfoPairs=" + stringDescPairs +
+                    ", stringCodePairs=" + stringCodePairs + "}";
+        }
     }
 
     /**
-     * 查找指定字符串key对应的描述
+     * 整型枚举解析结果
      */
-    public static String findValueByStringKey(String input, String stringKey) {
-        ParseResult result = parse(input);
-        return result.getStringPairs().get(stringKey);
+    @Getter
+    public static class IntParseResult extends ParseResult {
+        private final Map<Integer, String> intDescPairs;
+        private final Map<Integer, String> intCodePairs;
+
+        public IntParseResult(String desc, String name,
+                              Map<String, String> stringDescPairs,
+                              Map<String, String> stringCodePairs,
+                              Map<Integer, String> intDescPairs,
+                              Map<Integer, String> intCodePairs) {
+            super(desc, name, stringDescPairs, stringCodePairs);
+            this.intDescPairs = new LinkedHashMap<>(intDescPairs);
+            this.intCodePairs = new LinkedHashMap<>(intCodePairs);
+        }
+
+        @Override
+        public boolean isBooleanType() { return false; }
+
+        @Override
+        public boolean isIntType() { return true; }
+
+        @Override
+        public String toString() {
+            return "Int" + super.toString().substring(0, super.toString().length() - 1) +
+                    ", intInfoPairs=" + intDescPairs +
+                    ", intCodePairs=" + intCodePairs + "}";
+        }
     }
 
+    /**
+     * 布尔型枚举解析结果
+     */
+    @Getter
+    public static class BooleanParseResult extends ParseResult {
+        private final Map<Boolean, String> boolInfoPairs;
+        private final Map<Boolean, String> boolDescPairs;
+
+        public BooleanParseResult(String desc, String name,
+                                  Map<String, String> stringDescPairs,
+                                  Map<String, String> stringCodePairs,
+                                  Map<Boolean, String> boolInfoPairs,
+                                  Map<Boolean, String> boolDescPairs) {
+            super(desc, name, stringDescPairs, stringCodePairs);
+            this.boolInfoPairs = new LinkedHashMap<>(boolInfoPairs);
+            this.boolDescPairs = new LinkedHashMap<>(boolDescPairs);
+        }
+
+        @Override
+        public boolean isBooleanType() { return true; }
+
+        @Override
+        public boolean isIntType() { return false; }
+
+        @Override
+        public String toString() {
+            return "Boolean" + super.toString().substring(0, super.toString().length() - 1) +
+                    ", boolInfoPairs=" + boolInfoPairs +
+                    ", boolCodePairs=" + boolDescPairs + "}";
+        }
+    }
+
+
+
+    private static class KeyValueResult {
+        final Map<Integer, String> intInfoPairs = new LinkedHashMap<>();
+        final Map<Boolean, String> boolInfoPairs = new LinkedHashMap<>();
+        final Map<String, String> stringInfoPairs = new LinkedHashMap<>();
+
+        final Map<Integer, String> intCodePairs = new LinkedHashMap<>();
+        final Map<Boolean, String> boolCodePairs = new LinkedHashMap<>();
+        final Map<String, String> stringCodePairs = new LinkedHashMap<>();
+    }
 }

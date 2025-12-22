@@ -1,0 +1,41 @@
+package ##package##.##bizTag##.domain.enums;
+
+import lombok.Getter;
+import ##package##.domain.enums.BaseEnum;
+import org.wlpiaoyi.framework.utils.ValueUtils;
+
+import java.util.Map;
+
+/**
+ * {@code @author:} 		##author##
+ * {@code @description:} 	##enumComment## 枚举
+ * {@code @date:} 			##createTime##
+ * {@code @version:}: 		##version##
+ */
+@Getter
+public enum ##enumName##Enum implements BaseEnum {
+
+
+    <foreach-enum separator=", ">
+    ##enumInsCode##(##enumInsValue##, ##enumInsDesc##)
+    </foreach-enum>
+    ;
+
+    private final ##enumType## value;
+    private final String desc;
+
+
+    ##enumName##Enum(##enumType## value, String desc) {
+        this.value = value;
+        this.desc = desc;
+    }
+
+    public static ##enumName##Enum getByValue(##enumType## value){
+        for (##enumName##Enum enums : ##enumName##Enum.values()) {
+            if(enums.value.equals(value)){
+                return enums;
+            }
+        }
+        return DEFAULT;
+    }
+}

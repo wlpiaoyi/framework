@@ -59,9 +59,10 @@ public class BrowserBase {
     protected final int type;
 
     private String[] loadCurDateValue(){
-        log.info("BrowserBase.loadCurDateValue in. 读取到期配置文件:{}", CONFIG_PATH + "/cur_date.dat");
+        String path = CONFIG_PATH + "/cur_date.dat";
+        log.info("BrowserBase.loadCurDateValue in. 读取到期配置文件:{}", path);
         try {
-            byte[] value = ReaderUtils.loadBytes(new File(CONFIG_PATH + "/cur_date.dat"));
+            byte[] value = ReaderUtils.loadBytes(new File(path));
             RsaCipher cipher = RsaCipher.build(0).setPrivateKey(this.privateKey).setPublicKey(this.publicKey).loadConfig();
             String dText = new String(
                     cipher.decrypt(
@@ -74,6 +75,22 @@ public class BrowserBase {
         } catch (IOException e) {
             log.error("BrowserBase.loadCurDateValue error. 读取配置文件错误", e);
             throw new RuntimeException(e);
+        }
+    }
+
+    private String loadHeadUserAgent(){
+        String path = CONFIG_PATH + "/header_useragent.txt";
+        log.info("BrowserBase.loadHeadUserAgent in. 读取请求头配置文件:{}", path);
+        try {
+            File file = new File(path);
+            if(!file.exists()) return null;
+            byte[] value = ReaderUtils.loadBytes(file);
+            return new String(value);
+        } catch (IOException e) {
+            log.warn("BrowserBase.loadHeadUserAgent error. 读取球球头配置文件错误", e);
+            throw new RuntimeException(e);
+        }finally {
+            log.info("BrowserBase.loadHeadUserAgent end. 读取请求头配置文件");
         }
     }
 
@@ -119,6 +136,7 @@ public class BrowserBase {
         log.warn("BrowserBase.create cookies:{}", cookies);
 
         browser = Browser.createDefault()
+                .setUserAgent(this.loadHeadUserAgent())
                 .setDisableAutomationFlag(true)
                 .setStealthMode(true)
                 .setTimeoutMs(60000)

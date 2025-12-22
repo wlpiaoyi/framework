@@ -2,6 +2,7 @@ package org.wlpiaoyi.framework.generator.plugin;
 
 import lombok.Data;
 import org.wlpiaoyi.framework.generator.plugin.model.ConfigModel;
+import org.wlpiaoyi.framework.generator.plugin.utils.CommentEnumParse;
 import org.wlpiaoyi.framework.generator.plugin.utils.PluginUtils;
 import org.wlpiaoyi.framework.generator.plugin.utils.StructureConstant;
 import org.wlpiaoyi.framework.utils.DateUtils;
@@ -25,15 +26,13 @@ public class PluginClass {
     private ConfigModel configModel;
     private final PluginTable pluginTable;
     private final String templatePath;
-//    private final String name;
-//    private final String packagePath;
-//    private final List<String> excludeColumn;
     private final List<Map<String, String>> templateList;
+    private final PluginEnums pluginEnums;
 
     private static final String SLASH_ARG = "\\";
-//    private final String classVersion;
 
     public PluginClass(PluginTable pluginTable, String templatePath, ConfigModel configModel){
+        this.pluginEnums = new PluginEnums(templatePath, configModel);
         this.configModel = configModel;
         this.templatePath = templatePath + SLASH_ARG + "/##package##";
         this.pluginTable = pluginTable;
@@ -67,6 +66,9 @@ public class PluginClass {
                 this.iteratorInitTemplateList(templateList, subFile_subs, subDirName);
             }else{
                 String fileName = subFile.getName();
+                if(!fileName.endsWith(".vm")){
+                    continue;
+                }
                 String text = DataUtils.readFile(subFile.getAbsolutePath());
                 templateList.add(new HashMap(){{
                     put("fileName", fileName);
@@ -219,24 +221,9 @@ public class PluginClass {
         if(ValueUtils.isNotBlank(description)){
             String info = MapUtils.getString(commentRes, "desc", "");
             if(ValueUtils.isNotBlank(info)){
-                description += ":" + info;
+                description = info;
             }
-            String[] examples = MapUtils.get(commentRes, "options", new String[]{});
-            if(ValueUtils.isNotBlank(examples)){
-                description += " enums(" + ValueUtils.toStrings(examples) + ")";
-            }
-
             schemaInParams += " , description = \"" + description + "\"";
-        }
-        String[] examples = MapUtils.get(commentRes, "options", new String[]{});
-        if(ValueUtils.isNotBlank(examples)){
-            schemaInParams += " , examples = {";
-            for(String example : examples){
-                schemaInParams += "\"" + example + "\",";
-            }
-            schemaInParams = schemaInParams.substring(0, schemaInParams.length() - 1);
-            schemaInParams += "}";
-
         }
         fieldsText.append("@Schema(name = \"" + propertyName + "\"" + schemaInParams +")");
 
@@ -247,7 +234,12 @@ public class PluginClass {
                 throw new BusinessException("msgValidDict不支持的类型:" + columnType);
             }
             fieldsText.append(tabArgs);
-            fieldsText.append(anStr.replace("__comment__", MapUtils.getString(commentRes, "name", comment)));
+            CommentEnumParse.ParseResult parseResult = this.getParseResult(comment);
+            if(parseResult != null){
+                fieldsText.append(anStr.replace("__comment__",  parseResult.getDesc()));
+            }else{
+                fieldsText.append(anStr.replace("__comment__", MapUtils.getString(commentRes, "name", comment)));
+            };
             String importStr = implValidDict.get(columnType);
             if(ValueUtils.isBlank(importStr))
                 throw new BusinessException("implValidDict不支持的类型:" + columnType);
@@ -269,22 +261,57 @@ public class PluginClass {
         String fieldDec = fieldDecorateDict.get(columnType);
         if(!ValueUtils.isBlank(fieldDec)){
             fieldDec = fieldDec.replaceAll(StructureConstant.TAB_ARGS, tabArgs);
-//            for (String arg :
-//                    fieldDec.split(",")) {
-//                fieldsText.append(tabArgs);
-//                fieldsText.append(arg);
-//            }
             fieldsText.append(tabArgs);
             fieldsText.append(fieldDec);
         }
         String res = new String(line);
-        res = res.replaceAll(StructureConstant.PROPERTY_TYPE, propertyType);
+        if(res.contains(StructureConstant.PROPERTY_TYPE)){
+            CommentEnumParse.ParseResult parseResult = this.getParseResult(comment);
+            if(parseResult != null){
+                res = res.replaceAll(StructureConstant.PROPERTY_TYPE, parseResult.getName() + "Enum");
+                String impStr = configModel.getBizPackagePath() + ".domain.enums." + parseResult.getName() + "Enum";
+                if(!imports.contains(impStr)){
+                    imports.add(impStr);
+                }
+                this.pluginEnums.run(parseResult);
+            }else{
+                res = res.replaceAll(StructureConstant.PROPERTY_TYPE, propertyType);
+            }
+        }
+        if(res.contains("<result column=") && res.contains("/>")){
+            CommentEnumParse.ParseResult parseResult = this.getParseResult(comment);
+            if(parseResult != null){
+                res = res.replaceAll("/>", " typeHandler=\"" + configModel.getBizPackagePath() + ".handler." + parseResult.getName() + "Handler\"/>");
+                this.pluginEnums.run(parseResult);
+            }
+        }
+        if(Pattern.compile(XML_PROPERTY_REGEX).matcher(res).find()){
+            CommentEnumParse.ParseResult parseResult = this.getParseResult(comment);
+            if(parseResult != null){
+                res = res.replaceAll("\\}", " typeHandler=" + configModel.getBizPackagePath() + ".handler." + parseResult.getName() + "Handler}");
+                this.pluginEnums.run(parseResult);
+            }
+        }
         res = res.replaceAll(StructureConstant.PROPERTY_NAME, propertyName);
         res = res.replaceAll(StructureConstant.COLUMN_COMMENT, comment);
         res = res.replaceAll(StructureConstant.PROPERTY_ANNOTATIONS, fieldsText.toString());
         res = res.replaceAll(StructureConstant.COLUMN_NAME, columnName);
 
         return res;
+    }
+    // 在类中预编译（可选，提升性能）
+    private static final String XML_PROPERTY_REGEX = "#\\{[a-zA-Z0-9_]*\\.##[a-zA-Z0-9_]*##\\}";
+    private final Map<String, CommentEnumParse.ParseResult> parseResultDict = new HashMap<>();
+    public CommentEnumParse.ParseResult getParseResult(String description){
+        if(!CommentEnumParse.validate(description)){
+            return null;
+        }
+        if(!this.parseResultDict.containsKey(description)){
+            CommentEnumParse.ParseResult parseResult = CommentEnumParse.parse(description);
+            this.parseResultDict.put(description, parseResult);
+            return parseResult;
+        }
+        return this.parseResultDict.get(description);
     }
 
     public void run() throws SQLException {

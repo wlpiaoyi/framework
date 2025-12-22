@@ -1,0 +1,12 @@
+package ##package##.##bizTag##.handler;
+
+import ##package##.##bizTag##.domain.enums.##enumName##Enum;
+import ##package##.handler.EnumTypeHandler;
+
+public class ##enumName##Handler extends EnumTypeHandler<##enumName##Enum> {
+
+    public ##enumName##Handler() {
+        super(##enumName##Enum.class);
+    }
+
+}

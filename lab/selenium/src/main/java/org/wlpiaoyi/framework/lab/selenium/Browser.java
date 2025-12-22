@@ -8,7 +8,6 @@ import org.openqa.selenium.chrome.ChromeDriverService;
 import org.openqa.selenium.chrome.ChromeOptions;
 import org.openqa.selenium.support.ui.WebDriverWait;
 import org.wlpiaoyi.framework.utils.ValueUtils;
-import org.wlpiaoyi.framework.utils.data.DataUtils;
 import org.wlpiaoyi.framework.utils.exception.BusinessException;
 
 import java.io.File;
@@ -17,10 +16,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.time.Duration;
-import java.time.temporal.ChronoUnit;
-import java.time.temporal.TemporalUnit;
 import java.util.*;
-import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 /**
@@ -1063,7 +1059,7 @@ public class Browser {
         if (driver != null) {
             throw new BusinessException("Cannot set userAgent after driver is initialized");
         }
-        this.userAgent = userAgent;
+        this.userAgent = ValueUtils.isBlank(userAgent) ? DEFAULT_USER_AGENT : userAgent;
         return this;
     }
 
