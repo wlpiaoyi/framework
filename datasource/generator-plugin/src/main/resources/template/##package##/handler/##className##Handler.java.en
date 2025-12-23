@@ -3,6 +3,17 @@ package ##package##.##bizTag##.handler;
 import ##package##.##bizTag##.domain.enums.##enumName##Enum;
 import ##package##.handler.EnumTypeHandler;
 
+/**
+ * <p><b>{@code @author:}</b>         ##author##</p>
+ * <p><b>{@code @description:}</b>
+ * <div style='padding: 5px; margin-left: 5px; margin-bottom: 5px;'>
+ * ##enumComment## 处理器
+ * </div>
+ * </p>
+ * <p><b>{@code @date:}</b>           ##createTime##</p>
+ * <p><b>{@code @version:}</b>       ##version##</p>
+ * <hr/>
+ */
 public class ##enumName##Handler extends EnumTypeHandler<##enumName##Enum> {
 
     public ##enumName##Handler() {

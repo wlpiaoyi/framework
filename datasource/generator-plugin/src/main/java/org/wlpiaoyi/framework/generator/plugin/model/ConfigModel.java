@@ -2,8 +2,11 @@ package org.wlpiaoyi.framework.generator.plugin.model;
 
 import lombok.Builder;
 import lombok.Data;
+import lombok.Getter;
 import org.wlpiaoyi.framework.utils.ValueUtils;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Properties;
 
 /**
@@ -12,7 +15,7 @@ import java.util.Properties;
  * {@code @date:}           2023/12/8 16:01
  * {@code @version:}:       1.0
  */
-@Data
+@Getter
 public class ConfigModel {
 
     //数据库连接信息
@@ -31,6 +34,8 @@ public class ConfigModel {
     private String tableNamePattern;
     //包路径
     private String packagePath;
+    //业务包路径
+    private String bizPackagePath;
     //项目名称
     private String projectName;
     //排除字段
@@ -38,14 +43,18 @@ public class ConfigModel {
     //类版本
     private String classVersion;
 
-    public String getBizPackagePath(){
-        if(ValueUtils.isBlank(this.getBusinessTag())){
-            return this.getPackagePath();
-        }
-        return this.getPackagePath() + "." + this.getBusinessTag();
+    private static ConfigModel instance;
+
+    public static ConfigModel getInstance(){
+        return instance;
     }
 
-    public ConfigModel(Properties properties){
+    public static void loadData(Properties properties){
+        instance = new ConfigModel(properties);
+    }
+
+
+    private ConfigModel(Properties properties){
         this.url = properties.getProperty("url");
         this.userName = properties.getProperty("userName");
         this.password = properties.getProperty("password");
@@ -57,6 +66,11 @@ public class ConfigModel {
         this.projectName = properties.getProperty("projectName");
         this.excludeColumns = properties.getProperty("excludeColumns");
         this.classVersion = properties.getProperty("classVersion", "1.0");
+        if(ValueUtils.isBlank(this.businessTag)){
+            this.bizPackagePath = this.packagePath;
+        }else{
+            this.bizPackagePath = this.packagePath + "." + this.businessTag;
+        }
     }
 
 }

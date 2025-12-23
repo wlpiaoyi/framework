@@ -2,11 +2,10 @@ package org.wlpiaoyi.framework.generator.plugin;
 
 import lombok.Data;
 import org.wlpiaoyi.framework.generator.plugin.model.ConfigModel;
+import org.wlpiaoyi.framework.generator.plugin.model.PluginModel;
 import org.wlpiaoyi.framework.generator.plugin.utils.CommentEnumParse;
-import org.wlpiaoyi.framework.generator.plugin.utils.PluginUtils;
 import org.wlpiaoyi.framework.generator.plugin.utils.StructureConstant;
 import org.wlpiaoyi.framework.utils.DateUtils;
-import org.wlpiaoyi.framework.utils.MapUtils;
 import org.wlpiaoyi.framework.utils.ValueUtils;
 import org.wlpiaoyi.framework.utils.data.DataUtils;
 import org.wlpiaoyi.framework.utils.exception.BusinessException;
@@ -18,12 +17,11 @@ import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import static org.wlpiaoyi.framework.generator.plugin.utils.PluginUtils.*;
+import static org.wlpiaoyi.framework.generator.plugin.model.PluginModel.*;
 
 
 public class PluginClass {
 
-    private ConfigModel configModel;
     private final PluginTable pluginTable;
     private final String templatePath;
     private final List<Map<String, String>> templateList;
@@ -31,9 +29,8 @@ public class PluginClass {
 
     private static final String SLASH_ARG = "\\";
 
-    public PluginClass(PluginTable pluginTable, String templatePath, ConfigModel configModel){
-        this.pluginEnums = new PluginEnums(templatePath, configModel);
-        this.configModel = configModel;
+    public PluginClass(PluginTable pluginTable, String templatePath){
+        this.pluginEnums = new PluginEnums(templatePath);
         this.templatePath = templatePath + SLASH_ARG + "/##package##";
         this.pluginTable = pluginTable;
         File file = new File(this.templatePath);
@@ -81,13 +78,14 @@ public class PluginClass {
 
     private String getClassText(Map<String, String> templateDict, Map<String, String> table){
         String text = templateDict.get("text");
+        ConfigModel configModel = ConfigModel.getInstance();
         String classText = text.replaceAll(StructureConstant.TABLE_NAME, table.get("tableName"));
         classText = classText.replaceAll(StructureConstant.TABLE_COMMENT, table.get("comment"));
         classText = classText.replaceAll(StructureConstant.OBJECT_NAME, table.get("suffixName"));
         classText = classText.replaceAll(StructureConstant.CLASS_NAME, table.get("className"));
         classText = classText.replaceAll(StructureConstant.VAR_CLASS_NAME, table.get("varClassName"));
-        classText = classText.replaceAll(StructureConstant.PACKAGE, this.configModel.getPackagePath());
-        classText = classText.replaceAll(StructureConstant.BIZ_TAG, this.configModel.getBusinessTag());
+        classText = classText.replaceAll(StructureConstant.PACKAGE, configModel.getPackagePath());
+        classText = classText.replaceAll(StructureConstant.BIZ_TAG, configModel.getBusinessTag());
         return classText;
     }
 
@@ -103,7 +101,7 @@ public class PluginClass {
     private static final Pattern FOREACH_COLUMN_ATTRIBUTE_SEPARATOR_PATTERN = Pattern.compile(
             "separator=\"[0-9a-zA-Z,.:;%&*(){}\\[\\]=+\\-\\\"\\' ]*");
 
-    private String replaceForeachColumn(List<Map<String, Object>> columns, List<String> imports, int tabNum, String classText){
+    private String replaceForeachColumn(List<Map<String, Object>> columns, Set<String> imports, int tabNum, String classText){
         List<String> lines = new ArrayList(){{
             addAll(Arrays.asList(classText.split("\n")));
         }};
@@ -145,7 +143,8 @@ public class PluginClass {
                 range.getLines().add(line);
             }
         }
-        List<String> excludeColumn = ValueUtils.toStringList(this.configModel.getExcludeColumns());
+        ConfigModel configModel = ConfigModel.getInstance();
+        List<String> excludeColumn = ValueUtils.toStringList(configModel.getExcludeColumns());
         for (Range r : ranges){
             lines.remove(r.getEndIndex());
 
@@ -185,7 +184,8 @@ public class PluginClass {
     }
 
 
-    private String getFieldText(Map<String, Object> colMap , List<String> imports, String line){
+    private String getFieldText(Map<String, Object> colMap , Set<String> imports, String line){
+        ConfigModel configModel = ConfigModel.getInstance();
         String tabArgs = "\n";
         for (char c: line.toCharArray()){
             if(c != '\t' && c != ' ' && c != '\r'){
@@ -198,14 +198,14 @@ public class PluginClass {
         String propertyName = (String) colMap.get("propertyName");
         String comment = (String) colMap.get("comment");
         String columnType = ((String) colMap.get("columnType")).toUpperCase();
-        String propertyType = columnTypeDict.get(columnType);
+        String propertyType = PluginModel.getInstance().getColumnTypeDict().get(columnType);
         if(ValueUtils.isBlank(propertyType)){
             throw new BusinessException("not fund propertyType for " + columnType);
         }
         if(ValueUtils.isBlank(comment)){
             comment = propertyName;
         }
-        String implType = implTypeDict.get(columnType);
+        String implType = PluginModel.getInstance().getImplTypeDict().get(columnType);
 //        if(this.excludeColumn.contains(columnName))
 //            return null;
 
@@ -214,41 +214,60 @@ public class PluginClass {
                 imports.add(implType);
         }
 
-
-        Map commentRes = PluginUtils.patternComment(comment);
-        String schemaInParams = "";
-        String description = MapUtils.getString(commentRes, "name", comment);
-        if(ValueUtils.isNotBlank(description)){
-            String info = MapUtils.getString(commentRes, "desc", "");
-            if(ValueUtils.isNotBlank(info)){
-                description = info;
+        CommentEnumParse.ParseResult parseResult = this.getParseResult(comment);
+        String descShort = null;
+        String descFull = null;
+        if(parseResult == null){
+            if(ValueUtils.isBlank(comment)){
+                descShort = propertyName;
+            }else{
+                String args[] = comment.split(",", 2);
+                if(args.length < 2) descShort = args[0];
+                else {
+                    descShort = args[0];
+                    descFull = args[1];
+                }
             }
-            schemaInParams += " , description = \"" + description + "\"";
+        }else{
+            descShort = parseResult.getDesc();
+            descFull = comment;
         }
-        fieldsText.append("@Schema(name = \"" + propertyName + "\"" + schemaInParams +")");
+        if(ValueUtils.isBlank(descFull)){
+            descFull = descShort;
+        }
+        fieldsText.append("@Schema(name = \"" + propertyName + "\" , description = \"" + descFull + "\")");
 
         Integer nullable = (Integer) colMap.get("nullable");
         if(nullable == 0){
-            String anStr = msgValidDict.get(columnType);
+            String anStr = PluginModel.getInstance().getMsgValidDict().get(columnType);
             if(ValueUtils.isBlank(anStr)) {
                 throw new BusinessException("msgValidDict不支持的类型:" + columnType);
             }
             fieldsText.append(tabArgs);
-            CommentEnumParse.ParseResult parseResult = this.getParseResult(comment);
             if(parseResult != null){
                 fieldsText.append(anStr.replace("__comment__",  parseResult.getDesc()));
             }else{
-                fieldsText.append(anStr.replace("__comment__", MapUtils.getString(commentRes, "name", comment)));
+                fieldsText.append(anStr.replace("__comment__", descShort));
             };
-            String importStr = implValidDict.get(columnType);
+            String importStr = PluginModel.getInstance().getImplValidDict().get(columnType);
             if(ValueUtils.isBlank(importStr))
                 throw new BusinessException("implValidDict不支持的类型:" + columnType);
             if(!imports.contains(importStr)){
                 imports.add(importStr);
             }
         }
+        {
+            if(parseResult != null){
+                fieldsText.append(tabArgs);
+                fieldsText.append("@TableField(typeHandler = EnumTypeHandler.class)");
+                String importStr = "com.baomidou.mybatisplus.annotation.TableField";
+                if(!imports.contains(importStr)) imports.add(importStr);
+                importStr = configModel.getPackagePath() + ".handler.EnumTypeHandler";
+                if(!imports.contains(importStr)) imports.add(importStr);
+            }
+        }
 
-        String implDec = implDecorateDict.get(columnType);
+        String implDec = PluginModel.getInstance().getImplDecorateDict().get(columnType);
         if(!ValueUtils.isBlank(implDec)){
             for (String arg :
                     implDec.split(",")) {
@@ -258,15 +277,14 @@ public class PluginClass {
             }
         }
 
-        String fieldDec = fieldDecorateDict.get(columnType);
+        String fieldDec = PluginModel.getInstance().getFieldDecorateDict().get(columnType);
         if(!ValueUtils.isBlank(fieldDec)){
             fieldDec = fieldDec.replaceAll(StructureConstant.TAB_ARGS, tabArgs);
             fieldsText.append(tabArgs);
             fieldsText.append(fieldDec);
         }
         String res = new String(line);
-        if(res.contains(StructureConstant.PROPERTY_TYPE)){
-            CommentEnumParse.ParseResult parseResult = this.getParseResult(comment);
+        if(res.contains(StructureConstant.PROPERTY_TYPE)){;
             if(parseResult != null){
                 res = res.replaceAll(StructureConstant.PROPERTY_TYPE, parseResult.getName() + "Enum");
                 String impStr = configModel.getBizPackagePath() + ".domain.enums." + parseResult.getName() + "Enum";
@@ -274,19 +292,18 @@ public class PluginClass {
                     imports.add(impStr);
                 }
                 this.pluginEnums.run(parseResult);
+
             }else{
                 res = res.replaceAll(StructureConstant.PROPERTY_TYPE, propertyType);
             }
         }
         if(res.contains("<result column=") && res.contains("/>")){
-            CommentEnumParse.ParseResult parseResult = this.getParseResult(comment);
             if(parseResult != null){
                 res = res.replaceAll("/>", " typeHandler=\"" + configModel.getBizPackagePath() + ".handler." + parseResult.getName() + "Handler\"/>");
                 this.pluginEnums.run(parseResult);
             }
         }
         if(Pattern.compile(XML_PROPERTY_REGEX).matcher(res).find()){
-            CommentEnumParse.ParseResult parseResult = this.getParseResult(comment);
             if(parseResult != null){
                 res = res.replaceAll("\\}", " typeHandler=" + configModel.getBizPackagePath() + ".handler." + parseResult.getName() + "Handler}");
                 this.pluginEnums.run(parseResult);
@@ -315,6 +332,7 @@ public class PluginClass {
     }
 
     public void run() throws SQLException {
+        ConfigModel configModel = ConfigModel.getInstance();
         Map<String, Map<String, Object>> resDict = this.pluginTable.run();
 
         for (String key : resDict.keySet()) {
@@ -323,13 +341,13 @@ public class PluginClass {
             Map<String, String> table = (Map<String, String>) res.get("table");
             for (Map<String, String> templateDict : this.templateList) {
                 String classText = getClassText(templateDict, table);
-                String packageStr = this.configModel.getBizPackagePath();
+                String packageStr = configModel.getBizPackagePath();
 
-                List<String> imports = new ArrayList<>();
+                Set<String> imports = new HashSet<>();
                 classText = this.replaceForeachColumn(columns, imports, 1, classText);
 
                 String importsStr = "";
-                for (String impStr : imports){
+                for (String impStr : imports.stream().sorted().toList()){
                     importsStr += "import " + impStr + ";\n";
                 }
 
@@ -346,13 +364,13 @@ public class PluginClass {
                 }
 
                 classText = classText.replace(StructureConstant.AUTHOR, pcUserName + ":" + pcComputerName);
-                classText = classText.replace(StructureConstant.VERSION, this.configModel.getClassVersion());
+                classText = classText.replace(StructureConstant.VERSION, configModel.getClassVersion());
 
 
                 String fileName = templateDict.get("fileName").replace("##className##", table.get("className"));
                 fileName = fileName.substring(0, fileName.length() - 3);
                 String filePackage = packageStr + "." + templateDict.get("dirName");
-                String oname = this.configModel.getProjectName();
+                String oname = configModel.getProjectName();
                 if(!ValueUtils.isBlank(oname)){
                     oname += SLASH_ARG;
                 }

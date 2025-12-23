@@ -8,18 +8,17 @@ import java.util.*;
 public class PluginTable {
 
 
-    private final ConfigModel configModel;
     private Connection connection;
 
     private DatabaseMetaData metaData;
 
-    public PluginTable(ConfigModel configModel) {
-        this.configModel = configModel;
+    public PluginTable() {
     }
 
     public void start() throws SQLException {
-        this.connection = DriverManager.getConnection(this.configModel.getUrl(),
-                this.configModel.getUserName(), this.configModel.getPassword());
+        ConfigModel configModel = ConfigModel.getInstance();
+        this.connection = DriverManager.getConnection(configModel.getUrl(),
+                configModel.getUserName(), configModel.getPassword());
         this.metaData = this.connection.getMetaData();
     }
 
@@ -94,20 +93,21 @@ public class PluginTable {
         this.start();
         try{
             List<Map<String, String>> tableDicts = new ArrayList<>();
-            if(this.configModel.getTableNamePattern().contains(TABLE_NAME_PATTERN_SPLIT)){
-                for (String name : this.configModel.getTableNamePattern().split(TABLE_NAME_PATTERN_SPLIT)) {
-                    ResultSet tableRet = metaData.getTables(this.configModel.getDatabaseName(), null, name,
+            ConfigModel configModel = ConfigModel.getInstance();
+            if(configModel.getTableNamePattern().contains(TABLE_NAME_PATTERN_SPLIT)){
+                for (String name : configModel.getTableNamePattern().split(TABLE_NAME_PATTERN_SPLIT)) {
+                    ResultSet tableRet = metaData.getTables(configModel.getDatabaseName(), null, name,
                             new String[]{"TABLE"});
-                    tableDicts.addAll(PluginTable.iteratorTable(this.configModel.getTablePrefix(), tableRet));
+                    tableDicts.addAll(PluginTable.iteratorTable(configModel.getTablePrefix(), tableRet));
                 }
             }else{
-                ResultSet tableRet = metaData.getTables(this.configModel.getDatabaseName(), null, this.configModel.getTableNamePattern(),
+                ResultSet tableRet = metaData.getTables(configModel.getDatabaseName(), null, configModel.getTableNamePattern(),
                         new String[]{"TABLE"});
-                tableDicts.addAll(PluginTable.iteratorTable(this.configModel.getTablePrefix(), tableRet));
+                tableDicts.addAll(PluginTable.iteratorTable(configModel.getTablePrefix(), tableRet));
             }
             for (Map<String, String> tableDict : tableDicts) {
                 String tableName = tableDict.get("tableName");
-                ResultSet columnRet = metaData.getColumns(this.configModel.getDatabaseName(), null, tableName, "%");
+                ResultSet columnRet = metaData.getColumns(configModel.getDatabaseName(), null, tableName, "%");
                 List<Map<String, String>> columnDict = PluginTable.iteratorColumn(columnRet);
                 resDict.put(tableName,
                         new HashMap(2){{

@@ -3,35 +3,29 @@ package org.wlpiaoyi.framework.generator.plugin;
 import lombok.Data;
 import org.wlpiaoyi.framework.generator.plugin.model.ConfigModel;
 import org.wlpiaoyi.framework.generator.plugin.utils.CommentEnumParse;
-import org.wlpiaoyi.framework.generator.plugin.utils.PluginUtils;
 import org.wlpiaoyi.framework.generator.plugin.utils.StructureConstant;
 import org.wlpiaoyi.framework.utils.DateUtils;
-import org.wlpiaoyi.framework.utils.MapUtils;
 import org.wlpiaoyi.framework.utils.ValueUtils;
 import org.wlpiaoyi.framework.utils.data.DataUtils;
 import org.wlpiaoyi.framework.utils.exception.BusinessException;
 
 import java.io.File;
-import java.sql.SQLException;
 import java.time.LocalDateTime;
 import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import static org.wlpiaoyi.framework.generator.plugin.utils.PluginUtils.*;
 
 
 public class PluginEnums {
 
-    private ConfigModel configModel;
     private final String templatePath;
     private final List<Map<String, String>> templateList;
 
     private static final String SLASH_ARG = "\\";
 //    private final String classVersion;
 
-    public PluginEnums(String templatePath, ConfigModel configModel){
-        this.configModel = configModel;
+    public PluginEnums(String templatePath){
         this.templatePath = templatePath + SLASH_ARG + "/##package##";
         File file = new File(this.templatePath);
         if(!file.exists())
@@ -78,19 +72,19 @@ public class PluginEnums {
     private final Set<String> runedSet = new HashSet<>();
 
     public void run(CommentEnumParse.ParseResult parseResult){
+        ConfigModel configModel = ConfigModel.getInstance();
         for (Map<String, String> templateDict : this.templateList){
-
             String fileName = templateDict.get("fileName").replace("##className##", parseResult.getName());
             fileName = fileName.substring(0, fileName.length() - 3);
             String className = fileName.substring(0, fileName.lastIndexOf("."));
             String classText = templateDict.get("text");
-            String oname = this.configModel.getProjectName();
+            String oname = configModel.getProjectName();
             if(!ValueUtils.isBlank(oname)){
                 oname += SLASH_ARG;
             }
             String filePath = DataUtils.USER_DIR +
                     SLASH_ARG + "target" + SLASH_ARG + "generator" + SLASH_ARG + "output" + SLASH_ARG +
-                    oname + (this.configModel.getBizPackagePath() + "." + templateDict.get("dirName")).replace(".", SLASH_ARG);
+                    oname + (configModel.getBizPackagePath() + "." + templateDict.get("dirName")).replace(".", SLASH_ARG);
             DataUtils.makeDir(filePath);
             if(runedSet.contains(className)){
                 continue;
@@ -110,9 +104,9 @@ public class PluginEnums {
             String enumName = parseResult.getName();
 
             classText = classText.replace(StructureConstant.AUTHOR, pcUserName + ":" + pcComputerName);
-            classText = classText.replace(StructureConstant.VERSION, this.configModel.getClassVersion());
-            classText = classText.replaceAll(StructureConstant.PACKAGE, this.configModel.getPackagePath());
-            classText = classText.replaceAll(StructureConstant.BIZ_TAG, this.configModel.getBusinessTag());
+            classText = classText.replace(StructureConstant.VERSION, configModel.getClassVersion());
+            classText = classText.replaceAll(StructureConstant.PACKAGE, configModel.getPackagePath());
+            classText = classText.replaceAll(StructureConstant.BIZ_TAG, configModel.getBusinessTag());
             classText = classText.replaceAll(StructureConstant.ENUM_NAME, enumName);
             classText = classText.replaceAll(StructureConstant.ENUM_TYPE, enumType);
             classText = classText.replaceAll(StructureConstant.ENUM_COMMENT, parseResult.getDesc());

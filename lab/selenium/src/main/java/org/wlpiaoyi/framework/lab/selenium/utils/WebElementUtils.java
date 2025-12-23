@@ -210,6 +210,7 @@ public class WebElementUtils {
      */
     public static void click(Browser browser, WebElement ele){
         try{
+            Thread.sleep(new Random().nextInt() % 300 + 100);
             ele.click();
         }catch (Exception e){
             ((JavascriptExecutor)browser.getDriver()).executeScript("arguments[0].click();", ele);

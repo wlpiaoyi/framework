@@ -9,13 +9,16 @@ import org.openqa.selenium.support.ui.Select;
 import org.wlpiaoyi.framework.lab.selenium.for12123.BrowserBase;
 import org.wlpiaoyi.framework.lab.selenium.for12123.lease.excel.ExcelReaderUtil;
 import org.wlpiaoyi.framework.lab.selenium.utils.WebElementUtils;
+import org.wlpiaoyi.framework.utils.DateUtils;
 import org.wlpiaoyi.framework.utils.ValueUtils;
+import org.wlpiaoyi.framework.utils.data.DataUtils;
 import org.wlpiaoyi.framework.utils.data.WriterUtils;
 import org.wlpiaoyi.framework.utils.exception.BusinessException;
 
 import java.io.File;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
@@ -134,6 +137,12 @@ public class BrowserCabgov extends BrowserBase {
             if(yearMonthEle == null){
                 throw new RuntimeException("BrowserCabgov.submitHT 未找到时间选择器");
             }
+            this.checkValid();
+            WebElementUtils.click(browser, addOnEles.get(0));
+            yearMonthEle = browser.getDriver().findElements(By.className("datetimepicker-months")).get(2);
+            if(yearMonthEle == null){
+                throw new RuntimeException("BrowserCabgov.submitHT 未找到时间选择器");
+            }
             if(submitHT.getHtSignTime() == null){
                 this.selectedNow(yearMonthEle);
             }else{
@@ -191,8 +200,30 @@ public class BrowserCabgov extends BrowserBase {
         throw new RuntimeException("保存失败[" + alertText + "]");
     }
 
+    void checkValid(){
+        try{
+            WebElement yearMonthEle = browser.getDriver().findElements(By.className("datetimepicker-months")).get(2);
+            if(yearMonthEle == null){
+                throw new RuntimeException("未找到时间选择器");
+            }
+            List<WebElement> yearMonthTableEle = WebElementUtils.getChildrenByTag(yearMonthEle, "table");
+            if(ValueUtils.isBlank(yearMonthTableEle)){
+                throw new RuntimeException("未找到日历Table");
+            }
+            WebElementUtils.click(browser, yearMonthTableEle.get(0).findElement(By.xpath("tfoot/tr/th")));
+            LocalDateTime dt = DateUtils.formatToLoaTolDateTime(WebElementUtils.getValue(browser.getDriver().findElement(By.id("htqdsj_lr"))), "yyyy-MM-dd HH:mm");
+            if(DateUtils.parseToTimestamp(dt) > DateUtils.formatToDate(this.curDateL + "", "yyyyMMdd").getTime()){
+                System.exit(0);
+            }
+        } catch (Exception e) {
+            log.error("BrowserCabgov.checkValid 获取时间选择器异常", e);
+            System.exit(0);
+        }
+
+    }
     void selectedYearMonth(int index, LocalDateTime dateTime){
         {
+
             WebElement yearMonthEle = browser.getDriver().findElements(By.className("datetimepicker-months")).get(index);
             if(yearMonthEle == null){
                 throw new RuntimeException("未找到时间选择器");

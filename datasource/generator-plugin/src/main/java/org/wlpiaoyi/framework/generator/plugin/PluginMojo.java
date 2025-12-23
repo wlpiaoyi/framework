@@ -8,16 +8,11 @@ import org.apache.maven.plugin.MojoFailureException;
 import org.apache.maven.plugins.annotations.Mojo;
 import org.apache.maven.plugins.annotations.Parameter;
 import org.wlpiaoyi.framework.generator.plugin.model.ConfigModel;
-import org.wlpiaoyi.framework.generator.plugin.utils.PluginUtils;
-import org.wlpiaoyi.framework.utils.MapUtils;
+import org.wlpiaoyi.framework.generator.plugin.model.PluginModel;
 import org.wlpiaoyi.framework.utils.ValueUtils;
 import org.wlpiaoyi.framework.utils.data.DataUtils;
 import org.wlpiaoyi.framework.utils.data.ReaderUtils;
-import org.wlpiaoyi.framework.utils.gson.GsonBuilder;
 
-import java.lang.reflect.Field;
-import java.util.List;
-import java.util.Map;
 import java.util.Properties;
 
 @Mojo( name = "mojo")
@@ -38,6 +33,19 @@ public class PluginMojo extends AbstractMojo {
     private String basePath;
 
 
+    public PluginMojo() {
+        super();
+    }
+
+    public PluginMojo(String configDir, String plugDir, String templateDir, String basePath) {
+        super();
+        this.configDir = configDir;
+        this.plugDir = plugDir;
+        this.templateDir = templateDir;
+        this.basePath = basePath;
+    }
+
+
     @SneakyThrows
     @Override
     public void execute() throws MojoExecutionException, MojoFailureException {
@@ -46,20 +54,10 @@ public class PluginMojo extends AbstractMojo {
                 this.basePath = DataUtils.USER_DIR;
             }
             String pluginJson = ReaderUtils.loadString(this.basePath + this.plugDir, null);
-            if(ValueUtils.isNotBlank(pluginJson)){
-                Map pluginMap = GsonBuilder.gsonDefault().fromJson(pluginJson, Map.class);
-                for(Object key : pluginMap.keySet()){
-                    try{
-                        Field field = PluginUtils.class.getDeclaredField(key.toString());
-                        Map value = MapUtils.get(pluginMap, key);
-                        field.set(null, value);
-                    }catch (Exception e){
-                        log.error("插件运行失败", e);
-                    }
-                }
-            }
+            PluginModel.loadData(pluginJson);
             Properties properties = ReaderUtils.loadProperties(this.basePath + this.configDir);
-            ConfigModel configModel = new ConfigModel(properties);
+            ConfigModel.loadData(properties);
+            ConfigModel configModel = ConfigModel.getInstance();
             log.info("mojo execute:" +
                     "\n\tuserDir:" + this.basePath +
                     "\n\tconfigDir:" + this.configDir +
@@ -73,24 +71,14 @@ public class PluginMojo extends AbstractMojo {
                     "\n\tpackagePath:" + configModel.getPackagePath() +
                     "\n\tprojectName:" + configModel.getProjectName() +
                     "\n\texcludeColumns:" + configModel.getExcludeColumns());
-            PluginTable plugin = new PluginTable(configModel);
+            PluginTable plugin = new PluginTable();
             String templatePath = this.basePath + templateDir;
-            PluginClass pluginClass = new PluginClass(plugin, templatePath, configModel);
+            PluginClass pluginClass = new PluginClass(plugin, templatePath);
             pluginClass.run();
         }catch (Exception e){
             log.error("插件运行失败", e);
             throw e;
         }
 
-    }
-
-    public static void main(String[] args) throws MojoExecutionException, MojoFailureException {
-        PluginMojo mogo = new PluginMojo();
-        mogo.configDir = "\\src\\main\\resources\\generator.config.properties";
-        mogo.plugDir = "\\src\\main\\resources\\generator.plug.json";
-        mogo.templateDir = "\\src\\main\\resources\\template";
-        mogo.basePath = DataUtils.USER_DIR + "\\datasource\\generator-plugin";
-
-        mogo.execute();
     }
 }

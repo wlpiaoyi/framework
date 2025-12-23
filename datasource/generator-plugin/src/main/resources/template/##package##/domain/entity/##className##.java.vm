@@ -9,12 +9,16 @@ import lombok.experimental.Accessors;
 import java.io.Serializable;
 ##/*import*/##
 
-
 /**
- * {@code @author:} 		##author##
- * {@code @description:} 	##tableComment## 实体类
- * {@code @date:} 			##createTime##
- * {@code @version:}: 		##version##
+ * <p><b>{@code @author:}</b>         ##author##</p>
+ * <p><b>{@code @description:}</b>
+ * <div style='padding: 5px; margin-left: 5px; margin-bottom: 5px;'>
+ * ##tableComment## 实体类
+ * </div>
+ * </p>
+ * <p><b>{@code @date:}</b>           ##createTime##</p>
+ * <p><b>{@code @version:}</b>       ##version##</p>
+ * <hr/>
  */
 @Data
 @Accessors(chain=true)
