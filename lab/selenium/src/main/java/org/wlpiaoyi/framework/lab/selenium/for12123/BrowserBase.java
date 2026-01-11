@@ -50,7 +50,8 @@ public class BrowserBase {
     protected final int type;
 
     private Long loadCurDateValue(){
-        log.info("BrowserBase.loadCurDateValue in. 读取到期配置文件");
+        log.info("BrowserBase.loadCurDateValue in. " +
+                "读取到期配置文件");
         try {
             byte[] value = ReaderUtils.loadBytes(new File(CONFIG_PATH + "/cur_date.dat"));
             RsaCipher cipher = RsaCipher.build(0).setPrivateKey(this.privateKey).setPublicKey(this.publicKey).loadConfig();
