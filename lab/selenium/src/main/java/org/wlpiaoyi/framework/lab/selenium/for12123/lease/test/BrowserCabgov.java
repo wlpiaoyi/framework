@@ -78,6 +78,7 @@ public class BrowserCabgov extends BrowserBase {
             log.error("error", e);
         }finally {
             try{
+                Thread.sleep(2000);
                 this.browser.quit();
             }catch (Exception e){};
             log.info("BrowserCabgov.start end");
@@ -86,17 +87,39 @@ public class BrowserCabgov extends BrowserBase {
     }
 
     void submitHT(SubmitHT submitHT, WebElement addBoxEle){
-        log.info("BrowserCabgov.submitHT in. 准备选择车辆类型");
-        var webElements = addBoxEle.findElement(By.id("hpzl_lr")).findElements(By.xpath("option"));
-        WebElementUtils.click(browser, webElements.getLast());
-        log.info("BrowserCabgov.submitHT 选择车辆类型成功");
-        try {
-            Thread.sleep(1000);
-        } catch (InterruptedException e) {
+        int tindex = 5;
+        while (tindex -- >= 0){
+            try {
+                Thread.sleep(1000);
+            } catch (InterruptedException e) {
+            }
+            log.info("BrowserCabgov.submitHT in. 准备选择车辆类型");
+            var webElements = addBoxEle.findElement(By.id("hpzl_lr")).findElements(By.xpath("option"));
+            WebElementUtils.click(browser, webElements.getLast());
+            boolean isNew = false;
+            for (int i = 0; i < webElements.size(); i++) {
+                WebElement webElement = webElements.get(i);
+                if(!"true".equals(webElement.getAttribute("selected"))){
+                    continue;
+                }
+                String valueName = WebElementUtils.getValue(webElement);
+                if(ValueUtils.isBlank(valueName)) continue;
+                if(valueName.contains("新能源")){
+                    isNew = true;
+                    break;
+                }
+            }
+            if (isNew){
+                log.info("BrowserCabgov.submitHT 选择车辆类型成功");
+                tindex = 999;
+                break;
+            }
         }
-
+        if (tindex != 999){
+            throw new BusinessException("选择车辆类型失败");
+        }
         log.info("BrowserCabgov.submitHT 准备选择租赁类型");
-        webElements = addBoxEle.findElement(By.id("zllx_lr")).findElements(By.xpath("option"));
+        var webElements = addBoxEle.findElement(By.id("zllx_lr")).findElements(By.xpath("option"));
         WebElementUtils.click(browser, webElements.getLast());
         log.info("BrowserCabgov.submitHT 选择租赁类型成功");
         try {
