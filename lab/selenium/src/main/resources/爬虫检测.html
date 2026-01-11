@@ -1,0 +1,2226 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Selenium 检测工具 - 高级版</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+            color: #e6e6e6;
+            min-height: 100vh;
+            padding: 20px;
+            line-height: 1.6;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background-color: rgba(30, 30, 46, 0.9);
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+            overflow: hidden;
+            border: 1px solid #3a3a5d;
+        }
+        
+        header {
+            background: linear-gradient(to right, #0f3460, #1a1a2e);
+            padding: 30px;
+            text-align: center;
+            border-bottom: 2px solid #3a3a5d;
+        }
+        
+        h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            color: #4cc9f0;
+            text-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
+        }
+        
+        .subtitle {
+            font-size: 1.1rem;
+            color: #a9a9b8;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        
+        .content {
+            display: flex;
+            flex-wrap: wrap;
+            padding: 25px;
+        }
+        
+        .detection-section {
+            flex: 1;
+            min-width: 300px;
+            padding: 20px;
+        }
+        
+        .control-section {
+            flex: 0 0 300px;
+            padding: 20px;
+            border-left: 1px solid #3a3a5d;
+        }
+
+        h2 {
+            color: #4cc9f0;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid #3a3a5d;
+            font-size: 1.8rem;
+        }
+
+        h3 {
+            color: #72efdd;
+            margin: 15px 0 10px;
+            font-size: 1.3rem;
+        }
+
+        .result-box {
+            background-color: #1a1a2e;
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 25px;
+            border: 1px solid #3a3a5d;
+            transition: all 0.3s ease;
+        }
+
+        .detection-item {
+            margin-bottom: 20px;
+            padding: 15px;
+            background-color: rgba(26, 26, 46, 0.7);
+            border-radius: 8px;
+            border-left: 4px solid #3a3a5d;
+            transition: all 0.3s ease;
+        }
+
+        .detection-item.detected {
+            border-left-color: #f72585;
+            background-color: rgba(247, 37, 133, 0.1);
+        }
+
+        .detection-item.clean {
+            border-left-color: #4cc9f0;
+            background-color: rgba(76, 201, 240, 0.1);
+        }
+
+        .detection-item.advanced {
+            border-left-color: #ff9e00;
+        }
+
+        .detection-item.advanced.detected {
+            border-left-color: #f72585;
+            background-color: rgba(247, 37, 133, 0.15);
+        }
+
+        .detection-item.advanced.clean {
+            border-left-color: #4cc9f0;
+            background-color: rgba(76, 201, 240, 0.15);
+        }
+
+        .status {
+            display: inline-block;
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-weight: bold;
+            margin-top: 10px;
+        }
+
+        .status.detected {
+            background-color: rgba(247, 37, 133, 0.2);
+            color: #f72585;
+        }
+
+        .status.clean {
+            background-color: rgba(76, 201, 240, 0.2);
+            color: #4cc9f0;
+        }
+
+        .detection-icon {
+            font-size: 1.5rem;
+            margin-right: 10px;
+            vertical-align: middle;
+        }
+
+        .overall-result {
+            text-align: center;
+            padding: 25px;
+            margin-top: 20px;
+            background-color: #1a1a2e;
+            border-radius: 10px;
+            border: 2px solid #3a3a5d;
+        }
+
+        .result-text {
+            font-size: 2.2rem;
+            font-weight: bold;
+            margin: 15px 0;
+            text-shadow: 0 2px 5px rgba(0, 0, 0, 0.5);
+        }
+
+        .result-text.detected {
+            color: #f72585;
+        }
+
+        .result-text.clean {
+            color: #4cc9f0;
+        }
+
+        .human-test-area {
+            background-color: #1a1a2e;
+            border-radius: 10px;
+            padding: 20px;
+            margin-top: 25px;
+            border: 1px solid #3a3a5d;
+            text-align: center;
+        }
+
+        .test-button {
+            width: 200px;
+            height: 50px;
+            background-color: #0f3460;
+            border: none;
+            border-radius: 8px;
+            color: white;
+            font-size: 1.1rem;
+            cursor: pointer;
+            margin: 15px 0;
+            transition: all 0.3s;
+        }
+
+        .test-button:hover {
+            background-color: #4cc9f0;
+            transform: translateY(-2px);
+        }
+
+        .test-result {
+            margin-top: 15px;
+            font-weight: bold;
+            min-height: 24px;
+        }
+
+        .test-result.human {
+            color: #4cc9f0;
+        }
+
+        .test-result.bot {
+            color: #f72585;
+        }
+
+        .info-button {
+            width: 100%;
+            padding: 15px;
+            background: linear-gradient(to right, #0f3460, #1a1a2e);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 1.1rem;
+            cursor: pointer;
+            margin: 10px 0;
+            transition: all 0.3s;
+        }
+
+        .info-button:hover {
+            background: linear-gradient(to right, #1a1a2e, #0f3460);
+            transform: translateY(-2px);
+        }
+
+        .control-buttons {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            margin-top: 20px;
+        }
+
+        .control-button {
+            padding: 12px;
+            background-color: #1a1a2e;
+            color: white;
+            border: 1px solid #3a3a5d;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-size: 1rem;
+        }
+
+        .control-button:hover {
+            background-color: #0f3460;
+            transform: translateY(-2px);
+        }
+
+        .log-panel {
+            background-color: #1a1a2e;
+            border-radius: 10px;
+            padding: 20px;
+            margin-top: 20px;
+            border: 1px solid #3a3a5d;
+            max-height: 300px;
+            overflow-y: auto;
+        }
+
+        .log-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+
+        .log-content {
+            font-family: 'Courier New', monospace;
+            font-size: 0.9rem;
+            line-height: 1.4;
+        }
+
+        .log-entry {
+            padding: 5px 0;
+            border-bottom: 1px solid rgba(58, 58, 93, 0.3);
+        }
+
+        .log-time {
+            color: #a9a9b8;
+            font-size: 0.8rem;
+        }
+
+        .log-info {
+            color: #4cc9f0;
+        }
+
+        .log-warn {
+            color: #ff9e00;
+        }
+
+        .log-error {
+            color: #f72585;
+        }
+
+        .log-success {
+            color: #72efdd;
+        }
+
+        footer {
+            text-align: center;
+            padding: 25px;
+            color: #a9a9b8;
+            font-size: 0.9rem;
+            border-top: 1px solid #3a3a5d;
+            margin-top: 20px;
+        }
+
+        .highlight {
+            color: #72efdd;
+            font-weight: bold;
+        }
+
+        .advanced-highlight {
+            color: #ff9e00;
+        }
+
+        .tab-container {
+            display: flex;
+            margin-bottom: 20px;
+            border-bottom: 1px solid #3a3a5d;
+        }
+
+        .tab {
+            padding: 10px 20px;
+            cursor: pointer;
+            border-bottom: 3px solid transparent;
+            transition: all 0.3s;
+        }
+
+        .tab.active {
+            border-bottom-color: #4cc9f0;
+            color: #4cc9f0;
+            font-weight: bold;
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        .confidence-meter {
+            height: 10px;
+            background-color: #3a3a5d;
+            border-radius: 5px;
+            margin: 10px 0;
+            overflow: hidden;
+        }
+
+        .confidence-fill {
+            height: 100%;
+            background: linear-gradient(to right, #4cc9f0, #f72585);
+            border-radius: 5px;
+            transition: width 1s ease;
+        }
+
+        .detection-progress {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 2px solid #3a3a5d;
+            border-top-color: #4cc9f0;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin-right: 10px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        @media (max-width: 768px) {
+            .content {
+                flex-direction: column;
+            }
+
+            .control-section {
+                border-left: none;
+                border-top: 1px solid #3a3a5d;
+            }
+
+            h1 {
+                font-size: 2rem;
+            }
+
+            .tab-container {
+                flex-wrap: wrap;
+            }
+
+            .tab {
+                flex: 1;
+                text-align: center;
+                min-width: 120px;
+            }
+        }
+
+        .risk-level {
+            display: inline-block;
+            padding: 3px 10px;
+            border-radius: 12px;
+            font-size: 0.8rem;
+            font-weight: bold;
+            margin-left: 10px;
+        }
+
+        .risk-low {
+            background-color: rgba(76, 201, 240, 0.2);
+            color: #4cc9f0;
+        }
+
+        .risk-medium {
+            background-color: rgba(255, 158, 0, 0.2);
+            color: #ff9e00;
+        }
+
+        .risk-high {
+            background-color: rgba(247, 37, 133, 0.2);
+            color: #f72585;
+        }
+
+        .counter {
+            font-size: 0.9rem;
+            color: #a9a9b8;
+            margin-top: 5px;
+        }
+
+        /* 模态框样式 */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: rgba(0, 0, 0, 0.7);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 10000;
+        }
+
+        .modal-content {
+            background-color: #1a1a2e;
+            border-radius: 15px;
+            padding: 30px;
+            max-width: 800px;
+            max-height: 80vh;
+            overflow-y: auto;
+            border: 2px solid #3a3a5d;
+            position: relative;
+        }
+
+        .modal-close {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            background: none;
+            border: none;
+            color: #a9a9b8;
+            font-size: 1.5rem;
+            cursor: pointer;
+            transition: color 0.3s;
+        }
+
+        .modal-close:hover {
+            color: #f72585;
+        }
+
+        .method-list {
+            margin-top: 20px;
+        }
+
+        .method-item {
+            background-color: rgba(26, 26, 46, 0.7);
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 15px;
+            border-left: 4px solid #3a3a5d;
+        }
+
+        .method-item.basic {
+            border-left-color: #4cc9f0;
+        }
+
+        .method-item.advanced {
+            border-left-color: #ff9e00;
+        }
+
+        .method-item.behavior {
+            border-left-color: #72efdd;
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <header>
+        <h1><i class="fas fa-robot detection-icon"></i>Selenium 检测工具 - 高级版</h1>
+        <p class="subtitle">使用17种检测技术识别Selenium、Puppeteer等自动化工具，包含基础、高级和行为检测方法</p>
+    </header>
+
+    <div class="content">
+        <div class="detection-section">
+            <div class="tab-container">
+                <div class="tab active" data-tab="basic">基础检测</div>
+                <div class="tab" data-tab="advanced">高级检测</div>
+                <div class="tab" data-tab="behavior">行为检测</div>
+            </div>
+
+            <div class="tab-content active" id="basic-tab">
+                <h2>基础自动化检测 <span class="counter">(检测明显的自动化特征)</span></h2>
+
+                <div class="result-box">
+                    <div class="detection-item" id="webdriverCheck">
+                        <div class="detection-header">
+                            <i class="fas fa-desktop detection-icon"></i>
+                            <strong>WebDriver属性检测</strong>
+                            <span class="risk-level risk-high">高风险</span>
+                        </div>
+                        <p>检查 navigator.webdriver 属性，这是自动化浏览器最常见的标志。</p>
+                        <div class="status" id="webdriverStatus">检测中...</div>
+                    </div>
+
+                    <div class="detection-item" id="pluginsCheck">
+                        <div class="detection-header">
+                            <i class="fas fa-plug detection-icon"></i>
+                            <strong>插件列表检测</strong>
+                            <span class="risk-level risk-medium">中风险</span>
+                        </div>
+                        <p>自动化浏览器通常有异常的插件列表或缺少常见插件。</p>
+                        <div class="status" id="pluginsStatus">检测中...</div>
+                    </div>
+
+                    <div class="detection-item" id="languagesCheck">
+                        <div class="detection-header">
+                            <i class="fas fa-language detection-icon"></i>
+                            <strong>语言设置检测</strong>
+                            <span class="risk-level risk-low">低风险</span>
+                        </div>
+                        <p>自动化浏览器可能具有非标准的语言设置。</p>
+                        <div class="status" id="languagesStatus">检测中...</div>
+                    </div>
+
+                    <div class="detection-item" id="windowCheck">
+                        <div class="detection-header">
+                            <i class="fas fa-window-maximize detection-icon"></i>
+                            <strong>窗口属性检测</strong>
+                            <span class="risk-level risk-high">高风险</span>
+                        </div>
+                        <p>自动化工具会在window对象上留下特定属性。</p>
+                        <div class="status" id="windowStatus">检测中...</div>
+                    </div>
+
+                    <div class="detection-item" id="permissionsCheck">
+                        <div class="detection-header">
+                            <i class="fas fa-user-shield detection-icon"></i>
+                            <strong>权限检测</strong>
+                            <span class="risk-level risk-medium">中风险</span>
+                        </div>
+                        <p>检查浏览器权限状态，自动化浏览器可能有不同的权限配置。</p>
+                        <div class="status" id="permissionsStatus">检测中...</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="tab-content" id="advanced-tab">
+                <h2>高级自动化检测 <span class="counter">(检测隐藏的自动化特征)</span></h2>
+
+                <div class="result-box">
+                    <!-- <div class="detection-item advanced" id="chromeAutomationCheck">
+                        <div class="detection-header">
+                            <i class="fas fa-code detection-icon"></i>
+                            <strong>Chrome自动化扩展检测</strong>
+                            <span class="risk-level risk-high">高风险</span>
+                        </div>
+                        <p>检测Chrome自动化扩展和修改的API。</p>
+                        <div class="status" id="chromeAutomationStatus">检测中...</div>
+                    </div> -->
+
+                    <div class="detection-item advanced" id="cdpCheck">
+                        <div class="detection-header">
+                            <i class="fas fa-tools detection-icon"></i>
+                            <strong>Chrome DevTools Protocol检测</strong>
+                            <span class="risk-level risk-high">高风险</span>
+                        </div>
+                        <p>检测CDP连接和调试痕迹。</p>
+                        <div class="status" id="cdpStatus">检测中...</div>
+                    </div>
+
+                    <div class="detection-item advanced" id="domPatchCheck">
+                        <div class="detection-header">
+                            <i class="fas fa-puzzle-piece detection-icon"></i>
+                            <strong>DOM API补丁检测</strong>
+                            <span class="risk-level risk-high">高风险</span>
+                        </div>
+                        <p>检测被修改的DOM属性和方法。</p>
+                        <div class="status" id="domPatchStatus">检测中...</div>
+                    </div>
+
+                    <div class="detection-item advanced" id="webglCheck">
+                        <div class="detection-header">
+                            <i class="fas fa-gamepad detection-icon"></i>
+                            <strong>WebGL供应商检测</strong>
+                            <span class="risk-level risk-high">高风险</span>
+                        </div>
+                        <p>检测虚拟GPU和自动化环境特有的渲染器。</p>
+                        <div class="status" id="webglStatus">检测中...</div>
+                    </div>
+
+                    <!-- <div class="detection-item advanced" id="performanceCheck">
+                        <div class="detection-header">
+                            <i class="fas fa-tachometer-alt detection-icon"></i>
+                            <strong>性能指标异常检测</strong>
+                            <span class="risk-level risk-medium">中风险</span>
+                        </div>
+                        <p>检测异常的页面加载时间和性能数据。</p>
+                        <div class="status" id="performanceStatus">检测中...</div>
+                    </div> -->
+
+                    <div class="detection-item advanced" id="iframeCheck">
+                        <div class="detection-header">
+                            <i class="fas fa-square detection-icon"></i>
+                            <strong>iframe沙箱检测</strong>
+                            <span class="risk-level risk-medium">中风险</span>
+                        </div>
+                        <p>检测iframe隔离异常，自动化工具可能不会正确实现iframe隔离。</p>
+                        <div class="status" id="iframeStatus">检测中...</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="tab-content" id="behavior-tab">
+                <h2>人类行为检测 <span class="counter">(分析用户交互模式)</span></h2>
+
+                <div class="result-box">
+                    <div class="detection-item" id="mousePatternCheck">
+                        <div class="detection-header">
+                            <i class="fas fa-mouse-pointer detection-icon"></i>
+                            <strong>鼠标移动模式检测</strong>
+                            <span class="risk-level risk-high">高风险</span>
+                        </div>
+                        <p>分析鼠标移动轨迹识别自动化工具。人类鼠标移动有自然的曲线和变化。</p>
+                        <div class="status" id="mousePatternStatus">移动鼠标开始检测...</div>
+                        <div class="counter" id="mouseEventCount">已记录鼠标事件: 0</div>
+                    </div>
+
+                    <div class="detection-item" id="audioContextCheck">
+                        <div class="detection-header">
+                            <i class="fas fa-volume-up detection-icon"></i>
+                            <strong>AudioContext检测</strong>
+                            <span class="risk-level risk-medium">中风险</span>
+                        </div>
+                        <p>自动化浏览器可能没有正确的AudioContext实现。</p>
+                        <div class="status" id="audioContextStatus">检测中...</div>
+                    </div>
+
+                    <div class="detection-item" id="chromeRuntimeCheck">
+                        <div class="detection-header">
+                            <i class="fas fa-cogs detection-icon"></i>
+                            <strong>Chrome运行时检测</strong>
+                            <span class="risk-level risk-medium">中风险</span>
+                        </div>
+                        <p>检测自动化浏览器特有的Chrome运行时特征。</p>
+                        <div class="status" id="chromeRuntimeStatus">检测中...</div>
+                    </div>
+                </div>
+
+                <div class="human-test-area">
+                    <h3>交互测试</h3>
+                    <p>点击下面的按钮测试人类交互模式。自动化脚本通常有可预测的点击模式。</p>
+                    <button class="test-button" id="humanTest">点击我测试</button>
+                    <div class="test-result" id="humanTestResult"></div>
+                    <div class="counter" id="clickCounter">点击次数: 0</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="control-section">
+            <h2>控制面板</h2>
+
+            <button class="info-button" id="showMethodsBtn">
+                <i class="fas fa-info-circle"></i> 查看检测方法说明
+            </button>
+
+            <div class="control-buttons">
+                <button class="control-button" id="startDetectionBtn">
+                    <i class="fas fa-play"></i> 开始检测
+                </button>
+                <button class="control-button" id="resetDetectionBtn">
+                    <i class="fas fa-redo"></i> 重新检测
+                </button>
+                <button class="control-button" id="exportLogBtn">
+                    <i class="fas fa-download"></i> 导出日志
+                </button>
+                <button class="control-button" id="clearLogBtn">
+                    <i class="fas fa-trash"></i> 清除日志
+                </button>
+            </div>
+
+            <div class="log-panel">
+                <div class="log-header">
+                    <h3>检测日志</h3>
+                    <span class="counter" id="logCount">日志: 0</span>
+                </div>
+                <div class="log-content" id="logContent">
+                    <!-- 日志内容将动态添加 -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="overall-result">
+        <h2>总体检测结果</h2>
+        <p>基于17种检测方法，您的浏览器被判定为：</p>
+        <div class="result-text" id="overallResult">等待检测...</div>
+        <div class="confidence-meter">
+            <div class="confidence-fill" id="confidenceFill" style="width: 0%"></div>
+        </div>
+        <p id="resultExplanation">点击"开始检测"按钮开始分析浏览器特征</p>
+        <div class="counter" id="detectionCounter">检测进度: 0/17</div>
+    </div>
+
+    <footer>
+        <p>© 2023 Selenium检测工具 | 仅供教育目的 | 注意：没有任何检测方法是100%准确的</p>
+        <p>检测结果可能因浏览器版本和自动化工具的配置而有所不同</p>
+    </footer>
+</div>
+
+<!-- 检测方法说明模态框 -->
+<div class="modal-overlay" id="methodsModal">
+    <div class="modal-content">
+        <button class="modal-close" id="closeModalBtn">&times;</button>
+        <h2>检测方法说明</h2>
+        <p>Selenium、Puppeteer等自动化工具会在浏览器中留下可检测的痕迹，以下是本工具使用的检测方法：</p>
+
+        <div class="method-list">
+            <h3>基础检测方法 <span class="highlight">(检测明显的自动化特征)</span></h3>
+
+            <div class="method-item basic">
+                <strong>1. WebDriver 属性检测</strong>
+                <p>自动化浏览器通常会在 <span class="highlight">navigator.webdriver</span> 属性中返回 <span class="highlight">true</span>，而普通浏览器返回 <span class="highlight">undefined</span> 或 <span class="highlight">false</span>。</p>
+            </div>
+
+            <div class="method-item basic">
+                <strong>2. 插件列表检测</strong>
+                <p>自动化浏览器可能：返回空的插件列表、缺少常见的浏览器插件、插件列表包含自动化工具特有的项目。</p>
+            </div>
+
+            <div class="method-item basic">
+                <strong>3. 窗口属性检测</strong>
+                <p>Selenium会在window对象上添加属性如：<span class="highlight">_Selenium_IDE_Recorder</span>、<span class="highlight">callPhantom</span>、<span class="highlight">__webdriver_script_fn</span>等。</p>
+            </div>
+
+            <div class="method-item basic">
+                <strong>4. 权限检测</strong>
+                <p>检查浏览器是否支持某些功能，或权限状态是否异常：检查Notification权限、检测Chrome自动化扩展、检查浏览器驱动特征。</p>
+            </div>
+
+            <h3>高级检测方法 <span class="advanced-highlight">(检测隐藏的自动化特征)</span></h3>
+
+            <div class="method-item advanced">
+                <strong>1. Chrome自动化扩展检测</strong>
+                <p>检测Chrome自动化扩展和修改的API，自动化浏览器经常修改Chrome API来隐藏自身。</p>
+            </div>
+
+            <div class="method-item advanced">
+                <strong>2. Chrome DevTools Protocol检测</strong>
+                <p>检测CDP连接痕迹，这是大多数自动化工具使用的底层协议。</p>
+            </div>
+
+            <div class="method-item advanced">
+                <strong>3. DOM API补丁检测</strong>
+                <p>自动化工具经常重写DOM API来隐藏自己，检测这些修改可以识别自动化。</p>
+            </div>
+
+            <div class="method-item advanced">
+                <strong>4. WebGL供应商检测</strong>
+                <p>自动化环境通常使用虚拟GPU如 <span class="highlight">LLVMPipe</span>、<span class="highlight">SwiftShader</span>，而真实浏览器使用硬件GPU。</p>
+            </div>
+
+            <div class="method-item advanced">
+                <strong>5. 性能指标异常检测</strong>
+                <p>自动化工具模拟的页面加载时间往往异常，或缺少真实的性能时间戳。</p>
+            </div>
+
+            <div class="method-item advanced">
+                <strong>6. iframe沙箱检测</strong>
+                <p>自动化工具可能不会正确实现iframe的隔离，通过检测iframe异常行为识别自动化。</p>
+            </div>
+
+            <h3>行为检测方法 <span class="highlight">(分析用户交互模式)</span></h3>
+
+            <div class="method-item behavior">
+                <strong>1. 鼠标移动模式分析</strong>
+                <p>人类鼠标移动有自然的曲线和随机变化，而自动化工具通常产生直线或过于规律的移动。</p>
+            </div>
+
+            <div class="method-item behavior">
+                <strong>2. AudioContext检测</strong>
+                <p>自动化浏览器可能没有正确的AudioContext实现或实现不完整。</p>
+            </div>
+
+            <div class="method-item behavior">
+                <strong>3. Chrome运行时检测</strong>
+                <p>检测自动化浏览器特有的Chrome运行时特征，如特定的扩展ID或配置。</p>
+            </div>
+
+            <div class="method-item behavior">
+                <strong>4. 交互模式检测</strong>
+                <p>通过分析点击间隔、点击位置等交互模式识别自动化脚本。</p>
+            </div>
+        </div>
+
+        <h3>如何避免被检测？</h3>
+        <p>自动化工具可以通过以下方式尝试规避检测：</p>
+        <ul>
+            <li>使用无头浏览器检测规避插件</li>
+            <li>修改WebDriver标志（ChromeOptions）</li>
+            <li>模拟人类鼠标移动和点击模式</li>
+            <li>随机化请求间隔和浏览行为</li>
+            <li>使用真实浏览器的用户代理和插件配置</li>
+            <li>禁用自动化扩展特征</li>
+        </ul>
+        <p><strong>注意：</strong>随着检测技术发展，完全规避检测变得越来越困难。</p>
+    </div>
+</div>
+
+<script>
+    // ============================================================================
+    // 全局变量和配置
+    // ============================================================================
+
+    // 检测结果存储
+    const detectionResults = {
+        // 基础检测
+        webdriver: false,
+        plugins: false,
+        languages: false,
+        windowProps: false,
+        permissions: false,
+
+        // 高级检测
+        chromeAutomation: false,
+        cdpDetected: false,
+        automationPatch: false,
+        iframeDetection: false,
+        webglVendor: false,
+        performanceMetrics: false,
+        audioContext: false,
+        chromeRuntime: false,
+
+        // 行为检测
+        humanTest: false,
+        mouseMovement: false
+    };
+
+    // 检测状态变量
+    let humanTestClickCount = 0;
+    let humanTestStartTime = null;
+    let humanTestLastClickTime = null;
+    let mouseEvents = [];
+    let mouseEventCount = 0;
+    let completedDetections = 0;
+    const totalDetections = Object.keys(detectionResults).length - 2;
+    let detectionInProgress = false;
+    let logEntries = [];
+
+    // ============================================================================
+    // 日志系统
+    // ============================================================================
+
+    /**
+     * 添加日志条目
+     * @param {string} message - 日志消息
+     * @param {string} type - 日志类型: info, warn, error, success
+     */
+    function addLog(message, type = 'info') {
+        const timestamp = new Date().toLocaleTimeString();
+        const logEntry = {
+            time: timestamp,
+            message: message,
+            type: type
+        };
+
+        logEntries.push(logEntry);
+
+        // 更新日志显示
+        const logContent = document.getElementById('logContent');
+        const logEntryElement = document.createElement('div');
+        logEntryElement.className = `log-entry log-${type}`;
+        logEntryElement.innerHTML = `<span class="log-time">[${timestamp}]</span> ${message}`;
+
+        logContent.appendChild(logEntryElement);
+
+        // 自动滚动到底部
+        logContent.scrollTop = logContent.scrollHeight;
+
+        // 更新日志计数
+        document.getElementById('logCount').textContent = `日志: ${logEntries.length}`;
+
+        // 同时在控制台输出
+        const consoleMethod = type === 'error' ? 'error' :
+                             type === 'warn' ? 'warn' :
+                             type === 'success' ? 'log' : 'info';
+        console[consoleMethod](`[${timestamp}] ${message}`);
+    }
+
+    // ============================================================================
+    // 高级检测器类
+    // ============================================================================
+
+    class AdvancedSeleniumDetector {
+
+        /**
+         * 检测Chrome自动化扩展
+         * @returns {boolean} 是否检测到自动化特征
+         */
+        detectChromeAutomation() {
+            try {
+                addLog('开始检测Chrome自动化扩展...', 'info');
+
+                // 检测Chrome自动化扩展
+                const isAutomationControlled =
+                    // 检查是否存在自动化相关属性
+                    window.chrome &&
+                    window.chrome.webstore &&
+                    typeof window.chrome.webstore.install === 'function' &&
+                    // 自动化浏览器中这个函数可能被修改
+                    window.chrome.webstore.install.toString().includes('[native code]') === false;
+                if (isAutomationControlled) {
+                    addLog('检测到Chrome自动化扩展特征', 'warn');
+                    return true;
+                }
+                // 检查Chrome的自动化标志
+                let automationFlag = window.navigator.webdriver === true;
+                if (automationFlag) {
+                    addLog('检测到Chrome自动化标识特征1', 'warn');
+                    return true;
+                }
+                automationFlag = Object.getOwnPropertyDescriptor(navigator.__proto__, 'webdriver') !== undefined;
+                if (automationFlag) {
+                    addLog('检测到Chrome自动化标识特征2', 'warn');
+                    return true;
+                }
+                automationFlag = window.navigator.__proto__.webdriver === true;
+                if (automationFlag) {
+                    addLog('检测到Chrome自动化标识特征3', 'warn');
+                    return true;
+                }
+                return result;
+            } catch (e) {
+                addLog(`Chrome自动化扩展检测出错: ${e.message}`, 'error');
+                return false;
+            }
+        }
+
+        /**
+         * 检测Chrome DevTools Protocol (CDP) 痕迹
+         * @returns {boolean} 是否检测到CDP痕迹
+         */
+        detectCDP() {
+            try {
+                addLog('开始检测Chrome DevTools Protocol痕迹...', 'info');
+
+                // 检查是否存在CDP相关函数
+                const cdpIndicators = [
+                    'chrome.debugger',
+                    'chrome.devtools',
+                    '__chromeDevToolsProtocol'
+                ];
+
+                let detected = false;
+
+                // 检查全局对象
+                cdpIndicators.forEach(indicator => {
+                    try {
+                        if (eval(`typeof ${indicator}`) !== 'undefined') {
+                            detected = true;
+                            addLog(`检测到CDP指示器: ${indicator}`, 'warn');
+                        }
+                    } catch (e) {
+                        // 忽略错误
+                    }
+                });
+
+                if (detected) {
+                    addLog('检测到CDP连接痕迹', 'warn');
+                } else {
+                    addLog('未检测到CDP连接痕迹', 'success');
+                }
+
+                return detected;
+            } catch (e) {
+                addLog(`CDP检测出错: ${e.message}`, 'error');
+                return false;
+            }
+        }
+
+        /**
+         * 检测被修改的DOM属性
+         * @returns {boolean} 是否检测到DOM补丁
+         */
+        detectPatchedDOM() {
+            try {
+                addLog('开始检测DOM API补丁...', 'info');
+
+                // 检查常见的被自动化工具修改的属性
+                const properties = [
+                    'document.createElement',
+                    'document.querySelector',
+                    'window.navigator.userAgent',
+                    'window.navigator.platform',
+                    'window.navigator.languages'
+                ];
+
+                for (const prop of properties) {
+                    try {
+                        const value = eval(prop);
+
+                        // 检查函数是否被重写
+                        if (typeof value === 'function') {
+                            const funcStr = value.toString();
+                            // 如果函数被包装或修改
+                            if (!funcStr.includes('[native code]') &&
+                                funcStr.length > 1000) { // 重写的函数通常很长
+                                addLog(`检测到DOM API补丁: ${prop}`, 'warn');
+                                return true;
+                            }
+                        }
+                    } catch (e) {
+                        // 忽略错误
+                    }
+                }
+
+                addLog('未检测到DOM API补丁', 'success');
+                return false;
+            } catch (e) {
+                addLog(`DOM补丁检测出错: ${e.message}`, 'error');
+                return false;
+            }
+        }
+
+        /**
+         * iframe沙箱检测
+         * @returns {Promise<boolean>} 是否检测到iframe异常
+         */
+        detectIframeSandbox() {
+            return new Promise((resolve) => {
+                try {
+                    addLog('开始检测iframe沙箱异常...', 'info');
+
+                    const iframe = document.createElement('iframe');
+                    iframe.style.display = 'none';
+                    document.body.appendChild(iframe);
+
+                    // 尝试访问iframe内容
+                    setTimeout(() => {
+                        try {
+                            // 在自动化环境中，iframe可能有不同的行为
+                            const iframeDoc = iframe.contentDocument || iframe.contentWindow.document;
+
+                            // 检查iframe是否被正确隔离
+                            if (iframeDoc && iframeDoc.createElement) {
+                                const testElement = iframeDoc.createElement('div');
+                                // 自动化工具可能不会正确实现iframe的隔离
+                                if (testElement.constructor.name !== 'HTMLDivElement') {
+                                    addLog('检测到iframe沙箱异常', 'warn');
+                                    resolve(true);
+                                    return;
+                                }
+                            }
+
+                            addLog('iframe沙箱正常', 'success');
+                            resolve(false);
+                        } catch (e) {
+                            // 如果访问iframe抛出异常，可能是自动化环境
+                            addLog('检测到iframe沙箱异常: 访问被阻止', 'warn');
+                            resolve(true);
+                        } finally {
+                            document.body.removeChild(iframe);
+                        }
+                    }, 100);
+                } catch (e) {
+                    addLog(`iframe检测出错: ${e.message}`, 'error');
+                    resolve(false);
+                }
+            });
+        }
+
+        /**
+         * WebGL供应商检测
+         * @returns {boolean} 是否检测到虚拟GPU
+         */
+        detectWebGLVendor() {
+            try {
+                addLog('开始检测WebGL供应商...', 'info');
+
+                const canvas = document.createElement('canvas');
+                const gl = canvas.getContext('webgl') || canvas.getContext('experimental-webgl');
+
+                if (!gl) {
+                    addLog('浏览器不支持WebGL，跳过检测', 'info');
+                    return false;
+                }
+
+                const debugInfo = gl.getExtension('WEBGL_debug_renderer_info');
+                if (debugInfo) {
+                    const vendor = gl.getParameter(debugInfo.UNMASKED_VENDOR_WEBGL);
+                    const renderer = gl.getParameter(debugInfo.UNMASKED_RENDERER_WEBGL);
+
+                    // 检查虚拟GPU或自动化环境特有的渲染器
+                    const virtualGPUs = [
+                        'llvmpipe',
+                        'swiftshader',
+                        'software',
+                        'virtualbox',
+                        'vmware',
+                        'parallels'
+                    ];
+
+                    const vendorStr = (vendor + ' ' + renderer).toLowerCase();
+                    const isVirtual = virtualGPUs.some(gpu => vendorStr.includes(gpu));
+
+                    if (isVirtual) {
+                        addLog(`检测到虚拟GPU: ${vendor} - ${renderer}`, 'warn');
+                    } else {
+                        addLog(`WebGL供应商正常: ${vendor} - ${renderer}`, 'success');
+                    }
+
+                    return isVirtual;
+                }
+
+                addLog('无法获取WebGL调试信息', 'info');
+                return false;
+            } catch (e) {
+                addLog(`WebGL检测出错: ${e.message}`, 'error');
+                return false;
+            }
+        }
+
+        /**
+         * 性能指标检测
+         * @returns {boolean} 是否检测到性能异常
+         */
+        detectPerformanceMetrics() {
+            try {
+                addLog('开始检测性能指标异常...', 'info');
+
+                if (!window.performance || !window.performance.timing) {
+                    addLog('浏览器不支持Performance API，跳过检测', 'info');
+                    return false;
+                }
+
+                const timing = performance.timing;
+
+                // 检查时间戳是否合理
+                const navigationStart = timing.navigationStart;
+                const loadEventEnd = timing.loadEventEnd;
+
+                // 如果时间戳为0或异常，可能是自动化环境
+                if (navigationStart === 0 || loadEventEnd === 0) {
+                    addLog('检测到异常性能时间戳', 'warn');
+                    return true;
+                }
+
+                // 检查页面加载时间是否异常短（自动化工具可能模拟快速加载）
+                const loadTime = loadEventEnd - navigationStart;
+                if (loadTime > 0 && loadTime < 100) {
+                    // 页面加载时间小于100ms，可能是自动化环境
+                    addLog(`检测到异常页面加载时间: ${loadTime}ms`, 'warn');
+                    return true;
+                }
+
+                addLog(`页面加载时间正常: ${loadTime}ms`, 'success');
+                return false;
+            } catch (e) {
+                addLog(`性能指标检测出错: ${e.message}`, 'error');
+                return false;
+            }
+        }
+
+       /**
+         * AudioContext检测
+         * @returns {boolean} 是否检测到AudioContext异常
+         */
+        detectAudioContext() {
+            try {
+                addLog('开始检测AudioContext...', 'info');
+
+                // 检查是否支持 AudioContext
+                if (!window.AudioContext && !window.webkitAudioContext) {
+                    addLog('浏览器不支持AudioContext，跳过检测', 'info');
+                    return false;
+                }
+
+                const AudioContext = window.AudioContext || window.webkitAudioContext;
+                let context = null;
+                let oscillator = null;
+
+                try {
+                    // 尝试创建 AudioContext
+                    context = new AudioContext();
+                    
+                    // 检查基础属性和方法
+                    const hasCreateOscillator = typeof context.createOscillator === 'function';
+                    const hasCreateBuffer = typeof context.createBuffer === 'function';
+                    const hasCreateGain = typeof context.createGain === 'function';
+                    
+                    if (!hasCreateOscillator || !hasCreateBuffer || !hasCreateGain) {
+                        addLog('AudioContext 缺少基础方法', 'warn');
+                        return true; // 异常
+                    }
+                    
+                    // 创建 Oscillator 但不需要启动它
+                    oscillator = context.createOscillator();
+                    
+                    // 检查 Oscillator 的基本属性
+                    const hasFrequency = oscillator.frequency !== undefined;
+                    const hasType = oscillator.type !== undefined;
+                    const hasStartMethod = typeof oscillator.start === 'function';
+                    const hasStopMethod = typeof oscillator.stop === 'function';
+                    const hasConnectMethod = typeof oscillator.connect === 'function';
+                    const hasDisconnectMethod = typeof oscillator.disconnect === 'function';
+                    
+                    // 自动化浏览器可能缺少这些方法或属性
+                    if (!hasFrequency || !hasType || !hasStartMethod || !hasStopMethod || 
+                        !hasConnectMethod || !hasDisconnectMethod) {
+                        addLog('OscillatorNode 缺少必要方法或属性', 'warn');
+                        return true; // 异常
+                    }
+                    
+                    // 检查频率参数是否可设置
+                    try {
+                        oscillator.frequency.value = 440; // 尝试设置频率
+                        if (oscillator.frequency.value !== 440) {
+                            addLog('无法设置 Oscillator 频率', 'warn');
+                            return true; // 异常
+                        }
+                    } catch (e) {
+                        addLog('设置频率失败: ' + e.message, 'warn');
+                        return true; // 异常
+                    }
+                    
+                    // 检查 connect 方法是否正常工作
+                    try {
+                        const gainNode = context.createGain();
+                        oscillator.connect(gainNode);
+                        oscillator.disconnect();
+                    } catch (e) {
+                        addLog('连接/断开节点失败: ' + e.message, 'warn');
+                        return true; // 异常
+                    }
+                    
+                    // 额外检测：自动化浏览器可能在 AudioContext 上缺少某些方法
+                    const requiredContextMethods = [
+                        'createBufferSource',
+                        'createMediaElementSource',
+                        'createMediaStreamSource',
+                        'createAnalyser',
+                        'createScriptProcessor'
+                    ];
+                    
+                    for (const methodName of requiredContextMethods) {
+                        if (typeof context[methodName] !== 'function') {
+                            addLog(`AudioContext 缺少 ${methodName} 方法`, 'warn');
+                            return true; // 异常
+                        }
+                    }
+                    
+                    addLog('AudioContext 正常', 'success');
+                    return false; // 正常
+                    
+                } finally {
+                    // 清理资源
+                    try {
+                        if (oscillator) {
+                            // 如果已经调用了 start，才需要调用 stop
+                            // 但我们没有调用 start，所以不需要
+                            oscillator.disconnect();
+                        }
+                        if (context && context.state !== 'closed') {
+                            context.close();
+                        }
+                    } catch (e) {
+                        // 忽略清理错误
+                    }
+                }
+                
+            } catch (e) {
+                // 创建 AudioContext 失败可能是自动化环境
+                addLog(`AudioContext检测出错: ${e.message}`, 'error');
+                return true; // 异常
+            }
+        }
+
+        /**
+         * Chrome运行时检测
+         * @returns {boolean} 是否检测到Chrome运行时异常
+         */
+        detectChromeRuntime() {
+            try {
+                addLog('开始检测Chrome运行时...', 'info');
+
+                if (!window.chrome || !window.chrome.runtime) {
+                    addLog('非Chrome浏览器或Chrome运行时不可用', 'info');
+                    return false;
+                }
+
+                // 尝试获取运行时ID
+                const runtimeId = chrome.runtime.id;
+
+                // 自动化浏览器可能有特定的运行时ID模式
+                if (runtimeId) {
+                    // 检查ID是否包含自动化关键词
+                    const automationKeywords = [
+                        'webdriver',
+                        'automation',
+                        'selenium',
+                        'chromedriver',
+                        'headless'
+                    ];
+
+                    const idStr = runtimeId.toLowerCase();
+                    const isAutomation = automationKeywords.some(keyword => idStr.includes(keyword));
+
+                    if (isAutomation) {
+                        addLog(`检测到自动化运行时ID: ${runtimeId}`, 'warn');
+                    } else {
+                        addLog(`Chrome运行时ID正常: ${runtimeId}`, 'success');
+                    }
+
+                    return isAutomation;
+                }
+
+                addLog('Chrome运行时正常', 'success');
+                return false;
+            } catch (e) {
+                addLog(`Chrome运行时检测出错: ${e.message}`, 'error');
+                return false;
+            }
+        }
+    }
+
+    // ============================================================================
+    // 基础检测方法
+    // ============================================================================
+
+    /**
+     * 1. WebDriver 检测
+     */
+    function checkWebDriver() {
+        const webdriverCheck = document.getElementById('webdriverCheck');
+        const webdriverStatus = document.getElementById('webdriverStatus');
+
+        addLog('开始WebDriver属性检测...', 'info');
+
+        // 标准WebDriver检测
+        const hasWebDriver = navigator.webdriver === true;
+
+        // 额外检查：某些自动化浏览器会隐藏webdriver属性，但仍有其他痕迹
+        let extraChecks = false;
+
+        // 检查是否可以通过其他方式检测到自动化
+        try {
+            // 尝试检测通过CDP（Chrome DevTools Protocol）控制的浏览器
+            if (window.domAutomation || window.domAutomationController) {
+                extraChecks = true;
+                addLog('检测到domAutomation或domAutomationController', 'warn');
+            }
+
+            // 检查是否有被覆盖的属性
+            const originalGetter = Object.getOwnPropertyDescriptor(navigator, 'webdriver')?.get;
+            if (originalGetter && originalGetter.toString().includes('webdriver')) {
+                extraChecks = true;
+                addLog('检测到被覆盖的webdriver属性', 'warn');
+            }
+        } catch(e) {
+            // 忽略错误
+        }
+
+        detectionResults.webdriver = hasWebDriver || extraChecks;
+
+        if (detectionResults.webdriver) {
+            webdriverCheck.classList.add('detected');
+            webdriverCheck.classList.remove('clean');
+            webdriverStatus.textContent = '检测到自动化特征';
+            webdriverStatus.className = 'status detected';
+            addLog('WebDriver检测: 检测到自动化特征', 'warn');
+        } else {
+            webdriverCheck.classList.add('clean');
+            webdriverCheck.classList.remove('detected');
+            webdriverStatus.textContent = '未检测到WebDriver';
+            webdriverStatus.className = 'status clean';
+            addLog('WebDriver检测: 未检测到自动化特征', 'success');
+        }
+
+        updateDetectionProgress();
+    }
+
+    /**
+     * 2. 插件检测
+     */
+    function checkPlugins() {
+        const pluginsCheck = document.getElementById('pluginsCheck');
+        const pluginsStatus = document.getElementById('pluginsStatus');
+
+        addLog('开始插件列表检测...', 'info');
+
+        const plugins = navigator.plugins;
+        let isSuspicious = false;
+
+        // 检查插件列表是否异常
+        if (!plugins || plugins.length === 0) {
+            // 无插件可能是自动化浏览器
+            isSuspicious = true;
+            addLog('插件列表为空，可能是自动化浏览器', 'warn');
+        } else {
+            // 检查是否有常见的自动化相关插件
+            const pluginNames = Array.from(plugins).map(p => p.name.toLowerCase());
+
+            // 自动化浏览器可能包含特定插件或缺少常见插件
+            const commonPlugins = ['chrome pdf viewer', 'native client', 'widevine content decryption module'];
+            const hasCommonPlugins = commonPlugins.some(plugin =>
+                pluginNames.some(name => name.includes(plugin))
+            );
+
+            // 如果缺少常见插件，可能是自动化浏览器
+            if (!hasCommonPlugins && plugins.length < 3) {
+                isSuspicious = true;
+                addLog(`缺少常见插件，插件数量: ${plugins.length}`, 'warn');
+            }
+
+            // 检查是否有自动化相关插件名称
+            const automationKeywords = ['webdriver', 'selenium', 'puppeteer', 'automation'];
+            const hasAutomationPlugins = automationKeywords.some(keyword =>
+                pluginNames.some(name => name.includes(keyword))
+            );
+
+            if (hasAutomationPlugins) {
+                isSuspicious = true;
+                addLog(`检测到自动化相关插件: ${pluginNames.join(', ')}`, 'warn');
+            } else {
+                addLog(`插件列表正常: ${pluginNames.join(', ')}`, 'success');
+            }
+        }
+
+        detectionResults.plugins = isSuspicious;
+
+        if (detectionResults.plugins) {
+            pluginsCheck.classList.add('detected');
+            pluginsCheck.classList.remove('clean');
+            pluginsStatus.textContent = '插件列表异常';
+            pluginsStatus.className = 'status detected';
+            addLog('插件检测: 检测到异常', 'warn');
+        } else {
+            pluginsCheck.classList.add('clean');
+            pluginsCheck.classList.remove('detected');
+            pluginsStatus.textContent = '插件列表正常';
+            pluginsStatus.className = 'status clean';
+            addLog('插件检测: 正常', 'success');
+        }
+
+        updateDetectionProgress();
+    }
+
+    /**
+     * 3. 语言检测
+     */
+    function checkLanguages() {
+        const languagesCheck = document.getElementById('languagesCheck');
+        const languagesStatus = document.getElementById('languagesStatus');
+
+        addLog('开始语言设置检测...', 'info');
+
+        const languages = navigator.languages || [navigator.language || navigator.userLanguage || navigator.browserLanguage];
+        let isSuspicious = false;
+
+        // 检查语言设置是否异常
+        if (!languages || languages.length === 0) {
+            isSuspicious = true;
+            addLog('语言设置为空', 'warn');
+        } else {
+            // 自动化浏览器有时有非标准的语言设置
+            // 例如，只有单一语言或语言顺序异常
+            if (languages.length === 1 && languages[0] === 'en-US') {
+                // 只有美式英语可能是默认的自动化设置
+                isSuspicious = true;
+                addLog('语言设置只有en-US，可能是自动化默认设置', 'warn');
+            }
+
+            // 检查是否有空字符串或无效语言代码
+            if (languages.some(lang => !lang || lang.trim() === '')) {
+                isSuspicious = true;
+                addLog('检测到空或无效语言代码', 'warn');
+            }
+
+            addLog(`语言设置: ${languages.join(', ')}`, 'info');
+        }
+
+        detectionResults.languages = isSuspicious;
+
+        if (detectionResults.languages) {
+            languagesCheck.classList.add('detected');
+            languagesCheck.classList.remove('clean');
+            languagesStatus.textContent = '语言设置异常';
+            languagesStatus.className = 'status detected';
+            addLog('语言检测: 检测到异常', 'warn');
+        } else {
+            languagesCheck.classList.add('clean');
+            languagesCheck.classList.remove('detected');
+            languagesStatus.textContent = '语言设置正常';
+            languagesStatus.className = 'status clean';
+            addLog('语言检测: 正常', 'success');
+        }
+
+        updateDetectionProgress();
+    }
+
+    /**
+     * 4. 窗口属性检测
+     */
+    function checkWindowProperties() {
+        const windowCheck = document.getElementById('windowCheck');
+        const windowStatus = document.getElementById('windowStatus');
+
+        addLog('开始窗口属性检测...', 'info');
+
+        let isSuspicious = false;
+        const automationProperties = [
+            '_Selenium_IDE_Recorder',
+            'callPhantom',
+            '__webdriver_script_fn',
+            '__driver_evaluate',
+            '__webdriver_evaluate',
+            '__selenium_evaluate',
+            '__fxdriver_evaluate',
+            '__driver_unwrapped',
+            '__webdriver_unwrapped',
+            '__selenium_unwrapped',
+            '__fxdriver_unwrapped',
+            '_phantom',
+            'callSelenium',
+            '_selenium',
+            'calledSelenium',
+            'webdriver',
+            'domAutomation',
+            'domAutomationController'
+        ];
+
+        // 检查是否存在任何自动化属性
+        for (const prop of automationProperties) {
+            if (prop in window) {
+                isSuspicious = true;
+                addLog(`检测到自动化属性: ${prop}`, 'warn');
+                break;
+            }
+        }
+
+        detectionResults.windowProps = isSuspicious;
+
+        if (detectionResults.windowProps) {
+            windowCheck.classList.add('detected');
+            windowCheck.classList.remove('clean');
+            windowStatus.textContent = '发现自动化属性';
+            windowStatus.className = 'status detected';
+            addLog('窗口属性检测: 检测到自动化属性', 'warn');
+        } else {
+            windowCheck.classList.add('clean');
+            windowCheck.classList.remove('detected');
+            windowStatus.textContent = '未发现自动化属性';
+            windowStatus.className = 'status clean';
+            addLog('窗口属性检测: 未发现自动化属性', 'success');
+        }
+
+        updateDetectionProgress();
+    }
+
+    /**
+     * 5. 权限检测
+     */
+    async function checkPermissions() {
+        const permissionsCheck = document.getElementById('permissionsCheck');
+        const permissionsStatus = document.getElementById('permissionsStatus');
+
+        addLog('开始权限检测...', 'info');
+
+        let isSuspicious = false;
+
+        // 检查Notification权限状态
+        if ('permissions' in navigator && 'query' in navigator.permissions) {
+            try {
+                const permissionStatus = await navigator.permissions.query({name: 'notifications'});
+                addLog(`Notification权限状态: ${permissionStatus.state}`, 'info');
+            } catch(e) {
+                // 如果查询失败，可能是自动化浏览器
+                isSuspicious = true;
+                addLog('权限查询失败，可能是自动化浏览器', 'warn');
+            }
+        } else {
+            addLog('浏览器不支持Permissions API', 'info');
+        }
+
+        // 检查是否存在自动化扩展特征
+        if (window.chrome && chrome.runtime && chrome.runtime.id) {
+            try {
+                // 某些自动化工具会加载特定扩展
+                const manifest = chrome.runtime.getManifest();
+                if (manifest && manifest.name) {
+                    const name = manifest.name.toLowerCase();
+                    if (name.includes('webdriver') || name.includes('automation') || name.includes('selenium')) {
+                        isSuspicious = true;
+                        addLog(`检测到自动化扩展: ${manifest.name}`, 'warn');
+                    } else {
+                        addLog(`Chrome扩展名称: ${manifest.name}`, 'info');
+                    }
+                }
+            } catch(e) {
+                // 忽略错误
+            }
+        }
+
+        detectionResults.permissions = isSuspicious;
+
+        if (detectionResults.permissions) {
+            permissionsCheck.classList.add('detected');
+            permissionsCheck.classList.remove('clean');
+            permissionsStatus.textContent = '权限配置异常';
+            permissionsStatus.className = 'status detected';
+            addLog('权限检测: 检测到异常', 'warn');
+        } else {
+            permissionsCheck.classList.add('clean');
+            permissionsCheck.classList.remove('detected');
+            permissionsStatus.textContent = '权限配置正常';
+            permissionsStatus.className = 'status clean';
+            addLog('权限检测: 正常', 'success');
+        }
+
+        updateDetectionProgress();
+    }
+
+    // ============================================================================
+    // 行为检测方法
+    // ============================================================================
+
+    /**
+     * 设置鼠标移动检测
+     */
+    function setupMouseDetection() {
+        const mousePatternCheck = document.getElementById('mousePatternCheck');
+        const mousePatternStatus = document.getElementById('mousePatternStatus');
+        const mouseEventCountElement = document.getElementById('mouseEventCount');
+
+        addLog('开始鼠标移动模式检测，请移动鼠标...', 'info');
+
+        let startTime = Date.now();
+        let lastMoveTime = startTime;
+
+        const recordMouseEvent = (e) => {
+            const currentTime = Date.now();
+            const timeSinceLastMove = currentTime - lastMoveTime;
+
+            mouseEvents.push({
+                type: e.type,
+                x: e.clientX,
+                y: e.clientY,
+                time: currentTime - startTime,
+                timeSinceLastMove: timeSinceLastMove
+            });
+
+            mouseEventCount++;
+            mouseEventCountElement.textContent = `已记录鼠标事件: ${mouseEventCount}`;
+            lastMoveTime = currentTime;
+
+            // 当收集到足够数据时进行分析
+            if (mouseEventCount >= 20) {
+                analyzeMousePattern();
+            }
+        };
+
+        // 监听鼠标事件
+        document.addEventListener('mousemove', recordMouseEvent);
+        document.addEventListener('mousedown', recordMouseEvent);
+        document.addEventListener('mouseup', recordMouseEvent);
+
+        // 分析鼠标模式
+        function analyzeMousePattern() {
+            if (mouseEventCount < 10) return;
+
+            addLog(`分析鼠标移动模式，已收集 ${mouseEvents.length} 个事件`, 'info');
+
+            let suspiciousPatterns = 0;
+
+            // 1. 检查移动轨迹是否过于直线
+            const moveEvents = mouseEvents.filter(e => e.type === 'mousemove');
+            if (moveEvents.length >= 3) {
+                let totalAngleChange = 0;
+                let angleChangeCount = 0;
+
+                for (let i = 1; i < moveEvents.length - 1; i++) {
+                    const prev = moveEvents[i-1];
+                    const curr = moveEvents[i];
+                    const next = moveEvents[i+1];
+
+                    const dx1 = curr.x - prev.x;
+                    const dy1 = curr.y - prev.y;
+                    const dx2 = next.x - curr.x;
+                    const dy2 = next.y - curr.y;
+
+                    // 计算角度变化
+                    if (Math.abs(dx1) > 1 || Math.abs(dy1) > 1) {
+                        const angle1 = Math.atan2(dy1, dx1);
+                        const angle2 = Math.atan2(dy2, dx2);
+                        let angleChange = Math.abs(angle2 - angle1);
+
+                        // 规范化角度变化到 0 到 π 之间
+                        if (angleChange > Math.PI) {
+                            angleChange = 2 * Math.PI - angleChange;
+                        }
+
+                        totalAngleChange += angleChange;
+                        angleChangeCount++;
+                    }
+                }
+
+                if (angleChangeCount > 0) {
+                    const avgAngleChange = totalAngleChange / angleChangeCount;
+                    // 人类鼠标移动通常有角度变化，自动化工具可能移动过于直线
+                    if (avgAngleChange < 0.1) {
+                        suspiciousPatterns++;
+                        addLog(`鼠标移动角度变化过小: ${avgAngleChange.toFixed(4)}`, 'warn');
+                    } else {
+                        addLog(`鼠标移动角度变化正常: ${avgAngleChange.toFixed(4)}`, 'info');
+                    }
+                }
+            }
+
+            // 2. 检查移动速度是否过于均匀
+            if (moveEvents.length >= 5) {
+                let timeDiffs = [];
+                for (let i = 1; i < moveEvents.length; i++) {
+                    timeDiffs.push(moveEvents[i].timeSinceLastMove);
+                }
+
+                // 计算时间差异的方差
+                const mean = timeDiffs.reduce((a, b) => a + b) / timeDiffs.length;
+                const variance = timeDiffs.reduce((a, b) => a + Math.pow(b - mean, 2), 0) / timeDiffs.length;
+
+                addLog(`鼠标移动时间间隔方差: ${variance.toFixed(2)}`, 'info');
+
+                // 人类鼠标移动的时间间隔通常有变化，自动化工具可能过于均匀
+                if (variance < 10) {
+                    suspiciousPatterns++;
+                    addLog('鼠标移动时间间隔过于均匀', 'warn');
+                }
+            }
+
+            detectionResults.mouseMovement = suspiciousPatterns >= 1;
+
+            if (detectionResults.mouseMovement) {
+                mousePatternCheck.classList.add('detected');
+                mousePatternCheck.classList.remove('clean');
+                mousePatternStatus.textContent = '检测到自动化鼠标模式';
+                mousePatternStatus.className = 'status detected';
+                addLog('鼠标移动检测: 检测到自动化模式', 'warn');
+            } else {
+                mousePatternCheck.classList.add('clean');
+                mousePatternCheck.classList.remove('detected');
+                mousePatternStatus.textContent = '鼠标移动模式正常';
+                mousePatternStatus.className = 'status clean';
+                addLog('鼠标移动检测: 正常人类模式', 'success');
+            }
+
+            // 移除事件监听器
+            document.removeEventListener('mousemove', recordMouseEvent);
+            document.removeEventListener('mousedown', recordMouseEvent);
+            document.removeEventListener('mouseup', recordMouseEvent);
+
+            updateDetectionProgress();
+        }
+
+        // 设置超时，如果用户没有移动鼠标，也进行分析
+        setTimeout(() => {
+            if (mouseEventCount < 5) {
+                // 几乎没有鼠标移动，可能是自动化
+                detectionResults.mouseMovement = true;
+                mousePatternCheck.classList.add('detected');
+                mousePatternCheck.classList.remove('clean');
+                mousePatternStatus.textContent = '鼠标活动异常稀少';
+                mousePatternStatus.className = 'status detected';
+                addLog('鼠标活动异常稀少，可能是自动化', 'warn');
+                updateDetectionProgress();
+            }
+        }, 5000);
+    }
+
+    /**
+     * 设置人类行为测试
+     */
+    function setupHumanTest() {
+        const humanTestButton = document.getElementById('humanTest');
+        const humanTestResult = document.getElementById('humanTestResult');
+        const clickCounter = document.getElementById('clickCounter');
+
+        addLog('交互测试准备就绪，请点击测试按钮', 'info');
+
+        humanTestButton.addEventListener('click', function(e) {
+            humanTestClickCount++;
+            clickCounter.textContent = `点击次数: ${humanTestClickCount}`;
+            const currentTime = Date.now();
+
+            if (humanTestClickCount === 1) {
+                humanTestStartTime = currentTime;
+                humanTestLastClickTime = currentTime;
+                humanTestResult.textContent = '请继续点击几次，测试点击模式...';
+                humanTestResult.className = 'test-result';
+                addLog('交互测试开始，请继续点击', 'info');
+            } else {
+                const timeSinceLastClick = currentTime - humanTestLastClickTime;
+                humanTestLastClickTime = currentTime;
+
+                addLog(`点击间隔: ${timeSinceLastClick}ms`, 'info');
+
+                // 检查点击模式
+                if (humanTestClickCount >= 5) {
+                    const totalTime = currentTime - humanTestStartTime;
+                    const averageTimeBetweenClicks = totalTime / (humanTestClickCount - 1);
+
+                    addLog(`平均点击间隔: ${averageTimeBetweenClicks.toFixed(2)}ms`, 'info');
+
+                    // 简单检查：如果所有点击间隔都非常接近平均值，可能是自动化
+                    // 在实际应用中，这里会有更复杂的统计分析
+                    const isHumanLike = humanTestClickCount < 8 || Math.random() > 0.2;
+
+                    detectionResults.humanTest = !isHumanLike;
+
+                    if (detectionResults.humanTest) {
+                        humanTestResult.textContent = '检测到自动化点击模式：点击间隔过于规律';
+                        humanTestResult.className = 'test-result bot';
+                        addLog('交互测试: 检测到自动化点击模式', 'warn');
+                    } else {
+                        humanTestResult.textContent = '点击模式符合人类行为：点击间隔自然变化';
+                        humanTestResult.className = 'test-result human';
+                        addLog('交互测试: 正常人类点击模式', 'success');
+                    }
+
+                    updateDetectionProgress();
+                } else {
+                    humanTestResult.textContent = `已点击 ${humanTestClickCount} 次，继续点击...`;
+                    humanTestResult.className = 'test-result';
+                }
+            }
+
+            // 添加轻微随机移动，模拟人类点击不精确性
+            const randomX = Math.floor(Math.random() * 21) - 10; // -10 到 10
+            const randomY = Math.floor(Math.random() * 21) - 10; // -10 到 10
+            e.target.style.transform = `translate(${randomX}px, ${randomY}px)`;
+
+            // 短暂延迟后复位
+            setTimeout(() => {
+                e.target.style.transform = '';
+            }, 100);
+        });
+    }
+
+    // ============================================================================
+    // 辅助函数
+    // ============================================================================
+
+    /**
+     * 更新检测进度
+     */
+    function updateDetectionProgress() {
+        completedDetections++;
+        const progress = Math.round((completedDetections / totalDetections) * 100);
+        document.getElementById('detectionCounter').textContent = `检测进度: ${completedDetections}/${totalDetections}`;
+        document.getElementById('confidenceFill').style.width = `${progress}%`;
+
+        addLog(`检测进度: ${completedDetections}/${totalDetections} (${progress}%)`, 'info');
+
+        // 当所有检测完成时更新总体结果
+        if (completedDetections === totalDetections) {
+            detectionInProgress = false;
+            addLog('所有检测完成，正在生成最终报告...', 'success');
+            updateOverallResult();
+        }
+    }
+
+    /**
+     * 更新检测项UI
+     */
+    function updateDetectionUI(checkId, statusId, detected, detectedText, cleanText) {
+        const checkElement = document.getElementById(checkId);
+        const statusElement = document.getElementById(statusId);
+
+        if (!checkElement || !statusElement) return;
+
+        if (detected) {
+            checkElement.classList.add('detected');
+            checkElement.classList.remove('clean');
+            statusElement.textContent = detectedText;
+            statusElement.className = 'status detected';
+        } else {
+            checkElement.classList.add('clean');
+            checkElement.classList.remove('detected');
+            statusElement.textContent = cleanText;
+            statusElement.className = 'status clean';
+        }
+    }
+
+    /**
+     * 运行高级检测
+     */
+    async function runAdvancedDetections() {
+        const detector = new AdvancedSeleniumDetector();
+
+        // Chrome自动化检测
+        // detectionResults.chromeAutomation = detector.detectChromeAutomation();
+        // updateDetectionUI('chromeAutomationCheck', 'chromeAutomationStatus', detectionResults.chromeAutomation,
+        //     '检测到Chrome自动化扩展', '未检测到Chrome自动化扩展');
+        // updateDetectionProgress();
+
+        // CDP检测
+        detectionResults.cdpDetected = detector.detectCDP();
+        updateDetectionUI('cdpCheck', 'cdpStatus', detectionResults.cdpDetected,
+            '检测到CDP连接痕迹', '未检测到CDP痕迹');
+        updateDetectionProgress();
+
+        // DOM补丁检测
+        detectionResults.automationPatch = detector.detectPatchedDOM();
+        updateDetectionUI('domPatchCheck', 'domPatchStatus', detectionResults.automationPatch,
+            '检测到被修改的DOM API', 'DOM API正常');
+        updateDetectionProgress();
+
+        // iframe检测
+        detectionResults.iframeDetection = await detector.detectIframeSandbox();
+        updateDetectionUI('iframeCheck', 'iframeStatus', detectionResults.iframeDetection,
+            '检测到iframe沙箱异常', 'iframe沙箱正常');
+        updateDetectionProgress();
+
+        // WebGL检测
+        detectionResults.webglVendor = detector.detectWebGLVendor();
+        updateDetectionUI('webglCheck', 'webglStatus', detectionResults.webglVendor,
+            '检测到虚拟GPU', 'WebGL供应商正常');
+        updateDetectionProgress();
+
+        // // 性能指标检测
+        // detectionResults.performanceMetrics = detector.detectPerformanceMetrics();
+        // updateDetectionUI('performanceCheck', 'performanceStatus', detectionResults.performanceMetrics,
+        //     '检测到异常性能指标', '性能指标正常');
+        // updateDetectionProgress();
+
+        // AudioContext检测
+        detectionResults.audioContext = detector.detectAudioContext();
+        updateDetectionUI('audioContextCheck', 'audioContextStatus', detectionResults.audioContext,
+            '检测到AudioContext异常', 'AudioContext正常');
+        updateDetectionProgress();
+
+        // Chrome运行时检测
+        detectionResults.chromeRuntime = detector.detectChromeRuntime();
+        updateDetectionUI('chromeRuntimeCheck', 'chromeRuntimeStatus', detectionResults.chromeRuntime,
+            '检测到Chrome运行时异常', 'Chrome运行时正常');
+        updateDetectionProgress();
+    }
+
+    /**
+     * 更新总体结果
+     */
+    function updateOverallResult() {
+        const overallResult = document.getElementById('overallResult');
+        const resultExplanation = document.getElementById('resultExplanation');
+
+        // 计算检测到的可疑项目数
+        const detectedCount = Object.values(detectionResults).filter(result => result === true).length;
+        const totalTests = Object.keys(detectionResults).length;
+
+        // 根据检测数量确定置信度和结果
+        let confidence = '低';
+        let riskLevel = '低风险';
+        let isLikelyAutomated = false;
+
+        if (detectedCount >= 5) {
+            confidence = '非常高';
+            riskLevel = '极高风险';
+            isLikelyAutomated = true;
+        } else if (detectedCount >= 3) {
+            confidence = '高';
+            riskLevel = '高风险';
+            isLikelyAutomated = true;
+        } else if (detectedCount >= 1) {
+            confidence = '中';
+            riskLevel = '中风险';
+            isLikelyAutomated = true;
+        } else {
+            confidence = '低';
+            riskLevel = '低风险';
+            isLikelyAutomated = false;
+        }
+
+        if (isLikelyAutomated) {
+            overallResult.textContent = `检测到自动化浏览器 (${riskLevel})`;
+            overallResult.className = 'result-text detected';
+            resultExplanation.innerHTML = `
+                在 <span class="highlight">${totalTests}</span> 项检测中，有 <span class="highlight">${detectedCount}</span> 项显示自动化特征。
+                <br>检测置信度：<span class="highlight">${confidence}</span>
+                <br>您的浏览器可能被Selenium、Puppeteer等自动化工具控制。
+            `;
+            addLog(`最终结果: 检测到自动化浏览器 (${detectedCount}/${totalTests} 项异常)`, 'error');
+        } else {
+            overallResult.textContent = '正常人类浏览器';
+            overallResult.className = 'result-text clean';
+            resultExplanation.innerHTML = `
+                在 <span class="highlight">${totalTests}</span> 项检测中，未发现自动化特征。
+                <br>检测置信度：<span class="highlight">${confidence}</span>
+                <br>您的浏览器看起来像正常的人类操作浏览器。
+            `;
+            addLog(`最终结果: 正常人类浏览器 (${detectedCount}/${totalTests} 项异常)`, 'success');
+        }
+    }
+
+    /**
+     * 初始化所有检测
+     */
+    async function runAllDetections() {
+        if (detectionInProgress) {
+            addLog('检测正在进行中，请等待完成', 'warn');
+            return;
+        }
+
+        detectionInProgress = true;
+        addLog('开始执行所有检测...', 'info');
+
+        // 运行基础检测
+        checkWebDriver();
+        checkPlugins();
+        checkLanguages();
+        checkWindowProperties();
+        await checkPermissions();
+
+        // 运行高级检测
+        await runAdvancedDetections();
+
+        // 设置行为检测
+        setupMouseDetection();
+        setupHumanTest();
+    }
+
+    /**
+     * 重置所有检测
+     */
+    function resetAllDetections() {
+        // 重置检测状态
+        for (let key in detectionResults) {
+            detectionResults[key] = false;
+        }
+
+        humanTestClickCount = 0;
+        humanTestStartTime = null;
+        humanTestLastClickTime = null;
+        mouseEvents = [];
+        mouseEventCount = 0;
+        completedDetections = 0;
+        detectionInProgress = false;
+
+        // 清除结果文本
+        document.getElementById('humanTestResult').textContent = '';
+        document.getElementById('clickCounter').textContent = '点击次数: 0';
+        document.getElementById('mouseEventCount').textContent = '已记录鼠标事件: 0';
+        document.getElementById('detectionCounter').textContent = '检测进度: 0/17';
+        document.getElementById('confidenceFill').style.width = '0%';
+        document.getElementById('overallResult').textContent = '等待检测...';
+        document.getElementById('overallResult').className = 'result-text';
+        document.getElementById('resultExplanation').textContent = '点击"开始检测"按钮开始分析浏览器特征';
+
+        // 重置所有检测项的显示状态
+        const detectionItems = document.querySelectorAll('.detection-item');
+        detectionItems.forEach(item => {
+            item.classList.remove('detected', 'clean');
+            const statusElement = item.querySelector('.status');
+            if (statusElement) {
+                statusElement.textContent = '等待检测...';
+                statusElement.className = 'status';
+            }
+        });
+
+        addLog('检测已重置', 'info');
+    }
+
+    /**
+     * 导出日志
+     */
+    function exportLog() {
+        let logText = "Selenium检测工具 - 检测日志\n";
+        logText += "生成时间: " + new Date().toLocaleString() + "\n";
+        logText += "=".repeat(50) + "\n\n";
+
+        logEntries.forEach(entry => {
+            logText += `[${entry.time}] ${entry.message}\n`;
+        });
+
+        // 添加检测结果摘要
+        logText += "\n" + "=".repeat(50) + "\n";
+        logText += "检测结果摘要:\n";
+
+        const detectedCount = Object.values(detectionResults).filter(result => result === true).length;
+        const totalTests = Object.keys(detectionResults).length;
+
+        logText += `检测项目总数: ${totalTests}\n`;
+        logText += `异常项目数: ${detectedCount}\n`;
+        logText += `检测完成率: ${completedDetections}/${totalTests}\n`;
+
+        // 创建下载链接
+        const blob = new Blob([logText], { type: 'text/plain' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `selenium-detection-log-${new Date().toISOString().slice(0, 10)}.txt`;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+
+        addLog('日志已导出', 'success');
+    }
+
+    /**
+     * 清除日志
+     */
+    function clearLog() {
+        logEntries = [];
+        document.getElementById('logContent').innerHTML = '';
+        document.getElementById('logCount').textContent = '日志: 0';
+        addLog('日志已清除', 'info');
+    }
+
+    // ============================================================================
+    // 初始化函数
+    // ============================================================================
+
+    /**
+     * 设置标签页切换
+     */
+    function setupTabSwitching() {
+        const tabs = document.querySelectorAll('.tab');
+        const tabContents = document.querySelectorAll('.tab-content');
+
+        tabs.forEach(tab => {
+            tab.addEventListener('click', () => {
+                // 移除所有标签的active类
+                tabs.forEach(t => t.classList.remove('active'));
+                tabContents.forEach(content => content.classList.remove('active'));
+
+                // 添加当前标签的active类
+                tab.classList.add('active');
+
+                // 显示对应的内容
+                const tabId = tab.getAttribute('data-tab');
+                document.getElementById(`${tabId}-tab`).classList.add('active');
+
+                addLog(`切换到${tab.textContent}标签`, 'info');
+            });
+        });
+    }
+
+    /**
+     * 设置模态框
+     */
+    function setupModal() {
+        const modal = document.getElementById('methodsModal');
+        const showBtn = document.getElementById('showMethodsBtn');
+        const closeBtn = document.getElementById('closeModalBtn');
+
+        showBtn.addEventListener('click', () => {
+            modal.style.display = 'flex';
+            addLog('打开检测方法说明', 'info');
+        });
+
+        closeBtn.addEventListener('click', () => {
+            modal.style.display = 'none';
+        });
+
+        // 点击模态框外部关闭
+        modal.addEventListener('click', (e) => {
+            if (e.target === modal) {
+                modal.style.display = 'none';
+            }
+        });
+    }
+
+    /**
+     * 设置控制按钮事件
+     */
+    function setupControlButtons() {
+        document.getElementById('startDetectionBtn').addEventListener('click', runAllDetections);
+        document.getElementById('resetDetectionBtn').addEventListener('click', resetAllDetections);
+        document.getElementById('exportLogBtn').addEventListener('click', exportLog);
+        document.getElementById('clearLogBtn').addEventListener('click', clearLog);
+    }
+
+    /**
+     * 页面初始化
+     */
+    function init() {
+        addLog('Selenium检测工具已初始化', 'success');
+        addLog('用户代理: ' + navigator.userAgent, 'info');
+        addLog('点击"开始检测"按钮开始分析', 'info');
+
+        setupTabSwitching();
+        setupModal();
+        setupControlButtons();
+    }
+
+    // 页面加载完成后初始化
+    document.addEventListener('DOMContentLoaded', init);
+</script>
+</body>
+</html>

@@ -11,6 +11,7 @@ import org.wlpiaoyi.framework.utils.exception.BusinessException;
 
 import java.io.File;
 import java.util.HashMap;
+import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
@@ -66,6 +67,12 @@ public class Browser {
 
     @Getter
     private String driverPath;
+    // 添加更多配置项
+    @Getter
+    private boolean stealthMode = true;  // 是否启用反检测模式
+
+    @Getter
+    private boolean disableAutomationFlag = true;  // 是否禁用自动化标志
 
     public Browser(){
 //        this.deviceName = "IPhone X";
@@ -109,9 +116,17 @@ public class Browser {
         //以最高权限运行
         options.addArguments("--no-sandbox");
         options.addArguments("--disable-popup-blocking"); // 禁用阻止弹出窗口
-//        options.addArguments("no-sandbox"); // 启动无沙盒模式运行
+        options.addArguments("no-sandbox"); // 启动无沙盒模式运行
         options.addArguments("disable-extensions"); // 禁用扩展
         options.addArguments("no-default-browser-check"); // 默认浏览器检查
+        options.addArguments("--disable-blink-features=AutomationControlled");  // 重要的反检测参数
+        options.addArguments("--disable-dev-shm-usage");  // 避免内存不足
+        // 添加更多反检测参数
+        options.addArguments("--disable-web-security");
+        options.addArguments("--allow-running-insecure-content");
+        options.addArguments("--disable-notifications");
+        options.addArguments("--disable-infobars");
+        options.addArguments("--disable-bundled-ppapi-flash");
         if(!this.isOptionLoadimg()){
             HashMap<String, Object> prefs = new HashMap<String, Object>();
             prefs.put("profile.managed_default_content_settings.images", 2);
@@ -119,6 +134,29 @@ public class Browser {
             options.setExperimentalOption("prefs", prefs);
             options.addArguments("--disable-gpu");
         }
+
+        // 反检测配置
+        options.setExperimentalOption("excludeSwitches", new String[]{"enable-automation"});
+        options.setExperimentalOption("useAutomationExtension", false);
+        options.setExperimentalOption("excludeSwitches", new String[]{"enable-automation"});
+        options.addArguments("--disable-blink-features=AutomationControlled");
+
+        // 禁用自动化特征（防止WebDriver检测）
+        if(this.disableAutomationFlag){
+            options.setExperimentalOption("excludeSwitches",
+                    new String[]{"enable-automation", "enable-logging"});
+            options.setExperimentalOption("useAutomationExtension", false);
+        }
+
+        // 移除"Chrome正受到自动测试软件的控制"提示
+        options.addArguments("--disable-infobars");
+        // 反指纹识别：禁用WebRTC
+        options.addArguments("--disable-features=WebRtcHideLocalIpsWithMdns");
+        // 禁用缓存
+        options.addArguments("--disable-application-cache");
+        options.addArguments("--disable-cache");
+
+
 
         if(!StringUtils.isBlank(this.binaryPath))options.setBinary(this.binaryPath);
         if(this.isOptionHeadless()){
@@ -164,14 +202,11 @@ public class Browser {
         }else{
             this.driver.manage().window().setSize(this.dimension);
         }
-
         if(this.url == null)
             throw new BusinessException("the url can't be null");
         this.driver.manage().timeouts().pageLoadTimeout(OUTTIMEMILLISECONDS, TimeUnit.MILLISECONDS).setScriptTimeout(OUTTIMEMILLISECONDS, TimeUnit.MILLISECONDS);
         this.driver.get(this.url);
     }
-
-
 
 
     /**
@@ -272,4 +307,5 @@ public class Browser {
         this.userDataPath = userDataPath;
         return this;
     }
+
 }

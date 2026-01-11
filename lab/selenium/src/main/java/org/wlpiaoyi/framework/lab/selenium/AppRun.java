@@ -9,6 +9,7 @@ public class AppRun {
 
     public static void main(String[] args) {
         try {
+            log.info("启动参数:{}", args);
             if(ValueUtils.isBlank(args)){
                 throw new RuntimeException("请输入参数[0:拉取违章信息详情, 1:拉取违章信息列表,2:绑定司机]");
             }
@@ -27,6 +28,8 @@ public class AppRun {
             bc.start();
         }catch (Exception e){
             log.error("启动失败", e);
+        }finally {
+            log.info("运行结束");
         }
     }
 }

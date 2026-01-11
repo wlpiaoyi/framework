@@ -35,6 +35,7 @@ public class BrowserBase {
     private String publicKey = "MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQCfvMFCBzGR7HUiSn15AWmERys7jUj9t0Oib7It\n" +
             "F/xlTd99tMpQL7O0EsEVkvhRFzEaqczHKYr41Gq8+6v0MOfFhR9GjM5sdqZsYZZFLGPy8VFQLTNQ\n" +
             "3zyj6IWfmtOg/bZOPoZxsFUBhMF/aAcKe/FWczM3QGOSnW3Hg9qEEv6j+wIDAQAB";
+
     protected final String localName = "四川省";
     protected final String browserUlr = "https://sc.122.gov.cn/views/memrent/vehlist.html";
 
