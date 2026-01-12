@@ -76,7 +76,7 @@ public class IdWorker {
      */
     public IdWorker(byte workerId, byte datacenterId, long timerEpoch) {
         this.workerIdBits = 6L;
-        this.datacenterIdBits = 5L;
+        this.datacenterIdBits = 6L;
         this.sequenceBits = 10L;
         this.workerIdShift = this.sequenceBits;
         this.datacenterIdShift = this.sequenceBits + this.workerIdBits;
@@ -107,7 +107,7 @@ public class IdWorker {
      * @author: wlpia
      * @date: 2023/12/25 16:57
      */
-    public IdWorker(byte workerIdBits, byte datacenterIdBits, byte sequenceBits, int workerId, int datacenterId, long timerEpoch) {
+    public IdWorker(byte workerIdBits, byte datacenterIdBits, byte sequenceBits, byte workerId, byte datacenterId, long timerEpoch) {
         this.workerIdBits = workerIdBits;
         this.datacenterIdBits = datacenterIdBits;
         this.sequenceBits = sequenceBits;
@@ -192,6 +192,73 @@ public class IdWorker {
         return System.currentTimeMillis();
     }
 
+    /**
+     * <p><b>{@code @description:}</b>
+     * <div style='padding: 5px; margin-left: 5px; margin-bottom: 5px;'>
+     * 获取工作位Id
+     * </div>
+     * </p>
+     *
+     * <p><b>{@code @param}</b> <b>id</b>
+     * {@link long}
+     * </p>
+     *
+     * <p><b>{@code @param}</b> <b>sequenceBits</b>
+     * {@link long}
+     * 序列在id中占的位数
+     * </p>
+     *
+     * <p><b>{@code @param}</b> <b>workerIdBits</b>
+     * {@link long}
+     * 工作id中占的位数
+     * </p>
+     *
+     * <p><b>{@code @date:}</b>2026/1/12 14:29</p>
+     * <p><b>{@code @return:}</b>{@link long}</p>
+     * <p><b>{@code @author:}</b>wlpiaoyi</p>
+     * <hr/>
+     */
+    public static long getWorkerId(long id, long sequenceBits, long workerIdBits){
+        return (((id >> (workerIdBits + sequenceBits))<< (workerIdBits + sequenceBits))^ id) >> sequenceBits;
+    }
+    public long getWorkerId(long id){
+       return getWorkerId(id, this.sequenceBits, this.workerIdBits);
+    }
+
+    /**
+     * <p><b>{@code @description:}</b>
+     * <div style='padding: 5px; margin-left: 5px; margin-bottom: 5px;'>
+     * 获取数据中心ID
+     * </div>
+     * </p>
+     *
+     * <p><b>{@code @param}</b> <b>id</b>
+     * {@link long}
+     * </p>
+     *
+     * <p><b>{@code @param}</b> <b>timestampLeftShift</b>
+     * {@link long}
+     * 时间截向左移22位
+     * </p>
+     *
+     * <p><b>{@code @param}</b> <b>datacenterIdBits</b>
+     * {@link long}
+     * 数据中心ID位数
+     * </p>
+     * id = 1010 | 1011| 1111
+     *
+     * <p><b>{@code @date:}</b>2026/1/12 11:26</p>
+     * <p><b>{@code @return:}</b>{@link long}</p>
+     * <p><b>{@code @author:}</b>wlpiaoyi</p>
+     * <hr/>
+     */
+    public static long getDatacenterId(long id, long timestampLeftShift, long datacenterIdBits){
+        id = (id >> (timestampLeftShift) << timestampLeftShift) ^ (id >> (timestampLeftShift - datacenterIdBits) << (timestampLeftShift - datacenterIdBits));
+        return id >> (timestampLeftShift - datacenterIdBits);
+    }
+    public long getDatacenterId(long id){
+        return getDatacenterId(id, timestampLeftShift, datacenterIdBits);
+    }
 
 
     /**
@@ -219,9 +286,13 @@ public class IdWorker {
      * <p><b>{@code @author:}</b>wlpiaoyi</p>
      * <hr/>
      */
-    public static long getHappenTimestamp(long id, int timestampLeftShift, int timerEpoch){
+    public static long getHappenTimestamp(long id, long timestampLeftShift, long timerEpoch){
         return (id >> timestampLeftShift) + timerEpoch;
     }
+    public long getHappenTimestamp(long id){
+        return getHappenTimestamp(id, this.timestampLeftShift, this.timerEpoch);
+    }
+
 
     /**
      * <p><b>{@code @description:}</b>
@@ -246,5 +317,28 @@ public class IdWorker {
      */
     public static long getSequence(long id, long sequenceBits){
         return id ^ ((id >> sequenceBits) << sequenceBits);
+    }
+    public long getSequence(long id){
+        return getSequence(id, this.sequenceBits);
+    }
+
+    @Override
+    public String toString() {
+        return "IdWorker{" +
+                "timerEpoch=" + timerEpoch +
+                ", workerId=" + workerId +
+                ", datacenterId=" + datacenterId +
+                ", sequence=" + sequence +
+                ", lastTimestamp=" + lastTimestamp +
+                ", maxWorkerId=" + maxWorkerId +
+                ", maxDatacenterId=" + maxDatacenterId +
+                ", workerIdBits=" + workerIdBits +
+                ", datacenterIdBits=" + datacenterIdBits +
+                ", sequenceBits=" + sequenceBits +
+                ", workerIdShift=" + workerIdShift +
+                ", datacenterIdShift=" + datacenterIdShift +
+                ", timestampLeftShift=" + timestampLeftShift +
+                ", sequenceMask=" + sequenceMask +
+                '}';
     }
 }

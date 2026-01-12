@@ -34,17 +34,27 @@ public class BrowserCabgov extends BrowserBase {
     @SneakyThrows
     public boolean start(){
         log.info("BrowserCabgov.start in. 启动浏览器");
-        if(!super.start()) return false;
-        this.openAndLogin();
-        this.checkLocal();
-        for (int i = 0; i < 5; i++) {
-            this.runData(i);
+        boolean hasError = true;
+        try{
+            if(!super.start()) return false;
+            this.openAndLogin();
+            this.checkLocal();
+            for (int i = 0; i < 5; i++) {
+                if(this.runData(i)){hasError = true; break;};
+            }
+        }finally {
+            try{
+                Thread.sleep(2000);
+                this.browser.quit();
+            }catch (Exception e){};
+            log.info("BrowserCabgov.start end. hasError:{}", hasError);
         }
         return true;
     }
 
-    void runData(int index){
+    boolean runData(int index){
 
+        boolean hasError = false;
         try{
             String filePath = CONFIG_PATH + "\\12123司机信息表.xlsx";
             List<SubmitHT> submitHTList = ExcelReaderUtil.readExcelToSubmitHTList(filePath);
@@ -58,7 +68,8 @@ public class BrowserCabgov extends BrowserBase {
             if(index > 0){
                 File preErrorFile = new File(DATA_PATH + "\\12123司机信息错误-" + curTimeName + "." + (index - 1) + ".txt");
                 if(!preErrorFile.exists()){
-                    throw new BusinessException("没有找到上一次的错误文件:" + preErrorFile.getAbsolutePath());
+                    log.info("BrowserCabgov.start 没有找到上一次的错误文件:{}", preErrorFile.getAbsolutePath());
+                    return true;
                 }
                 String preErrorString = DataUtils.readFile(preErrorFile.getAbsolutePath());
                 Arrays.asList(preErrorString.split("\r\n")).forEach(line -> {
@@ -81,6 +92,7 @@ public class BrowserCabgov extends BrowserBase {
                     this.submitHT(submitHT, addBoxEle);
                     log.info("BrowserCabgov.start 提交数据成功, 确认提交");
                 }catch (Exception e){
+                    hasError = true;
                     log.error("BrowserCabgov.start 提交合同信息失败:{}", submitHT.toString(), e);
                     // 检查父目录是否存在，不存在则创建
                     File parentDir = erroFile.getParentFile();
@@ -102,13 +114,8 @@ public class BrowserCabgov extends BrowserBase {
             }
         }catch (Exception e){
             log.error("error", e);
-        }finally {
-            try{
-                Thread.sleep(2000);
-                this.browser.quit();
-            }catch (Exception e){};
-            log.info("BrowserCabgov.start end");
         }
+        return !hasError;
     }
 
     void submitHT(SubmitHT submitHT, WebElement addBoxEle){
