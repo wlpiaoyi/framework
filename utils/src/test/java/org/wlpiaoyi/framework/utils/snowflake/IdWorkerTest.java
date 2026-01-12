@@ -21,15 +21,13 @@ public class IdWorkerTest {
     @Test
     public void test() throws Exception {
         Long timerEpoch = System.currentTimeMillis();
-        IdWorker idWorker = new IdWorker((byte) 1, (byte) 2, timerEpoch);
-//        IdWorker idWorker = new IdWorker((byte)4, (byte)4, (byte)4,  5, 2, timerEpoch);
+//        IdWorker idWorker = new IdWorker((byte) 1, (byte) 2, timerEpoch);
+        IdWorker idWorker = new IdWorker((byte)4, (byte)4, (byte)4,  5, 2, timerEpoch);
         for (int i = 0; i < 100; i++) {
             long id = idWorker.nextId();
             System.out.println(Long.toBinaryString(id));
             System.out.println(id);
-            System.out.println("timestamp assert:" + (idWorker.getTimestamp(id) == idWorker.getLastTimestamp())
-                    + ", idWorker.getTimestamp.id:" + idWorker.getTimestamp(id)
-                    + ", sequence assert:" + (idWorker.getSequence() == idWorker.getSequence(id))
+            System.out.println("idWorker.getTimestamp.id:" + idWorker.getTimestamp(id)
                     + ", idWorker.getSequence.id:" + idWorker.getSequence(id));
         }
         timerEpoch = DateUtils.parseToTimestamp(DateUtils.formatToLoaTolDateTime("2021-01-01 08:00:00"));
@@ -57,7 +55,12 @@ public class IdWorkerTest {
         id = idWorker.nextId();
         System.out.println(Long.toBinaryString(id));
         System.out.println(id);
-        timerEpoch = DateUtils.parseToTimestamp(DateUtils.formatToLoaTolDateTime("1954-04-20 02:30:00"));
+        timerEpoch = DateUtils.parseToTimestamp(DateUtils.formatToLoaTolDateTime("1950-01-01 02:30:00"));
+        idWorker = new IdWorker((byte) 1, (byte) 2, timerEpoch);
+        id = idWorker.nextId();
+        System.out.println(Long.toBinaryString(id));
+        System.out.println(id);
+        timerEpoch = DateUtils.parseToTimestamp(DateUtils.formatToLoaTolDateTime("1920-01-01 02:30:00"));
         idWorker = new IdWorker((byte) 1, (byte) 2, timerEpoch);
         id = idWorker.nextId();
         System.out.println(Long.toBinaryString(id));

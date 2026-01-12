@@ -94,7 +94,7 @@ class ValueParseUtils extends ValueBlankUtils{
             hexChars[j * 2] = HEX_ARRAY[v >>> 4];
             hexChars[j * 2 + 1] = HEX_ARRAY[v & 0x0F];
         }
-        return "0x" + new String(hexChars);
+        return new String(hexChars);
     }
 
     /**

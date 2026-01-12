@@ -15,7 +15,7 @@ import org.wlpiaoyi.framework.utils.data.ReaderUtils;
 
 import java.util.Properties;
 
-@Mojo( name = "mojo")
+@Mojo(name = "mojo")
 @Slf4j
 public class PluginMojo extends AbstractMojo {
 

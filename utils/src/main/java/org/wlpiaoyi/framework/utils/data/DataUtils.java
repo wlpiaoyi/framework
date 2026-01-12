@@ -290,6 +290,13 @@ public class DataUtils {
         }
     }
 
+    public static byte[] sha1(byte[] bytes) {
+        return DigestUtils.sha1(bytes);
+    }
+    public static String sha1(String datas) {
+        return DigestUtils.sha1Hex(datas);
+    }
+
     public static byte[] sha256(byte[] bytes) {
         return DigestUtils.sha256(bytes);
     }

@@ -19,6 +19,7 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.OutputStream;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicReference;
 
@@ -557,19 +558,8 @@ public class BrowserCabgov extends BrowserBase {
                     log.warn("BrowserCabgov.search while error. not fund 违法查询结束日期控件 ele:tody", e);
                     continue;
                 }
-                try{
-                    WebElement enDataInput = webElement.findElement(By.id("endDate2"));
-                    if(enDataInput == null){
-                        System.exit(0);
-                    }
-                    Long endDateL = Long.parseLong(WebElementUtils.getValue(enDataInput).toString());
-                    if(curDateL < endDateL){
-                        System.exit(0);
-                    }
-                }catch (Exception e){
-                    log.warn("BrowserCabgov.search while error. not fund 违法查询结束日期控件 ele:tody", e);
-                    continue;
-                }
+
+                this.checkValid(webElement);
 
                 try{
                     WebElementUtils.click(browser, webElements.get(3).findElement(By.xpath("button")));
@@ -591,6 +581,21 @@ public class BrowserCabgov extends BrowserBase {
         }
         if(ValueUtils.isNotBlank(errorMsg)){
             throw new BusinessException(errorMsg);
+        }
+    }
+
+    private void checkValid(WebElement webElement){
+        try{
+            this.checkValid(() -> {
+                WebElement enDataInput = webElement.findElement(By.id("endDate2"));
+                if(enDataInput == null){
+                    System.exit(0);
+                }
+                return Long.parseLong(WebElementUtils.getValue(enDataInput).toString());
+            });
+        } catch (Exception e) {
+            log.error("BrowserCabgov.checkValid 获取时间选择器异常", e);
+            System.exit(0);
         }
     }
 
@@ -684,7 +689,7 @@ public class BrowserCabgov extends BrowserBase {
             Thread.sleep(1000);
         }
     }
-//
+
 //    public Map<String, String> querySurvielDetail(String hphm, String xh, String cjjg, String cookies) throws IOException, InterruptedException {
 //        Thread.sleep(5000);
 //        String url = "https://sc.122.gov.cn/user/m/tsc/vio/querySurvielDetail";

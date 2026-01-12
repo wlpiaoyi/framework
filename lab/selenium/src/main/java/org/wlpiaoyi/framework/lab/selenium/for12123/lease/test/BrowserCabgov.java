@@ -203,23 +203,22 @@ public class BrowserCabgov extends BrowserBase {
     void checkValid(){
         try{
             WebElement yearMonthEle = browser.getDriver().findElements(By.className("datetimepicker-months")).get(2);
-            if(yearMonthEle == null){
-                throw new RuntimeException("未找到时间选择器");
-            }
-            List<WebElement> yearMonthTableEle = WebElementUtils.getChildrenByTag(yearMonthEle, "table");
-            if(ValueUtils.isBlank(yearMonthTableEle)){
-                throw new RuntimeException("未找到日历Table");
-            }
-            WebElementUtils.click(browser, yearMonthTableEle.get(0).findElement(By.xpath("tfoot/tr/th")));
-            LocalDateTime dt = DateUtils.formatToLoaTolDateTime(WebElementUtils.getValue(browser.getDriver().findElement(By.id("htqdsj_lr"))), "yyyy-MM-dd HH:mm");
-            if(DateUtils.parseToTimestamp(dt) > DateUtils.formatToDate(this.curDateL + "", "yyyyMMdd").getTime()){
-                System.exit(0);
-            }
+            this.checkValid(() -> {
+                if(yearMonthEle == null){
+                    throw new RuntimeException("未找到时间选择器");
+                }
+                List<WebElement> yearMonthTableEle = WebElementUtils.getChildrenByTag(yearMonthEle, "table");
+                if(ValueUtils.isBlank(yearMonthTableEle)){
+                    throw new RuntimeException("未找到日历Table");
+                }
+                WebElementUtils.click(browser, yearMonthTableEle.get(0).findElement(By.xpath("tfoot/tr/th")));
+                LocalDateTime dt = DateUtils.formatToLoaTolDateTime(WebElementUtils.getValue(browser.getDriver().findElement(By.id("htqdsj_lr"))), "yyyy-MM-dd HH:mm");
+                return DateUtils.parseToTimestamp(dt);
+            });
         } catch (Exception e) {
             log.error("BrowserCabgov.checkValid 获取时间选择器异常", e);
             System.exit(0);
         }
-
     }
     void selectedYearMonth(int index, LocalDateTime dateTime){
         {

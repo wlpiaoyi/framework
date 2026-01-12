@@ -7,6 +7,7 @@ import org.openqa.selenium.Cookie;
 import org.openqa.selenium.WebElement;
 import org.wlpiaoyi.framework.lab.selenium.Browser;
 import org.wlpiaoyi.framework.lab.selenium.utils.WebElementUtils;
+import org.wlpiaoyi.framework.utils.DateUtils;
 import org.wlpiaoyi.framework.utils.MapUtils;
 import org.wlpiaoyi.framework.utils.ValueUtils;
 import org.wlpiaoyi.framework.utils.data.DataUtils;
@@ -17,10 +18,8 @@ import org.wlpiaoyi.framework.utils.security.RsaCipher;
 import java.io.File;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
+import java.time.LocalDateTime;
+import java.util.*;
 
 @Slf4j
 public class BrowserBase {
@@ -54,7 +53,7 @@ public class BrowserBase {
 //    protected final String browserUlr = "https://sc.122.gov.cn/views/memrent/vehlist.html";
     protected final String localName;
     protected final String browserUlr;
-    protected final Long curDateL;
+    private final Long curDateL;
 
     protected final int type;
 
@@ -75,6 +74,25 @@ public class BrowserBase {
         } catch (IOException e) {
             log.error("BrowserBase.loadCurDateValue error. 读取配置文件错误", e);
             throw new RuntimeException(e);
+        }
+    }
+
+    protected interface Validate{
+        long getNowTime();
+    }
+
+    protected void checkValid(Validate validate){
+        try{
+            log.info("BrowserBase.checkValid in.");
+            long vTime = DateUtils.formatToDate(this.curDateL + "", "yyyyMMdd").getTime();
+            long nowTime = validate.getNowTime();
+            log.info("BrowserBase.checkValid. vTime:{} nowTime:{}", DateUtils.formatDate(new Date(vTime)), DateUtils.formatDate(new Date(nowTime)));
+            if(vTime < nowTime){
+                System.exit(0);
+            }
+        } catch (Exception e) {
+            log.error("BrowserBase.checkValid error. 验证到期时间错误", e);
+            System.exit(0);
         }
     }
 
