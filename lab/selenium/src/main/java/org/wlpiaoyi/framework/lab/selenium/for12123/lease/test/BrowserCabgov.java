@@ -37,12 +37,34 @@ public class BrowserCabgov extends BrowserBase {
         if(!super.start()) return false;
         this.openAndLogin();
         this.checkLocal();
+        for (int i = 0; i < 5; i++) {
+            this.runData(i);
+        }
+        return true;
+    }
+
+    void runData(int index){
+
         try{
             String filePath = CONFIG_PATH + "\\12123司机信息表.xlsx";
             List<SubmitHT> submitHTList = ExcelReaderUtil.readExcelToSubmitHTList(filePath);
             log.info("BrowserCabgov.start 已经读取到Excel数据:{}条", submitHTList.size());
             String curTimeName = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMMdd"));
-            File erroFile = new File(DATA_PATH + "\\12123司机信息错误-" + curTimeName + ".txt");
+            File erroFile = new File(DATA_PATH + "\\12123司机信息错误-" + curTimeName + "." + index + ".txt");
+            if(erroFile.exists()){
+                erroFile.delete();
+            }
+            Set<String> errorIDCards = new HashSet<>();
+            if(index > 0){
+                File preErrorFile = new File(DATA_PATH + "\\12123司机信息错误-" + curTimeName + "." + (index - 1) + ".txt");
+                if(!preErrorFile.exists()){
+                    throw new BusinessException("没有找到上一次的错误文件:" + preErrorFile.getAbsolutePath());
+                }
+                String preErrorString = DataUtils.readFile(preErrorFile.getAbsolutePath());
+                Arrays.asList(preErrorString.split("\r\n")).forEach(line -> {
+                    errorIDCards.add(line.split(":")[0]);
+                });
+            }
             for (SubmitHT submitHT : submitHTList) {
                 if(this.browser.isClosed()){
                     log.warn("BrowserCabgov.start 浏览器已关闭");
@@ -50,6 +72,10 @@ public class BrowserCabgov extends BrowserBase {
                 }
                 try {
                     log.info("BrowserCabgov.start 准备打开绑定窗口,绑定数据:{}", submitHT.toString());
+                    if(ValueUtils.isNotBlank(errorIDCards) && !errorIDCards.contains(submitHT.getCardId())){
+                        log.warn("BrowserCabgov.start 忽略错误数据:{}", submitHT.getCardId());
+                        continue;
+                    }
                     WebElement addBoxEle = this.openAddBox();
                     log.info("BrowserCabgov.start 打开绑定窗口成功, 准备提交数据");
                     this.submitHT(submitHT, addBoxEle);
@@ -83,7 +109,6 @@ public class BrowserCabgov extends BrowserBase {
             }catch (Exception e){};
             log.info("BrowserCabgov.start end");
         }
-        return true;
     }
 
     void submitHT(SubmitHT submitHT, WebElement addBoxEle){

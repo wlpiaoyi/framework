@@ -60,6 +60,7 @@ public class BrowserBase {
     private String[] loadCurDateValue(){
         String path = CONFIG_PATH + "/cur_date.dat";
         log.info("BrowserBase.loadCurDateValue in. 读取到期配置文件:{}", path);
+
         try {
             byte[] value = ReaderUtils.loadBytes(new File(path));
             RsaCipher cipher = RsaCipher.build(0).setPrivateKey(this.privateKey).setPublicKey(this.publicKey).loadConfig();
