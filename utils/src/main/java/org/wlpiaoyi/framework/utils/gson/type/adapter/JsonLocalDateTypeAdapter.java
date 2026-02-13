@@ -7,7 +7,7 @@ import org.wlpiaoyi.framework.utils.gson.GsonBuilder;
 import java.lang.reflect.Type;
 import java.time.LocalDate;
 
-public class JsonLocalDateTypeAdapter implements GsonBuilder.JsonSerializer<LocalDate>, JsonDeserializer<LocalDate> {
+public class JsonLocalDateTypeAdapter implements org.wlpiaoyi.framework.utils.gson.JsonSerializer<LocalDate>, JsonDeserializer<LocalDate> {
 
 
     public static Class getType(){
@@ -22,11 +22,11 @@ public class JsonLocalDateTypeAdapter implements GsonBuilder.JsonSerializer<Loca
         if (!(json instanceof JsonPrimitive)) {
             throw new JsonParseException("The date should be a string value");
         }
-        return DateUtils.parseToLocalDate(json.getAsLong());
+        return DateUtils.parseLocalDate(json.getAsLong());
     }
 
     @Override
     public JsonElement serialize(LocalDate date, Type typeOfSrc, JsonSerializationContext context) {
-        return new JsonPrimitive(DateUtils.parseToEpochDay(date));
+        return new JsonPrimitive(DateUtils.parseEpochDay(date));
     }
 }

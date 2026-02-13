@@ -7,7 +7,7 @@ import org.wlpiaoyi.framework.utils.gson.GsonBuilder;
 import java.lang.reflect.Type;
 import java.time.LocalTime;
 
-public class JsonLocalTimeTypeAdapter implements GsonBuilder.JsonSerializer<LocalTime>, JsonDeserializer<LocalTime> {
+public class JsonLocalTimeTypeAdapter implements org.wlpiaoyi.framework.utils.gson.JsonSerializer<LocalTime>, JsonDeserializer<LocalTime> {
 
     public static Class getType(){
         return LocalTime.class;
@@ -24,12 +24,12 @@ public class JsonLocalTimeTypeAdapter implements GsonBuilder.JsonSerializer<Loca
         }
 
         long nanoOfDay = json.getAsLong();
-        LocalTime dateTime = DateUtils.parseToLocalTime(nanoOfDay);
+        LocalTime dateTime = DateUtils.parseLocalTime(nanoOfDay);
         return dateTime;
     }
 
     @Override
     public JsonElement serialize(LocalTime src, Type typeOfSrc, JsonSerializationContext context) {
-        return new JsonPrimitive(DateUtils.parseToNanoOfDay(src));
+        return new JsonPrimitive(DateUtils.parseNanoOfDay(src));
     }
 }

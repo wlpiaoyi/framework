@@ -6,7 +6,7 @@ import org.wlpiaoyi.framework.utils.gson.GsonBuilder;
 import java.lang.reflect.Type;
 import java.util.Date;
 
-public class JsonDateTypeAdapter implements GsonBuilder.JsonSerializer<Date>, JsonDeserializer<Date> {
+public class JsonDateTypeAdapter implements org.wlpiaoyi.framework.utils.gson.JsonSerializer<Date>, JsonDeserializer<Date> {
 
     public JsonDateTypeAdapter(){
 

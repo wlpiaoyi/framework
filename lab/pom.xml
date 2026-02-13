@@ -17,6 +17,7 @@
         <module>selenium</module>
         <module>MetaMqtt</module>
         <module>space</module>
+        <module>document</module>
     </modules>
 
     <properties>

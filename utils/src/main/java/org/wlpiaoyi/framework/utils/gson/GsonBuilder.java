@@ -14,11 +14,6 @@ import java.util.List;
 import java.util.Map;
 
 public class GsonBuilder  {
-    public interface JsonSerializer<T> extends com.google.gson.JsonSerializer<T> {
-        static Class getType(){
-            return null;
-        }
-    }
 
     @NonNull
     protected Gson gson;

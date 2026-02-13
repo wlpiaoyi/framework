@@ -43,3 +43,4 @@ lab/MetaMqtt/target/*
 fw_config/selenium/chrome-app11/
 config/selenium/chromedriver.*
 config/selenium/chromedriver
+lab/document/target/

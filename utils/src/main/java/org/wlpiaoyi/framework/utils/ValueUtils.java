@@ -633,12 +633,12 @@ class ValueBlankUtils extends ValueTypeUtils{
         if(value instanceof Map){
             return isBlank((Map) value);
         }
-        if(value instanceof BigDecimal){
-            return isBlank((BigDecimal) value);
-        }
-        if(value instanceof BigInteger){
-            return isBlank((BigInteger) value);
-        }
+//        if(value instanceof BigDecimal){
+//            return isBlank((BigDecimal) value);
+//        }
+//        if(value instanceof BigInteger){
+//            return isBlank((BigInteger) value);
+//        }
         return value == null;
 
     }

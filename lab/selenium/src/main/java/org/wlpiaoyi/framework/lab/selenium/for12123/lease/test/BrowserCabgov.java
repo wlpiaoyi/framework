@@ -11,14 +11,12 @@ import org.wlpiaoyi.framework.lab.selenium.for12123.lease.excel.ExcelReaderUtil;
 import org.wlpiaoyi.framework.lab.selenium.utils.WebElementUtils;
 import org.wlpiaoyi.framework.utils.DateUtils;
 import org.wlpiaoyi.framework.utils.ValueUtils;
-import org.wlpiaoyi.framework.utils.data.DataUtils;
 import org.wlpiaoyi.framework.utils.data.WriterUtils;
 import org.wlpiaoyi.framework.utils.exception.BusinessException;
 
 import java.io.File;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
@@ -211,8 +209,8 @@ public class BrowserCabgov extends BrowserBase {
                 throw new RuntimeException("未找到日历Table");
             }
             WebElementUtils.click(browser, yearMonthTableEle.get(0).findElement(By.xpath("tfoot/tr/th")));
-            LocalDateTime dt = DateUtils.formatToLoaTolDateTime(WebElementUtils.getValue(browser.getDriver().findElement(By.id("htqdsj_lr"))), "yyyy-MM-dd HH:mm");
-            if(DateUtils.parseToTimestamp(dt) > DateUtils.formatToDate(this.curDateL + "", "yyyyMMdd").getTime()){
+            LocalDateTime dt = DateUtils.parseLocalDateTime(WebElementUtils.getValue(browser.getDriver().findElement(By.id("htqdsj_lr"))), "yyyy-MM-dd HH:mm");
+            if(DateUtils.parseTimestamp(dt) > DateUtils.parseDate(this.curDateL + "", "yyyyMMdd").getTime()){
                 System.exit(0);
             }
         } catch (Exception e) {

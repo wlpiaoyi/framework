@@ -8,9 +8,8 @@ import org.jetbrains.annotations.Range;
 import java.text.SimpleDateFormat;
 import java.time.*;
 import java.time.format.DateTimeFormatter;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
+import java.util.regex.Pattern;
 
 /**
  * <p><b>{@code @description:}</b>  时间工具</p>
@@ -21,33 +20,52 @@ import java.util.Map;
 public class DateUtils {
 
 
-//    public static final String PATTERN_STR = "^(\\d{2,4}/\\d{1,2}/\\d{1,2} \\d{1,2}:\\d{1,2}:\\d{1,2})$";
-
-    public static final String HOUR_FORMAT_TAG = "_{H}_";
-    public static final String MINUTE_FORMAT_TAG = "_{m}_";
-    public static final String SECOND_FORMAT_TAG = "_{s}_";
-
-    public static final Map<String, String> PATTERN_FORMAT_TIME = new HashMap(){{
-        put("HH" + HOUR_FORMAT_TAG +"mm" + MINUTE_FORMAT_TAG +"ss" + SECOND_FORMAT_TAG,"\\d{2}" + HOUR_FORMAT_TAG +"\\d{2}" + MINUTE_FORMAT_TAG +"\\d{2}" + SECOND_FORMAT_TAG);
-        put("H" + HOUR_FORMAT_TAG +"m" + MINUTE_FORMAT_TAG +"ss" + SECOND_FORMAT_TAG,"\\d{1,2}" + HOUR_FORMAT_TAG +"\\d{1,2}" + MINUTE_FORMAT_TAG +"\\d{1,2}" + SECOND_FORMAT_TAG);
-        put("HH" + HOUR_FORMAT_TAG +"mm" + MINUTE_FORMAT_TAG,"\\d{2}" + HOUR_FORMAT_TAG +"\\d{2}" + MINUTE_FORMAT_TAG);
-        put("H" + HOUR_FORMAT_TAG +"m" + MINUTE_FORMAT_TAG,"\\d{1,2}" + HOUR_FORMAT_TAG +"\\d{1,2}" + MINUTE_FORMAT_TAG);
-    }};
-
-    public static final String YEAR_FORMAT_TAG = "_{y}_";
-    public static final String MONTH_FORMAT_TAG = "_{M}_";
-    public static final String DAY_FORMAT_TAG = "_{d}_";
-    public static final Map<String, String> PATTERN_FORMAT_DATE = new HashMap(){{
-        put("yyyy" + YEAR_FORMAT_TAG + "MM" + MONTH_FORMAT_TAG + "dd" + DAY_FORMAT_TAG,"\\d{4}" + YEAR_FORMAT_TAG + "\\d{2}" + MONTH_FORMAT_TAG + "\\d{2}" + DAY_FORMAT_TAG);
-        put("yyyy" + YEAR_FORMAT_TAG + "MM" + MONTH_FORMAT_TAG ,"\\d{4}" + YEAR_FORMAT_TAG + "\\d{2}" + MONTH_FORMAT_TAG);
-        put("yy" + YEAR_FORMAT_TAG + "M" + MONTH_FORMAT_TAG + "d" + DAY_FORMAT_TAG,"\\d{2}" + YEAR_FORMAT_TAG + "\\d{1,2}" + MONTH_FORMAT_TAG + "\\d{1,2}" + DAY_FORMAT_TAG);
-        put("yy" + YEAR_FORMAT_TAG + "M" + MONTH_FORMAT_TAG ,"\\d{2}" + YEAR_FORMAT_TAG + "\\d{1,2}" + MONTH_FORMAT_TAG);
-    }};
 
     public static final String YYYYMMDDHHMMSS = "yyyy-MM-dd HH:mm:ss";
     public static final String HHMMSS = "HH:mm:ss";
     public static final String YYYYMMDD = "yyyy-MM-dd";
 
+
+    /**
+     * <p><b>{@code @description:}</b>
+     * String format Date with pattern
+     * </p>
+     *
+     * <p><b>@param</b> <b>dateStr</b>
+     * {@link String}
+     * </p>
+     *
+     * <p><b>{@code @date:}</b>2023/5/13 9:56</p>
+     * <p><b>{@code @return:}</b>{@link Date}</p>
+     * <p><b>{@code @author:}</b>wlpia</p>
+     */
+    @SneakyThrows
+    public static Date parseDate(String dateStr) {
+        if (dateStr == null || dateStr.trim().isEmpty()) {
+            throw new IllegalArgumentException("日期字符串不能为空");
+        }
+        dateStr = dateStr.trim();
+        SimpleDateFormat sdf;
+        if (CST_PATTERN.matcher(dateStr).matches()) {
+            sdf = new SimpleDateFormat("EEE MMM dd HH:mm:ss zzz yyyy", Locale.US);
+        } else if (SLASH_DATE_TIME.matcher(dateStr).matches()) {
+            sdf = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
+        } else if (SLASH_DATE_TIME_NO_SEC.matcher(dateStr).matches()) {
+            sdf = new SimpleDateFormat("yyyy/MM/dd HH:mm");
+        } else if (LINE_DATE_TIME.matcher(dateStr).matches()) {
+            sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        } else if (LINE_DATE_TIME_NO_SEC.matcher(dateStr).matches()) {
+            sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm");
+        } else if (COMPACT_DATE_TIME.matcher(dateStr).matches()) {
+            sdf = new SimpleDateFormat("yyyyMMddHHmmss");
+        } else if (COMPACT_DATE_TIME_NO_SEC.matcher(dateStr).matches()) {
+            sdf = new SimpleDateFormat("yyyyMMddHHmm");
+        } else if (dateStr.length() == 8) {
+            // 纯日期 20260210
+            sdf = new SimpleDateFormat("yyyyMMdd");
+        } else throw new IllegalArgumentException("日期字符串格式错误");
+        return sdf.parse(dateStr);
+    }
 
     /**
      * <p><b>{@code @description:}</b>
@@ -62,7 +80,7 @@ public class DateUtils {
      * <p><b>{@code @return:}</b>{@link long}</p>
      * <p><b>{@code @author:}</b>wlpia</p>
      */
-    public static long parseToNanoOfDay(@NonNull LocalTime localTime) {
+    public static long parseNanoOfDay(@NonNull LocalTime localTime) {
         return localTime.toNanoOfDay();
     }
 
@@ -79,7 +97,7 @@ public class DateUtils {
      * <p><b>{@code @return:}</b>{@link long}</p>
      * <p><b>{@code @author:}</b>wlpia</p>
      */
-    public static long parseToEpochDay(@NonNull LocalDate localDate) {
+    public static long parseEpochDay(@NonNull LocalDate localDate) {
         return localDate.toEpochDay();
     }
 
@@ -96,9 +114,9 @@ public class DateUtils {
      * <p><b>{@code @return:}</b>{@link long}</p>
      * <p><b>{@code @author:}</b>wlpia</p>
      */
-    public static long parseToTimestamp(@NonNull LocalDateTime localDateTime) {
+    public static long parseTimestamp(@NonNull LocalDateTime localDateTime) {
         ZoneId zoneId = ZoneId.systemDefault();
-        return DateUtils.parseToTimestamp(localDateTime, zoneId);
+        return DateUtils.parseTimestamp(localDateTime, zoneId);
     }
 
     /**
@@ -118,7 +136,7 @@ public class DateUtils {
      * <p><b>{@code @return:}</b>{@link long}</p>
      * <p><b>{@code @author:}</b>wlpia</p>
      */
-    public static long parseToTimestamp(LocalDateTime localDateTime, ZoneId zoneId) {
+    public static long parseTimestamp(LocalDateTime localDateTime, ZoneId zoneId) {
         if (localDateTime == null) {
             throw new IllegalArgumentException("参数不能为空");
         }
@@ -143,7 +161,7 @@ public class DateUtils {
      * <p><b>{@code @return:}</b>{@link LocalTime}</p>
      * <p><b>{@code @author:}</b>wlpia</p>
      */
-    public static LocalTime parseToLocalTime(long nanoOfDay) {
+    public static LocalTime parseLocalTime(long nanoOfDay) {
         return LocalTime.ofNanoOfDay(nanoOfDay);
     }
 
@@ -160,8 +178,8 @@ public class DateUtils {
      * <p><b>{@code @return:}</b>{@link LocalDate}</p>
      * <p><b>{@code @author:}</b>wlpia</p>
      */
-    public static LocalDate parseToLocalDate(long timestamp) {
-        return parseToLocalDateTime(timestamp).toLocalDate();
+    public static LocalDate parseLocalDate(long timestamp) {
+        return parseLocalDateTime(timestamp).toLocalDate();
     }
 
     /**
@@ -177,7 +195,7 @@ public class DateUtils {
      * <p><b>{@code @return:}</b>{@link LocalDate}</p>
      * <p><b>{@code @author:}</b>wlpia</p>
      */
-    public static LocalDate parseToLocalDate(int epochDay) {
+    public static LocalDate parseLocalDate(int epochDay) {
         return LocalDate.ofEpochDay(epochDay);
     }
 
@@ -198,7 +216,7 @@ public class DateUtils {
      * <p><b>{@code @return:}</b>{@link LocalDate}</p>
      * <p><b>{@code @author:}</b>wlpia</p>
      */
-    public static LocalDate parseToLocalDate(@Range(from = -5000, to = 5000) int year,
+    public static LocalDate parseLocalDate(@Range(from = -5000, to = 5000) int year,
                                              @Range(from = 0, to = 366) int dayOfYear) {
         return LocalDate.ofYearDay(year, dayOfYear);
     }
@@ -217,8 +235,8 @@ public class DateUtils {
      * <p><b>{@code @return:}</b>{@link LocalDateTime}</p>
      * <p><b>{@code @author:}</b>wlpia</p>
      */
-    public static LocalDateTime parseToLocalDateTime(long timestamp) {
-        return DateUtils.parseToLocalDateTime(timestamp, ZoneId.systemDefault());
+    public static LocalDateTime parseLocalDateTime(long timestamp) {
+        return DateUtils.parseLocalDateTime(timestamp, ZoneId.systemDefault());
     }
     
     /**
@@ -238,7 +256,7 @@ public class DateUtils {
      * <p><b>{@code @return:}</b>{@link LocalDateTime}</p>
      * <p><b>{@code @author:}</b>wlpia</p>
      */
-    public static LocalDateTime parseToLocalDateTime(long timestamp, ZoneId zoneId) {
+    public static LocalDateTime parseLocalDateTime(long timestamp, ZoneId zoneId) {
         if(zoneId == null){
             zoneId = ZoneId.systemDefault();
         }
@@ -258,9 +276,9 @@ public class DateUtils {
      * <p><b>{@code @return:}</b>{@link Date}</p>
      * <p><b>{@code @author:}</b>wlpia</p>
      */
-    public static Date parseToDate(LocalDate localDate) {
+    public static Date parseDate(LocalDate localDate) {
         ZoneId zoneId = ZoneId.systemDefault();
-        return DateUtils.parseToDate(localDate, zoneId);
+        return DateUtils.parseDate(localDate, zoneId);
     }
 
     /**
@@ -280,7 +298,7 @@ public class DateUtils {
      * <p><b>{@code @return:}</b>{@link Date}</p>
      * <p><b>{@code @author:}</b>wlpia</p>
      */
-    public static Date parseToDate(LocalDate localDate, ZoneId zoneId) {
+    public static Date parseDate(LocalDate localDate, ZoneId zoneId) {
         if(zoneId == null){
             zoneId = ZoneId.systemDefault();
         }
@@ -300,9 +318,9 @@ public class DateUtils {
      * <p><b>{@code @return:}</b>{@link Date}</p>
      * <p><b>{@code @author:}</b>wlpia</p>
      */
-    public static Date parseToDate(LocalDateTime localDateTime) {
+    public static Date parseDate(LocalDateTime localDateTime) {
         ZoneId zoneId = ZoneId.systemDefault();
-        return DateUtils.parseToDate(localDateTime, zoneId);
+        return DateUtils.parseDate(localDateTime, zoneId);
     }
 
     /**
@@ -322,7 +340,7 @@ public class DateUtils {
      * <p><b>{@code @return:}</b>{@link Date}</p>
      * <p><b>{@code @author:}</b>wlpia</p>
      */
-    public static Date parseToDate(LocalDateTime localDateTime, ZoneId zoneId) {
+    public static Date parseDate(LocalDateTime localDateTime, ZoneId zoneId) {
         if(zoneId == null){
             zoneId = ZoneId.systemDefault();
         }
@@ -342,9 +360,9 @@ public class DateUtils {
      * <p><b>{@code @return:}</b>{@link LocalDate}</p>
      * <p><b>{@code @author:}</b>wlpia</p>
      */
-    public static LocalDate parseToLocalDate(Date date) {
+    public static LocalDate parseLocalDate(Date date) {
         ZoneId zoneId = ZoneId.systemDefault();
-        return DateUtils.parseToLocalDate(date, zoneId);
+        return DateUtils.parseLocalDate(date, zoneId);
     }
 
     /**
@@ -364,7 +382,7 @@ public class DateUtils {
      * <p><b>{@code @return:}</b>{@link LocalDate}</p>
      * <p><b>{@code @author:}</b>wlpia</p>
      */
-    public static LocalDate parseToLocalDate(@NonNull Date date, ZoneId zoneId) {
+    public static LocalDate parseLocalDate(@NonNull Date date, ZoneId zoneId) {
         if (date == null) {
             throw new IllegalArgumentException("参数不能为空");
         }
@@ -387,12 +405,12 @@ public class DateUtils {
      * <p><b>{@code @return:}</b>{@link LocalDateTime}</p>
      * <p><b>{@code @author:}</b>wlpia</p>
      */
-    public static LocalDateTime parseToLocalDateTime(Date date) {
+    public static LocalDateTime parseLocalDateTime(Date date) {
         if (date == null) {
             throw new IllegalArgumentException("参数不能为空");
         }
         ZoneId zoneId = ZoneId.systemDefault();
-        return DateUtils.parseToLocalDateTime(date, zoneId);
+        return DateUtils.parseLocalDateTime(date, zoneId);
     }
 
     /**
@@ -412,7 +430,7 @@ public class DateUtils {
      * <p><b>{@code @return:}</b>{@link LocalDateTime}</p>
      * <p><b>{@code @author:}</b>wlpia</p>
      */
-    public static LocalDateTime parseToLocalDateTime(Date date, ZoneId zoneId) {
+    public static LocalDateTime parseLocalDateTime(Date date, ZoneId zoneId) {
         if (date == null) {
             throw new IllegalArgumentException("参数不能为空");
         }
@@ -436,8 +454,8 @@ public class DateUtils {
      * <p><b>{@code @return:}</b>{@link LocalDateTime}</p>
      * <p><b>{@code @author:}</b>wlpia</p>
      */
-    public static LocalDateTime formatToLoaTolDateTime(String localDateTime) {
-        return formatToLoaTolDateTime(localDateTime, YYYYMMDDHHMMSS);
+    public static LocalDateTime parseLocalDateTime(String localDateTime) {
+        return parseLocalDateTime(localDateTime, YYYYMMDDHHMMSS);
     }
 
     /**
@@ -457,7 +475,7 @@ public class DateUtils {
      * <p><b>{@code @return:}</b>{@link LocalDateTime}</p>
      * <p><b>{@code @author:}</b>wlpia</p>
      */
-    public static LocalDateTime formatToLoaTolDateTime(String localDateTime, String pattern) {
+    public static LocalDateTime parseLocalDateTime(String localDateTime, String pattern) {
         if (ValueUtils.isBlank(localDateTime)) {
             throw new IllegalArgumentException("参数不能为空");
         }
@@ -487,7 +505,7 @@ public class DateUtils {
      * <p><b>{@code @return:}</b>{@link LocalDateTime}</p>
      * <p><b>{@code @author:}</b>wlpia</p>
      */
-    public static LocalDateTime formatToLoaTolDateTime(String localDateTime, String pattern, ZoneId zoneId) {
+    public static LocalDateTime parseLocalDateTime(String localDateTime, String pattern, ZoneId zoneId) {
         if (ValueUtils.isBlank(localDateTime)) {
             throw new IllegalArgumentException("参数不能为空");
         }
@@ -510,8 +528,8 @@ public class DateUtils {
      * <p><b>{@code @return:}</b>{@link LocalDate}</p>
      * <p><b>{@code @author:}</b>wlpia</p>
      */
-    public static LocalDate formatLocalDate(String localDate) {
-        return formatLocalDate(localDate, YYYYMMDD);
+    public static LocalDate parseLocalDate(String localDate) {
+        return parseLocalDate(localDate, YYYYMMDD);
     }
 
 
@@ -532,30 +550,12 @@ public class DateUtils {
      * <p><b>{@code @return:}</b>{@link LocalDate}</p>
      * <p><b>{@code @author:}</b>wlpia</p>
      */
-    public static LocalDate formatLocalDate(String localDate, String pattern) {
+    public static LocalDate parseLocalDate(String localDate, String pattern) {
         if (ValueUtils.isBlank(localDate)) {
             throw new IllegalArgumentException("参数不能为空");
         }
         DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern(pattern);
         return LocalDate.parse(localDate, dateTimeFormatter);
-    }
-    
-    /**
-     * <p><b>{@code @description:}</b>
-     * String format Date with pattern
-     * </p>
-     *
-     * <p><b>@param</b> <b>dateStr</b>
-     * {@link String}
-     * </p>
-     *
-     * <p><b>{@code @date:}</b>2023/5/13 9:56</p>
-     * <p><b>{@code @return:}</b>{@link Date}</p>
-     * <p><b>{@code @author:}</b>wlpia</p>
-     */
-    @SneakyThrows
-    public static Date formatToDate(String dateStr){
-        return formatToDate(dateStr, YYYYMMDDHHMMSS);
     }
 
     /**
@@ -576,7 +576,7 @@ public class DateUtils {
      * <p><b>{@code @author:}</b>wlpia</p>
      */
     @SneakyThrows
-    public static Date formatToDate(String dateStr, String pattern){
+    public static Date parseDate(String dateStr, String pattern){
         SimpleDateFormat dateFormat = new SimpleDateFormat(pattern);
         return dateFormat.parse(dateStr);
     }
@@ -690,12 +690,12 @@ public class DateUtils {
      * <p><b>{@code @return:}</b>{@link String}</p>
      * <p><b>{@code @author:}</b>wlpia</p>
      */
-    public static String formatDate(Date date){
-        return formatDate(date, YYYYMMDDHHMMSS);
+    public static String parseDate(Date date){
+        return parseDate(date, YYYYMMDDHHMMSS);
     }
     @Deprecated
     public static String formatLocalTime(Date date){
-        return formatDate(date, YYYYMMDDHHMMSS);
+        return parseDate(date, YYYYMMDDHHMMSS);
     }
 
     /**
@@ -715,22 +715,13 @@ public class DateUtils {
      * <p><b>{@code @return:}</b>{@link String}</p>
      * <p><b>{@code @author:}</b>wlpia</p>
      */
-    public static String formatDate(Date date, String pattern){
+    public static String parseDate(Date date, String pattern){
         SimpleDateFormat dateFormat = new SimpleDateFormat(pattern);
         return dateFormat.format(date);
     }
     @Deprecated
     public static String formatLocalTime(Date date, String pattern){
-        return formatDate(date, pattern);
-    }
-
-
-    private static String getUnit2Number(long n){
-        long un = Math.abs(n);
-        if(un < 10){
-            return "0" + un;
-        }
-        return "" + un;
+        return parseDate(date, pattern);
     }
 
     /**
@@ -748,8 +739,8 @@ public class DateUtils {
      */
     public static String friendCNLocalDateTime(LocalDateTime dateTime){
         LocalDateTime curDateTime = LocalDateTime.now();
-        long timestamp = DateUtils.parseToTimestamp(dateTime);
-        long curTimestamp = DateUtils.parseToTimestamp(curDateTime);
+        long timestamp = DateUtils.parseTimestamp(dateTime);
+        long curTimestamp = DateUtils.parseTimestamp(curDateTime);
         long offSeconds = (curTimestamp - timestamp) / 1000;
         String endSuffix;
         if(offSeconds > 0){
@@ -790,7 +781,112 @@ public class DateUtils {
         return DateUtils.formatLocalDateTime(dateTime, "YY/MM/dd HH:mm:ss");
     }
 
+    // ==================== 日期加减（返回 Date） ====================
+
+    public static Date plusDays(Date date, int days) {
+        return modify(date, d -> d.plusDays(days));
+    }
+
+    public static Date minusDays(Date date, int days) {
+        return plusDays(date, -days);
+    }
+
+    public static Date plusHours(Date date, int hours) {
+        return modify(date, d -> d.plusHours(hours));
+    }
+
+    public static Date minusHours(Date date, int hours) {
+        return plusHours(date, -hours);
+    }
+
+    public static Date plusMinutes(Date date, int minutes) {
+        return modify(date, d -> d.plusMinutes(minutes));
+    }
+
+    public static Date minusMinutes(Date date, int minutes) {
+        return plusMinutes(date, -minutes);
+    }
+
+    public static Date plusSeconds(Date date, int seconds) {
+        return modify(date, d -> d.plusSeconds(seconds));
+    }
+
+    public static Date minusSeconds(Date date, int seconds) {
+        return plusSeconds(date, -seconds);
+    }
+
+    public static Date plusMonths(Date date, int months) {
+        return modify(date, d -> d.plusMonths(months));
+    }
+
+    public static Date minusMonths(Date date, int months) {
+        return plusMonths(date, -months);
+    }
+
+    public static Date plusYears(Date date, int years) {
+        return modify(date, d -> d.plusYears(years));
+    }
+
+    public static Date minusYears(Date date, int years) {
+        return plusYears(date, -years);
+    }
+
+    public static Date plusWeeks(Date date, int weeks) {
+        return modify(date, d -> d.plusWeeks(weeks));
+    }
+
+    public static Date minusWeeks(Date date, int weeks) {
+        return plusWeeks(date, -weeks);
+    }
+
+    // ==================== 私有辅助方法 ====================
+
+    // 定义各种日期格式的正则表达式
+    private static final Pattern CST_PATTERN =
+            Pattern.compile("[A-Za-z]{3} [A-Za-z]{3} \\d{2} \\d{2}:\\d{2}:\\d{2} [A-Z]{3} \\d{4}");
+    private static final Pattern SLASH_DATE_TIME =
+            Pattern.compile("\\d{4}/\\d{2}/\\d{2} \\d{2}:\\d{2}:\\d{2}");
+    private static final Pattern SLASH_DATE_TIME_NO_SEC =
+            Pattern.compile("\\d{4}/\\d{2}/\\d{2} \\d{2}:\\d{2}");
+    private static final Pattern LINE_DATE_TIME =
+            Pattern.compile("\\d{4}-\\d{2}-\\d{2} \\d{2}:\\d{2}:\\d{2}");
+    private static final Pattern LINE_DATE_TIME_NO_SEC =
+            Pattern.compile("\\d{4}-\\d{2}-\\d{2} \\d{2}:\\d{2}");
+    private static final Pattern COMPACT_DATE_TIME =
+            Pattern.compile("\\d{14}");
+    private static final Pattern COMPACT_DATE_TIME_NO_SEC =
+            Pattern.compile("\\d{12}");
+
+    @FunctionalInterface
+    private interface LocalDateTimeOperator {
+        LocalDateTime apply(LocalDateTime dateTime);
+    }
+
+    /**
+     * 修改时间
+     */
+    private static Date modify(Date date, LocalDateTimeOperator operator) {
+        Objects.requireNonNull(date, "date must not be null");
+        LocalDateTime ldt = parseLocalDateTime(date);
+        LocalDateTime result = operator.apply(ldt);
+        return parseDate(result);
+    }
+
+    /**
+     * 获取数字的2位
+     */
+    private static String getUnit2Number(long n){
+        long un = Math.abs(n);
+        if(un < 10){
+            return "0" + un;
+        }
+        return "" + un;
+    }
+
 //    public static void main(String[] args) {
+//        Date date = new Date();
+//        String dateStr = date.toString();
+//        Date d = DateUtils.parseDate(dateStr);
 //        System.out.println();
 //    }
 

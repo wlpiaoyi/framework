@@ -5,7 +5,7 @@ import org.wlpiaoyi.framework.utils.gson.GsonBuilder;
 
 import java.lang.reflect.Type;
 
-public class JsonLongTypeAdapter implements GsonBuilder.JsonSerializer<Long>, JsonDeserializer<Long> {
+public class JsonLongTypeAdapter implements org.wlpiaoyi.framework.utils.gson.JsonSerializer<Long>, JsonDeserializer<Long> {
 
     public static Class getType(){
         return Long.class;
