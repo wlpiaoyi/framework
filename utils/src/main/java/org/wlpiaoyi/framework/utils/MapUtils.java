@@ -225,7 +225,7 @@ public class MapUtils {
         }else if(value instanceof LocalDate){
             return DateUtils.formatLocalDate((LocalDate) value);
         }else if(value instanceof Date){
-            return DateUtils.parseDate((Date) value);
+            return DateUtils.formatDate((Date) value);
         }else{
             return value.toString();
         }
@@ -631,7 +631,7 @@ public class MapUtils {
             }
         } else if (clazz == String.class) {
             if (valueData instanceof Date) {
-                valueData = DateUtils.parseDate((Date) valueData);
+                valueData = DateUtils.formatDate((Date) valueData);
             } else if (valueData instanceof LocalDate) {
                 valueData = DateUtils.formatLocalDate((LocalDate) valueData);
             } else if (valueData instanceof LocalDateTime) {

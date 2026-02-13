@@ -320,7 +320,7 @@ public class DateUtils {
      */
     public static Date parseDate(LocalDateTime localDateTime) {
         ZoneId zoneId = ZoneId.systemDefault();
-        return DateUtils.parseDate(localDateTime, zoneId);
+        return DateUtils.formatDate(localDateTime, zoneId);
     }
 
     /**
@@ -340,7 +340,7 @@ public class DateUtils {
      * <p><b>{@code @return:}</b>{@link Date}</p>
      * <p><b>{@code @author:}</b>wlpia</p>
      */
-    public static Date parseDate(LocalDateTime localDateTime, ZoneId zoneId) {
+    public static Date formatDate(LocalDateTime localDateTime, ZoneId zoneId) {
         if(zoneId == null){
             zoneId = ZoneId.systemDefault();
         }
@@ -576,7 +576,7 @@ public class DateUtils {
      * <p><b>{@code @author:}</b>wlpia</p>
      */
     @SneakyThrows
-    public static Date parseDate(String dateStr, String pattern){
+    public static Date formatDate(String dateStr, String pattern){
         SimpleDateFormat dateFormat = new SimpleDateFormat(pattern);
         return dateFormat.parse(dateStr);
     }
@@ -690,12 +690,12 @@ public class DateUtils {
      * <p><b>{@code @return:}</b>{@link String}</p>
      * <p><b>{@code @author:}</b>wlpia</p>
      */
-    public static String parseDate(Date date){
-        return parseDate(date, YYYYMMDDHHMMSS);
+    public static String formatDate(Date date){
+        return formatDate(date, YYYYMMDDHHMMSS);
     }
     @Deprecated
     public static String formatLocalTime(Date date){
-        return parseDate(date, YYYYMMDDHHMMSS);
+        return formatDate(date, YYYYMMDDHHMMSS);
     }
 
     /**
@@ -715,13 +715,13 @@ public class DateUtils {
      * <p><b>{@code @return:}</b>{@link String}</p>
      * <p><b>{@code @author:}</b>wlpia</p>
      */
-    public static String parseDate(Date date, String pattern){
+    public static String formatDate(Date date, String pattern){
         SimpleDateFormat dateFormat = new SimpleDateFormat(pattern);
         return dateFormat.format(date);
     }
     @Deprecated
     public static String formatLocalTime(Date date, String pattern){
-        return parseDate(date, pattern);
+        return formatDate(date, pattern);
     }
 
     /**

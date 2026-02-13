@@ -19,7 +19,6 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.OutputStream;
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicReference;
 
@@ -114,8 +113,8 @@ public class BrowserCabgov extends BrowserBase {
     @SneakyThrows
     public void writeExcel(List<Map<String, String>> itemsList, List<String> errorCarNos, List<String> noItemCarNos){
         log.info("BrowserCabgov.writeExcel in. 输出数据：itemsList.Size:{}", itemsList.size());
-        String pathDateName = DateUtils.parseDate(new Date(), "YY年MM月dd日");
-        String fileTimeName = DateUtils.parseDate(new Date(), "HHmmss");
+        String pathDateName = DateUtils.formatDate(new Date(), "YY年MM月dd日");
+        String fileTimeName = DateUtils.formatDate(new Date(), "HHmmss");
         File dataPath = new File(DATA_PATH + "/" + pathDateName);
         if(!dataPath.exists())
             dataPath.mkdirs();
@@ -487,7 +486,7 @@ public class BrowserCabgov extends BrowserBase {
                 }
 
                 try{
-                    String curYear = DateUtils.parseDate(DateUtils.parseDate(LocalDate.now().plusYears(-1)), "YYYY");
+                    String curYear = DateUtils.formatDate(DateUtils.parseDate(LocalDate.now().plusYears(-1)), "YYYY");
                     List<WebElement> eles = browser.getDriver().findElements(By.className("datetimepicker-years")).get(0).findElements(By.xpath("table/tbody/tr/td/span"));
                     WebElement curEle = null;
                     for (WebElement ele : eles){
@@ -627,7 +626,7 @@ public class BrowserCabgov extends BrowserBase {
                 if(enDataInput == null){
                     System.exit(0);
                 }
-                return DateUtils.formatToDate(WebElementUtils.getValue(enDataInput).toString(), "yyyyMMdd").getTime();
+                return DateUtils.formatDate(WebElementUtils.getValue(enDataInput).toString(), "yyyyMMdd").getTime();
             });
         } catch (Exception e) {
             log.error("BrowserCabgov.checkValid 获取时间选择器异常", e);

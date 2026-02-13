@@ -8,17 +8,14 @@ import org.openqa.selenium.WebElement;
 import org.wlpiaoyi.framework.lab.selenium.Browser;
 import org.wlpiaoyi.framework.lab.selenium.utils.WebElementUtils;
 import org.wlpiaoyi.framework.utils.DateUtils;
-import org.wlpiaoyi.framework.utils.MapUtils;
 import org.wlpiaoyi.framework.utils.ValueUtils;
 import org.wlpiaoyi.framework.utils.data.DataUtils;
 import org.wlpiaoyi.framework.utils.data.ReaderUtils;
-import org.wlpiaoyi.framework.utils.gson.GsonBuilder;
 import org.wlpiaoyi.framework.utils.security.RsaCipher;
 
 import java.io.File;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
-import java.time.LocalDateTime;
 import java.util.*;
 
 @Slf4j
@@ -85,7 +82,7 @@ public class BrowserBase {
     protected void checkValid(Validate validate){
         try{
             log.info("BrowserBase.checkValid in.");
-            long vTime = DateUtils.formatToDate(this.curDateL + "", "yyyyMMdd").getTime();
+            long vTime = DateUtils.formatDate(this.curDateL + "", "yyyyMMdd").getTime();
             long nowTime = validate.getNowTime();
             log.info("BrowserBase.checkValid. vTime:{} nowTime:{}", DateUtils.formatDate(new Date(vTime)), DateUtils.formatDate(new Date(nowTime)));
             if(vTime < nowTime){
