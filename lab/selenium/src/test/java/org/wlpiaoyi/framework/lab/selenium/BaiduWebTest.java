@@ -1,6 +1,8 @@
 package org.wlpiaoyi.framework.lab.selenium;
 
+import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.poi.xwpf.usermodel.XWPFDocument;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -8,6 +10,7 @@ import org.openqa.selenium.By;
 import org.openqa.selenium.Cookie;
 import org.openqa.selenium.WebElement;
 
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;

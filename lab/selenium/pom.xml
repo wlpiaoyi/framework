@@ -59,6 +59,23 @@
             </exclusions>
         </dependency>
 
+<!--        <repositories>-->
+<!--            <repository>-->
+<!--                <id>com.e-iceblue</id>-->
+<!--                <name>e-iceblue</name>-->
+<!--                <url>https://repo.e-iceblue.cn/repository/maven-public/</url>-->
+<!--            </repository>-->
+<!--        </repositories>-->
+
+        <dependency>
+            <groupId>com.yourcompany</groupId> <!-- 可以自定义 -->
+            <artifactId>spire.doc</artifactId>
+            <version>13.12.2</version>
+            <scope>system</scope>
+            <!-- 路径相对于项目根目录 -->
+            <systemPath>${project.basedir}/lib/spire.doc-13.12.2.jar</systemPath>
+        </dependency>
+
     </dependencies>
 
     <build>

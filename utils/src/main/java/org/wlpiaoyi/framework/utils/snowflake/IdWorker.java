@@ -18,13 +18,24 @@ import lombok.Getter;
 public class IdWorker {
 // ==============================Fields===========================================
     /** 开始时间截 (2021-10-01) */
+    @Getter
     protected final long timerEpoch;
 
     /** 工作机器ID(0~31) */
+    @Getter
     private final long workerId;
 
     /** 数据中心ID(0~31) */
+    @Getter
     private final long datacenterId;
+
+    /** 毫秒内序列(0~4095) */
+    @Getter
+    private long sequence = 0L;
+
+    /** 上次生成ID的时间截 */
+    @Getter
+    private long lastTimestamp = -1L;
 
     /** 支持的最大机器id，结果是31 (这个移位算法可以很快的计算出几位二进制数所能表示的最大十进制数) */
     private final long maxWorkerId;
@@ -52,13 +63,6 @@ public class IdWorker {
 
     /** 生成序列的掩码，这里为4095 (0b111111111111=0xfff=4095) */
     private final long sequenceMask;// = -1L ^ (-1L << sequenceBits);
-    /** 毫秒内序列(0~4095) */
-    @Getter
-    private long sequence = 0L;
-
-    /** 上次生成ID的时间截 */
-    @Getter
-    private long lastTimestamp = -1L;
 
     //==============================Constructors=====================================
     /**
@@ -71,9 +75,9 @@ public class IdWorker {
      * @date: 2023/12/25 16:51
      */
     public IdWorker(byte workerId, byte datacenterId, long timerEpoch) {
-        this.workerIdBits = 5L;
-        this.datacenterIdBits = 5L;
-        this.sequenceBits = 12L;
+        this.workerIdBits = 6L;
+        this.datacenterIdBits = 6L;
+        this.sequenceBits = 10L;
         this.workerIdShift = this.sequenceBits;
         this.datacenterIdShift = this.sequenceBits + this.workerIdBits;
         this.timestampLeftShift = this.sequenceBits + this.workerIdBits + this.datacenterIdBits;
@@ -103,7 +107,7 @@ public class IdWorker {
      * @author: wlpia
      * @date: 2023/12/25 16:57
      */
-    public IdWorker(byte workerIdBits, byte datacenterIdBits, byte sequenceBits, int workerId, int datacenterId, long timerEpoch) {
+    public IdWorker(byte workerIdBits, byte datacenterIdBits, byte sequenceBits, byte workerId, byte datacenterId, long timerEpoch) {
         this.workerIdBits = workerIdBits;
         this.datacenterIdBits = datacenterIdBits;
         this.sequenceBits = sequenceBits;
@@ -166,28 +170,6 @@ public class IdWorker {
     }
 
     /**
-     * 获取对应Id的时间戳
-     * @param id
-     * @return: long
-     * @author: wlpia
-     * @date: 2023/12/25 17:14
-     */
-    public final long getTimestamp(long id){
-        return (id >> timestampLeftShift) + timerEpoch;
-    }
-
-    /**
-     * 获取对应Id的毫秒内序列
-     * @param id
-     * @return: long
-     * @author: wlpia
-     * @date: 2023/12/25 17:15
-     */
-    public final long getSequence(long id){
-        return ((id >> this.sequenceBits) << this.sequenceBits) ^ id;
-    }
-
-    /**
      * 阻塞到下一个毫秒，直到获得新的时间戳
      * @param lastTimestamp 上次生成ID的时间截
      * @return 当前时间戳
@@ -210,4 +192,153 @@ public class IdWorker {
         return System.currentTimeMillis();
     }
 
+    /**
+     * <p><b>{@code @description:}</b>
+     * <div style='padding: 5px; margin-left: 5px; margin-bottom: 5px;'>
+     * 获取工作位Id
+     * </div>
+     * </p>
+     *
+     * <p><b>{@code @param}</b> <b>id</b>
+     * {@link long}
+     * </p>
+     *
+     * <p><b>{@code @param}</b> <b>sequenceBits</b>
+     * {@link long}
+     * 序列在id中占的位数
+     * </p>
+     *
+     * <p><b>{@code @param}</b> <b>workerIdBits</b>
+     * {@link long}
+     * 工作id中占的位数
+     * </p>
+     *
+     * <p><b>{@code @date:}</b>2026/1/12 14:29</p>
+     * <p><b>{@code @return:}</b>{@link long}</p>
+     * <p><b>{@code @author:}</b>wlpiaoyi</p>
+     * <hr/>
+     */
+    public static long getWorkerId(long id, long sequenceBits, long workerIdBits){
+        return (((id >> (workerIdBits + sequenceBits))<< (workerIdBits + sequenceBits))^ id) >> sequenceBits;
+    }
+    public long getWorkerId(long id){
+       return getWorkerId(id, this.sequenceBits, this.workerIdBits);
+    }
+
+    /**
+     * <p><b>{@code @description:}</b>
+     * <div style='padding: 5px; margin-left: 5px; margin-bottom: 5px;'>
+     * 获取数据中心ID
+     * </div>
+     * </p>
+     *
+     * <p><b>{@code @param}</b> <b>id</b>
+     * {@link long}
+     * </p>
+     *
+     * <p><b>{@code @param}</b> <b>timestampLeftShift</b>
+     * {@link long}
+     * 时间截向左移22位
+     * </p>
+     *
+     * <p><b>{@code @param}</b> <b>datacenterIdBits</b>
+     * {@link long}
+     * 数据中心ID位数
+     * </p>
+     * id = 1010 | 1011| 1111
+     *
+     * <p><b>{@code @date:}</b>2026/1/12 11:26</p>
+     * <p><b>{@code @return:}</b>{@link long}</p>
+     * <p><b>{@code @author:}</b>wlpiaoyi</p>
+     * <hr/>
+     */
+    public static long getDatacenterId(long id, long timestampLeftShift, long datacenterIdBits){
+        id = (id >> (timestampLeftShift) << timestampLeftShift) ^ (id >> (timestampLeftShift - datacenterIdBits) << (timestampLeftShift - datacenterIdBits));
+        return id >> (timestampLeftShift - datacenterIdBits);
+    }
+    public long getDatacenterId(long id){
+        return getDatacenterId(id, timestampLeftShift, datacenterIdBits);
+    }
+
+
+    /**
+     * <p><b>{@code @description:}</b>
+     * <div style='padding: 5px; margin-left: 5px; margin-bottom: 5px;'>
+     * 获取对应Id生成的的时间戳
+     * </div>
+     * </p>
+     *
+     * <p><b>{@code @param}</b> <b>id</b>
+     * {@link long}
+     * </p>
+     *
+     * <p><b>{@code @param}</b> <b>timestampLeftShift</b>
+     * {@link int}
+     * 时间截向左移22位
+     * </p>
+     *
+     * <p><b>{@code @param}</b> <b>timerEpoch</b>
+     * {@link int}
+     * </p>
+     * 开始时间截
+     * <p><b>{@code @date:}</b>2023/12/25 17:15</p>
+     * <p><b>{@code @return:}</b>{@link long}</p>
+     * <p><b>{@code @author:}</b>wlpiaoyi</p>
+     * <hr/>
+     */
+    public static long getHappenTimestamp(long id, long timestampLeftShift, long timerEpoch){
+        return (id >> timestampLeftShift) + timerEpoch;
+    }
+    public long getHappenTimestamp(long id){
+        return getHappenTimestamp(id, this.timestampLeftShift, this.timerEpoch);
+    }
+
+
+    /**
+     * <p><b>{@code @description:}</b>
+     * <div style='padding: 5px; margin-left: 5px; margin-bottom: 5px;'>
+     * 获取对应Id的毫秒内序列
+     * </div>
+     * </p>
+     *
+     * <p><b>{@code @param}</b> <b>id</b>
+     * {@link long}
+     * </p>
+     *
+     * <p><b>{@code @param}</b> <b>sequenceBits</b>
+     * {@link long}
+     * 序列在id中占的位数
+     * </p>
+     *
+     * <p><b>{@code @date:}</b>2023/12/25 17:15</p>
+     * <p><b>{@code @return:}</b>{@link long}</p>
+     * <p><b>{@code @author:}</b>wlpiaoyi</p>
+     * <hr/>
+     */
+    public static long getSequence(long id, long sequenceBits){
+        return id ^ ((id >> sequenceBits) << sequenceBits);
+    }
+    public long getSequence(long id){
+        return getSequence(id, this.sequenceBits);
+    }
+
+    @Override
+    public String toString() {
+        return "IdWorker{" +
+                "timerEpoch=" + timerEpoch +
+                ", workerId=" + workerId +
+                ", datacenterId=" + datacenterId +
+                ", sequence=" + sequence +
+                ", lastTimestamp=" + lastTimestamp +
+                ", maxWorkerId=" + maxWorkerId +
+                ", maxDatacenterId=" + maxDatacenterId +
+                ", workerIdBits=" + workerIdBits +
+                ", datacenterIdBits=" + datacenterIdBits +
+                ", sequenceBits=" + sequenceBits +
+                ", workerIdShift=" + workerIdShift +
+                ", datacenterIdShift=" + datacenterIdShift +
+                ", timestampLeftShift=" + timestampLeftShift +
+                ", sequenceMask=" + sequenceMask +
+                '}';
+    }
 }

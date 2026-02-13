@@ -21,17 +21,30 @@ public class IdWorkerTest {
     @Test
     public void test() throws Exception {
         Long timerEpoch = System.currentTimeMillis();
-        IdWorker idWorker = new IdWorker((byte) 1, (byte) 2, timerEpoch);
-//        IdWorker idWorker = new IdWorker((byte)4, (byte)4, (byte)4,  5, 2, timerEpoch);
-        for (int i = 0; i < 100; i++) {
+        IdWorker idWorker = new IdWorker((byte) 5, (byte)2, timerEpoch);
+        System.out.println("IdWorker:" + idWorker);
+        for (int i = 0; i < 5; i++) {
             long id = idWorker.nextId();
-            System.out.println(Long.toBinaryString(id));
-            System.out.println(id);
-            System.out.println("timestamp assert:" + (idWorker.getTimestamp(id) == idWorker.getLastTimestamp())
-                    + ", idWorker.getTimestamp.id:" + idWorker.getTimestamp(id)
-                    + ", sequence assert:" + (idWorker.getSequence() == idWorker.getSequence(id))
-                    + ", idWorker.getSequence.id:" + idWorker.getSequence(id));
+            System.out.println("Id:" + id);
+            System.out.println("Id to binary string:" + Long.toBinaryString(id));
+            System.out.println("Id getWorkerId:" + idWorker.getWorkerId(id));
+            System.out.println("Id getDatacenterId:" + idWorker.getDatacenterId(id));
+            System.out.println("Id getHappenTimestamp:" + idWorker.getHappenTimestamp(id));
+            System.out.println("Id getSequence:" + idWorker.getSequence(id));
         }
+        timerEpoch -= 11198;
+        idWorker = new IdWorker((byte)4, (byte)5, (byte)5,  (byte)6, (byte)4, timerEpoch);
+        System.out.println("IdWorker:" + idWorker);
+        for (int i = 0; i < 5; i++) {
+            long id = idWorker.nextId();
+            System.out.println("Id:" + id);
+            System.out.println("Id to binary string:" + Long.toBinaryString(id));
+            System.out.println("Id getWorkerId:" + idWorker.getWorkerId(id));
+            System.out.println("Id getDatacenterId:" + idWorker.getDatacenterId(id));
+            System.out.println("Id getHappenTimestamp:" + idWorker.getHappenTimestamp(id));
+            System.out.println("Id getSequence:" + idWorker.getSequence(id));
+        }
+
         timerEpoch = DateUtils.parseTimestamp(DateUtils.parseLocalDateTime("2021-01-01 08:00:00"));
         idWorker = new IdWorker((byte) 1, (byte) 2, timerEpoch);
         long id = idWorker.nextId();
@@ -57,7 +70,12 @@ public class IdWorkerTest {
         id = idWorker.nextId();
         System.out.println(Long.toBinaryString(id));
         System.out.println(id);
-        timerEpoch = DateUtils.parseTimestamp(DateUtils.parseLocalDateTime("1954-04-20 02:30:00"));
+        timerEpoch = DateUtils.parseTimestamp(DateUtils.parseLocalDateTime("1950-01-01 02:30:00"));
+        idWorker = new IdWorker((byte) 1, (byte) 2, timerEpoch);
+        id = idWorker.nextId();
+        System.out.println(Long.toBinaryString(id));
+        System.out.println(id);
+        timerEpoch = DateUtils.parseTimestamp(DateUtils.parseLocalDateTime("1920-01-01 02:30:00"));
         idWorker = new IdWorker((byte) 1, (byte) 2, timerEpoch);
         id = idWorker.nextId();
         System.out.println(Long.toBinaryString(id));

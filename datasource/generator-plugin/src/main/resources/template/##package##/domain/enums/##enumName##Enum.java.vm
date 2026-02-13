@@ -1,0 +1,51 @@
+package ##package##.##bizTag##.domain.enums;
+
+import lombok.Getter;
+import ##package##.##bizTag##.enums.BaseEnum;
+import org.wlpiaoyi.framework.utils.ValueUtils;
+
+import java.util.Map;
+
+/**
+ * {@code @author:} 		##author##
+ * {@code @description:} 	##enumDesc## 类型
+ * {@code @date:} 			##createTime##
+ * {@code @version:}: 		##version##
+ */
+@Getter
+public enum FileRoleEnum implements BaseEnum {
+
+    DEFAULT(0, "默认"),
+    DOWN_INHERIT(1, "向下继承"),
+    PASSIVE_DOWN_INHERIT(2, "被动向下继承"),
+    ;
+
+    private final Integer value;
+    private final String desc;
+
+
+    FileRoleEnum(Integer value, String desc) {
+        this.value = value;
+        this.desc = desc;
+    }
+
+    public static FileRoleEnum getByValue(Integer value){
+        if(ValueUtils.isNotBlank(ValueCache) && ValueCache.containsKey(value)){
+            return ValueCache.get(value);
+        }
+        for (FileRoleEnum enums : FileRoleEnum.values()) {
+            if(enums.value.equals(value)){
+                return enums;
+            }
+        }
+        return DEFAULT;
+    }
+
+
+    private static Map<Integer, FileRoleEnum> ValueCache;
+
+    @Override
+    public <T extends BaseEnum> void putValueCache(Map<Integer, T> valueCache) {
+        ValueCache = (Map<Integer, FileRoleEnum>) valueCache;
+    }
+}

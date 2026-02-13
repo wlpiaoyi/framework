@@ -11,6 +11,7 @@ import org.wlpiaoyi.framework.lab.selenium.for12123.lease.excel.ExcelReaderUtil;
 import org.wlpiaoyi.framework.lab.selenium.utils.WebElementUtils;
 import org.wlpiaoyi.framework.utils.DateUtils;
 import org.wlpiaoyi.framework.utils.ValueUtils;
+import org.wlpiaoyi.framework.utils.data.DataUtils;
 import org.wlpiaoyi.framework.utils.data.WriterUtils;
 import org.wlpiaoyi.framework.utils.exception.BusinessException;
 
@@ -32,15 +33,48 @@ public class BrowserCabgov extends BrowserBase {
     @SneakyThrows
     public boolean start(){
         log.info("BrowserCabgov.start in. 启动浏览器");
-        if(!super.start()) return false;
-        this.openAndLogin();
-        this.checkLocal();
+        boolean hasError = true;
+        try{
+            if(!super.start()) return false;
+            this.openAndLogin();
+            this.checkLocal();
+            for (int i = 0; i < 5; i++) {
+                if(this.runData(i)){hasError = true; break;};
+            }
+        }finally {
+            try{
+                Thread.sleep(2000);
+                this.browser.quit();
+            }catch (Exception e){};
+            log.info("BrowserCabgov.start end. hasError:{}", hasError);
+        }
+        return true;
+    }
+
+    boolean runData(int index){
+
+        boolean hasError = false;
         try{
             String filePath = CONFIG_PATH + "\\12123司机信息表.xlsx";
             List<SubmitHT> submitHTList = ExcelReaderUtil.readExcelToSubmitHTList(filePath);
             log.info("BrowserCabgov.start 已经读取到Excel数据:{}条", submitHTList.size());
             String curTimeName = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMMdd"));
-            File erroFile = new File(DATA_PATH + "\\12123司机信息错误-" + curTimeName + ".txt");
+            File erroFile = new File(DATA_PATH + "\\12123司机信息错误-" + curTimeName + "." + index + ".txt");
+            if(erroFile.exists()){
+                erroFile.delete();
+            }
+            Set<String> errorIDCards = new HashSet<>();
+            if(index > 0){
+                File preErrorFile = new File(DATA_PATH + "\\12123司机信息错误-" + curTimeName + "." + (index - 1) + ".txt");
+                if(!preErrorFile.exists()){
+                    log.info("BrowserCabgov.start 没有找到上一次的错误文件:{}", preErrorFile.getAbsolutePath());
+                    return true;
+                }
+                String preErrorString = DataUtils.readFile(preErrorFile.getAbsolutePath());
+                Arrays.asList(preErrorString.split("\r\n")).forEach(line -> {
+                    errorIDCards.add(line.split(":")[0]);
+                });
+            }
             for (SubmitHT submitHT : submitHTList) {
                 if(this.browser.isClosed()){
                     log.warn("BrowserCabgov.start 浏览器已关闭");
@@ -48,11 +82,16 @@ public class BrowserCabgov extends BrowserBase {
                 }
                 try {
                     log.info("BrowserCabgov.start 准备打开绑定窗口,绑定数据:{}", submitHT.toString());
+                    if(ValueUtils.isNotBlank(errorIDCards) && !errorIDCards.contains(submitHT.getCardId())){
+                        log.warn("BrowserCabgov.start 忽略错误数据:{}", submitHT.getCardId());
+                        continue;
+                    }
                     WebElement addBoxEle = this.openAddBox();
                     log.info("BrowserCabgov.start 打开绑定窗口成功, 准备提交数据");
                     this.submitHT(submitHT, addBoxEle);
                     log.info("BrowserCabgov.start 提交数据成功, 确认提交");
                 }catch (Exception e){
+                    hasError = true;
                     log.error("BrowserCabgov.start 提交合同信息失败:{}", submitHT.toString(), e);
                     // 检查父目录是否存在，不存在则创建
                     File parentDir = erroFile.getParentFile();
@@ -74,27 +113,44 @@ public class BrowserCabgov extends BrowserBase {
             }
         }catch (Exception e){
             log.error("error", e);
-        }finally {
-            try{
-                this.browser.quit();
-            }catch (Exception e){};
-            log.info("BrowserCabgov.start end");
         }
-        return true;
+        return !hasError;
     }
 
     void submitHT(SubmitHT submitHT, WebElement addBoxEle){
-        log.info("BrowserCabgov.submitHT in. 准备选择车辆类型");
-        var webElements = addBoxEle.findElement(By.id("hpzl_lr")).findElements(By.xpath("option"));
-        WebElementUtils.click(browser, webElements.getLast());
-        log.info("BrowserCabgov.submitHT 选择车辆类型成功");
-        try {
-            Thread.sleep(1000);
-        } catch (InterruptedException e) {
+        int tindex = 5;
+        while (tindex -- >= 0){
+            try {
+                Thread.sleep(1000);
+            } catch (InterruptedException e) {
+            }
+            log.info("BrowserCabgov.submitHT in. 准备选择车辆类型");
+            var webElements = addBoxEle.findElement(By.id("hpzl_lr")).findElements(By.xpath("option"));
+            WebElementUtils.click(browser, webElements.getLast());
+            boolean isNew = false;
+            for (int i = 0; i < webElements.size(); i++) {
+                WebElement webElement = webElements.get(i);
+                if(!"true".equals(webElement.getAttribute("selected"))){
+                    continue;
+                }
+                String valueName = WebElementUtils.getValue(webElement);
+                if(ValueUtils.isBlank(valueName)) continue;
+                if(valueName.contains("新能源")){
+                    isNew = true;
+                    break;
+                }
+            }
+            if (isNew){
+                log.info("BrowserCabgov.submitHT 选择车辆类型成功");
+                tindex = 999;
+                break;
+            }
         }
-
+        if (tindex != 999){
+            throw new BusinessException("选择车辆类型失败");
+        }
         log.info("BrowserCabgov.submitHT 准备选择租赁类型");
-        webElements = addBoxEle.findElement(By.id("zllx_lr")).findElements(By.xpath("option"));
+        var webElements = addBoxEle.findElement(By.id("zllx_lr")).findElements(By.xpath("option"));
         WebElementUtils.click(browser, webElements.getLast());
         log.info("BrowserCabgov.submitHT 选择租赁类型成功");
         try {
@@ -201,23 +257,22 @@ public class BrowserCabgov extends BrowserBase {
     void checkValid(){
         try{
             WebElement yearMonthEle = browser.getDriver().findElements(By.className("datetimepicker-months")).get(2);
-            if(yearMonthEle == null){
-                throw new RuntimeException("未找到时间选择器");
-            }
-            List<WebElement> yearMonthTableEle = WebElementUtils.getChildrenByTag(yearMonthEle, "table");
-            if(ValueUtils.isBlank(yearMonthTableEle)){
-                throw new RuntimeException("未找到日历Table");
-            }
-            WebElementUtils.click(browser, yearMonthTableEle.get(0).findElement(By.xpath("tfoot/tr/th")));
-            LocalDateTime dt = DateUtils.parseLocalDateTime(WebElementUtils.getValue(browser.getDriver().findElement(By.id("htqdsj_lr"))), "yyyy-MM-dd HH:mm");
-            if(DateUtils.parseTimestamp(dt) > DateUtils.parseDate(this.curDateL + "", "yyyyMMdd").getTime()){
-                System.exit(0);
-            }
+            this.checkValid(() -> {
+                if(yearMonthEle == null){
+                    throw new RuntimeException("未找到时间选择器");
+                }
+                List<WebElement> yearMonthTableEle = WebElementUtils.getChildrenByTag(yearMonthEle, "table");
+                if(ValueUtils.isBlank(yearMonthTableEle)){
+                    throw new RuntimeException("未找到日历Table");
+                }
+                WebElementUtils.click(browser, yearMonthTableEle.get(0).findElement(By.xpath("tfoot/tr/th")));
+                LocalDateTime dt = DateUtils.parseLocalDateTime(WebElementUtils.getValue(browser.getDriver().findElement(By.id("htqdsj_lr"))), "yyyy-MM-dd HH:mm");
+                return DateUtils.parseTimestamp(dt);
+            });
         } catch (Exception e) {
             log.error("BrowserCabgov.checkValid 获取时间选择器异常", e);
             System.exit(0);
         }
-
     }
     void selectedYearMonth(int index, LocalDateTime dateTime){
         {

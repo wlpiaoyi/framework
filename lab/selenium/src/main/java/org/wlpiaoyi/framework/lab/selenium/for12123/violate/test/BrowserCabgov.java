@@ -19,6 +19,7 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.OutputStream;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicReference;
 
@@ -419,8 +420,13 @@ public class BrowserCabgov extends BrowserBase {
                 log.info("BrowserCabgov.openAndLogin.while.click.end 请选择服务类型:{}", "非营运机动车信息服务");
                 Thread.sleep(1000);
                 log.info("BrowserCabgov.openAndLogin.while.click.start 交通违法查询");
+                var userSidebarEl = browser.getDriver().findElement(By.id("userSidebar"));
+                log.info("BrowserCabgov.openAndLogin.while.click.start. 交通违法查询 userSidebar");
+                WebElementUtils.click(browser, userSidebarEl.findElement(By.id("sidebar_menu_5")));
+                log.info("BrowserCabgov.openAndLogin.while.click.end 交通违法查询 sidebar_menu_5.1");
+                Thread.sleep(1000);
                 WebElementUtils.click(browser, browser.getDriver().findElement(By.id("sidebar_menu_5")));
-                log.info("BrowserCabgov.openAndLogin.while.click.end 交通违法查询");
+                log.info("BrowserCabgov.openAndLogin.while.click.end 交通违法查询 sidebar_menu_5.2");
                 Thread.sleep(1000);
                 break;
             } catch (Exception e) {
@@ -530,11 +536,42 @@ public class BrowserCabgov extends BrowserBase {
                 try{
                     WebElementUtils.click(browser, webElements.get(1).findElement(By.id("hpzl")).findElements(By.xpath("option")).get(3));
                     Thread.sleep(1000);
+
+                    int tindex = 5;
+                    while (tindex -- >= 0){
+                        try {
+                            Thread.sleep(1000);
+                        } catch (InterruptedException e) {
+                        }
+                        log.info("BrowserCabgov.search in. 准备选择车辆类型");
+                        var els = webElements.get(1).findElement(By.id("hpzl")).findElements(By.xpath("option"));
+                        WebElementUtils.click(browser, els.get(3));
+                        boolean isNew = false;
+                        for (int k = 0; k < els.size(); k++) {
+                            WebElement el = els.get(k);
+                            if(!"true".equals(el.getAttribute("selected"))){
+                                continue;
+                            }
+                            String valueName = WebElementUtils.getValue(el);
+                            if(ValueUtils.isBlank(valueName)) continue;
+                            if(valueName.contains("新能源")){
+                                isNew = true;
+                                break;
+                            }
+                        }
+                        if (isNew){
+                            log.info("BrowserCabgov.search 选择车辆类型成功");
+                            tindex = 999;
+                            break;
+                        }
+                    }
+                    if (tindex != 999){
+                        throw new BusinessException("选择车辆类型失败");
+                    }
                 }catch (Exception e){
                     log.warn("BrowserCabgov.search while error. not fund 违法查询 ele:hpzl.option", e);
                     continue;
                 }
-
                 try{
                     WebElementUtils.setValue(webElements.get(2).findElement(By.id("hphm")), text);
                     Thread.sleep(1000);
@@ -557,19 +594,8 @@ public class BrowserCabgov extends BrowserBase {
                     log.warn("BrowserCabgov.search while error. not fund 违法查询结束日期控件 ele:tody", e);
                     continue;
                 }
-                try{
-                    WebElement enDataInput = webElement.findElement(By.id("endDate2"));
-                    if(enDataInput == null){
-                        System.exit(0);
-                    }
-                    Long endDateL = Long.parseLong(WebElementUtils.getValue(enDataInput).toString());
-                    if(curDateL < endDateL){
-                        System.exit(0);
-                    }
-                }catch (Exception e){
-                    log.warn("BrowserCabgov.search while error. not fund 违法查询结束日期控件 ele:tody", e);
-                    continue;
-                }
+
+                this.checkValid(webElement);
 
                 try{
                     WebElementUtils.click(browser, webElements.get(3).findElement(By.xpath("button")));
@@ -591,6 +617,21 @@ public class BrowserCabgov extends BrowserBase {
         }
         if(ValueUtils.isNotBlank(errorMsg)){
             throw new BusinessException(errorMsg);
+        }
+    }
+
+    private void checkValid(WebElement webElement){
+        try{
+            this.checkValid(() -> {
+                WebElement enDataInput = webElement.findElement(By.id("endDate2"));
+                if(enDataInput == null){
+                    System.exit(0);
+                }
+                return DateUtils.formatToDate(WebElementUtils.getValue(enDataInput).toString(), "yyyyMMdd").getTime();
+            });
+        } catch (Exception e) {
+            log.error("BrowserCabgov.checkValid 获取时间选择器异常", e);
+            System.exit(0);
         }
     }
 
@@ -684,7 +725,7 @@ public class BrowserCabgov extends BrowserBase {
             Thread.sleep(1000);
         }
     }
-//
+
 //    public Map<String, String> querySurvielDetail(String hphm, String xh, String cjjg, String cookies) throws IOException, InterruptedException {
 //        Thread.sleep(5000);
 //        String url = "https://sc.122.gov.cn/user/m/tsc/vio/querySurvielDetail";
