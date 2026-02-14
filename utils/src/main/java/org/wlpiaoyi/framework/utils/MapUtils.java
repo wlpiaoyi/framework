@@ -3,42 +3,68 @@ package org.wlpiaoyi.framework.utils;
 import com.google.gson.Gson;
 import org.wlpiaoyi.framework.utils.gson.GsonBuilder;
 
+import java.io.Serializable;
 import java.lang.reflect.Array;
-import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.time.ZoneId;
-import java.time.format.DateTimeParseException;
 import java.util.*;
-import java.util.regex.Pattern;
 
 /**
- * Map取值器
+ * Map 取值器，提供从 Map 中安全获取各种类型值的方法，支持：
+ * <ul>
+ *   <li>基本类型及包装类（Boolean, Byte, Short, Integer, Long, Float, Double, String）</li>
+ *   <li>日期时间类型（Date, LocalDate, LocalDateTime）</li>
+ *   <li>集合类型（Map, List, Set, 数组）</li>
+ *   <li>通过点号路径（如 "user.address.city"）和数组索引（如 "users[0].name"）深度取值</li>
+ *   <li>类型自动转换（如字符串转数字、时间戳转日期等）</li>
+ * </ul>
+ *
  * @author wlpiaoyi
  */
 public class MapUtils {
+//
+//    public static void main(String[] args) {
+//        Map map = new HashMap(){{
+//            put("dateTime", String.valueOf(DateUtils.parseTimestamp(LocalDateTime.now())));
+//            put("dict", new HashMap() {{
+//                put("liststr1", "1,2,3, 4");
+//                put("liststr2", "[\"abc\",\"2adfasdf\"]");
+//                put("liststr3", "\"123456\",\"2022-12-14 12:12:00\",\"17393838\"");
+//                put("list", new ArrayList() {{
+//                    add("1");
+//                    add("2");
+//                }});
+//                put("array", new Map[]{
+//                    new HashMap() {{
+//                        put("a", "1");
+//                        put("b", "2");
+//                    }},
+//                    new HashMap() {{
+//                        put("a", "3");
+//                        put("b", "4");
+//                    }}
+//                });
+//            }});
+//        }};
+//        LocalDateTime dateTime = MapUtils.getLocalDateTime(map, "dateTime");
+//        MapUtils.checkValueType(map, "dateTime", LocalDateTime.class);
+//        Integer a =  MapUtils.getValueByKeyPath(map, "dict.list[0]", null, Integer.class);
+//        Integer b =  MapUtils.getValueByKeyPath(map, "dict.array[1].a", null, Integer.class);
+//        var liststr1 = MapUtils.getValueByKeyPath(map, "dict.liststr1",null, Integer[].class);
+//        var liststr2 = MapUtils.getValueByKeyPath(map, "dict.liststr2",null, String[].class);
+//        var liststr3 = MapUtils.getValueByKeyPath(map, "dict.liststr3",null, Date[].class);
+//        System.out.println();
+//    }
 
     /**
-     * <p><b>{@code @description:}</b>
-     * 检查对象类型
-     * </p>
+     * 检查 Map 中指定键对应的值是否为指定的类型。
      *
-     * <p><b>{@code @param}</b> <b>map</b>
-     * {@link Map}
-     * </p>
-     *
-     * <p><b>{@code @param}</b> <b>key</b>
-     * {@link Object}
-     * </p>
-     *
-     * <p><b>{@code @param}</b> <b>valueType</b>
-     * {@link Class<T>}
-     * </p>
-     *
-     * <p><b>{@code @date:}</b>2025/11/6 9:52</p>
-     * <p><b>{@code @return:}</b>{@link boolean}</p>
-     * <p><b>{@code @author:}</b>wlpiaoyi</p>
+     * @param map       Map 对象，允许为 null 或空
+     * @param key       键
+     * @param valueType 期望的类型
+     * @param <T>       类型参数
+     * @return 如果值存在且是 valueType 类型（或其子类型），返回 true；否则返回 false
      */
     @SuppressWarnings("rawtypes")
     public static <T> boolean checkValueType(Map map, Object key, Class<T> valueType){
@@ -53,31 +79,23 @@ public class MapUtils {
     }
 
     /**
-     * <p><b>{@code @description:}</b> 
-     * TODO
-     * </p>
-     * 
-     * <p><b>@param</b> <b>map</b>
-     * {@link Map}
-     * </p>
-     * 
-     * <p><b>@param</b> <b>keyPath</b>
-     * {@link String}
-     * </p>
-     * 
-     * <p><b>@param</b> <b>defaultValue</b>
-     * {@link T}
-     * </p>
-     * 
-     * <p><b>@param</b> <b>clazz</b>
-     * {@link Class<T>}
+     * 根据键路径从 Map 中获取指定类型的值。
+     * <p>
+     * 键路径支持点号分隔（如 "user.address.city"）以及数组/集合索引（如 "users[0].name"）。
+     * 如果路径中途遇到 null 或类型不匹配，将返回 defaultValue。
      * </p>
      *
-     * <p><b>{@code @date:}</b>2024/7/10 7:56</p>
-     * <p><b>{@code @return:}</b>{@link T}</p>
-     * <p><b>{@code @author:}</b>wlpiaoyi</p>
+     * @param map         Map 对象
+     * @param keyPath     键路径，例如 "order.items[1].price"
+     * @param defaultValue 当值为 null 或转换失败时的默认值
+     * @param clazz       期望返回的类型
+     * @param <T>         返回值类型
+     * @return 转换后的值，若无法获取或转换则返回 defaultValue
+     * @throws IllegalArgumentException 如果路径中的中间节点不是 Map 类型，或者索引访问的对象不是集合/数组
+     * @throws NullPointerException     如果路径中的中间键对应的值为 null
+     * @throws IndexOutOfBoundsException 如果索引越界
      */
-    @SuppressWarnings({"rawtypes", "StatementWithEmptyBody", "unchecked"})
+    @SuppressWarnings({"rawtypes"})
     public static <T> T getValueByKeyPath(Map map, String keyPath, T defaultValue, Class<T> clazz){
         if(map == null || map.isEmpty()) {
             return  defaultValue;
@@ -87,7 +105,6 @@ public class MapUtils {
         }
         String[] keys = keyPath.split("\\.");
         Object valueData = map;
-//        int ki = 0;
         int ksl = keys.length;
         for (String key : keys){
             ksl --;
@@ -103,7 +120,7 @@ public class MapUtils {
                 index = Integer.parseInt(key.substring(index + 1, key.length() - 1));
                 key = k;
             }else index = -1;
-            if(index > 0){
+            if(index >= 0){
                 Object value = ((Map<?, ?>) valueData).get(key);
                 if (value == null) {
                     throw new NullPointerException("Value for key '" + key + "' is null");
@@ -145,33 +162,64 @@ public class MapUtils {
                 return defaultValue;
             }
             if(ksl > 0) continue;
-            return parseValue(valueData, clazz);
+            return parseKeyPathValue(valueData, clazz, defaultValue);
         }
         return defaultValue;
     }
 
+    // 私有辅助方法，根据目标类型解析值
+    private static <T> T parseKeyPathValue(Object valueData, Class<T> clazz, T defaultValue) {
+        if (clazz == Boolean.class) {
+            return (T) ValueParse.toBoolean(valueData, (Boolean) defaultValue);
+        } else if (clazz == Byte.class) {
+            return (T) ValueParse.toByte(valueData, (Byte) defaultValue);
+        } else if (clazz == Short.class) {
+            return (T) ValueParse.toShort(valueData, (Short) defaultValue);
+        } else if (clazz == Integer.class) {
+            return (T) ValueParse.toInteger(valueData, (Integer) defaultValue);
+        } else if (clazz == Long.class) {
+            return (T) ValueParse.toLong(valueData, (Long) defaultValue);
+        } else if (clazz == Float.class) {
+            return (T) ValueParse.toFloat(valueData, (Float) defaultValue);
+        } else if (clazz == Double.class) {
+            return (T) ValueParse.toDouble(valueData, (Double) defaultValue);
+        } else if (clazz == String.class) {
+            return (T) ValueParse.toString(valueData, (String) defaultValue);
+        } else if (clazz == Map.class) {
+            return (T) ValueParse.toMap(valueData, (Map<?, ?>) defaultValue);
+        } else if (clazz == List.class) {
+            return (T) ValueParse.toList(valueData, (List<?>) defaultValue);
+        } else if (clazz == Set.class) {
+            return (T) ValueParse.toSet(valueData, (Set<?>) defaultValue);
+        } else if (clazz == Date.class) {
+            return (T) ValueParse.toDate(valueData, (Date) defaultValue);
+        } else if (clazz == LocalDate.class) {
+            return (T) ValueParse.toLocalDate(valueData, (LocalDate) defaultValue);
+        } else if (clazz == LocalDateTime.class) {
+            return (T) ValueParse.toLocalDateTime(valueData, (LocalDateTime) defaultValue);
+        } else if (clazz.isArray()) {
+            var res = ValueParse.toArray(valueData);
+            if (res == null) return defaultValue;
+            Class<?> componentType = clazz.getComponentType();
+            res = ValueParse.toArrayGeneric(res, componentType, null);
+            if (res == null) return defaultValue;
+            return (T) res;
+        } else if (clazz.isAssignableFrom(valueData.getClass())){
+            return (T) valueData;
+        }
+        throw new IllegalArgumentException("Unsupported type: " + clazz.getName());
+    }
+
     /**
-     * <p><b>{@code @description:}</b>
-     * 获取指定类型的对象
-     * </p>
+     * 从 Map 中获取指定键的值，不进行类型转换，直接返回 Object 类型。
      *
-     * <p><b>{@code @param}</b> <b>map</b>
-     * {@link Map}
-     * </p>
-     *
-     * <p><b>{@code @param}</b> <b>key</b>
-     * {@link Object}
-     * </p>
-     *
-     * <p><b>{@code @param}</b> <b>defaultValue</b>
-     * {@link T}
-     * </p>
-     *
-     * <p><b>{@code @date:}</b>2025/11/6 9:32</p>
-     * <p><b>{@code @return:}</b>{@link T}</p>
-     * <p><b>{@code @author:}</b>wlpiaoyi</p>
+     * @param map         Map 对象
+     * @param key         键
+     * @param defaultValue 默认值（当值为 null 时返回）
+     * @param <T>         返回值类型（通常为 Object 子类）
+     * @return 键对应的值，若为 null 则返回 defaultValue
      */
-    @SuppressWarnings({"rawtypes", "unchecked"})
+    @SuppressWarnings({"rawtypes"})
     public static <T> T get(Map map, Object key, T defaultValue){
         if(map == null || map.isEmpty()) {
             return  defaultValue;
@@ -183,13 +231,32 @@ public class MapUtils {
         return (T) value;
     }
 
+    /**
+     * 从 Map 中获取指定键的值，不进行类型转换，返回 Object 类型（可能为 null）。
+     *
+     * @param map Map 对象
+     * @param key 键
+     * @param <T> 返回值类型
+     * @return 键对应的值，可能为 null
+     */
     @SuppressWarnings("rawtypes")
     public static <T> T get(Map map, Object key) {
         return get(map, key,null);
     }
 
+    /**
+     * 从 Map 中获取指定键的值，并尝试转换为指定类型。
+     *
+     * @param map         Map 对象
+     * @param key         键
+     * @param tClass      目标类型
+     * @param defaultValue 转换失败或值为 null 时的默认值
+     * @param <T>         目标类型
+     * @return 转换后的值，若无法转换则返回 defaultValue
+     * @throws IllegalArgumentException 如果目标类型不受支持
+     */
     @SuppressWarnings("rawtypes")
-    public static Object getObject(Map map, Object key, Object defaultValue){
+    public static <T> T get(Map map, Object key, Class<T> tClass, T defaultValue){
         if(map == null || map.isEmpty()) {
             return  defaultValue;
         }
@@ -197,240 +264,311 @@ public class MapUtils {
         if(value == null){
             return defaultValue;
         }
-        return value;
+        return parseKeyPathValue(value, tClass, defaultValue);
     }
 
+    /**
+     * 从 Map 中获取指定键的值，并尝试转换为指定类型，无默认值（可能返回 null）。
+     *
+     * @param map    Map 对象
+     * @param key    键
+     * @param tClass 目标类型
+     * @param <T>    目标类型
+     * @return 转换后的值，若值为 null 或转换失败则返回 null
+     */
     @SuppressWarnings("rawtypes")
-    public static Object getObject(Map map, Object key){
-        return getObject(map, key, null);
+    public static <T> T get(Map map, Object key, Class<T> tClass){
+        return get(map, key, tClass, null);
     }
 
+    /**
+     * 从 Map 中获取 String 类型的值。
+     *
+     * @param map Map 对象
+     * @param key 键
+     * @return 转换后的 String，若值为 null 则返回 null
+     */
     @SuppressWarnings("rawtypes")
     public static String getString(Map map, Object key){
         return MapUtils.getString(map, key, null);
     }
 
+    /**
+     * 从 Map 中获取 String 类型的值，支持默认值。
+     *
+     * @param map         Map 对象
+     * @param key         键
+     * @param defaultValue 默认值
+     * @return 转换后的 String，若值为 null 则返回 defaultValue
+     */
     @SuppressWarnings("rawtypes")
     public static String getString(Map map, Object key, String defaultValue){
         if(map == null || map.isEmpty()) {
             return defaultValue;
         }
         Object value = map.get(key);
-        if(value == null) {
-            return defaultValue;
-        }else if(value instanceof String){
-            return (String) value;
-        }else if(value instanceof LocalDateTime){
-            return DateUtils.formatLocalDateTime((LocalDateTime) value);
-        }else if(value instanceof LocalDate){
-            return DateUtils.formatLocalDate((LocalDate) value);
-        }else if(value instanceof Date){
-            return DateUtils.formatDate((Date) value);
-        }else{
-            return value.toString();
-        }
+        return ValueParse.toString(value, defaultValue);
     }
 
+    /**
+     * 从 Map 中获取 Float 类型的值。
+     *
+     * @param map Map 对象
+     * @param key 键
+     * @return 转换后的 Float，若值为 null 则返回 null
+     */
     @SuppressWarnings("rawtypes")
     public static Float getFloat(Map map, Object key){
         return MapUtils.getFloat(map, key, null);
     }
 
+    /**
+     * 从 Map 中获取 Float 类型的值，支持默认值。
+     *
+     * @param map         Map 对象
+     * @param key         键
+     * @param defaultValue 默认值
+     * @return 转换后的 Float，若值为 null 则返回 defaultValue
+     */
     @SuppressWarnings("rawtypes")
     public static Float getFloat(Map map, Object key, Float defaultValue){
         if(map == null || map.isEmpty()) {
             return  defaultValue;
         }
         Object value = map.get(key);
-        if(value == null) {
-            return defaultValue;
-        }else if(value instanceof Float){
-            return (Float) value;
-        }else if(value instanceof String){
-            return Float.valueOf((String) value);
-        }else if(value instanceof Number){
-            return ((Number) value).floatValue();
-        }else if(value instanceof Boolean){
-            return ((Boolean) value) ? 1.0f : 0.0f;
-        }else throw new IllegalArgumentException("Float conversion failed - valueData is not a Float, String or Number: " +
-                value.getClass().getName());
+        return ValueParse.toFloat(value, defaultValue);
     }
 
+    /**
+     * 从 Map 中获取 Double 类型的值。
+     *
+     * @param map Map 对象
+     * @param key 键
+     * @return 转换后的 Double，若值为 null 则返回 null
+     */
     @SuppressWarnings("rawtypes")
     public static Double getDouble(Map map, Object key){
         return MapUtils.getDouble(map, key, null);
     }
 
+    /**
+     * 从 Map 中获取 Double 类型的值，支持默认值。
+     *
+     * @param map         Map 对象
+     * @param key         键
+     * @param defaultValue 默认值
+     * @return 转换后的 Double，若值为 null 则返回 defaultValue
+     */
     @SuppressWarnings("rawtypes")
     public static Double getDouble(Map map, Object key, Double defaultValue){
         if(map == null || map.isEmpty()) {
             return  defaultValue;
         }
         Object value = map.get(key);
-        if(value == null) {
-            return defaultValue;
-        }else if(value instanceof Double){
-            return (Double) value;
-        }else if(value instanceof String){
-            return Double.valueOf((String) value);
-        }else if(value instanceof Number){
-            return ((Number) value).doubleValue();
-        }else if(value instanceof Boolean){
-            return ((Boolean) value) ? 1.0d : 0.0d;
-        }else throw new IllegalArgumentException("Double conversion failed - valueData is not a Double, String or Number: " +
-                value.getClass().getName());
+        return ValueParse.toDouble(value, defaultValue);
     }
 
+    /**
+     * 从 Map 中获取 Boolean 类型的值。
+     *
+     * @param map Map 对象
+     * @param key 键
+     * @return 转换后的 Boolean，若值为 null 则返回 null
+     */
     @SuppressWarnings("rawtypes")
     public static Boolean getBoolean(Map map, Object key){
         return MapUtils.getBoolean(map, key, null);
     }
 
+    /**
+     * 从 Map 中获取 Boolean 类型的值，支持默认值。
+     *
+     * @param map         Map 对象
+     * @param key         键
+     * @param defaultValue 默认值
+     * @return 转换后的 Boolean，若值为 null 则返回 defaultValue
+     */
     @SuppressWarnings("rawtypes")
     public static Boolean getBoolean(Map map, Object key, Boolean defaultValue){
         if(map == null || map.isEmpty()) {
             return  defaultValue;
         }
         Object value = map.get(key);
-        if(value == null) {
-            return defaultValue;
-        }else if(value instanceof Boolean){
-            return (Boolean) value;
-        }else if(value instanceof String){
-            return Boolean.valueOf((String) value);
-        }else if(value instanceof Number){
-            return ((Number) value).intValue() == 1;
-        }else throw new IllegalArgumentException("Boolean conversion failed - valueData is not a Boolean, String or Number: " +
-                value.getClass().getName());
+        return ValueParse.toBoolean(value, defaultValue);
     }
 
+    /**
+     * 从 Map 中获取 Byte 类型的值。
+     *
+     * @param map Map 对象
+     * @param key 键
+     * @return 转换后的 Byte，若值为 null 则返回 null
+     */
     @SuppressWarnings("rawtypes")
     public static Byte getByte(Map map, Object key){
         return MapUtils.getByte(map, key, null);
     }
 
+    /**
+     * 从 Map 中获取 Byte 类型的值，支持默认值。
+     *
+     * @param map         Map 对象
+     * @param key         键
+     * @param defaultValue 默认值
+     * @return 转换后的 Byte，若值为 null 则返回 defaultValue
+     */
     @SuppressWarnings("rawtypes")
     public static Byte getByte(Map map, Object key, Byte defaultValue){
         if(map == null || map.isEmpty()) {
             return  defaultValue;
         }
         Object value = map.get(key);
-        if(value == null) {
-            return defaultValue;
-        }else if(value instanceof Byte){
-            return (Byte) value;
-        }else if(value instanceof String){
-            return Byte.valueOf((String) value);
-        }else if(value instanceof Number){
-            return ((Number) value).byteValue();
-        }else throw new IllegalArgumentException("Byte conversion failed - valueData is not a Byte, String or Number: " +
-                value.getClass().getName());
+        return ValueParse.toByte(value, defaultValue);
     }
 
+    /**
+     * 从 Map 中获取 Short 类型的值。
+     *
+     * @param map Map 对象
+     * @param key 键
+     * @return 转换后的 Short，若值为 null 则返回 null
+     */
+    @SuppressWarnings("rawtypes")
+    public static Short getShort(Map map, Object key){
+        return MapUtils.getShort(map, key, null);
+    }
+
+    /**
+     * 从 Map 中获取 Short 类型的值，支持默认值。
+     *
+     * @param map         Map 对象
+     * @param key         键
+     * @param defaultValue 默认值
+     * @return 转换后的 Short，若值为 null 则返回 defaultValue
+     */
+    @SuppressWarnings("rawtypes")
+    public static Short getShort(Map map, Object key, Short defaultValue){
+        if(map == null || map.isEmpty()) {
+            return  defaultValue;
+        }
+        Object value = map.get(key);
+        return ValueParse.toShort(value, defaultValue);
+    }
+
+    /**
+     * 从 Map 中获取 Integer 类型的值。
+     *
+     * @param map Map 对象
+     * @param key 键
+     * @return 转换后的 Integer，若值为 null 则返回 null
+     */
     @SuppressWarnings("rawtypes")
     public static Integer getInteger(Map map, Object key){
         return MapUtils.getInteger(map, key, null);
     }
 
+    /**
+     * 从 Map 中获取 Integer 类型的值，支持默认值。
+     *
+     * @param map         Map 对象
+     * @param key         键
+     * @param defaultValue 默认值
+     * @return 转换后的 Integer，若值为 null 则返回 defaultValue
+     */
     @SuppressWarnings("rawtypes")
     public static Integer getInteger(Map map, Object key, Integer defaultValue){
         if(map == null || map.isEmpty()) {
             return  defaultValue;
         }
         Object value = map.get(key);
-        if(value == null) {
-            return defaultValue;
-        }else if(value instanceof Integer){
-            return (Integer) value;
-        }else if(value instanceof String){
-            return Integer.valueOf((String) value);
-        }else if(value instanceof Number){
-            return ((Number) value).intValue();
-        }else if(value instanceof Boolean){
-            return ((Boolean) value) ? 1 : 0;
-        }else throw new IllegalArgumentException("Integer conversion failed - valueData is not a Integer, String or Number: " +
-                value.getClass().getName());
+        return ValueParse.toInteger(value, defaultValue);
     }
 
+    /**
+     * 从 Map 中获取 Long 类型的值。
+     *
+     * @param map Map 对象
+     * @param key 键
+     * @return 转换后的 Long，若值为 null 则返回 null
+     */
     @SuppressWarnings("rawtypes")
     public static Long getLong(Map map, Object key){
         return MapUtils.getLong(map, key, null);
     }
 
+    /**
+     * 从 Map 中获取 Long 类型的值，支持默认值。
+     *
+     * @param map         Map 对象
+     * @param key         键
+     * @param defaultValue 默认值
+     * @return 转换后的 Long，若值为 null 则返回 defaultValue
+     */
     @SuppressWarnings("rawtypes")
     public static Long getLong(Map map, Object key, Long defaultValue){
         if(map == null || map.isEmpty()) {
             return  defaultValue;
         }
         Object value = map.get(key);
-        if (value == null){
-            return defaultValue;
-        }else if (value instanceof Long) {
-            return (Long) value;
-        }else if (value instanceof String) {
-            return Long.valueOf((String) value);
-        }else if (value instanceof Number) {
-            return ((Number) value).longValue();
-        }else if (value instanceof Boolean) {
-            return ((Boolean) value) ? 1L : 0L;
-        }else throw new IllegalArgumentException("Long conversion failed - valueData is not a Long, String or Number: " +
-                value.getClass().getName());
+        return ValueParse.toLong(value, defaultValue);
     }
 
+    /**
+     * 从 Map 中获取 LocalDateTime 类型的值。
+     *
+     * @param map Map 对象
+     * @param key 键
+     * @return 转换后的 LocalDateTime，若值为 null 则返回 null
+     */
     @SuppressWarnings("rawtypes")
     public static LocalDateTime getLocalDateTime(Map map, Object key){
         return MapUtils.getLocalDateTime(map, key, null);
     }
 
+    /**
+     * 从 Map 中获取 LocalDateTime 类型的值，支持默认值。
+     *
+     * @param map         Map 对象
+     * @param key         键
+     * @param defaultValue 默认值
+     * @return 转换后的 LocalDateTime，若值为 null 则返回 defaultValue
+     */
     @SuppressWarnings("rawtypes")
     public static LocalDateTime getLocalDateTime(Map map, Object key, LocalDateTime defaultValue){
         if(map == null || map.isEmpty()) {
             return  defaultValue;
         }
         Object value = map.get(key);
-        if(value == null) {
-            return defaultValue;
-        }else if(value instanceof LocalDateTime){
-            return (LocalDateTime) value;
-        }else if(value instanceof String){
-            boolean isMatch = Pattern.matches("^\\d+$", (CharSequence) value);
-            if (isMatch) {
-                return DateUtils.parseLocalDateTime(Long.parseLong((String) value));
-            } else {
-                return DateUtils.parseLocalDateTime((String) value);
-            }
-        }else if(value instanceof Number){
-            return DateUtils.parseLocalDateTime(((Number) value).longValue());
-        }else throw new IllegalArgumentException("LocalDateTime conversion failed - valueData is not a LocalDateTime, String or Number: " +
-                value.getClass().getName());
+        return ValueParse.toLocalDateTime(value, defaultValue);
     }
 
+    /**
+     * 从 Map 中获取 LocalDate 类型的值。
+     *
+     * @param map Map 对象
+     * @param key 键
+     * @return 转换后的 LocalDate，若值为 null 则返回 null
+     */
     @SuppressWarnings("rawtypes")
     public static LocalDate getLocalDate(Map map, Object key){
         return MapUtils.getLocalDate(map, key, null);
     }
 
+    /**
+     * 从 Map 中获取 LocalDate 类型的值，支持默认值。
+     *
+     * @param map         Map 对象
+     * @param key         键
+     * @param defaultValue 默认值
+     * @return 转换后的 LocalDate，若值为 null 则返回 defaultValue
+     */
     @SuppressWarnings("rawtypes")
     public static LocalDate getLocalDate(Map map, Object key, LocalDate defaultValue){
         if(map == null || map.isEmpty()) {
             return  defaultValue;
         }
         Object value = map.get(key);
-        if(value == null) {
-            return defaultValue;
-        }else if(value instanceof LocalDate){
-            return (LocalDate) value;
-        }else if(value instanceof String){
-            boolean isMatch = Pattern.matches("^\\d+$", (CharSequence) value);
-            if (isMatch) {
-                return DateUtils.parseLocalDate(Long.parseLong((String) value));
-            } else {
-                return DateUtils.parseLocalDate((String) value);
-            }
-        }else if(value instanceof Number){
-            return DateUtils.parseLocalDate(((Number) value).longValue());
-        }else throw new IllegalArgumentException("LocalDate conversion failed - valueData is not a LocalDate, String or Number: " +
-                value.getClass().getName());
+        return ValueParse.toLocalDate(value, defaultValue);
     }
 
     @SuppressWarnings("rawtypes")
@@ -444,21 +582,7 @@ public class MapUtils {
             return  defaultValue;
         }
         Object value = map.get(key);
-        if(value == null) {
-            return defaultValue;
-        }else if(value instanceof Date){
-            return (Date) value;
-        }else if(value instanceof String){
-            boolean isMatch = Pattern.matches("^\\d+$", (CharSequence) value);
-            if (isMatch) {
-                return new Date(Long.parseLong((String) value));
-            } else {
-                return DateUtils.parseDate((String) value);
-            }
-        }else if(value instanceof Number){
-            return new Date(((Number) value).longValue());
-        }else throw new IllegalArgumentException("Date conversion failed - valueData is not a Date, String or Number: " +
-                value.getClass().getName());
+        return ValueParse.toDate(value, defaultValue);
     }
 
     @SuppressWarnings("rawtypes")
@@ -471,11 +595,11 @@ public class MapUtils {
         if(map == null || map.isEmpty()) {
             return  defaultValue;
         }
-        Map value = get(map, key);
-        if(value == null || value.isEmpty()){
+        Object value = map.get(key);
+        if(value == null){
             return defaultValue;
         }
-        return value;
+        return ValueParse.toMap(value, defaultValue);
     }
 
     @SuppressWarnings("rawtypes")
@@ -488,16 +612,14 @@ public class MapUtils {
         if(map == null || map.isEmpty()) {
             return  defaultValue;
         }
-        Object[] value = get(map, key);
-        if(value == null || value.length == 0){
-            return defaultValue;
-        }
-        return value;
+        return ValueParse.toArray(map.get(key));
     }
 
     @SuppressWarnings("rawtypes")
     public static <T> T[] getArrayGeneric(Map map, Object key, Class<T> clazz, T[] defaultValue){
-        return ValueParse.toArrayGeneric(map.get(key), clazz, defaultValue);
+        var res = MapUtils.getArray(map, key, defaultValue);
+        if(res == defaultValue) return defaultValue;
+        return ValueParse.toArrayGeneric(res, clazz, defaultValue);
     }
 
     @SuppressWarnings("rawtypes")
@@ -507,6 +629,9 @@ public class MapUtils {
 
     @SuppressWarnings({"rawtypes"})
     public static List getList(Map map, Object key, List defaultValue){
+        if(map == null || map.isEmpty()) {
+            return  defaultValue;
+        }
         return ValueParse.toList(map.get(key), defaultValue);
     }
 
@@ -517,10 +642,9 @@ public class MapUtils {
 
     @SuppressWarnings({"rawtypes"})
     public static <T> List<T> getListGeneric(Map map, Object key, Class<T> clazz, List<T> defaultValue){
-        if(map == null || map.isEmpty()) {
-            return  defaultValue;
-        }
-        return ValueParse.toListGeneric(MapUtils.getList(map, key, defaultValue), clazz, defaultValue);
+        var res = MapUtils.getList(map, key, defaultValue);
+        if(res == defaultValue) return defaultValue;
+        return ValueParse.toListGeneric(res, clazz, defaultValue);
     }
 
     @SuppressWarnings("rawtypes")
@@ -530,6 +654,9 @@ public class MapUtils {
 
     @SuppressWarnings({"rawtypes"})
     public static Set getSet(Map map, Object key, Set defaultValue){
+        if(map == null || map.isEmpty()) {
+            return  defaultValue;
+        }
         return ValueParse.toSet(map.get(key), defaultValue);
     }
 
@@ -542,303 +669,279 @@ public class MapUtils {
         if(map == null || map.isEmpty()) {
             return  defaultValue;
         }
-        return ValueParse.toSetGeneric(MapUtils.getSet(map, key, defaultValue), clazz, defaultValue);
+        var res = MapUtils.getSet(map, key, defaultValue);
+        if (res == defaultValue) return defaultValue;
+        return ValueParse.toSetGeneric(res, clazz, defaultValue);
     }
 
-    private static <T> T parseValue(Object valueData, Class<T> clazz) {
-        if (clazz == Boolean.class) {
-            if (valueData instanceof String) {
-                valueData = Boolean.valueOf((String) valueData);
-            } else if (valueData instanceof Number) {
-                valueData = ((Number) valueData).intValue() != 0;
-            } else if (valueData instanceof Boolean) {
-                // 已经是Boolean类型，无需转换
-            } else {
-                throw new IllegalArgumentException("Boolean conversion failed - valueData is not a String, Number or Boolean: " +
-                        valueData.getClass().getName());
+    private static final Gson GSON = GsonBuilder.gsonDefault();
+
+    static class ValueParse {
+        static Boolean toBoolean(Object value, Boolean defaultValue) {
+            if (value == null) {
+                return defaultValue;
+            }else if (value instanceof Boolean) {
+                return (Boolean) value;
+            }else if (value instanceof String) {
+                return Boolean.parseBoolean((String) value);
+            }else if (value instanceof Number) {
+                return ((Number) value).intValue() == 1;
             }
-        }else if (clazz == Integer.class) {
-            if (valueData instanceof Number) {
-                valueData = ((Number) valueData).intValue();
-            } else if (valueData instanceof Boolean){
-                valueData  = ((Boolean) valueData) ? 1 : 0;
-            } else if (valueData instanceof String) {
-                try {
-                    valueData = Integer.parseInt(valueData.toString().trim());
-                } catch (NumberFormatException e) {
-                    throw new IllegalArgumentException("Integer conversion failed - invalid string format: " + valueData, e);
-                }
-            } else {
-                throw new IllegalArgumentException("Integer conversion failed - valueData is not a Number or String: " +
-                        valueData.getClass().getName());
-            }
-        } else if (clazz == Long.class) {
-            if (valueData instanceof Number) {
-                valueData = ((Number) valueData).longValue();
-            } else if (valueData instanceof Boolean){
-                valueData  = ((Boolean) valueData) ? 1L : 0L;
-            } else if (valueData instanceof Date) {
-                valueData = ((Date) valueData).getTime();
-            } else if (valueData instanceof LocalDate) {
-                valueData = DateUtils.parseEpochDay((LocalDate) valueData) * 24 * 3600 * 1000;
-            } else if (valueData instanceof LocalDateTime) {
-                valueData = DateUtils.parseTimestamp((LocalDateTime) valueData);
-            } else if (valueData instanceof String) {
-                try {
-                    valueData = Long.parseLong(valueData.toString().trim());
-                } catch (NumberFormatException e) {
-                    throw new IllegalArgumentException("Long conversion failed - invalid string format: " + valueData, e);
-                }
-            } else {
-                throw new IllegalArgumentException("Long conversion failed - valueData is not a Number or String: " +
-                        valueData.getClass().getName());
-            }
-        } else if (clazz == Float.class) {
-            if (valueData instanceof Number) {
-                valueData = ((Number) valueData).floatValue();
-            } else if (valueData instanceof Boolean){
-                valueData  = ((Boolean) valueData) ? 1.0f : 0.0f;
-            } else if (valueData instanceof String) {
-                try {
-                    valueData = Float.parseFloat(valueData.toString().trim());
-                } catch (NumberFormatException e) {
-                    throw new IllegalArgumentException("Float conversion failed - invalid string format: " + valueData, e);
-                }
-            } else {
-                throw new IllegalArgumentException("Float conversion failed - valueData is not a Number or String: " +
-                        valueData.getClass().getName());
-            }
-        } else if (clazz == Double.class) {
-            if (valueData instanceof Number) {
-                valueData = ((Number) valueData).doubleValue();
-            } else if (valueData instanceof Boolean){
-                valueData  = ((Boolean) valueData) ? 1.0d : 0.0d;
-            } else if (valueData instanceof Date) {
-                valueData = (double) ((Date) valueData).getTime();
-            } else if (valueData instanceof LocalDate) {
-                valueData = (double) (DateUtils.parseEpochDay((LocalDate) valueData) * 24 * 3600 * 1000);
-            } else if (valueData instanceof LocalDateTime) {
-                valueData = (double) (DateUtils.parseTimestamp((LocalDateTime) valueData));
-            } else if (valueData instanceof String) {
-                try {
-                    valueData = Double.parseDouble(valueData.toString().trim());
-                } catch (NumberFormatException e) {
-                    throw new IllegalArgumentException("Double conversion failed - invalid string format: " + valueData, e);
-                }
-            } else {
-                throw new IllegalArgumentException("Double conversion failed - valueData is not a Number or String: " +
-                        valueData.getClass().getName());
-            }
-        } else if (clazz == String.class) {
-            if (valueData instanceof Date) {
-                valueData = DateUtils.formatDate((Date) valueData);
-            } else if (valueData instanceof LocalDate) {
-                valueData = DateUtils.formatLocalDate((LocalDate) valueData);
-            } else if (valueData instanceof LocalDateTime) {
-                valueData = DateUtils.formatLocalDateTime((LocalDateTime) valueData);
-            } else valueData = valueData.toString();
-        } else if (clazz == BigDecimal.class) {
-            if (valueData instanceof Number) {
-                valueData = BigDecimal.valueOf(((Number) valueData).doubleValue());
-            } else if (valueData instanceof String) {
-                try {
-                    valueData = new BigDecimal(valueData.toString().trim());
-                } catch (NumberFormatException e) {
-                    throw new IllegalArgumentException("BigDecimal conversion failed - invalid string format: " + valueData, e);
-                }
-            } else {
-                throw new IllegalArgumentException("BigDecimal conversion failed - valueData is not a Number or String: " +
-                        valueData.getClass().getName());
-            }
-        } else if (clazz == Map.class) {
-            if (valueData instanceof Map) {
-                // 已经是Map类型，无需转换
-            } else if (valueData instanceof String) {
-                try {
-                    Gson gson = GsonBuilder.gsonDefault();
-                    // 尝试解析JSON字符串为Map
-                    valueData = gson.fromJson(valueData.toString(), Map.class);
-                } catch (Exception e) {
-                    throw new IllegalArgumentException("Map conversion failed - invalid JSON string: " + valueData, e);
-                }
-            } else {
-                throw new IllegalArgumentException("Map conversion failed - valueData is not a Map or JSON String: " +
-                        valueData.getClass().getName());
-            }
-        } else if (clazz == List.class) {
-            if (valueData instanceof List) {
-                // 已经是List类型，无需转换
-            } else if (valueData instanceof Collection) {
-                // 其他Collection类型转换为List
-                valueData = new ArrayList<>((Collection<?>) valueData);
-            } else if (valueData.getClass().isArray()) {
-                // 数组转换为List
-                valueData = Arrays.asList((Object[]) valueData);
-            } else if (valueData instanceof String) {
-                try {
-                    Gson gson = GsonBuilder.gsonDefault();
-                    // 尝试解析JSON字符串为Map
-                    valueData = gson.fromJson(valueData.toString(), List.class);
-                } catch (Exception e) {
-                    throw new IllegalArgumentException("List conversion failed - invalid JSON string: " + valueData, e);
-                }
-            } else {
-                throw new IllegalArgumentException("List conversion failed - valueData is not a Collection, Array or JSON String: " +
-                        valueData.getClass().getName());
-            }
-        } else if (clazz == Set.class) {
-            if (valueData instanceof Set) {
-                // 已经是Set类型，无需转换
-            } else if (valueData instanceof Collection) {
-                // 其他Collection类型转换为Set
-                valueData = new HashSet<>((Collection<?>) valueData);
-            } else if (valueData.getClass().isArray()) {
-                // 数组转换为Set
-                valueData = new HashSet<>(Arrays.asList((Object[]) valueData));
-            } else if (valueData instanceof String) {
-                try {
-                    Gson gson = GsonBuilder.gsonDefault();
-                    // 尝试解析JSON字符串为Map
-                    valueData = gson.fromJson(valueData.toString(), Set.class);
-                } catch (Exception e) {
-                    throw new IllegalArgumentException("Set conversion failed - invalid JSON string: " + valueData, e);
-                }
-            } else {
-                throw new IllegalArgumentException("Set conversion failed - valueData is not a Collection, Array or JSON String: " +
-                        valueData.getClass().getName());
-            }
-        } else if (clazz == Date.class) {
-            if (valueData instanceof Date) {
-                // 已经是Date类型，无需转换
-            }else if (valueData instanceof String) {
-                valueData = DateUtils.parseDate(valueData.toString());
-            } else if (valueData instanceof LocalDate) {
-                valueData = DateUtils.parseDate((LocalDate) valueData);
-            } else if (valueData instanceof LocalDateTime) {
-                valueData = DateUtils.parseDate((LocalDateTime) valueData);
-            } else if (valueData instanceof Number){
-                valueData = new Date(((Number) valueData).longValue());
-            }else throw new IllegalArgumentException("Date conversion failed - valueData is not a String or Date: " +
-                    valueData.getClass().getName());
-        } else if (clazz == LocalDate.class) {
-            if (valueData instanceof LocalDate) {
-                // 已经是LocalDate类型，无需转换
-            } else if (valueData instanceof Date) {
-                valueData = ((Date) valueData).toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
-            } else if (valueData instanceof LocalDateTime){
-                valueData = ((LocalDateTime) valueData).toLocalDate();
-            }else if (valueData instanceof String) {
-                try {
-                    valueData = LocalDate.parse(valueData.toString());
-                } catch (DateTimeParseException e) {
-                    throw new IllegalArgumentException("LocalDate conversion failed - invalid date format: " + valueData, e);
-                }
-            } else if (valueData instanceof Number){
-                valueData = DateUtils.parseLocalDate(((Number) valueData).longValue());
-            } else {
-                throw new IllegalArgumentException("LocalDate conversion failed - valueData is not a String or Date: " +
-                        valueData.getClass().getName());
-            }
-        } else if (clazz == LocalDateTime.class) {
-            if (valueData instanceof LocalDateTime) {
-                // 已经是LocalDateTime类型，无需转换
-            } else if (valueData instanceof Date) {
-                valueData = ((Date) valueData).toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime();
-            } else if (valueData instanceof LocalDate){
-                valueData = ((LocalDate) valueData).atStartOfDay();
-            } else if (valueData instanceof Number){
-                valueData = DateUtils.parseLocalDateTime(((Number) valueData).longValue());
-            } else if (valueData instanceof String) {
-                try {
-                    valueData = LocalDateTime.parse(valueData.toString());
-                } catch (DateTimeParseException e) {
-                    throw new IllegalArgumentException("LocalDateTime conversion failed - invalid datetime format: " + valueData, e);
-                }
-            } else {
-                throw new IllegalArgumentException("LocalDateTime conversion failed - valueData is not a String or Date: " +
-                        valueData.getClass().getName());
-            }
-        } else {
-            throw new IllegalArgumentException("Unsupported target type: " + clazz.getName());
+            throw new IllegalArgumentException("Unsupported target type: " + value.getClass().getName());
         }
-        return (T) valueData;
-    }
 
-    public static void main(String[] args) {
-        Map map = new HashMap(){{
-                put("dateTime", String.valueOf(DateUtils.parseTimestamp(LocalDateTime.now())));
-                put("dict", new HashMap() {{
-                    put("list", new ArrayList() {{
-                        add("1");
-                        add("2");
-                    }});
-                    put("array", new Map[]{new HashMap() {{
-                        put("a", "1");
-                        put("b", "2");
-                    }}, new HashMap() {{
-                        put("a", "3");
-                        put("b", "4");
-                    }} });
-                }});
-            }};
-        LocalDateTime dateTime = MapUtils.getLocalDateTime(map, "dateTime");
-        MapUtils.checkValueType(map, "dateTime", LocalDateTime.class);
-        Integer a =  MapUtils.getValueByKeyPath(map, "dict.list[1]", -1, Integer.class);
-        Integer b =  MapUtils.getValueByKeyPath(map, "dict.array[1].a", -1, Integer.class);
-        System.out.println();
-    }
-
-    private static class ValueParse {
-
-        @SuppressWarnings({"unchecked"})
-        private static <T> T toGeneric(Object value, Class<T> clazz, Gson[] gsons){
-            if (ValueUtils.isBlank(value)) {
-                return null;
+        static Byte toByte(Object value, byte defaultValue) {
+            if (value == null) {
+                return defaultValue;
+            }else if (value instanceof Byte) {
+                return (Byte) value;
+            }else if (value instanceof String) {
+                return Byte.parseByte((String) value);
+            }else if (value instanceof Boolean) {
+                return (byte) ((Boolean) value ? 1 : 0);
+            }else if (value instanceof Number) {
+                return ((Number) value).byteValue();
             }
-            Gson gson = null;
-            if(gsons.length > 0) gson = gsons[0];
+            throw new IllegalArgumentException("Unsupported target type: " + value.getClass().getName());
+        }
 
-            T item;
-            if(clazz.isAssignableFrom(value.getClass())){
-                item = (T) value;
-            }else if(clazz == String.class){
-                item = (T) value.toString();
-            }else if(clazz == Integer.class){
-                item = (T) Integer.valueOf(value.toString());
-            }else if(clazz == Long.class){
-                item = (T) Long.valueOf(value.toString());
-            }else if(clazz == Float.class){
-                item = (T) Float.valueOf(value.toString());
-            }else if(clazz == Double.class){
-                item = (T) Double.valueOf(value.toString());
-            }else if(clazz == Character[].class){
-                item = (T) value.toString().toCharArray();
-            }else if(clazz == BigDecimal.class){
-                item = (T) new BigDecimal(value.toString());
-            }else if(clazz == BigInteger.class){
-                item = (T) new BigInteger(value.toString());
-            }else if(clazz == Map.class){
-                if(value instanceof Map) {
-                    item = (T) value;
-                }else if (value instanceof String){
-                    if(gson == null){
-                        gson = GsonBuilder.gsonDefault();
-                        gsons[0] = gson;
+        static Short toShort(Object value, short defaultValue) {
+            if (value == null) {
+                return defaultValue;
+            }else if (value instanceof Short) {
+                return (Short) value;
+            }else if (value instanceof String) {
+                return Short.parseShort((String) value);
+            }else if (value instanceof Boolean) {
+                return (short) ((Boolean) value ? 1 : 0);
+            }else if (value instanceof Number) {
+                return ((Number) value).shortValue();
+            }
+            throw new IllegalArgumentException("Unsupported target type: " + value.getClass().getName());
+        }
+
+        static Integer toInteger(Object value, Integer defaultValue) {
+            if (value == null) {
+                return defaultValue;
+            }else if (value instanceof Integer) {
+                return (Integer) value;
+            }else if (value instanceof String) {
+                return Integer.parseInt((String) value);
+            }else if (value instanceof Boolean) {
+                return ((Boolean) value ? 1 : 0);
+            }else if (value instanceof Number) {
+                return ((Number) value).intValue();
+            }
+            throw new IllegalArgumentException("Unsupported target type: " + value.getClass().getName());
+        }
+
+        static Long toLong(Object value, Long defaultValue) {
+            if (value == null) {
+                return defaultValue;
+            }else if (value instanceof Long) {
+                return (Long) value;
+            }else if (value instanceof String) {
+                return Long.parseLong((String) value);
+            }else if (value instanceof Boolean) {
+                return (long) ((Boolean) value ? 1 : 0);
+            }else if (value instanceof Number) {
+                return ((Number) value).longValue();
+            }
+            throw new IllegalArgumentException("Unsupported target type: " + value.getClass().getName());
+        }
+
+        static Float toFloat(Object value, Float defaultValue) {
+            if (value == null) {
+                return defaultValue;
+            }else if (value instanceof Float) {
+                return (Float) value;
+            }else if (value instanceof String) {
+                return Float.parseFloat((String) value);
+            }else if (value instanceof Boolean) {
+                return (float) ((Boolean) value ? 1 : 0);
+            }else if (value instanceof Number) {
+                return ((Number) value).floatValue();
+            }
+            throw new IllegalArgumentException("Unsupported target type: " + value.getClass().getName());
+        }
+
+        static Double toDouble(Object value, Double defaultValue) {
+            if (value == null) {
+                return defaultValue;
+            }else if (value instanceof Double) {
+                return (Double) value;
+            }else if (value instanceof String) {
+                return Double.parseDouble((String) value);
+            }else if (value instanceof Boolean) {
+                return (double) ((Boolean) value ? 1 : 0);
+            }else if (value instanceof Number) {
+                return ((Number) value).doubleValue();
+            }
+            throw new IllegalArgumentException("Unsupported target type: " + value.getClass().getName());
+        }
+
+        static String toString(Object value, String defaultValue) {
+            if (value == null) {
+                return defaultValue;
+            }else if (value instanceof String) {
+                return (String) value;
+            }else return value.toString();
+        }
+
+
+        static Date toDate(Object value, Date defaultValue) {
+            if (value == null) {
+                return defaultValue;
+            }else if (value instanceof Date) {
+                return (Date) value;
+            }else if (value instanceof LocalDateTime) {
+                return DateUtils.parseDate((LocalDateTime) value);
+            }else if (value instanceof LocalDate) {
+                return DateUtils.parseDate((LocalDate) value);
+            }else if (value instanceof String) {
+                return DateUtils.parseDate((String) value);
+            }else if (value instanceof Number) {
+                return new Date(((Number) value).longValue());
+            }
+            throw new IllegalArgumentException("Unsupported target type: " + value.getClass().getName());
+        }
+
+        static LocalDateTime toLocalDateTime(Object value, LocalDateTime defaultValue) {
+            if (value == null) {
+                return defaultValue;
+            }else if (value instanceof Date) {
+                return DateUtils.parseLocalDateTime((Date) value);
+            }else if (value instanceof LocalDateTime) {
+                return (LocalDateTime) value;
+            }else if (value instanceof LocalDate) {
+                return ((LocalDate) value).atStartOfDay();
+            }else if (value instanceof String) {
+                return DateUtils.parseLocalDateTime((String) value);
+            }else if (value instanceof Number) {
+                return DateUtils.parseLocalDateTime(((Number) value).longValue());
+            }
+            throw new IllegalArgumentException("Unsupported target type: " + value.getClass().getName());
+        }
+
+        static LocalDate toLocalDate(Object value, LocalDate defaultValue) {
+            if (value == null) {
+                return defaultValue;
+            }else if (value instanceof Date) {
+                return DateUtils.parseLocalDate((Date) value);
+            }else if (value instanceof LocalDateTime) {
+                return ((LocalDateTime) value).toLocalDate();
+            }else if (value instanceof LocalDate) {
+                return (LocalDate) value;
+            }else if (value instanceof String) {
+                return DateUtils.parseLocalDate((String) value);
+            }else if (value instanceof Number) {
+                return DateUtils.parseLocalDate(((Number) value).longValue());
+            }
+            throw new IllegalArgumentException("Unsupported target type: " + value.getClass().getName());
+        }
+
+        static Map toMap(Object value, Map defaultValue){
+            if (value == null) {
+                return defaultValue;
+            }else if (value instanceof Map<?, ?> map) {
+                return (Map) map;
+            }else if (value instanceof Object[] objects) {
+                if (objects.length == 0) {
+                    return defaultValue;
+                }
+                Map map = new HashMap();
+                for (Object object : objects) {
+                    if (object instanceof Map.Entry<?, ?> entry) {
+                        map.put(entry.getKey(), entry.getValue());
                     }
-                    item = (T) gson.fromJson((String) value, Map.class);
-                }else throw new IllegalArgumentException("Unsupported target type: " + clazz.getName());
-            }else{
-                if(gson == null){
-                    gson = GsonBuilder.gsonDefault();
-                    gsons[0] = gson;
                 }
-                item = gson.fromJson(gson.toJson(value), clazz);
+                return map;
+            }else if (value instanceof String str){
+                if (ValueUtils.isBlank(str)) {  // Java 11+
+                    return defaultValue;
+                }
+                // 可进一步检查是否以 '{' 开头（快速过滤非 JSON）
+                if (str.trim().charAt(0) != '{') {
+                    throw new IllegalArgumentException("Invalid JSON string for Map: " + str);
+                }
+                return GSON.fromJson(str, Map.class);
             }
-            return item;
+            throw new IllegalArgumentException("Unsupported target type: " + value.getClass().getName());
+        }
+
+        static Object[] toArray(Object value){
+            if (value == null) {
+                return null;
+            }else if (value instanceof Object[] objects) {
+                return objects;
+            }else if (value instanceof Collection<?> collection){
+                return collection.toArray();
+            }else if (value instanceof String string){
+                if (!string.contains(",")) {
+                   return new Object[]{string};
+                }
+                if (string.startsWith("[")) {
+                    string = string.substring(1, string.length() - 1);
+                }
+                if (string.endsWith("[")){
+                    string = string.substring(0, string.length() - 1);
+                }
+                // 统计逗号数量，用于预分配列表容量
+                int commaCount = 0;
+                for (int i = 0; i < string.length(); i++) {
+                    if (string.charAt(i) == ',') {
+                        commaCount++;
+                    }
+                }
+                List<String> tokens = new ArrayList<>(commaCount + 1);
+
+                int start = 0, end;
+                while ((end = string.indexOf(',', start)) >= 0) {
+                    tokens.add(extractToken(string, start, end));
+                    start = end + 1;
+                }
+                // 处理最后一个 token
+                tokens.add(extractToken(string, start, string.length()));
+
+                return tokens.toArray(new String[0]); // 或 new Object[0] 均可
+            }
+            throw new IllegalArgumentException("Unsupported target type: " + value.getClass().getName());
         }
 
 
-        @SuppressWarnings({"rawtypes", "unchecked"})
+        /**
+         * 从字符串 s 的 [start, end) 区间提取 token，去除前后空白和首尾引号。
+         */
+        private static String extractToken(String s, int start, int end) {
+            // 跳过前导空白
+            int i = start;
+            while (i < end && s.charAt(i) == ' ') {
+                i++;
+            }
+            // 跳过尾部空白
+            int j = end - 1;
+            while (j >= i && s.charAt(j) == ' ') {
+                j--;
+            }
+
+            // 完全空白的情况
+            if (i > j) {
+                return "";
+            }
+
+            // 去除首尾引号（如果存在）
+            if (s.charAt(i) == '"') {
+                i++;
+            }
+            if (j >= i && s.charAt(j) == '"') {
+                j--;
+            }
+
+            // 注意：去除引号后不需要再次跳过空白，因为内部空白应保留
+            return s.substring(i, j + 1);
+        }
+
+        @SuppressWarnings({"rawtypes"})
         static Set toSet(Object value, Set defaultValue){
             if (value == null) {
                 return defaultValue;
@@ -854,9 +957,16 @@ public class MapUtils {
                     return defaultValue;
                 }
                 return new HashSet((Collection) value);
-            }else return defaultValue;
+            }else if (value instanceof String string){
+                Object[] objects = ValueParse.toArray(string);
+                if(objects == null || objects.length == 0)
+                    return defaultValue;
+                return new HashSet(Arrays.asList(objects));
+            }
+            throw new IllegalArgumentException("Unsupported target type: " + value.getClass().getName());
         }
-        @SuppressWarnings({"rawtypes", "unchecked"})
+
+        @SuppressWarnings({"rawtypes"})
         static <T> Set<T> toSetGeneric(Set value, Class<T> clazz, Set<T> defaultValue){
             if (ValueUtils.isBlank(value)) {
                 return defaultValue;
@@ -874,15 +984,15 @@ public class MapUtils {
             if (allMatch) {
                 return (Set<T>) value;
             }
-            Gson[] gsons = new Gson[1];
             Set<T> items = new HashSet<>();
             for (Object data : value){
-                T item = toGeneric(data, clazz, gsons);
+                T item = toGeneric(data, clazz);
                 items.add(item);
             }
             return items;
         }
-        @SuppressWarnings({"rawtypes", "unchecked"})
+
+        @SuppressWarnings({"rawtypes"})
         public static List toList(Object value, List defaultValue){
             if (value == null) {
                 return defaultValue;
@@ -898,9 +1008,16 @@ public class MapUtils {
                     return defaultValue;
                 }
                 return new ArrayList((Collection) value);
-            }else return defaultValue;
+            }else if (value instanceof String string){
+                Object[] objects = ValueParse.toArray(string);
+                if(objects == null || objects.length == 0)
+                    return defaultValue;
+                return Arrays.asList(objects);
+            }
+            throw new IllegalArgumentException("Unsupported target type: " + value.getClass().getName());
         }
-        @SuppressWarnings({"rawtypes", "unchecked"})
+
+        @SuppressWarnings({"rawtypes"})
         static <T> List<T> toListGeneric(List value, Class<T> clazz, List<T> defaultValue){
             if (ValueUtils.isBlank(value)) {
                 return defaultValue;
@@ -910,7 +1027,10 @@ public class MapUtils {
             // 检查是否所有元素都是 T 类型（或子类型）
             boolean allMatch = true;
             for (Object element : value) {
-                if (element != null && !clazz.isAssignableFrom(element.getClass())) {
+                if (element == null) {
+                    continue;
+                }
+                if (!clazz.isAssignableFrom(element.getClass())) {
                     allMatch = false;
                     break;
                 }
@@ -918,17 +1038,14 @@ public class MapUtils {
             if (allMatch) {
                 return (List<T>) value;
             }
-            Gson[] gsons = new Gson[1];
             List<T> items = new ArrayList<>();
             for (Object data : value){
-                T item = toGeneric(data, clazz, gsons);
+                T item = toGeneric(data, clazz);
                 items.add(item);
             }
             return items;
         }
 
-
-        @SuppressWarnings({"unchecked"})
         static <T> T[] toArrayGeneric(Object value, Class<T> clazz, T[] defaultValue){
             if (ValueUtils.isBlank(value) || !value.getClass().isArray()) {
                 return defaultValue;
@@ -939,7 +1056,10 @@ public class MapUtils {
             // 检查是否所有元素都是 T 类型（或子类型）
             boolean allMatch = true;
             for (Object element : array) {
-                if (element != null && !clazz.isAssignableFrom(element.getClass())) {
+                if (element == null) {
+                    continue;
+                }
+                if (!clazz.isAssignableFrom(element.getClass())) {
                     allMatch = false;
                     break;
                 }
@@ -947,12 +1067,56 @@ public class MapUtils {
             if (allMatch) {
                 return (T[]) array;
             }
-            Gson[] gsons = new Gson[1];
             T[] items = (T[]) Array.newInstance(clazz, length);
             for (int i = 0; i < length; i++) {
-                items[i] = toGeneric(array[i], clazz, gsons);
+                items[i] = toGeneric(array[i], clazz);
             }
             return items;
+        }
+
+        private static <T> T toGeneric(Object value, Class<T> clazz){
+            if (ValueUtils.isBlank(value)) {
+                return null;
+            }
+
+            T item;
+            if(clazz.isAssignableFrom(value.getClass())){
+                item = (T) value;
+            }else if (clazz == String.class) {
+                item = (T) ValueParse.toString(value, null);
+            }else if (clazz == Integer.class) {
+                item = (T) ValueParse.toInteger(value, null);
+            }else if (clazz == Long.class) {
+                item = (T) ValueParse.toLong(value, null);
+            }else if (clazz == Float.class) {
+                item = (T) ValueParse.toFloat(value, null);
+            }else if (clazz == Double.class) {
+                item = (T) ValueParse.toDouble(value, null);
+            }else if (clazz == Character[].class) {
+                char[] chars = value.toString().toCharArray();
+                Character[] charArray = new Character[chars.length];
+                for (int i = 0; i < chars.length; i++) {
+                    charArray[i] = chars[i];
+                }
+                item = (T) charArray;
+            }else if (clazz == BigInteger.class) {
+                if (value instanceof Number) {
+                    item = (T) BigInteger.valueOf(((Number) value).longValue());
+                } else {
+                    item = (T) new BigInteger(value.toString());
+                }
+            }else if (clazz == Date.class){
+                item = (T) ValueParse.toDate(value, null);
+            }else if (clazz == LocalDateTime.class){
+                item = (T) ValueParse.toLocalDateTime(value, null);
+            }else if (clazz == LocalDate.class){
+                item = (T) ValueParse.toLocalDate(value, null);
+            }else if (clazz == Map.class){
+                item = (T) ValueParse.toMap(value, null);
+            }else if (value instanceof Serializable){
+                item = GSON.fromJson(GSON.toJson(value), clazz);
+            }else item = null;
+            return item;
         }
     }
 

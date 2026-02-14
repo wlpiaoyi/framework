@@ -8,6 +8,9 @@ import org.jetbrains.annotations.Range;
 import java.text.SimpleDateFormat;
 import java.time.*;
 import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
+import java.time.temporal.ChronoField;
+import java.time.temporal.TemporalAccessor;
 import java.util.*;
 import java.util.regex.Pattern;
 
@@ -18,13 +21,6 @@ import java.util.regex.Pattern;
  * <p><b>{@code @version:}</b>      1.0</p>
  */
 public class DateUtils {
-
-
-
-    public static final String YYYYMMDDHHMMSS = "yyyy-MM-dd HH:mm:ss";
-    public static final String HHMMSS = "HH:mm:ss";
-    public static final String YYYYMMDD = "yyyy-MM-dd";
-
 
     /**
      * <p><b>{@code @description:}</b>
@@ -38,33 +34,313 @@ public class DateUtils {
      * <p><b>{@code @date:}</b>2023/5/13 9:56</p>
      * <p><b>{@code @return:}</b>{@link Date}</p>
      * <p><b>{@code @author:}</b>wlpia</p>
-     */
-    @SneakyThrows
-    public static Date parseDate(String dateStr) {
+     */public static Date parseDate(String dateStr) {
         if (dateStr == null || dateStr.trim().isEmpty()) {
             throw new IllegalArgumentException("日期字符串不能为空");
         }
         dateStr = dateStr.trim();
-        SimpleDateFormat sdf;
-        if (CST_PATTERN.matcher(dateStr).matches()) {
-            sdf = new SimpleDateFormat("EEE MMM dd HH:mm:ss zzz yyyy", Locale.US);
-        } else if (SLASH_DATE_TIME.matcher(dateStr).matches()) {
-            sdf = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
-        } else if (SLASH_DATE_TIME_NO_SEC.matcher(dateStr).matches()) {
-            sdf = new SimpleDateFormat("yyyy/MM/dd HH:mm");
-        } else if (LINE_DATE_TIME.matcher(dateStr).matches()) {
-            sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-        } else if (LINE_DATE_TIME_NO_SEC.matcher(dateStr).matches()) {
-            sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm");
-        } else if (COMPACT_DATE_TIME.matcher(dateStr).matches()) {
-            sdf = new SimpleDateFormat("yyyyMMddHHmmss");
-        } else if (COMPACT_DATE_TIME_NO_SEC.matcher(dateStr).matches()) {
-            sdf = new SimpleDateFormat("yyyyMMddHHmm");
-        } else if (dateStr.length() == 8) {
-            // 纯日期 20260210
-            sdf = new SimpleDateFormat("yyyyMMdd");
-        } else throw new IllegalArgumentException("日期字符串格式错误");
-        return sdf.parse(dateStr);
+
+        // 1. 尝试使用预定义格式解析
+        for (DateTimeFormatter formatter : FORMATTERS) {
+            try {
+                TemporalAccessor parsed = formatter.parse(dateStr);
+                return toDate(parsed);
+            } catch (DateTimeParseException ignored) {
+                // 继续尝试下一个格式
+            }
+        }
+
+        // 2. 尝试解析为数字时间戳
+        Date date = parseNumeric(dateStr);
+        if (date != null) {
+            return date;
+        }
+
+        throw new IllegalArgumentException("日期字符串格式错误: " + dateStr);
+    }
+
+    /**
+     * 将 TemporalAccessor 转换为 java.util.Date
+     */
+    private static Date toDate(TemporalAccessor parsed) {
+        if (parsed.isSupported(ChronoField.INSTANT_SECONDS)) {
+            // 包含时区信息（如 CST 格式）
+            Instant instant = Instant.from(parsed);
+            return Date.from(instant);
+        } else if (parsed.isSupported(ChronoField.YEAR)) {
+            // 本地日期时间，使用系统默认时区
+            LocalDateTime ldt;
+            if (parsed.isSupported(ChronoField.HOUR_OF_DAY)) {
+                ldt = LocalDateTime.from(parsed);
+            } else {
+                ldt = LocalDate.from(parsed).atStartOfDay();
+            }
+            return Date.from(ldt.atZone(ZoneId.systemDefault()).toInstant());
+        } else {
+            throw new IllegalArgumentException("无法解析的日期格式");
+        }
+    }
+
+    /**
+     * 尝试将字符串解析为数字时间戳（支持整数和浮点数）
+     * @return 成功返回 Date，失败返回 null
+     */
+    private static Date parseNumeric(String dateStr) {
+        // 快速判断是否可能为数字（允许负号、小数点）
+        boolean isNumeric = true;
+        boolean hasDot = false;
+        for (int i = 0; i < dateStr.length(); i++) {
+            char c = dateStr.charAt(i);
+            if (c == '-') {
+                if (i != 0) { // 负号只能在首位
+                    isNumeric = false;
+                    break;
+                }
+            } else if (c == '.') {
+                if (hasDot) { // 多个小数点非法
+                    isNumeric = false;
+                    break;
+                }
+                hasDot = true;
+            } else if (c < '0' || c > '9') {
+                isNumeric = false;
+                break;
+            }
+        }
+        if (!isNumeric) {
+            return null;
+        }
+
+        try {
+            if (hasDot) {
+                return new Date((long) Double.parseDouble(dateStr));
+            } else {
+                return new Date(Long.parseLong(dateStr));
+            }
+        } catch (NumberFormatException e) {
+            return null;
+        }
+    }
+
+
+    /**
+     * <p><b>{@code @description:}</b>
+     * String format to LocalDateTime
+     * </p>
+     *
+     * <p><b>@param</b> <b>localDateTime</b>
+     * {@link String}
+     * </p>
+     *
+     * <p><b>{@code @date:}</b>2021/7/13 9:56</p>
+     * <p><b>{@code @return:}</b>{@link LocalDateTime}</p>
+     * <p><b>{@code @author:}</b>wlpia</p>
+     */public static LocalDateTime parseLocalDateTime(String dateStr) {
+        if (dateStr == null || dateStr.trim().isEmpty()) {
+            throw new IllegalArgumentException("日期字符串不能为空");
+        }
+        dateStr = dateStr.trim();
+
+        // 1. 尝试使用预定义格式解析
+        for (DateTimeFormatter formatter : FORMATTERS) { // 复用之前的 FORMATTERS 列表
+            try {
+                TemporalAccessor parsed = formatter.parse(dateStr);
+                return toLocalDateTime(parsed);
+            } catch (DateTimeParseException ignored) {
+                // continue
+            }
+        }
+
+        // 2. 尝试解析为数字时间戳
+        LocalDateTime ldt = parseNumericToLocalDateTime(dateStr);
+        if (ldt != null) {
+            return ldt;
+        }
+
+        throw new IllegalArgumentException("日期字符串格式错误: " + dateStr);
+    }
+
+    /**
+     * 将 TemporalAccessor 转换为 LocalDateTime
+     */
+    private static LocalDateTime toLocalDateTime(TemporalAccessor parsed) {
+        if (parsed.isSupported(ChronoField.NANO_OF_DAY)) {
+            // 包含时间部分
+            return LocalDateTime.from(parsed);
+        } else if (parsed.isSupported(ChronoField.EPOCH_DAY)) {
+            // 只有日期部分
+            return LocalDate.from(parsed).atStartOfDay();
+        } else {
+            throw new IllegalArgumentException("无法解析为 LocalDateTime");
+        }
+    }
+
+    /**
+     * 尝试将字符串解析为数字时间戳并转换为 LocalDateTime
+     */
+    private static LocalDateTime parseNumericToLocalDateTime(String dateStr) {
+        // 快速判断是否可能为数字（允许负号、小数点）
+        boolean isNumeric = true;
+        boolean hasDot = false;
+        for (int i = 0; i < dateStr.length(); i++) {
+            char c = dateStr.charAt(i);
+            if (c == '-') {
+                if (i != 0) { // 负号只能在首位
+                    isNumeric = false;
+                    break;
+                }
+            } else if (c == '.') {
+                if (hasDot) { // 多个小数点非法
+                    isNumeric = false;
+                    break;
+                }
+                hasDot = true;
+            } else if (c < '0' || c > '9') {
+                isNumeric = false;
+                break;
+            }
+        }
+        if (!isNumeric) {
+            return null;
+        }
+
+        try {
+            long millis;
+            if (hasDot) {
+                millis = (long) Double.parseDouble(dateStr);
+            } else {
+                millis = Long.parseLong(dateStr);
+            }
+            return LocalDateTime.ofInstant(Instant.ofEpochMilli(millis), ZoneId.systemDefault());
+        } catch (NumberFormatException e) {
+            return null;
+        }
+    }
+
+    /**
+     * <p><b>{@code @description:}</b>
+     * String format to LocalDate
+     * </p>
+     *
+     * <p><b>@param</b> <b>localDate</b>
+     * {@link String}
+     * </p>
+     *
+     * <p><b>{@code @date:}</b>2019/10/6 9:56</p>
+     * <p><b>{@code @return:}</b>{@link LocalDate}</p>
+     * <p><b>{@code @author:}</b>wlpia</p>
+     */
+    public static LocalDate parseLocalDate(String dateStr) {
+        if (dateStr == null || dateStr.trim().isEmpty()) {
+            throw new IllegalArgumentException("日期字符串不能为空");
+        }
+        dateStr = dateStr.trim();
+
+        // 1. 尝试使用预定义格式解析
+        for (DateTimeFormatter formatter : FORMATTERS) {
+            try {
+                TemporalAccessor parsed = formatter.parse(dateStr);
+                return toLocalDate(parsed);
+            } catch (DateTimeParseException ignored) {
+                // 继续尝试下一个格式
+            }
+        }
+
+        // 2. 尝试解析为数字时间戳
+        LocalDate ld = parseNumericToLocalDate(dateStr);
+        if (ld != null) {
+            return ld;
+        }
+
+        throw new IllegalArgumentException("日期字符串格式错误: " + dateStr);
+    }
+
+    /**
+     * 将 TemporalAccessor 转换为 LocalDate
+     */
+    private static LocalDate toLocalDate(TemporalAccessor parsed) {
+        if (parsed.isSupported(ChronoField.INSTANT_SECONDS)) {
+            // 带时区信息（如 CST 格式），转换为 Instant 再通过系统时区转 LocalDate
+            Instant instant = Instant.from(parsed);
+            return instant.atZone(ZoneId.systemDefault()).toLocalDate();
+        } else if (parsed.isSupported(ChronoField.EPOCH_DAY)) {
+            // 包含日期部分（可能是 LocalDate 或 LocalDateTime）
+            if (parsed.isSupported(ChronoField.NANO_OF_DAY)) {
+                // 是 LocalDateTime，只取日期部分
+                return LocalDateTime.from(parsed).toLocalDate();
+            } else {
+                return LocalDate.from(parsed);
+            }
+        } else {
+            throw new IllegalArgumentException("无法解析为 LocalDate");
+        }
+    }
+
+    /**
+     * 尝试将字符串解析为数字时间戳并转换为 LocalDate
+     */
+    private static LocalDate parseNumericToLocalDate(String dateStr) {
+        // 快速判断是否可能为数字（允许负号、小数点）
+        boolean isNumeric = true;
+        boolean hasDot = false;
+        for (int i = 0; i < dateStr.length(); i++) {
+            char c = dateStr.charAt(i);
+            if (c == '-') {
+                if (i != 0) { // 负号只能在首位
+                    isNumeric = false;
+                    break;
+                }
+            } else if (c == '.') {
+                if (hasDot) { // 多个小数点非法
+                    isNumeric = false;
+                    break;
+                }
+                hasDot = true;
+            } else if (c < '0' || c > '9') {
+                isNumeric = false;
+                break;
+            }
+        }
+        if (!isNumeric) {
+            return null;
+        }
+
+        try {
+            long millis;
+            if (hasDot) {
+                millis = (long) Double.parseDouble(dateStr);
+            } else {
+                millis = Long.parseLong(dateStr);
+            }
+            return Instant.ofEpochMilli(millis).atZone(ZoneId.systemDefault()).toLocalDate();
+        } catch (NumberFormatException e) {
+            return null;
+        }
+    }
+
+    /**
+     * <p><b>{@code @description:}</b>
+     * String format to LocalDateTime with pattern
+     * </p>
+     *
+     * <p><b>@param</b> <b>localDateTime</b>
+     * {@link String}
+     * </p>
+     *
+     * <p><b>@param</b> <b>pattern</b>
+     * {@link String}
+     * </p>
+     *
+     * <p><b>{@code @date:}</b>2019/10/6 9:56</p>
+     * <p><b>{@code @return:}</b>{@link LocalDateTime}</p>
+     * <p><b>{@code @author:}</b>wlpia</p>
+     */
+    public static LocalDateTime parseLocalDateTime(String dateStr, String pattern) {
+        if (dateStr == null || dateStr.trim().isEmpty()) {
+            throw new IllegalArgumentException("日期字符串不能为空");
+        }
+        DateTimeFormatter dtf = DateTimeFormatter.ofPattern(pattern);
+        return LocalDateTime.parse(dateStr.trim(), dtf);
     }
 
     /**
@@ -320,7 +596,7 @@ public class DateUtils {
      */
     public static Date parseDate(LocalDateTime localDateTime) {
         ZoneId zoneId = ZoneId.systemDefault();
-        return DateUtils.formatDate(localDateTime, zoneId);
+        return DateUtils.parseDate(localDateTime, zoneId);
     }
 
     /**
@@ -340,7 +616,7 @@ public class DateUtils {
      * <p><b>{@code @return:}</b>{@link Date}</p>
      * <p><b>{@code @author:}</b>wlpia</p>
      */
-    public static Date formatDate(LocalDateTime localDateTime, ZoneId zoneId) {
+    public static Date parseDate(LocalDateTime localDateTime, ZoneId zoneId) {
         if(zoneId == null){
             zoneId = ZoneId.systemDefault();
         }
@@ -443,49 +719,6 @@ public class DateUtils {
 
     /**
      * <p><b>{@code @description:}</b>
-     * String format to LocalDateTime
-     * </p>
-     *
-     * <p><b>@param</b> <b>localDateTime</b>
-     * {@link String}
-     * </p>
-     *
-     * <p><b>{@code @date:}</b>2021/7/13 9:56</p>
-     * <p><b>{@code @return:}</b>{@link LocalDateTime}</p>
-     * <p><b>{@code @author:}</b>wlpia</p>
-     */
-    public static LocalDateTime parseLocalDateTime(String localDateTime) {
-        return parseLocalDateTime(localDateTime, YYYYMMDDHHMMSS);
-    }
-
-    /**
-     * <p><b>{@code @description:}</b>
-     * String format to LocalDateTime with pattern
-     * </p>
-     *
-     * <p><b>@param</b> <b>localDateTime</b>
-     * {@link String}
-     * </p>
-     *
-     * <p><b>@param</b> <b>pattern</b>
-     * {@link String}
-     * </p>
-     *
-     * <p><b>{@code @date:}</b>2019/10/6 9:56</p>
-     * <p><b>{@code @return:}</b>{@link LocalDateTime}</p>
-     * <p><b>{@code @author:}</b>wlpia</p>
-     */
-    public static LocalDateTime parseLocalDateTime(String localDateTime, String pattern) {
-        if (ValueUtils.isBlank(localDateTime)) {
-            throw new IllegalArgumentException("参数不能为空");
-        }
-        DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern(pattern);
-        return LocalDateTime.parse(localDateTime, dateTimeFormatter);
-    }
-
-
-    /**
-     * <p><b>{@code @description:}</b>
      * String format to LocalDateTime with pattern
      * </p>
      *
@@ -505,31 +738,13 @@ public class DateUtils {
      * <p><b>{@code @return:}</b>{@link LocalDateTime}</p>
      * <p><b>{@code @author:}</b>wlpia</p>
      */
-    public static LocalDateTime parseLocalDateTime(String localDateTime, String pattern, ZoneId zoneId) {
-        if (ValueUtils.isBlank(localDateTime)) {
-            throw new IllegalArgumentException("参数不能为空");
+    public static LocalDateTime parseLocalDateTime(String dateStr, String pattern, ZoneId zoneId) {
+        if (dateStr == null || dateStr.trim().isEmpty()) {
+            throw new IllegalArgumentException("日期字符串不能为空");
         }
-        DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern(pattern);
-        LocalDateTime dateTime = LocalDateTime.parse(localDateTime, dateTimeFormatter);
-
+        DateTimeFormatter dtf = DateTimeFormatter.ofPattern(pattern);
+        LocalDateTime dateTime = LocalDateTime.parse(dateStr.trim(), dtf);
         return LocalDateTime.ofInstant(dateTime.toInstant(zoneId.getRules().getOffset(dateTime)), zoneId);
-    }
-    
-    /**
-     * <p><b>{@code @description:}</b>
-     * String format to LocalDate
-     * </p>
-     *
-     * <p><b>@param</b> <b>localDate</b>
-     * {@link String}
-     * </p>
-     *
-     * <p><b>{@code @date:}</b>2019/10/6 9:56</p>
-     * <p><b>{@code @return:}</b>{@link LocalDate}</p>
-     * <p><b>{@code @author:}</b>wlpia</p>
-     */
-    public static LocalDate parseLocalDate(String localDate) {
-        return parseLocalDate(localDate, YYYYMMDD);
     }
 
 
@@ -538,7 +753,7 @@ public class DateUtils {
      * String format to LocalDate with pattern
      * </p>
      *
-     * <p><b>@param</b> <b>localDate</b>
+     * <p><b>@param</b> <b>dateStr</b>
      * {@link String}
      * </p>
      *
@@ -550,12 +765,12 @@ public class DateUtils {
      * <p><b>{@code @return:}</b>{@link LocalDate}</p>
      * <p><b>{@code @author:}</b>wlpia</p>
      */
-    public static LocalDate parseLocalDate(String localDate, String pattern) {
-        if (ValueUtils.isBlank(localDate)) {
-            throw new IllegalArgumentException("参数不能为空");
+    public static LocalDate parseLocalDate(String dateStr, String pattern) {
+        if (dateStr == null || dateStr.trim().isEmpty()) {
+            throw new IllegalArgumentException("日期字符串不能为空");
         }
-        DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern(pattern);
-        return LocalDate.parse(localDate, dateTimeFormatter);
+        DateTimeFormatter dtf = DateTimeFormatter.ofPattern(pattern);
+        return LocalDate.parse(dateStr.trim(), dtf);
     }
 
     /**
@@ -841,22 +1056,6 @@ public class DateUtils {
 
     // ==================== 私有辅助方法 ====================
 
-    // 定义各种日期格式的正则表达式
-    private static final Pattern CST_PATTERN =
-            Pattern.compile("[A-Za-z]{3} [A-Za-z]{3} \\d{2} \\d{2}:\\d{2}:\\d{2} [A-Z]{3} \\d{4}");
-    private static final Pattern SLASH_DATE_TIME =
-            Pattern.compile("\\d{4}/\\d{2}/\\d{2} \\d{2}:\\d{2}:\\d{2}");
-    private static final Pattern SLASH_DATE_TIME_NO_SEC =
-            Pattern.compile("\\d{4}/\\d{2}/\\d{2} \\d{2}:\\d{2}");
-    private static final Pattern LINE_DATE_TIME =
-            Pattern.compile("\\d{4}-\\d{2}-\\d{2} \\d{2}:\\d{2}:\\d{2}");
-    private static final Pattern LINE_DATE_TIME_NO_SEC =
-            Pattern.compile("\\d{4}-\\d{2}-\\d{2} \\d{2}:\\d{2}");
-    private static final Pattern COMPACT_DATE_TIME =
-            Pattern.compile("\\d{14}");
-    private static final Pattern COMPACT_DATE_TIME_NO_SEC =
-            Pattern.compile("\\d{12}");
-
     @FunctionalInterface
     private interface LocalDateTimeOperator {
         LocalDateTime apply(LocalDateTime dateTime);
@@ -883,11 +1082,23 @@ public class DateUtils {
         return "" + un;
     }
 
-//    public static void main(String[] args) {
-//        Date date = new Date();
-//        String dateStr = date.toString();
-//        Date d = DateUtils.parseDate(dateStr);
-//        System.out.println();
-//    }
+    public static final String YYYYMMDDHHMMSS = "yyyy-MM-dd HH:mm:ss";
+    public static final String HHMMSS = "HH:mm:ss";
+    public static final String YYYYMMDD = "yyyy-MM-dd";
+
+
+    private static final List<DateTimeFormatter> FORMATTERS = new ArrayList<>(){{
+        // 按优先级添加，最可能匹配的放前面
+        add(DateTimeFormatter.ofPattern("EEE MMM dd HH:mm:ss zzz yyyy", Locale.US)); // CST
+        add(DateTimeFormatter.ofPattern("yyyy/MM/dd HH:mm:ss"));
+        add(DateTimeFormatter.ofPattern("yyyy/MM/dd HH:mm"));
+        add(DateTimeFormatter.ofPattern("yyyy/MM/dd"));
+        add(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
+        add(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm"));
+        add(DateTimeFormatter.ofPattern("yyyy-MM-dd"));
+        add(DateTimeFormatter.ofPattern("yyyyMMddHHmmss"));
+        add(DateTimeFormatter.ofPattern("yyyyMMddHHmm"));
+        add(DateTimeFormatter.ofPattern("yyyyMMdd"));
+    }};
 
 }
