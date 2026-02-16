@@ -23,12 +23,12 @@ class ClientRunner implements Runnable<java.lang.Runnable, Integer> {
     // The size of the buffer used for reading data from the client
     private static final int BUFFER_SIZE = 8192;
 
-    // The underlying socket connection for this client
-    private final Socket sClient;
-
     // Unique identifier for this client
     @Getter
     private final int clientId;
+
+    // The underlying socket connection for this client
+    private final Socket sClient;
 
     // Interface for reading data from the client
     private final IReader reader;
@@ -63,7 +63,7 @@ class ClientRunner implements Runnable<java.lang.Runnable, Integer> {
         this.sClient = sClient;
         this.clientId = clientId;
         this.reader = iReader;
-        this.writer = new Builder.ClientWriter(this.sClient.getOutputStream());
+        this.writer = Builder.getWriter(this.sClient.getOutputStream());
     }
 
     /**

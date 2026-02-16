@@ -9,7 +9,6 @@ import org.wlpiaoyi.framework.utils.thread.Runnable;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.OutputStream;
 import java.net.Socket;
 
 /**
@@ -24,20 +23,22 @@ import java.net.Socket;
  * <hr/>
  */
 @Slf4j
-public class SocketClient implements Runnable<java.lang.Runnable, Integer> {
+public class SocketClient{
 
     // The size of the buffer used for reading data from the client
     private static final int BUFFER_SIZE = 8192;
 
+    @Getter
     private final String host;
 
+    @Getter
     private final int port;
-
-    private Socket socket;
 
     // Unique identifier for this client
     @Getter
     private final int clientId;
+
+    private Socket socket;
 
     // Interface for reading data from the client
     private final IReader reader;
@@ -52,12 +53,20 @@ public class SocketClient implements Runnable<java.lang.Runnable, Integer> {
         this.reader = iReader;
     }
 
-    @Override
-    public Integer run(String taskId, java.lang.Runnable onFinishCallback) throws Exception {
+    public void connect() throws IOException {
+        log.info("SocketClient.connect. Connecting to server {}:{} clientId:{}", this.host, this.port, this.clientId);
+        if(this.socket != null && !this.socket.isClosed()){
+            log.warn("SocketClient.connect. The socket is already connected. Disconnecting and reconnecting...");
+            return;
+        }
+        socket = new Socket(this.host, this.port);
+        log.info("SocketClient.connect. Connected to server {}:{} clientId:{}", socket.getInetAddress(), socket.getPort(), this.clientId);
+    }
+
+    public Integer run(java.lang.Runnable onFinishCallback){
         // 使用 try-with-resources 确保 Socket 和相关流自动关闭
         try {
-            socket = new Socket(this.host, this.port);
-            this.writer = new Builder.ClientWriter(this.socket.getOutputStream());
+            this.writer = Builder.getWriter(this.socket.getOutputStream());
             InputStream in = socket.getInputStream();
             log.info("SocketClient.run. Connected to server {}:{} clientId:{}", socket.getInetAddress(), socket.getPort(), this.clientId);
             byte[] readBytes = new byte[BUFFER_SIZE];
@@ -69,32 +78,33 @@ public class SocketClient implements Runnable<java.lang.Runnable, Integer> {
         } catch (IOException e) {
             log.error("SocketClient.run. Error occurred while connecting to server {}:{} clientId:{}", this.host, this.port, this.clientId, e);
         }finally {
-            this.close();
+            this.disConnect();
             if(onFinishCallback != null){
                 onFinishCallback.run();
             }
         }
         return 0;
     }
-    public void close(){
+    public void disConnect(){
         if (this.socket == null) return;
         if (this.socket.isClosed()) return;
         try {
             socket.getInputStream().close();
         } catch (IOException e) {
-            log.info("SocketClient.close. Error occurred while closing socket.in", e);
+            log.info("SocketClient.disConnect. Error occurred while closing socket.in", e);
         }
         try {
             socket.getOutputStream().flush();
             socket.getOutputStream().close();
         } catch (IOException e) {
-            log.error("SocketClient.close. Error occurred while closing socket.out", e);
+            log.error("SocketClient.disConnect. Error occurred while closing socket.out", e);
         }
         try {
             socket.close();
         } catch (IOException e) {
-            log.error("SocketClient.close. Error occurred while closing socket", e);
+            log.error("SocketClient.disConnect. Error occurred while closing socket", e);
         }
+        this.socket = null;
 
     }
 }

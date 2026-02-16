@@ -1,5 +1,6 @@
 package org.wlpiaoyi.framework.utils.socket.server;
 
+import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 import org.wlpiaoyi.framework.utils.socket.Builder;
@@ -9,6 +10,8 @@ import java.io.IOException;
 import java.net.ServerSocket;
 import java.util.Map;
 import java.util.concurrent.*;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
 
 
 /**
@@ -26,22 +29,25 @@ import java.util.concurrent.*;
 public class SocketServer {
 
     // Port on which the server listens for incoming connections
+    @Getter
     private final int port;
+
+    // Map to store active client connections by their ID
+    private final Map<Integer, ClientRunner> clientMaps = new ConcurrentHashMap<>();
 
     // Interface for reading data from clients
     private IReader iReader;
 
     // Flag to control whether the server is running
-    private volatile boolean running = true;
+    private volatile boolean running = false;
 
     // Counter to assign unique IDs to connected clients
     private volatile int clientIndex = 0;
 
-    // Map to store active client connections by their ID
-    private final Map<Integer, ClientRunner> clientMaps = new ConcurrentHashMap<>();
-
     // Server socket used to accept incoming client connections
     private ServerSocket serverSocket;
+
+    private Lock lock = new ReentrantLock();
 
 
     /**
@@ -62,7 +68,6 @@ public class SocketServer {
      */
     public SocketServer(int port){
         this.port = port;
-        // Create a thread pool with specified configuration
     }
 
 
@@ -103,11 +108,14 @@ public class SocketServer {
      * <hr/>
      */
     public void start() {
+        log.info("SocketServer.start. Starting server...");
+        this.lock.lock();
         try (ServerSocket serverSocket = new ServerSocket(this.port)) {
             this.serverSocket = serverSocket;
             log.info("SocketServer.start. Server started successfully on port: {}", this.port);
             log.info("SocketServer.start. Waiting for client connections...");
-
+            this.running = true;
+            this.lock.unlock();
             // Continuously accept new client connections while the server is running
             while (running) {
                 try {
@@ -120,7 +128,9 @@ public class SocketServer {
 
                     // Create a new SocketClient instance for the connected client
                     var client = new ClientRunner(clientSocket, this.clientIndex, this.iReader);
-
+                    while (this.clientMaps.containsKey(this.clientIndex)){
+                        this.clientIndex++;
+                    }
                     // Add the client to the map of active clients
                     this.clientMaps.put(client.getClientId(), client);
 
@@ -137,7 +147,7 @@ public class SocketServer {
             log.error("SocketServer.start. Failed to start server: {}", e.getMessage(), e);
         } finally {
             log.info("SocketServer.start. Server shutdown.");
-            close(); // Ensure proper cleanup even if an error occurs
+            stop(); // Ensure proper cleanup even if an error occurs
         }
     }
 
@@ -153,25 +163,28 @@ public class SocketServer {
      * <p><b>{@code @author:}</b>wlpiaoyi</p>
      * <hr/>
      */
-    public void close() {
+    public void stop() {
         try {
+            this.lock.lock();
             this.running = false;
-            log.info("SocketServer.close. Shutting down the server...");
+            log.info("SocketServer.stop. Shutting down the server...");
 
             // 关闭 server socket 以中断 accept
             if (this.serverSocket != null && !this.serverSocket.isClosed()) {
                 this.serverSocket.close();
-                log.info("SocketServer.close. Server socket closed.");
+                log.info("SocketServer.stop. Server socket closed.");
             }
 
             // 先关闭所有客户端连接，使任务尽快结束
             clientMaps.forEach((id, client) -> {
                 client.close();
-                log.info("SocketServer.close. Closed connection for Client ID: {}", id);
+                log.info("SocketServer.stop. Closed connection for Client ID: {}", id);
             });
             clientMaps.clear();
         } catch (IOException e) {
-            log.error("SocketServer.close. Error occurred during server shutdown: {}", e.getMessage(), e);
+            log.error("SocketServer.stop. Error occurred during server shutdown: {}", e.getMessage(), e);
+        } finally {
+           this.lock.unlock();
         }
     }
 
