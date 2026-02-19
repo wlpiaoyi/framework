@@ -7,6 +7,7 @@ import org.wlpiaoyi.framework.forwarding.utils.socket.model.ResponseMessage;
 import org.wlpiaoyi.framework.utils.data.DataUtils;
 import org.wlpiaoyi.framework.utils.socket.IReader;
 import org.wlpiaoyi.framework.utils.socket.IWriter;
+import org.wlpiaoyi.framework.utils.socket.client.SocketClient;
 
 /**
  * <p><b>{@code @author:}</b>wlpiaoyi</p>
@@ -41,7 +42,13 @@ public class ClientReader implements IReader {
         byte[] data = new byte[readLen];
         System.arraycopy(readBytes, 0, data, 0, readLen);
         // use server forwarding data
+        System.out.println("S=================================================>:dMessage:");
+        System.out.println(new String(data));
+        System.out.println("S=================================================<:dMessage");
         message.setData(SecurityUtils.getSecurity().encrypt(data, 0, data.length));
+        System.out.println("S=================================================>:eMessage:");
+        System.out.println(new String(message.getData()));
+        System.out.println("S=================================================<:eMessage");
         if (!message.check()) throw new RuntimeException("message check error！clientId:" + clientId);
         message.toBytes(this.bufferCaches, 0);
         this.serverWriter.write(clientId, this.bufferCaches, message.getLen());

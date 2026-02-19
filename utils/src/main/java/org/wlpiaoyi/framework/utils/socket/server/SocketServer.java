@@ -3,12 +3,15 @@ package org.wlpiaoyi.framework.utils.socket.server;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
+import org.wlpiaoyi.framework.utils.MapUtils;
 import org.wlpiaoyi.framework.utils.socket.Builder;
 import org.wlpiaoyi.framework.utils.socket.IReader;
 
 import java.io.IOException;
+import java.lang.ref.WeakReference;
 import java.net.ServerSocket;
 import java.util.Map;
+import java.util.Objects;
 import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.locks.Lock;
@@ -34,6 +37,9 @@ public class SocketServer {
     // Port on which the server listens for incoming connections
     @Getter
     private final int port;
+
+    @Getter
+    private final int timeOut;
 
     // Map to store active client connections by their ID
     private final Map<Integer, ClientRunner> clientMaps = new ConcurrentHashMap<>();
@@ -64,13 +70,14 @@ public class SocketServer {
      * <p><b>{@code @author:}</b>wlpiaoyi</p>
      * <hr/>
      */
-    SocketServer(int port, int bufferSize){
+    SocketServer(int port, int bufferSize, int timeOut){
         this.port = port;
         this.bufferSize = bufferSize;
+        this.timeOut = timeOut;
     }
 
-    public static SocketServer build(int port, int bufferSize){
-        return new SocketServer(port, bufferSize);
+    public static SocketServer build(int port, int bufferSize, int timeOut){
+        return new SocketServer(port, bufferSize, timeOut);
     }
 
     public SocketServer setLoadReader(LoadReader loadReader){
@@ -131,6 +138,7 @@ public class SocketServer {
 //                log.debug("SocketServer.listener. Waiting for client connections...");
                 // Accept a new client connection
                 var clientSocket = serverSocket.accept();
+                clientSocket.setSoTimeout(this.timeOut * 1000);
 //                log.debug("SocketServer.listener. Accepted client connection from: {}", clientSocket.getInetAddress().getHostAddress());
                 IReader reader = this.loadReader.loadReader(clientId);
                 if(reader == null){
@@ -140,7 +148,7 @@ public class SocketServer {
                 }
                 // Create a new SocketClient instance for the connected client
                 var client = new ClientRunner(clientSocket, clientId, reader, this.bufferSize);
-                var onFinish = new ClientOnFinish(client, this.clientMaps, reader);
+                var onFinish = new ClientOnFinish(client, this, reader);
                 // Add the client to the map of active clients
                 this.clientMaps.put(client.getClientId(), client);
                 if(reader.begin(clientId, clientSocket.getInetAddress().getHostAddress(), clientSocket.getPort()) == -1){
@@ -153,7 +161,7 @@ public class SocketServer {
 //                    var future = Builder.getThreadPool().submit();
                 onFinish.setFuture(future);
 //                log.debug("SocketServer.listener. Submitted client task for Client ID: {}", client.getClientId());
-            } catch (IOException e) {
+            } catch (Exception e) {
                 log.warn("SocketServer.listener. Error accepting connection for Client ID: {}", clientId, e);
                 this.close(clientId);
             }
@@ -211,6 +219,7 @@ public class SocketServer {
 
     public void close(int clientId){
         try {
+            log.debug("SocketServer.close. Closing client for Client ID: {}", clientId);
             this.lock.lock();
             if(!this.clientMaps.containsKey(clientId)){
                 log.warn("SocketServer.close. No client for clientId: {}", clientId);
@@ -229,15 +238,15 @@ public class SocketServer {
     static class ClientOnFinish implements Runnable {
 
         private final ClientRunner sClient;
-        private final Map<Integer, ClientRunner> clientMaps;
+        private final WeakReference<SocketServer> socketServer;
         private final IReader reader;
 
         @Setter
         private Future<Integer> future;
 
-        ClientOnFinish(ClientRunner sClient, Map<Integer, ClientRunner> clientMaps, IReader reader) {
+        ClientOnFinish(ClientRunner sClient, SocketServer socketServer, IReader reader) {
             this.sClient = sClient;
-            this.clientMaps = clientMaps;
+            this.socketServer = new WeakReference<>(socketServer);
             this.reader = reader;
             this.future = null;
         }
@@ -260,7 +269,7 @@ public class SocketServer {
             } finally {
                 // Clean up resources after the client disconnects
                 this.sClient.close();
-                this.clientMaps.remove(sClient.getClientId());
+                Objects.requireNonNull(this.socketServer.get()).close(sClient.getClientId());
                 log.debug("ClientOnFinish.run. Client connection closed, Client ID: {}", sClient.getClientId());
             }
         }

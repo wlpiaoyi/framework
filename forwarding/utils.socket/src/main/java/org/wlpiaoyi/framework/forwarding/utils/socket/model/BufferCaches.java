@@ -21,12 +21,15 @@ public class BufferCaches {
     private int bufferLen = -1;
 
     public synchronized int loadIfNeed(byte[] bytes, int off,  int len) {
+        if(len <= 0) return -1;
         if(off < 0 || off >= len) {
             throw new RuntimeException("BufferCaches.loadIfNeed.off < 0 || off >= len");
         }
         if(this.bufferOff == -1 || this.bufferLen == -1){
             this.bufferOff = 0;
             this.bufferLen = (int) ValueUtils.byteToLong(bytes, off, 4);
+            if(this.bufferLen > ForwardUtils.MAX_CACHE_SIZE)
+                throw new RuntimeException("BufferCaches.loadIfNeed.bufferLen > MAX_CACHE_SIZE");
 //            log.debug("BufferCaches.loadIfNeed.load. bufferLen: {}", this.bufferLen);
         }
         int cOff = -1;

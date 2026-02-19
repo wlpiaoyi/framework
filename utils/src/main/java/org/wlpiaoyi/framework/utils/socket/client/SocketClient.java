@@ -33,6 +33,9 @@ public class SocketClient{
     @Getter
     private final int port;
 
+    @Getter
+    private final int timeOut;
+
     // Unique identifier for this client
     @Getter
     private final int clientId;
@@ -45,12 +48,13 @@ public class SocketClient{
     @Getter
     private IWriter writer;
 
-    public SocketClient(String host, int port, int clientId, int bufferSize, IReader iReader){
+    public SocketClient(String host, int port, int timeOut, int clientId, int bufferSize, IReader iReader){
         this.host = host;
         this.port = port;
         this.clientId = clientId;
         this.reader = iReader;
         this.bufferSize = bufferSize;
+        this.timeOut = timeOut;
     }
 
     public void connect() throws IOException {
@@ -60,6 +64,7 @@ public class SocketClient{
             return;
         }
         socket = new Socket(this.host, this.port);
+//        socket.setSoTimeout(this.timeOut * 1000);
         // Interface for writing data to the client
         this.writer = Builder.getWriter(this.socket.getOutputStream());
         this.reader.begin(this.clientId, socket.getInetAddress().getHostAddress(), socket.getPort());
@@ -108,6 +113,7 @@ public class SocketClient{
                 this.disConnect();
                 return 0;
             }
+            if(this.reader.read(this.writer, this.clientId, readBytes, 0) == -1) return 0;
             while (true){
 //                if(!Thread.currentThread().isInterrupted()){
 //                    log.warn("SocketClient.run. Error occurred while reading from server {}:{} clientId:{}", socket.getInetAddress(), socket.getPort(), this.clientId);
@@ -134,7 +140,7 @@ public class SocketClient{
         return 0;
     }
     public void disConnect(){
-//        log.debug("SocketClient.disConnect. Disconnecting client with ID: {}", this.clientId);
+        log.debug("SocketClient.disConnect. Disconnecting client with ID: {}", this.clientId);
         try {
             if(!this.socket.isInputShutdown()){
                 this.socket.shutdownInput();

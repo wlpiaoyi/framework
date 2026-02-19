@@ -20,7 +20,7 @@ public class ForwardUtils {
 
 //    public static final int MAX_CACHE_SIZE = 1024 * 1024 * 20;
 //    public static final int BUFF_CACHE_SIZE = 1024 * 1024 * 10;
-    protected static final String CONFIG_PATH = "C:\\Home\\Document\\Develop\\Java\\framework\\forwarding\\utils.socket\\src\\main\\resources\\config.json";
+    protected static final String CONFIG_PATH = "fw_config/forwarding/config.json";
     public static final int MAX_CACHE_SIZE = 1024 * 2;
     public static final int BUFF_CACHE_SIZE = 1024;
 

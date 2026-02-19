@@ -81,7 +81,10 @@ public class ResponseMessage extends Message implements Serializable {
         int start = offset;
         offset += super.formatBytes(bytes, offset);
         // 读取 data 长度和内容
+        this.setData(null);
+        if(offset >= bytes.length) return offset - start;
         int dataLen = (int) ValueUtils.byteToLong(bytes, offset, 2);
+        if (dataLen == 0) return offset - start;
         offset += 2;
         this.data = new byte[dataLen];
         for (int i = 0; i < dataLen; i++){

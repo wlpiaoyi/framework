@@ -1,5 +1,7 @@
 package org.wlpiaoyi.framework.utils.socket;
 
+import org.wlpiaoyi.framework.utils.socket.client.SocketClient;
+
 public interface IReader {
 
     /**

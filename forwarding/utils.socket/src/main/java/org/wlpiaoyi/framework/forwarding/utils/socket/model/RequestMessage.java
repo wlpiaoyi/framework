@@ -115,15 +115,16 @@ public class RequestMessage extends Message implements java.io.Serializable{
         if (hostLen > 65535) {
             throw new IllegalArgumentException("Host length exceeds 65535 bytes");
         }
-        int bodyLen = data.length;
+        int bodyLen = 0;
+        if (this.data != null) bodyLen = data.length;
         if (bodyLen > 65535) {
             throw new IllegalArgumentException("Data length exceeds 65535 bytes");
         }
 
         // 计算消息总长度并设置 len
         int totalLen =  2 + hostLen  // host 长度 + host 数据
-                + 4       // port
-                + 2 + bodyLen;
+                + 4;       // port
+        if(bodyLen > 0) totalLen += (2 + bodyLen);
         offset += super.toBytes(bytes, offset, totalLen);
         // 写入 host 长度和内容
         ValueUtils.longToBytes(hostLen, bytes, offset, 2);
@@ -131,11 +132,13 @@ public class RequestMessage extends Message implements java.io.Serializable{
         System.arraycopy(hostBytes, 0, bytes, offset, hostLen);
         offset += hostLen;
         offset += writePort(bytes, offset);     // port (4)
-        // 写入 data 长度和内容
-        ValueUtils.longToBytes(bodyLen, bytes, offset, 2);
-        offset += 2;
-        System.arraycopy(this.data, 0, bytes, offset, bodyLen);
-        offset += bodyLen;
+        if (bodyLen > 0){
+            // 写入 data 长度和内容
+            ValueUtils.longToBytes(bodyLen, bytes, offset, 2);
+            offset += 2;
+            System.arraycopy(this.data, 0, bytes, offset, bodyLen);
+            offset += bodyLen;
+        }
         return offset - start;  // 返回总写入字节数
     }
 
@@ -166,7 +169,10 @@ public class RequestMessage extends Message implements java.io.Serializable{
 
         // 读取 data 长度和内容
 //        int dataLen = ((bytes[off] & 0xFF) << 8) | (bytes[off + 1] & 0xFF);
+        this.setData(null);
+        if (bytes.length <= off) return off - start;
         int dataLen = (int) ValueUtils.byteToLong(bytes, off, 2);
+        if(dataLen == 0) return off - start;
         off += 2;
         this.data = new byte[dataLen];
         for (int i = 0; i < dataLen; i++){

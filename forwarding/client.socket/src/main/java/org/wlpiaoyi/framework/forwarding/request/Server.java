@@ -29,7 +29,8 @@ public class Server {
         ForwardUtils.getDict().forEach((k, v) -> {
             Builder.getThreadPool().submit((Runnable<Object, Object>) (taskId, param) -> {
                 int port = Integer.parseInt(k.toString());
-                var server = SocketServer.build(port, ForwardUtils.BUFF_CACHE_SIZE).setLoadReader(clientId -> new ServerReader(port));
+                int timeOut = MapUtils.getInteger(ForwardUtils.getCONFIG_MAP(), "timeOut",60);
+                var server = SocketServer.build(port, ForwardUtils.BUFF_CACHE_SIZE, timeOut).setLoadReader(clientId -> new ServerReader(port));
                 server.start();
                 return 0;
             });

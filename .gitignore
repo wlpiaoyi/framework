@@ -41,3 +41,6 @@ lab/document/target/
 fw_config/selenium/chromedriver.*
 fw_config/selenium/chromedriver
 fw_config/selenium/cur_date.dat
+forwarding/client.socket/target/
+forwarding/response/target/
+forwarding/utils.socket/target/

@@ -94,13 +94,14 @@ class ClientRunner implements Runnable<java.lang.Runnable, Integer> {
             log.debug("ClientRunner.run. Starting data reception for Client ID: {}", this.clientId);
             InputStream in = this.sClient.getInputStream();
             byte[] readBytes = new byte[this.bufferSize];
-            int readLen;
+            int readLen = 0;
+            if(this.reader.read(this.writer, this.clientId, readBytes, readLen) == -1) return -1;
             while (true) {
 //                if(!Thread.currentThread().isInterrupted()){
 //                    log.warn("ClientRunner.run. Error occurred while reading from server {}:{} clientId:{}", this.sClient.getInetAddress(), this.sClient.getPort(), this.clientId);
 ////                    break;
 //                }
-                readLen = in.read(readBytes, 0, readBytes.length);
+                readLen = in.read(readBytes);
                 if (readLen == -1) {
                     log.warn("ClientRunner.run. Server {}:{} clientId:{} disconnected", this.sClient.getInetAddress(), this.sClient.getPort(), this.clientId);
                     break;

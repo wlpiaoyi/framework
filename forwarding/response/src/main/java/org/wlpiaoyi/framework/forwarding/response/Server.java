@@ -1,6 +1,7 @@
 package org.wlpiaoyi.framework.forwarding.response;
 
 import org.wlpiaoyi.framework.forwarding.utils.socket.ForwardUtils;
+import org.wlpiaoyi.framework.utils.MapUtils;
 import org.wlpiaoyi.framework.utils.socket.server.SocketServer;
 
 /**
@@ -14,7 +15,8 @@ public class Server {
     private final SocketServer server;
 
     public Server(int port) {
-        this.server = SocketServer.build(port, ForwardUtils.BUFF_CACHE_SIZE).setLoadReader(clientId -> new ServerReader());
+        int timeOut = MapUtils.getInteger(ForwardUtils.getCONFIG_MAP(), "timeOut",60);
+        this.server = SocketServer.build(port, ForwardUtils.BUFF_CACHE_SIZE, timeOut).setLoadReader(clientId -> new ServerReader());
     }
 
     public void run() throws InterruptedException {

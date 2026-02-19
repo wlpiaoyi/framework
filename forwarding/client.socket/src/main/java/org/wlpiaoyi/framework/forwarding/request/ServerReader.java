@@ -4,6 +4,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.wlpiaoyi.framework.forwarding.utils.socket.ForwardUtils;
 import org.wlpiaoyi.framework.forwarding.utils.socket.Security;
 import org.wlpiaoyi.framework.forwarding.utils.socket.model.RequestMessage;
+import org.wlpiaoyi.framework.utils.MapUtils;
 import org.wlpiaoyi.framework.utils.socket.IReader;
 import org.wlpiaoyi.framework.utils.socket.IWriter;
 import org.wlpiaoyi.framework.utils.socket.client.SocketClient;
@@ -50,11 +51,20 @@ public class ServerReader implements IReader {
             message.setHost(addrs[0]);
             message.setPort(Integer.parseInt(addrs[1]));
         }
-        byte[] data = new byte[len];
-        System.arraycopy(bytes, 0, data, 0, len);
-        message.setData(SecurityUtils.getSecurity().encrypt(data, 0, data.length));
-
-        var client = this.getClient(clientId, message, writer);
+        if(len > 0){
+            byte[] data = new byte[len];
+            System.arraycopy(bytes, 0, data, 0, len);
+            message.setData(SecurityUtils.getSecurity().encrypt(data, 0, data.length));
+        }else{
+            message.setData(null);
+        }
+        SocketClient client;
+        {
+            var addrs = ForwardUtils.getResponseServerAddress().split(":");
+            String respHost = addrs[0];
+            int respPort = Integer.parseInt(addrs[1]);
+            client = this.getClient(clientId, respHost, respPort, writer);
+        }
         int bLen = message.toBytes(this.bufferCaches, 0);
         client.getWriter().write(clientId, this.bufferCaches, bLen);
         log.debug("ServerReader.read. request ClientId: {}, Host: {}, Port: {} ", clientId, message.getHost(), message.getPort());
@@ -64,21 +74,29 @@ public class ServerReader implements IReader {
     @Override
     public void error(int clientId, Exception e) {
         log.error("ServerReader.error. ClientId: {}", clientId, e);
-        this.clientContentDict.clear();
+        synchronized (this.clientContentDict){
+            this.clientContentDict.forEach((k, v) -> {
+                v.disConnect();
+            });
+            this.clientContentDict.clear();
+        }
     }
 
     @Override
     public void end(int clientId) {
         log.debug("ServerReader.end. ClientId: {}", clientId);
-        this.clientContentDict.clear();
+        synchronized (this.clientContentDict){
+            this.clientContentDict.forEach((k, v) -> {
+                v.disConnect();
+            });
+            this.clientContentDict.clear();
+        }
     }
 
-    protected synchronized SocketClient getClient(int clientId, RequestMessage message, IWriter serverWriter){
-        String[] addrs = ForwardUtils.getResponseServerAddress().split(":");
-        String host = addrs[0];
-        int port = Integer.parseInt(addrs[1]);
-        return this.clientContentDict.computeIfAbsent(message.getHost() + ":" + message.getPort(), k -> {
-            SocketClient socketClient = new SocketClient(host, port, clientId, ForwardUtils.BUFF_CACHE_SIZE, new ClientReader(serverWriter));
+    public SocketClient getClient(int clientId, String respHost, int respPort, IWriter serverWriter) {
+        return this.clientContentDict.computeIfAbsent(clientId + ":" + respHost + ":" + respPort, k -> {
+            int timeOut = MapUtils.getInteger(ForwardUtils.getCONFIG_MAP(), "timeOut",60);
+            SocketClient socketClient = new SocketClient(respHost, respPort, clientId, timeOut, ForwardUtils.BUFF_CACHE_SIZE, new ClientReader(serverWriter));
             try {
                 socketClient.connect();
                 socketClient.asyncRun(null);
@@ -88,4 +106,5 @@ public class ServerReader implements IReader {
             return socketClient;
         });
     }
+
 }
