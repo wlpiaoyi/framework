@@ -29,7 +29,7 @@ public class AesCipherTest {
     @Test
     public void test() throws Exception {
 
-        AesCipher aes = AesCipher.build().setKey(StringUtils.getUUID32()).loadConfig();
+        AesCipher aes = AesCipher.build().setKey(StringUtils.getUUID32().substring(0, 16)).loadConfig();
         System.out.println("AEA Key:\n" + aes.getKey().toString());
         String source = "这是一行没有任何意义的文字，你看完了等于没看，不是吗这是一行没有任何意义的文字，你看完了等于没看，不是吗这是一行没有任何意义的文字，你看完了等于没看，不是吗这是一行没有任何意义的文字，你看完了等于没看，不是吗";
         System.out.println("\r加密前文字：\r\n" + source);

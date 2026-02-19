@@ -1,9 +1,13 @@
 package org.wlpiaoyi.framework.forwarding.request;
 
 import org.wlpiaoyi.framework.forwarding.utils.socket.ForwardUtils;
+import org.wlpiaoyi.framework.utils.MapUtils;
 import org.wlpiaoyi.framework.utils.socket.Builder;
 import org.wlpiaoyi.framework.utils.socket.server.SocketServer;
 import org.wlpiaoyi.framework.utils.thread.Runnable;
+
+import java.io.IOException;
+import java.util.Map;
 
 /**
  * <p><b>{@code @author:}</b>wlpiaoyi</p>
@@ -13,20 +17,22 @@ import org.wlpiaoyi.framework.utils.thread.Runnable;
  */
 public class Server {
 
+    static {
+        try {
+            ForwardUtils.loadMap();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
     public void run() throws InterruptedException {
-
-        Builder.getThreadPool().submit((Runnable<Object, Object>) (taskId, param) -> {
-            int port = 1122;
-            var server = SocketServer.build(port, ForwardUtils.BUFF_CACHE_SIZE).setLoadReader(clientId -> new ServerReader(port));
-            server.start();
-            return 0;
-        });
-
-        Builder.getThreadPool().submit((Runnable<Object, Object>) (taskId, param) -> {
-            int port = 1180;
-            var server = SocketServer.build(port, ForwardUtils.BUFF_CACHE_SIZE).setLoadReader(clientId -> new ServerReader(port));
-            server.start();
-            return 0;
+        ForwardUtils.getDict().forEach((k, v) -> {
+            Builder.getThreadPool().submit((Runnable<Object, Object>) (taskId, param) -> {
+                int port = Integer.parseInt(k.toString());
+                var server = SocketServer.build(port, ForwardUtils.BUFF_CACHE_SIZE).setLoadReader(clientId -> new ServerReader(port));
+                server.start();
+                return 0;
+            });
         });
     }
 

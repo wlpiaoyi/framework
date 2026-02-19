@@ -140,13 +140,13 @@ public class Builder {
         @Override
         public void write(int clientId, byte[] writeBytes, int len) {
             try {
-                log.debug("ClientWriter.write. Sending data to Client ID: {}, Length: {} bytesLen: {}", clientId, len, writeBytes.length);
+//                log.debug("ClientWriter.write. Sending data to Client ID: {}, Length: {} bytesLen: {}", clientId, len, writeBytes.length);
                 if(writeBytes.length < len){
                     throw new IOException("writeBytes.length < len");
                 }
                 this.out.write(writeBytes, 0, len);
                 this.out.flush();
-                log.debug("ClientWriter.write. Data sent to Client ID: {}, Length: {}", clientId, len);
+//                log.debug("ClientWriter.write. Data sent to Client ID: {}, Length: {}", clientId, len);
             } catch (IOException e) {
                 log.error("ClientWriter.write. Error occurred while sending data to Client ID: {}", clientId, e);
             }

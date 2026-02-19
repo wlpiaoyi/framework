@@ -40,8 +40,7 @@ public class ClientReader implements IReader {
 
     @Override
     public synchronized int read(IWriter writer, int clientId, byte[] readBytes, int readLen) {
-        System.out.println("==========>" + ValueUtils.byteToLong(readBytes, 0, 6));
-        log.debug("ClientReader.read. ClientId: {}, ReadLen: {}", clientId, readLen);
+//        log.debug("ClientReader.read. ClientId: {}, ReadLen: {}", clientId, readLen);
         int off = this.read(writer, clientId, readBytes, 0, readLen);
         while (off > 0) {
            off = this.read(writer, clientId, readBytes, off, readLen);
@@ -66,15 +65,16 @@ public class ClientReader implements IReader {
             if(this.messageId < 0) this.messageId = 1;
             cOff = this.bufferCaches.loadIfNeed(bytes, off, len);
             if(cOff == -1){
-                log.debug("ClientReader.read.load.continue ClientId: {}, MessageId: {}", clientId, messageId);
+//                log.debug("ClientReader.read.load.continue ClientId: {}, MessageId: {}", clientId, messageId);
                 return 0;
             }
-            log.debug("ClientReader.read.load.end. ClientId: {}, MessageId: {}", clientId, messageId);
+//            log.debug("ClientReader.read.load.end. ClientId: {}, MessageId: {}", clientId, messageId);
             ResponseMessage message = new ResponseMessage(this.messageId);
             message.formatBytes(this.bufferCaches.getBuffers(), 0);
             if (!message.check()) throw new RuntimeException("message check error！clientId:" + clientId);
             // use server forwarding data
-            this.serverWriter.write(clientId, message.getData(), message.getData().length);
+            var data = SecurityUtils.getSecurity().decrypt(message.getData(), 0, message.getData().length);
+            this.serverWriter.write(clientId, data, data.length);
 //            log.debug("ClientReader.read. ClientId: {} write len:{} message: {}", clientId, message.getData().length, new String(message.getData()));
             return cOff;
         }finally {

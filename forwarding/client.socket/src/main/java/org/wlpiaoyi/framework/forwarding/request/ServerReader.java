@@ -2,6 +2,7 @@ package org.wlpiaoyi.framework.forwarding.request;
 
 import lombok.extern.slf4j.Slf4j;
 import org.wlpiaoyi.framework.forwarding.utils.socket.ForwardUtils;
+import org.wlpiaoyi.framework.forwarding.utils.socket.Security;
 import org.wlpiaoyi.framework.forwarding.utils.socket.model.RequestMessage;
 import org.wlpiaoyi.framework.utils.socket.IReader;
 import org.wlpiaoyi.framework.utils.socket.IWriter;
@@ -39,8 +40,8 @@ public class ServerReader implements IReader {
     }
 
     @Override
-    public int read(IWriter writer, int clientId, byte[] readBytes, int readLen) {
-        log.debug("ServerReader.read. ClientId: {}, ReadLen: {}", clientId, readLen);
+    public int read(IWriter writer, int clientId, byte[] bytes, int len) {
+//        log.debug("ServerReader.read. ClientId: {}, ReadLen: {}", clientId, readLen);
         this.messageId ++;
         if(this.messageId < 0) this.messageId = 1;
         RequestMessage message = new RequestMessage(this.messageId);
@@ -49,16 +50,14 @@ public class ServerReader implements IReader {
             message.setHost(addrs[0]);
             message.setPort(Integer.parseInt(addrs[1]));
         }
-        byte[] data = new byte[readLen];
-        System.arraycopy(readBytes, 0, data, 0, readLen);
-        message.setData(data);
-
-        int len = message.toBytes(this.bufferCaches, 0);
-        if (!message.check()) throw new RuntimeException("message check error！clientId:" + clientId);
+        byte[] data = new byte[len];
+        System.arraycopy(bytes, 0, data, 0, len);
+        message.setData(SecurityUtils.getSecurity().encrypt(data, 0, data.length));
 
         var client = this.getClient(clientId, message, writer);
-        client.getWriter().write(clientId, this.bufferCaches, len);
-
+        int bLen = message.toBytes(this.bufferCaches, 0);
+        client.getWriter().write(clientId, this.bufferCaches, bLen);
+        log.debug("ServerReader.read. request ClientId: {}, Host: {}, Port: {} ", clientId, message.getHost(), message.getPort());
         return 0;
     }
 

@@ -2,8 +2,9 @@ package org.wlpiaoyi.framework.forwarding.response;
 
 import lombok.extern.slf4j.Slf4j;
 import org.wlpiaoyi.framework.forwarding.utils.socket.ForwardUtils;
+import org.wlpiaoyi.framework.forwarding.utils.socket.Security;
 import org.wlpiaoyi.framework.forwarding.utils.socket.model.ResponseMessage;
-import org.wlpiaoyi.framework.utils.ValueUtils;
+import org.wlpiaoyi.framework.utils.data.DataUtils;
 import org.wlpiaoyi.framework.utils.socket.IReader;
 import org.wlpiaoyi.framework.utils.socket.IWriter;
 
@@ -39,11 +40,12 @@ public class ClientReader implements IReader {
         if (this.messageId < 0) this.messageId = 1;
         byte[] data = new byte[readLen];
         System.arraycopy(readBytes, 0, data, 0, readLen);
-        message.setData(data);
+        // use server forwarding data
+        message.setData(SecurityUtils.getSecurity().encrypt(data, 0, data.length));
         if (!message.check()) throw new RuntimeException("message check error！clientId:" + clientId);
         message.toBytes(this.bufferCaches, 0);
-        // use server forwarding data
         this.serverWriter.write(clientId, this.bufferCaches, message.getLen());
+//        log.debug("ClientReader.read. write len:{} message: {}", message.getLen(), DataUtils.base64Encode(this.bufferCaches));
         return 0;
     }
 

@@ -54,7 +54,7 @@ public class SocketClient{
     }
 
     public void connect() throws IOException {
-        log.debug("SocketClient.connect. Connecting to server {}:{} clientId:{}", this.host, this.port, this.clientId);
+//        log.debug("SocketClient.connect. Connecting to server {}:{} clientId:{}", this.host, this.port, this.clientId);
         if(this.socket != null && !this.socket.isClosed()){
             log.warn("SocketClient.connect. The socket is already connected. Disconnecting and reconnecting...");
             return;
@@ -63,7 +63,7 @@ public class SocketClient{
         // Interface for writing data to the client
         this.writer = Builder.getWriter(this.socket.getOutputStream());
         this.reader.begin(this.clientId, socket.getInetAddress().getHostAddress(), socket.getPort());
-        log.debug("SocketClient.connect. Connected to server {}:{} clientId:{}", socket.getInetAddress(), socket.getPort(), this.clientId);
+//        log.debug("SocketClient.connect. Connected to server {}:{} clientId:{}", socket.getInetAddress(), socket.getPort(), this.clientId);
     }
 
     /**
@@ -99,7 +99,7 @@ public class SocketClient{
     public Integer syncRun(java.lang.Runnable onFinishCallback){
         // 使用 try-with-resources 确保 Socket 和相关流自动关闭
         try {
-            log.debug("SocketClient.run. Connected to server {}:{} clientId:{}", socket.getInetAddress(), socket.getPort(), this.clientId);
+//            log.debug("SocketClient.run. Connected to server {}:{} clientId:{}", socket.getInetAddress(), socket.getPort(), this.clientId);
             int readLen;
             byte[] readBytes = new byte[this.bufferSize];
             final InputStream in = socket.getInputStream();
@@ -109,18 +109,17 @@ public class SocketClient{
                 return 0;
             }
             while (true){
-                if(!Thread.currentThread().isInterrupted()){
-                    log.warn("SocketClient.run. Error occurred while reading from server {}:{} clientId:{}", socket.getInetAddress(), socket.getPort(), this.clientId);
-                }
+//                if(!Thread.currentThread().isInterrupted()){
+//                    log.warn("SocketClient.run. Error occurred while reading from server {}:{} clientId:{}", socket.getInetAddress(), socket.getPort(), this.clientId);
+//                }
                 readLen = in.read(readBytes, 0, readBytes.length);
                 if (readLen == -1) {
                     log.warn("SocketClient.run. Server {}:{} clientId:{} disconnected", socket.getInetAddress(), socket.getPort(), this.clientId);
                     break;
                 }
                 if(this.reader.read(this.writer, this.clientId, readBytes, readLen) == -1) break;
-                log.debug("SocketClient.run. Received data from server {}:{} clientId:{} message:{}", socket.getInetAddress(), socket.getPort(), this.clientId, new String(readBytes));
             }
-            log.debug("SocketClient.run. Disconnected from server {}:{} clientId:{}", socket.getInetAddress(), socket.getPort(), this.clientId);
+//            log.debug("SocketClient.run. Disconnected from server {}:{} clientId:{}", socket.getInetAddress(), socket.getPort(), this.clientId);
         } catch (Exception e) {
             this.reader.error(this.clientId, e);
             log.error("SocketClient.run. Error occurred while connecting to server {}:{} clientId:{}", this.host, this.port, this.clientId, e);
@@ -135,13 +134,13 @@ public class SocketClient{
         return 0;
     }
     public void disConnect(){
-        log.debug("SocketClient.disConnect. Disconnecting client with ID: {}", this.clientId);
+//        log.debug("SocketClient.disConnect. Disconnecting client with ID: {}", this.clientId);
         try {
             if(!this.socket.isInputShutdown()){
                 this.socket.shutdownInput();
             }
         } catch (IOException e) {
-            log.debug("ClientRunner.close. Error occurred while closing socket.in", e);
+            log.error("ClientRunner.close. Error occurred while closing socket.in", e);
         }
         try {
             if(!this.socket.isOutputShutdown()){
@@ -152,10 +151,10 @@ public class SocketClient{
             log.error("ClientRunner.close. Error occurred while closing socket.out", e);
         }
         try {
-            log.debug("ClientRunner.close. Attempting to close connection for Client ID: {}", this.clientId);
+//            log.debug("ClientRunner.close. Attempting to close connection for Client ID: {}", this.clientId);
             if (!socket.isClosed()) {
                 socket.close();
-                log.debug("ClientRunner.close. Successfully closed connection for Client ID: {}", this.clientId);
+//                log.debug("ClientRunner.close. Successfully closed connection for Client ID: {}", this.clientId);
             }
         } catch (IOException e) {
             log.error("ClientRunner.close. Error occurred while closing connection for Client ID: {}", this.clientId, e);

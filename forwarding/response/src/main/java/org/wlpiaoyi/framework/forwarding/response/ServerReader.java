@@ -6,6 +6,7 @@ import org.wlpiaoyi.framework.forwarding.utils.socket.model.BufferCaches;
 import org.wlpiaoyi.framework.forwarding.utils.socket.model.RequestMessage;
 import org.wlpiaoyi.framework.forwarding.utils.socket.model.ResponseMessage;
 import org.wlpiaoyi.framework.utils.ValueUtils;
+import org.wlpiaoyi.framework.utils.data.DataUtils;
 import org.wlpiaoyi.framework.utils.socket.IReader;
 import org.wlpiaoyi.framework.utils.socket.IWriter;
 import org.wlpiaoyi.framework.utils.socket.client.SocketClient;
@@ -35,7 +36,6 @@ public class ServerReader implements IReader {
 
     @Override
     public int read(IWriter writer, int clientId, byte[] readBytes, int readLen) {
-        log.info("ServerReader.read. ClientId: {}, ReadLen: {}", clientId, readLen);
         int off = this.read(writer, clientId, readBytes, 0, readLen);
         while (off > 0) {
             off = this.read(writer, clientId, readBytes, off, readLen);
@@ -83,11 +83,11 @@ public class ServerReader implements IReader {
             RequestMessage message = new RequestMessage(this.messageId);
             message.formatBytes(this.bufferCaches.getBuffers(), 0);
             if (!message.check()) throw new RuntimeException("message check error！clientId:" + clientId);
+            log.debug("ServerReader.read. ClientId: {} write len:{} message: {}", clientId, message.getData().length, new String(DataUtils.base64Encode(message.getData())));
             // use server forwarding data
-            // use client forwarding data
             var client = this.getClient(clientId, message, writer);
-            client.getWriter().write(clientId, message.getData(), message.getData().length);
-//            log.debug("ServerReader.read. ClientId: {} write len:{} message: {}", clientId, message.getData().length, new String(message.getData()));
+            var data = SecurityUtils.getSecurity().decrypt(message.getData(), 0, message.getData().length);
+            client.getWriter().write(clientId, data, data.length);
             return cOff;
         }finally {
             if (cOff != -1) this.bufferCaches.init();

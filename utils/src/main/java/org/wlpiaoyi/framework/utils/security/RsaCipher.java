@@ -136,12 +136,15 @@ public class RsaCipher extends Security{
      */
     @SneakyThrows
     public synchronized byte[] encrypt(byte[] buffer){
+        return this.encrypt(buffer, 0, buffer.length);
+    }
+    @SneakyThrows
+    public synchronized byte[] encrypt(byte[] buffer, int offset, int len){
         if(this.eCipher == null){
             throw new BusinessException("not support encrypt");
         }
-        return this.eCipher.doFinal(buffer);
+        return this.eCipher.doFinal(buffer, offset, len);
     }
-
     /**
      * 解密
      * @param buffer
@@ -149,10 +152,14 @@ public class RsaCipher extends Security{
      */
     @SneakyThrows
     public synchronized byte[] decrypt(byte[] buffer){
+        return this.decrypt(buffer, 0, buffer.length);
+    }
+    @SneakyThrows
+    public synchronized byte[] decrypt(byte[] buffer, int offset, int len){
         if(this.dCipher == null){
             throw new BusinessException("not support decrypt");
         }
-        return this.dCipher.doFinal(buffer);
+        return this.dCipher.doFinal(buffer, offset, len);
     }
 
     public RsaCipher setPublicKey(String publicKey) {

@@ -128,10 +128,10 @@ public class SocketServer {
                     clientIndex.incrementAndGet();
                 }
                 clientId = clientIndex.get();
-                log.debug("SocketServer.listener. Waiting for client connections...");
+//                log.debug("SocketServer.listener. Waiting for client connections...");
                 // Accept a new client connection
                 var clientSocket = serverSocket.accept();
-                log.debug("SocketServer.listener. Accepted client connection from: {}", clientSocket.getInetAddress().getHostAddress());
+//                log.debug("SocketServer.listener. Accepted client connection from: {}", clientSocket.getInetAddress().getHostAddress());
                 IReader reader = this.loadReader.loadReader(clientId);
                 if(reader == null){
                     log.warn("SocketServer.listener. No reader for client: {}", clientId);
@@ -152,7 +152,7 @@ public class SocketServer {
                 var future = Builder.getThreadPool().submit(client, onFinish);
 //                    var future = Builder.getThreadPool().submit();
                 onFinish.setFuture(future);
-                log.debug("SocketServer.listener. Submitted client task for Client ID: {}", client.getClientId());
+//                log.debug("SocketServer.listener. Submitted client task for Client ID: {}", client.getClientId());
             } catch (IOException e) {
                 log.warn("SocketServer.listener. Error accepting connection for Client ID: {}", clientId, e);
                 this.close(clientId);

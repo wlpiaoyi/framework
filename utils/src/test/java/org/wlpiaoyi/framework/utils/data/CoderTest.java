@@ -28,8 +28,6 @@ public class CoderTest {
 
     @Test
     public void encryptMD5() throws Exception {
-        ValueUtils.bytesToBin(ValueUtils.toBytes(0b10001010101010101010));
-        ValueUtils.bytesToHex(ValueUtils.toBytes(0xFFAACC));
         ValueUtils.toLong(ValueUtils.hexToBytes("0xFF"));
         ValueUtils.toLong(ValueUtils.binToBytes("0b10001010101010101010"));
         String path = DataUtils.USER_DIR + "/target/test/reader.txt";

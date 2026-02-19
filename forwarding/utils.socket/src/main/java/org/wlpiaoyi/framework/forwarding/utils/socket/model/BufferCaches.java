@@ -27,7 +27,7 @@ public class BufferCaches {
         if(this.bufferOff == -1 || this.bufferLen == -1){
             this.bufferOff = 0;
             this.bufferLen = (int) ValueUtils.byteToLong(bytes, off, 4);
-            log.debug("BufferCaches.loadIfNeed.load. bufferLen: {}", this.bufferLen);
+//            log.debug("BufferCaches.loadIfNeed.load. bufferLen: {}", this.bufferLen);
         }
         int cOff = -1;
         for (int i = off; i < len; i++){
@@ -37,7 +37,7 @@ public class BufferCaches {
                 break;
             }
         }
-        log.debug("BufferCaches.loadIfNeed.read. bufferOff: {}, bufferLen: {}", this.bufferOff, this.bufferLen);
+//        log.debug("BufferCaches.loadIfNeed.read. bufferOff: {}, bufferLen: {}", this.bufferOff, this.bufferLen);
         return cOff == len ? 0 : cOff;
     }
 
