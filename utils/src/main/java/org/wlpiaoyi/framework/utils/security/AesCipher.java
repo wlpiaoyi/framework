@@ -136,7 +136,7 @@ public class AesCipher extends Security{
         while ((nRead = dataIn.read(data, 0, data.length)) != -1) {
             byte[] outBytes = eCipher.doFinal(data, 0, nRead);
             int dataL = outBytes.length;
-            byte[] lbs = ValueUtils.toBytes(dataL, 8);
+            byte[] lbs = ValueUtils.longToBytes(dataL, 8);
             dataOut.write(lbs);
             dataOut.write(outBytes);
             dataOut.flush();
@@ -235,7 +235,7 @@ public class AesCipher extends Security{
 
         byte[] lbs = new byte[8];
         while (dataIn.read(lbs, 0, lbs.length) != -1) {
-            final int dataL = (int) ValueUtils.toLong(lbs);
+            final int dataL = (int) ValueUtils.byteToLong(lbs);
             byte[] data = new byte[dataL];
             final int dataI = dataIn.read(data, 0, dataL);
             if (dataI == -1){

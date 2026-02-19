@@ -10,6 +10,7 @@ import java.io.IOException;
 import java.net.ServerSocket;
 import java.util.Map;
 import java.util.concurrent.*;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
@@ -28,6 +29,8 @@ import java.util.concurrent.locks.ReentrantLock;
 @Slf4j
 public class SocketServer {
 
+    private final int bufferSize;
+
     // Port on which the server listens for incoming connections
     @Getter
     private final int port;
@@ -35,19 +38,14 @@ public class SocketServer {
     // Map to store active client connections by their ID
     private final Map<Integer, ClientRunner> clientMaps = new ConcurrentHashMap<>();
 
-    // Interface for reading data from clients
-    private IReader iReader;
-
     // Flag to control whether the server is running
     private volatile boolean running = false;
 
-    // Counter to assign unique IDs to connected clients
-    private volatile int clientIndex = 0;
+    private LoadReader loadReader;
 
-    // Server socket used to accept incoming client connections
-    private ServerSocket serverSocket;
+    private final Lock lock = new ReentrantLock();
 
-    private Lock lock = new ReentrantLock();
+    private final Object synTagObj = new Object();
 
 
     /**
@@ -66,32 +64,17 @@ public class SocketServer {
      * <p><b>{@code @author:}</b>wlpiaoyi</p>
      * <hr/>
      */
-    public SocketServer(int port){
+    SocketServer(int port, int bufferSize){
         this.port = port;
+        this.bufferSize = bufferSize;
     }
 
+    public static SocketServer build(int port, int bufferSize){
+        return new SocketServer(port, bufferSize);
+    }
 
-    /**
-     * <p><b>{@code @description:}</b>
-     * <div style='border-radius: 12px; padding: 5px; margin-left: 5px; margin-bottom: 5px;'>
-     * Sets the client reader interface to handle incoming data from clients.
-     * </div>
-     * </p>
-     *
-     * <p><b>{@code @param}</b> <b>iClientReader</b>
-     * {@link IReader}
-     * The implementation of IClientReader to process client data.
-     * </p>
-     *
-     * <p><b>{@code @date:}</b>2026/2/15 21:51</p>
-     * <p><b>{@code @return:}</b>{@link SocketServer}
-     * This instance of SocketServer for method chaining.
-     * </p>
-     * <p><b>{@code @author:}</b>wlpiaoyi</p>
-     * <hr/>
-     */
-    public SocketServer setClientReader(IReader iReader) {
-        this.iReader = iReader;
+    public SocketServer setLoadReader(LoadReader loadReader){
+        this.loadReader = loadReader;
         return this;
     }
 
@@ -107,48 +90,93 @@ public class SocketServer {
      * <p><b>{@code @author:}</b>wlpiaoyi</p>
      * <hr/>
      */
-    public void start() {
-        log.info("SocketServer.start. Starting server...");
+    public boolean start() {
+        log.debug("SocketServer.start. Starting server...");
         this.lock.lock();
-        try (ServerSocket serverSocket = new ServerSocket(this.port)) {
-            this.serverSocket = serverSocket;
-            log.info("SocketServer.start. Server started successfully on port: {}", this.port);
-            log.info("SocketServer.start. Waiting for client connections...");
-            this.running = true;
+        if(this.running){
+            log.warn("SocketServer.start. Server is already running.");
             this.lock.unlock();
-            // Continuously accept new client connections while the server is running
-            while (running) {
-                try {
-                    this.clientIndex++;
-                    log.info("SocketServer.start. Accepting client connection from: {}, Client ID: {}",
-                            serverSocket.getInetAddress().getHostAddress(), this.clientIndex);
-
-                    // Accept a new client connection
-                    var clientSocket = serverSocket.accept();
-
-                    // Create a new SocketClient instance for the connected client
-                    var client = new ClientRunner(clientSocket, this.clientIndex, this.iReader);
-                    while (this.clientMaps.containsKey(this.clientIndex)){
-                        this.clientIndex++;
-                    }
-                    // Add the client to the map of active clients
-                    this.clientMaps.put(client.getClientId(), client);
-
-                    // Submit the client task to the thread pool
-                    var onFinish = new ClientOnFinish(client, this.clientMaps);
-                    var future = Builder.getThreadPool().submit(client,onFinish );
-                    onFinish.setFuture(future);
-                    log.info("SocketServer.start. Submitted client task for Client ID: {}", client.getClientId());
-                } catch (IOException e) {
-                    log.warn("SocketServer.start. Error accepting connection for Client ID: {}", this.clientIndex, e);
-                }
-            }
-        } catch (IOException e) {
-            log.error("SocketServer.start. Failed to start server: {}", e.getMessage(), e);
-        } finally {
-            log.info("SocketServer.start. Server shutdown.");
-            stop(); // Ensure proper cleanup even if an error occurs
+            return false;
         }
+        try (ServerSocket serverSocket = new ServerSocket(this.port)) {
+            this.lock.unlock();
+            log.debug("SocketServer.start. Server started successfully on port: {}", this.port);
+            this.listener(serverSocket);
+            return true;
+        } catch (Exception e) {
+            log.error("SocketServer.start. Failed to start server: {}", e.getMessage(), e);
+            return false;
+        } finally {
+            this.lock.unlock();
+            log.debug("SocketServer.listener. Server shutdown.");
+            stop(); // Ensure proper cleanup even if an error occurs
+            this.synTagObj.notifyAll();
+        }
+    }
+
+    private void listener(ServerSocket serverSocket) {
+        log.debug("SocketServer.listener. Server is running.");
+        this.running = true;
+        // Continuously accept new client connections while the server is running
+        final AtomicInteger clientIndex = new AtomicInteger(0);
+        int clientId = 0;
+        while (running) {
+            try {
+                clientId = 0;
+                if(clientIndex.get() < 0) clientIndex.set(1);
+                while (clientIndex.get() == 0 || this.clientMaps.containsKey(clientIndex.get())){
+                    clientIndex.incrementAndGet();
+                }
+                clientId = clientIndex.get();
+                log.debug("SocketServer.listener. Waiting for client connections...");
+                // Accept a new client connection
+                var clientSocket = serverSocket.accept();
+                log.debug("SocketServer.listener. Accepted client connection from: {}", clientSocket.getInetAddress().getHostAddress());
+                IReader reader = this.loadReader.loadReader(clientId);
+                if(reader == null){
+                    log.warn("SocketServer.listener. No reader for client: {}", clientId);
+                    clientSocket.close();
+                    continue;
+                }
+                // Create a new SocketClient instance for the connected client
+                var client = new ClientRunner(clientSocket, clientId, reader, this.bufferSize);
+                var onFinish = new ClientOnFinish(client, this.clientMaps, reader);
+                // Add the client to the map of active clients
+                this.clientMaps.put(client.getClientId(), client);
+                if(reader.begin(clientId, clientSocket.getInetAddress().getHostAddress(), clientSocket.getPort()) == -1){
+                    log.warn("SocketServer.listener. Reader begin failed for client: {}", clientId);
+                    this.close(clientId);
+                    continue;
+                }
+                // Submit the client task to the thread pool
+                var future = Builder.getThreadPool().submit(client, onFinish);
+//                    var future = Builder.getThreadPool().submit();
+                onFinish.setFuture(future);
+                log.debug("SocketServer.listener. Submitted client task for Client ID: {}", client.getClientId());
+            } catch (IOException e) {
+                log.warn("SocketServer.listener. Error accepting connection for Client ID: {}", clientId, e);
+                this.close(clientId);
+            }
+        }
+    }
+
+
+    /**
+     * <p><b>{@code @description:}</b>
+     * <div style='border-radius: 12px; padding: 5px; margin-left: 5px; margin-bottom: 5px;'>
+     * Waits for the server to stop.
+     * </div>
+     * </p>
+     *
+     * <p><b>{@code @date:}</b>2026/2/15 21:53</p>
+     * <p><b>{@code @author:}</b>wlpiaoyi</p>
+     * <p><b>{@code @return:}</b>{@link boolean}
+     * <p><b>{@code @throws:}</b>{@link InterruptedException}</p>
+     * <hr/>
+     */
+    public void await() throws InterruptedException {
+        if(!this.running) throw new IllegalStateException("Server is not running.");
+        this.synTagObj.wait();
     }
 
     /**
@@ -167,60 +195,79 @@ public class SocketServer {
         try {
             this.lock.lock();
             this.running = false;
-            log.info("SocketServer.stop. Shutting down the server...");
-
-            // 关闭 server socket 以中断 accept
-            if (this.serverSocket != null && !this.serverSocket.isClosed()) {
-                this.serverSocket.close();
-                log.info("SocketServer.stop. Server socket closed.");
-            }
-
+            log.debug("SocketServer.stop. Shutting down the server...");
             // 先关闭所有客户端连接，使任务尽快结束
             clientMaps.forEach((id, client) -> {
                 client.close();
-                log.info("SocketServer.stop. Closed connection for Client ID: {}", id);
+                log.debug("SocketServer.stop. Closed connection for Client ID: {}", id);
             });
             clientMaps.clear();
-        } catch (IOException e) {
+        } catch (Exception e) {
             log.error("SocketServer.stop. Error occurred during server shutdown: {}", e.getMessage(), e);
         } finally {
            this.lock.unlock();
         }
     }
 
-    static class ClientOnFinish implements java.lang.Runnable {
+    public void close(int clientId){
+        try {
+            this.lock.lock();
+            if(!this.clientMaps.containsKey(clientId)){
+                log.warn("SocketServer.close. No client for clientId: {}", clientId);
+                return;
+            }
+            var client = this.clientMaps.get(clientId);
+            client.close();
+            this.clientMaps.remove(clientId);
+        } catch (Exception e) {
+            log.error("SocketServer.close. Error occurred during client close: {}", e.getMessage(), e);
+        } finally {
+            this.lock.unlock();
+        }
+    }
+
+    static class ClientOnFinish implements Runnable {
 
         private final ClientRunner sClient;
         private final Map<Integer, ClientRunner> clientMaps;
+        private final IReader reader;
 
         @Setter
         private Future<Integer> future;
 
-        ClientOnFinish(ClientRunner sClient, Map<Integer, ClientRunner> clientMaps) {
+        ClientOnFinish(ClientRunner sClient, Map<Integer, ClientRunner> clientMaps, IReader reader) {
             this.sClient = sClient;
             this.clientMaps = clientMaps;
+            this.reader = reader;
             this.future = null;
         }
+
 
         @Override
         public void run() {
             try {
-                int i = 10;
-                while (this.future == null && i > 0){
-                    Thread.sleep(1000);
+                int i = 20;
+                while (this.future == null && i-- > 0){
+                    Thread.sleep(100);
                 }
                 if (this.future == null) throw new RuntimeException("future is null");
                 // Wait for the client task to complete (with a timeout of 60 minutes)
-                this.future.get(60, TimeUnit.MINUTES);
+//                this.future.get(60, TimeUnit.MINUTES);
+                this.reader.end(this.sClient.getClientId());
             } catch (Exception e) {
+                this.reader.error(this.sClient.getClientId(), e);
                 log.error("ClientOnFinish.run. Error waiting for client task to complete: {}", e.getMessage(), e);
             } finally {
                 // Clean up resources after the client disconnects
                 this.sClient.close();
                 this.clientMaps.remove(sClient.getClientId());
-                log.info("ClientOnFinish.run. Client connection closed, Client ID: {}", sClient.getClientId());
+                log.debug("ClientOnFinish.run. Client connection closed, Client ID: {}", sClient.getClientId());
             }
         }
+    }
+
+    public interface LoadReader {
+        IReader loadReader(long clientId);
     }
 
 }

@@ -20,8 +20,8 @@ import java.net.Socket;
 @Slf4j
 class ClientRunner implements Runnable<java.lang.Runnable, Integer> {
 
-    // The size of the buffer used for reading data from the client
-    private static final int BUFFER_SIZE = 8192;
+
+    private final int bufferSize;
 
     // Unique identifier for this client
     @Getter
@@ -59,11 +59,12 @@ class ClientRunner implements Runnable<java.lang.Runnable, Integer> {
      * <p><b>{@code @author:}</b>wlpiaoyi</p>
      * <hr/>
      */
-    ClientRunner(Socket sClient, int clientId, IReader iReader) throws IOException {
+    ClientRunner(Socket sClient, int clientId, IReader iReader, int bufferSize) throws IOException {
         this.sClient = sClient;
         this.clientId = clientId;
         this.reader = iReader;
         this.writer = Builder.getWriter(this.sClient.getOutputStream());
+        this.bufferSize = bufferSize;
     }
 
     /**
@@ -90,21 +91,30 @@ class ClientRunner implements Runnable<java.lang.Runnable, Integer> {
     @Override
     public Integer run(String taskId, java.lang.Runnable onFinishCallback) throws Exception {
         try {
-            log.info("ClientRunner.run. Starting data reception for Client ID: {}", this.clientId);
+            log.debug("ClientRunner.run. Starting data reception for Client ID: {}", this.clientId);
             InputStream in = this.sClient.getInputStream();
-            byte[] readBytes = new byte[BUFFER_SIZE];
+            byte[] readBytes = new byte[this.bufferSize];
             int readLen;
-            while (!Thread.currentThread().isInterrupted() && (readLen = in.read(readBytes)) != -1) {
-                this.reader.read(this.writer, this.clientId, readBytes, readLen);
+            while (true) {
+                if(!Thread.currentThread().isInterrupted()){
+                    log.warn("ClientRunner.run. Error occurred while reading from server {}:{} clientId:{}", this.sClient.getInetAddress(), this.sClient.getPort(), this.clientId);
+//                    break;
+                }
+                readLen = in.read(readBytes, 0, readBytes.length);
+                if (readLen == -1) {
+                    log.warn("ClientRunner.run. Server {}:{} clientId:{} disconnected", this.sClient.getInetAddress(), this.sClient.getPort(), this.clientId);
+                    break;
+                }
+                if(this.reader.read(this.writer, this.clientId, readBytes, readLen) == -1) break;
+                log.debug("ClientRunner.run. Received data for Client ID: {}", this.clientId);
             }
-            log.info("ClientRunner.run. Data reception completed for Client ID: {}", this.clientId);
-        } catch (IOException e) {
+            log.debug("ClientRunner.run. Data reception completed for Client ID: {}", this.clientId);
+        } catch (Exception e) {
             if (e.getMessage().contains("Socket closed")) {
-                log.info("ClientRunner.run. Socket closed for Client ID: {}", this.clientId);
+                log.debug("ClientRunner.run. Socket closed for Client ID: {}", this.clientId);
             } else {
                 log.error("ClientRunner.run. Error occurred while receiving data for Client ID: {}", this.clientId, e);
             }
-        } catch (Exception e) {
             log.error("ClientRunner.run. Unexpected error for Client ID: {}", this.clientId, e);
         } finally {
             close();
@@ -127,22 +137,25 @@ class ClientRunner implements Runnable<java.lang.Runnable, Integer> {
      * <hr/>
      */
     void close() {
+        log.debug("ClientRunner.close. Closing connection for Client ID: {}", this.clientId);
         try {
-            this.sClient.getInputStream().close();
+            if(!this.sClient.isInputShutdown()){
+                this.sClient.shutdownInput();
+            }
         } catch (IOException e) {
-            log.info("ClientRunner.close. Error occurred while closing socket.in", e);
+            log.debug("ClientRunner.close. Error occurred while closing socket.in", e);
         }
         try {
-            this.sClient.getOutputStream().flush();
-            this.sClient.getOutputStream().close();
+            if(!this.sClient.isOutputShutdown()){
+                this.sClient.getOutputStream().flush();
+                this.sClient.shutdownOutput();
+            }
         } catch (IOException e) {
             log.error("ClientRunner.close. Error occurred while closing socket.out", e);
         }
         try {
-            log.info("ClientRunner.close. Attempting to close connection for Client ID: {}", this.clientId);
-            if (sClient != null && !sClient.isClosed()) {
+            if (!sClient.isClosed()) {
                 sClient.close();
-                log.info("ClientRunner.close. Successfully closed connection for Client ID: {}", this.clientId);
             }
         } catch (IOException e) {
             log.error("ClientRunner.close. Error occurred while closing connection for Client ID: {}", this.clientId, e);

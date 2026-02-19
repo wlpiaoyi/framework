@@ -14,6 +14,7 @@
         <module>datasource</module>
 <!--        <module>sshd</module>-->
         <module>lab</module>
+        <module>forwarding</module>
     </modules>
 
 
@@ -22,6 +23,7 @@
         <junit.version>4.13.2</junit.version>
         <slf4j.version>2.0.17</slf4j.version>
         <log4j.version>1.2.17</log4j.version>
+        <logback-classic.version>1.5.32</logback-classic.version>
         <lombok.version>1.18.30</lombok.version>
         <java.version>21</java.version>
         <skipTests>true</skipTests>
@@ -43,7 +45,7 @@
         <cglib.version>3.3.0</cglib.version>
         <apache.http.client5.version>5.3.1</apache.http.client5.version>
         <apache.http.client.version>4.5.14</apache.http.client.version>
-        <apache.tomcat-embed-websocket.version>10.1.20</apache.tomcat-embed-websocket.version>
+        <apache.tomcat-embed-websocket.version>10.1.25</apache.tomcat-embed-websocket.version>
         <java-websocket.version>1.5.6</java-websocket.version>
         <javax.mail.version>1.6.2</javax.mail.version>
         <jsch.version>0.1.55</jsch.version>
@@ -155,6 +157,11 @@
                 <version>${fw.project.version}</version>
             </dependency>
             <dependency>
+                <groupId>org.wlpiaoyi.framework.forwarding</groupId>
+                <artifactId>utils.socket</artifactId>
+                <version>${fw.project.version}</version>
+            </dependency>
+            <dependency>
                 <groupId>org.slf4j</groupId>
                 <artifactId>slf4j-api</artifactId>
                 <version>${slf4j.version}</version>
@@ -163,6 +170,11 @@
                 <groupId>org.slf4j</groupId>
                 <artifactId>slf4j-log4j12</artifactId>
                 <version>${slf4j.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>ch.qos.logback</groupId>
+                <artifactId>logback-classic</artifactId>
+                <version>${logback-classic.version}</version>
             </dependency>
             <dependency>
                 <groupId>log4j</groupId>

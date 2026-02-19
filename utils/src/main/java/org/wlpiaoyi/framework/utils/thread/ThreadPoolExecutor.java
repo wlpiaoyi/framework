@@ -164,6 +164,9 @@ public class ThreadPoolExecutor {
     public <P, R> Future<R> submit(Runnable<P, R> runnable, P param) {
         return this.pSubmit(runnable, param, null, null);
     }
+    public <P, R> Future<R> submit(Runnable<P, R> runnable) {
+        return this.pSubmit(runnable, null, null, null);
+    }
 
     /**
      * <p><b>{@code @description:}</b>

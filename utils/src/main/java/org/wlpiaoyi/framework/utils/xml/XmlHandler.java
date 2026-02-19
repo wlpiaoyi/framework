@@ -223,7 +223,7 @@ class XmlHandler extends DefaultHandler {
                              Attributes attributes) throws SAXException {
         try {
             // 深度检查
-            if (xmlDeep >= maxDeep) {
+            if (xmlDeep > maxDeep) {
                 String errorMsg = String.format("XML深度超出限制: 当前深度=%d, 最大深度=%d",
                         xmlDeep, maxDeep);
                 log.error(errorMsg);

@@ -221,7 +221,7 @@ public class Aes {
         while ((nRead = dataIn.read(data, 0, data.length)) != -1) {
             byte[] outBytes = eCipher.doFinal(data, 0, nRead);
             int length = outBytes.length;
-            byte[] lbs = ValueUtils.toBytes(length);
+            byte[] lbs = ValueUtils.longToBytes(length);
             final int lbsL = lbs.length;
             if(lbsL == 7){
                 dataOut.write(lbs);
@@ -293,7 +293,7 @@ public class Aes {
                 }
             }
 
-            final int dataL = (int) ValueUtils.toLong(lbs);
+            final int dataL = (int) ValueUtils.byteToLong(lbs);
             byte[] data = new byte[dataL];
             final int dataI = dataIn.read(data, 0, dataL);
             if (dataI == -1){

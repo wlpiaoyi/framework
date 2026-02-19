@@ -2,6 +2,7 @@ package org.wlpiaoyi.framework.utils.socket;
 
 import lombok.extern.slf4j.Slf4j;
 import org.wlpiaoyi.framework.utils.MapUtils;
+import org.wlpiaoyi.framework.utils.ValueUtils;
 import org.wlpiaoyi.framework.utils.data.ReaderUtils;
 import org.wlpiaoyi.framework.utils.thread.ThreadPoolExecutor;
 import org.wlpiaoyi.framework.utils.thread.ThreadPoolExecutorBuilder;
@@ -79,8 +80,11 @@ public class Builder {
             if (threadPool != null) return threadPool;
             Map<String, Object> configMap = null;
             try {
-                configMap = ReaderUtils.loadMap(System.getenv().get("st_thread_config_path"), StandardCharsets.UTF_8);
-            } catch (IOException e) {
+                String loadPath = System.getenv().get("st_thread_config_path");
+                if (ValueUtils.isBlank(loadPath)) {
+                    configMap = ReaderUtils.loadMap(loadPath, StandardCharsets.UTF_8);
+                }
+            } catch (Exception e) {
                 log.warn("Builder.getThreadPool. Failed to load thread pool configuration. loadPath: {}", System.getenv().get("st_thread_config_path"));
             }
             int corePoolSize = 100;
@@ -136,7 +140,10 @@ public class Builder {
         @Override
         public void write(int clientId, byte[] writeBytes, int len) {
             try {
-                log.debug("ClientWriter.write. Sending data to Client ID: {}, Length: {}", clientId, len);
+                log.debug("ClientWriter.write. Sending data to Client ID: {}, Length: {} bytesLen: {}", clientId, len, writeBytes.length);
+                if(writeBytes.length < len){
+                    throw new IOException("writeBytes.length < len");
+                }
                 this.out.write(writeBytes, 0, len);
                 this.out.flush();
                 log.debug("ClientWriter.write. Data sent to Client ID: {}, Length: {}", clientId, len);

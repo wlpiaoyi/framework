@@ -66,7 +66,7 @@ public class TokenContext {
      */
     public String makeToken(AuthBody authBody){
         // 将 expireSeconds 转换为字节数组
-        byte[] expireSecondsBytes = ValueUtils.toBytes(authBody.getExpireSeconds());
+        byte[] expireSecondsBytes = ValueUtils.longToBytes(authBody.getExpireSeconds());
 
         // 拼接完整的待加密数据结构：第一个字节表示 expireSeconds 字节数长度，
         // 接着是 expireSeconds 字节内容，最后是 tokenValue 内容

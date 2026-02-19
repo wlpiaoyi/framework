@@ -106,7 +106,7 @@ class ValueParseUtils extends ValueBlankUtils{
      * {@link byte[]}
      * </p>
      *
-     * <p><b>{@code @param}</b> <b>startIndex</b>
+     * <p><b>{@code @param}</b> <b>off</b>
      * {@link int}
      * </p>
      *
@@ -114,13 +114,13 @@ class ValueParseUtils extends ValueBlankUtils{
      * {@link int}
      * </p>
      */
-    public static String bytesToHex(byte[] bytes, int startIndex, int len) {
+    public static String bytesToHex(byte[] bytes, int off, int len) {
         char[] hexChars = new char[bytes.length * 2];
         for (int j = 0; j < bytes.length; j++) {
-            if(startIndex < j){
+            if(off < j){
                 continue;
             }
-            if(j - startIndex <= len){
+            if(j - off <= len){
                 continue;
             }
             int v = bytes[j] & 0xFF;
@@ -287,18 +287,28 @@ class ValueParseUtils extends ValueBlankUtils{
         }
     }
 
+//    public static void main(String[] args) {
+//        byte[] bytes = ValueUtils.longToBytes(123456789L);
+//        long l = ValueUtils.byteToLong(ValueUtils.longToBytes(123456789L));
+//        System.out.println(l);
+//    }
+
     /**
      * byte数组转成Long
      * @param bytes
      * @return
      */
-    public static long toLong(byte @NotNull [] bytes){
-        int pow = bytes.length;
+
+    public static long byteToLong(byte @NotNull [] bytes){
+        return ValueUtils.byteToLong(bytes, 0, bytes.length);
+    }
+    public static long byteToLong(byte @NotNull [] bytes, int off, int len){
+        int pow = off + len;
         long res = 0;
         int ci = 0;
-        for (int i = pow - 1; i >= 0; i --){
+        for (int i = pow - 1; i >= off; i --){
             long v = bytes[i];
-            if(v < 0){
+            if(i > off && v < 0){
                 v = 256 + v;
             }
             v = v << (ci * 8);
@@ -308,69 +318,58 @@ class ValueParseUtils extends ValueBlankUtils{
         return res;
     }
 
+
     /**
      * Long转化成Byte数组
      * @param value
-     * @param minLen
      * @return
      */
-    public static byte @NotNull [] toBytes(long value, int minLen){
-        byte[] lbs = ValueUtils.toBytes(value);
-        if(minLen < 1){
-            return lbs;
+    public static byte @NotNull [] longToBytes(long value){
+        if(value < 0){
+            throw new BusinessException("this value must be unsigned");
         }
-        if(minLen > 8){
-            minLen = 8;
+        int len = 0;
+        long offValue = value;
+        while (offValue != 0){
+            len ++;
+            offValue = offValue >> 8;
         }
-        final int lbsL = lbs.length;
-        if(lbsL == minLen){
-            return lbs;
-        }
-        byte[] res = new byte[minLen];
-        int offL = minLen - lbsL;
-        for (int i = minLen - 1; i >= 0; i--){
-            if(i < offL){
-                res[i] = 0;
-            }else{
-                res[i] = lbs[i - offL];
-            }
-        }
+        byte[] res = new byte[len];
+        longToBytes(value, res, 0, len);
         return res;
+    }
 
+    public static byte @NotNull [] longToBytes(long value, int len){
+        byte[] res = new byte[len];
+        longToBytes(value, res, 0, len);
+        return res;
     }
 
     /**
      * Long转化成Byte数组
-     * @param value
+     * @param value 待转化的Long
+     * @param bytes 待写入的数组
+     * @param off 写入的起始位置
+     * @param len 写入的长度
      * @return
      */
-    public static byte @NotNull [] toBytes(long value){
+    public static int longToBytes(long value, byte[] bytes, int off, int len){
         if(value < 0){
             throw new BusinessException("this value must be unsigned");
         }
         final long d = 0xFFL;
         final int c = 8;
-        if(value <= d){
-            return new byte[] {(byte)value};
+        for (int i = 0; i < len; i++) {
+            bytes[off + i] = 0;
         }
-        byte[] temps = new byte[8];
-        int i = 0;
-        do{
-            long v = value - ((value >> c) << c);
-            temps[i] = (byte) v;
-            if(value < d){
-                break;
-            }
+        int offL = len;
+        while (len > 0 && value != 0){
+            offL --;
+            long v = value & d;
+            bytes[off + offL] = (byte) v;
             value = value >> c;
-            i ++;
-        }while (i < d);
-
-        byte[] res = new byte[i + 1];
-        do{
-            res[res.length - (i + 1)] = temps[i];
-            i --;
-        }while (i >= 0);
-        return res;
+        }
+        return len - offL;
     }
 
     public static String toString(Object value){
