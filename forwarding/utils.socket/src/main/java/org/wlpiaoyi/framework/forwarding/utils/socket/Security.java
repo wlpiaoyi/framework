@@ -107,8 +107,8 @@ public class Security {
         log.info("public key: \n{}", rsa.getPublicKey());
     }
 
-//    public static void main(String[] args) throws IllegalBlockSizeException, BadPaddingException {
-////        keyGenerator();
+    public static void main(String[] args) throws IllegalBlockSizeException, BadPaddingException {
+        keyGenerator();
 ////        String privateKey = """
 ////                MIIBVgIBADANBgkqhkiG9w0BAQEFAASCAUAwggE8AgEAAkEAu+i/Tl2VphlrYYLbstTCT3S4nXOz
 ////                uWkCubUtAdvSXu5J7BN5V8gldFwzJ9G1hd4znVxAiSeJKRZOwOw1yWA2bQIDAQABAkAithiqxv5X
@@ -137,5 +137,5 @@ public class Security {
 //        dBytes = rsa2.decrypt(eBytes);
 //        System.out.println("dBytes:" + new String(dBytes));
 //
-//    }
+    }
 }

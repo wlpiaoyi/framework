@@ -4,10 +4,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.wlpiaoyi.framework.forwarding.utils.socket.ForwardUtils;
 import org.wlpiaoyi.framework.forwarding.utils.socket.model.BufferCaches;
 import org.wlpiaoyi.framework.forwarding.utils.socket.model.RequestMessage;
-import org.wlpiaoyi.framework.forwarding.utils.socket.model.ResponseMessage;
 import org.wlpiaoyi.framework.utils.MapUtils;
-import org.wlpiaoyi.framework.utils.ValueUtils;
-import org.wlpiaoyi.framework.utils.data.DataUtils;
 import org.wlpiaoyi.framework.utils.socket.IReader;
 import org.wlpiaoyi.framework.utils.socket.IWriter;
 import org.wlpiaoyi.framework.utils.socket.client.SocketClient;
@@ -66,7 +63,7 @@ public class ServerReader implements IReader {
         }
     }
 
-    public SocketClient getClient(int clientId, String respHost, int respPort, IWriter serverWriter) {
+    private SocketClient getClient(int clientId, String respHost, int respPort, IWriter serverWriter) {
         return this.clientContentDict.computeIfAbsent(clientId + ":" + respHost + ":" + respPort, k -> {
             int timeOut = MapUtils.getInteger(ForwardUtils.getCONFIG_MAP(), "timeOut",60);
             SocketClient socketClient = new SocketClient(respHost, respPort, timeOut, clientId, ForwardUtils.BUFF_CACHE_SIZE,
@@ -80,21 +77,6 @@ public class ServerReader implements IReader {
             return socketClient;
         });
     }
-
-//    protected synchronized SocketClient getClient(int clientId, RequestMessage message, IWriter serverWriter){
-//        return this.clientContentDict.computeIfAbsent(message.getHost() + ":" + message.getPort(), k -> {
-//            int timeOut = MapUtils.getInteger(ForwardUtils.getCONFIG_MAP(), "timeOut",60);
-//            SocketClient socketClient = new SocketClient(message.getHost(), message.getPort(), timeOut, clientId, ForwardUtils.BUFF_CACHE_SIZE,
-//            new ClientReader(serverWriter));
-//            try {
-//                socketClient.connect();
-//                socketClient.asyncRun(null);
-//            } catch (IOException e) {
-//                log.error("ServerReader.getClient. ClientId: {} connect fail", clientId, e);
-//            }
-//            return socketClient;
-//        });
-//    }
 
     private int read(IWriter writer, int clientId, byte[] bytes, int off,  int len) {
         int cOff = 0;
@@ -113,14 +95,12 @@ public class ServerReader implements IReader {
             // use server forwarding data
             var client = this.getClient(clientId, message.getHost(), message.getPort(), writer);
             if (message.getData() != null && message.getData().length > 0){
+                log.debug("R{} eMessage:\nToHost:{} ToPort:{}\nToData:{}\nR{}",
+                        SecurityUtils.getLineStart(), message.getHost(), message.getPort(), new String(message.getData()),SecurityUtils.getLineEnd());
                 var data = SecurityUtils.getSecurity().decrypt(message.getData(), 0, message.getData().length);
                 client.getWriter().write(clientId, data, data.length);
-                System.out.println("R=================================================>:eMessage:");
-                System.out.println(new String(message.getData()));
-                System.out.println("R=================================================<:eMessage");
-                System.out.println("R=================================================>:dMessage:");
-                System.out.println(new String(data));
-                System.out.println("R=================================================<:dMessage");
+                log.debug("R{} dMessage:\nToHost:{} ToPort:{}\nToData:{}\nR{}",
+                        SecurityUtils.getLineStart(), message.getHost(), message.getPort(), new String(message.getData()),SecurityUtils.getLineEnd());
             }
             return cOff;
         }finally {

@@ -42,13 +42,13 @@ public class ClientReader implements IReader {
         byte[] data = new byte[readLen];
         System.arraycopy(readBytes, 0, data, 0, readLen);
         // use server forwarding data
-        System.out.println("S=================================================>:dMessage:");
-        System.out.println(new String(data));
-        System.out.println("S=================================================<:dMessage");
+        log.debug("S{} dMessage:\nReHost:{} RePort:{}\nToData:{}\nR{}",
+                SecurityUtils.getLineStart(), this.serverWriter.getServerHost(), this.serverWriter.getServerPort(),
+                new String(data), SecurityUtils.getLineEnd());
         message.setData(SecurityUtils.getSecurity().encrypt(data, 0, data.length));
-        System.out.println("S=================================================>:eMessage:");
-        System.out.println(new String(message.getData()));
-        System.out.println("S=================================================<:eMessage");
+        log.debug("S{} eMessage:\nReHost:{} RePort:{}\nToData:{}\nR{}",
+                SecurityUtils.getLineStart(), this.serverWriter.getServerHost(), this.serverWriter.getServerPort(),
+                new String(message.getData()), SecurityUtils.getLineEnd());
         if (!message.check()) throw new RuntimeException("message check error！clientId:" + clientId);
         message.toBytes(this.bufferCaches, 0);
         this.serverWriter.write(clientId, this.bufferCaches, message.getLen());

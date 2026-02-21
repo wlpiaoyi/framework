@@ -66,7 +66,7 @@ public class SocketClient{
         socket = new Socket(this.host, this.port);
 //        socket.setSoTimeout(this.timeOut * 1000);
         // Interface for writing data to the client
-        this.writer = Builder.getWriter(this.socket.getOutputStream());
+        this.writer = Builder.getWriter(this.socket.getOutputStream(), this.socket.getInetAddress().getHostAddress(), this.getPort());
         this.reader.begin(this.clientId, socket.getInetAddress().getHostAddress(), socket.getPort());
 //        log.debug("SocketClient.connect. Connected to server {}:{} clientId:{}", socket.getInetAddress(), socket.getPort(), this.clientId);
     }

@@ -14,7 +14,7 @@
     <packaging>pom</packaging>
     <modules>
         <module>response</module>
-        <module>client.socket</module>
+        <module>request</module>
         <module>utils.socket</module>
     </modules>
     <dependencies>

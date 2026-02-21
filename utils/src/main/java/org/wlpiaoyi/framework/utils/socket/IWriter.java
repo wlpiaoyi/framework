@@ -27,4 +27,8 @@ public interface IWriter {
      */
     void write(int clientId, byte[] writeBytes, int Len);
 
+    String getServerHost();
+
+    int getServerPort();
+
 }

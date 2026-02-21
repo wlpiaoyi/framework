@@ -1,5 +1,6 @@
 package org.wlpiaoyi.framework.utils.socket;
 
+import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import org.wlpiaoyi.framework.utils.MapUtils;
 import org.wlpiaoyi.framework.utils.ValueUtils;
@@ -111,8 +112,8 @@ public class Builder {
         return threadPool;
     }
 
-    public static IWriter getWriter(OutputStream out){
-        return new ClientWriter(out);
+    public static IWriter getWriter(OutputStream out, String serverHost, int serverPort){
+        return new ClientWriter(out, serverHost, serverPort);
     }
 
 
@@ -133,8 +134,16 @@ public class Builder {
         // Output stream for sending data to the client
         private final OutputStream out;
 
-        ClientWriter(OutputStream out) {
+        @Getter
+        private final String serverHost;
+
+        @Getter
+        private final int serverPort;
+
+        ClientWriter(OutputStream out, String serverHost, int serverPort) {
             this.out = out;
+            this.serverHost = serverHost;
+            this.serverPort = serverPort;
         }
 
         @Override

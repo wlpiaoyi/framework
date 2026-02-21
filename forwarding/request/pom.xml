@@ -10,7 +10,7 @@
     </parent>
 
     <groupId>org.wlpiaoyi.framework.forwarding</groupId>
-    <artifactId>client.socket</artifactId>
+    <artifactId>request</artifactId>
 
     <dependencies>
         <dependency>

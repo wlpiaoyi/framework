@@ -63,7 +63,7 @@ class ClientRunner implements Runnable<java.lang.Runnable, Integer> {
         this.sClient = sClient;
         this.clientId = clientId;
         this.reader = iReader;
-        this.writer = Builder.getWriter(this.sClient.getOutputStream());
+        this.writer = Builder.getWriter(this.sClient.getOutputStream(), this.sClient.getInetAddress().getHostAddress(), this.sClient.getPort());
         this.bufferSize = bufferSize;
     }
 
