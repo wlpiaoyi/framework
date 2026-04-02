@@ -70,6 +70,9 @@ public class XmlReader {
      */
     public void read(String xml, XmlParsing xmlParsing, Object userData, int maxDeep)
             throws XmlParseException {
+        if (xml == null) {
+            throw new XmlParseException("XML内容不能为空");
+        }
         long startTime = System.currentTimeMillis();
         log.info("开始解析XML字符串，长度={}", xml.length());
 
@@ -236,6 +239,10 @@ public class XmlReader {
                          Object userData, int maxDeep, String sourceType)
             throws XmlParseException {
 
+        if (xmlParsing == null) {
+            throw new XmlParseException("XML解析回调不能为空");
+        }
+
         int parserId = parserInstanceCounter.incrementAndGet();
         log.debug("创建SAX解析器实例，ID={}, 数据源类型={}", parserId, sourceType);
 
@@ -337,6 +344,9 @@ public class XmlReader {
      * 验证XML格式（快速验证）
      */
     public boolean validate(String xml) {
+        if (xml == null || xml.isEmpty()) {
+            return false;
+        }
         try {
             // 使用简单的解析回调进行验证
             XmlParsing validator = new XmlParsing() {

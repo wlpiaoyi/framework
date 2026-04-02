@@ -145,6 +145,9 @@ public class HttpFactory {
 
 
     private static <T> T getResponseBody(HttpEntity entity, Map<String, String> headers, Class<T> tClass) throws IOException {
+        if(entity == null || entity.getContent() == null){
+            return null;
+        }
         byte[] buffer = ReaderUtils.loadBuffer(entity.getContent());
         if(tClass == byte[].class){
             return (T) buffer;

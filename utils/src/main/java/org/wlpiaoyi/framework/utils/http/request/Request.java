@@ -1,17 +1,28 @@
 package org.wlpiaoyi.framework.utils.http.request;
 
 import lombok.Getter;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.hc.client5.http.impl.classic.HttpClientBuilder;
 import org.apache.hc.client5.http.impl.classic.HttpClients;
+import org.apache.hc.client5.http.impl.io.PoolingHttpClientConnectionManagerBuilder;
+import org.apache.hc.client5.http.io.HttpClientConnectionManager;
 import org.apache.hc.client5.http.protocol.HttpClientContext;
+import org.apache.hc.client5.http.ssl.NoopHostnameVerifier;
+import org.apache.hc.client5.http.ssl.SSLConnectionSocketFactory;
+import org.apache.hc.client5.http.ssl.TrustAllStrategy;
 import org.apache.hc.core5.http.*;
+import org.apache.hc.core5.ssl.SSLContexts;
 import org.wlpiaoyi.framework.utils.ValueUtils;
 import org.wlpiaoyi.framework.utils.http.HttpMessage;
 import org.wlpiaoyi.framework.utils.http.factory.HttpFactory;
 import org.wlpiaoyi.framework.utils.http.HttpUtils;
 import org.wlpiaoyi.framework.utils.http.response.Response;
 
+import javax.net.ssl.SSLContext;
 import java.io.IOException;
+import java.security.KeyManagementException;
+import java.security.KeyStoreException;
+import java.security.NoSuchAlgorithmException;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -22,6 +33,7 @@ import java.util.Map;
  * <p><b>{@code @date:}</b>2024-09-23 07:53:39</p>
  * <p><b>{@code @version:}:</b>1.0</p>
  */
+@Slf4j
 public class Request<T> implements HttpMessage<T> {
 
     /**
@@ -149,17 +161,40 @@ public class Request<T> implements HttpMessage<T> {
      * <p><b>{@code @return:}</b>{@link Response<T>}</p>
      * <p><b>{@code @author:}</b>wlpiaoyi</p>
      */
-    public Response<T> execute(Class<T> tClass) throws IOException {
+    public Response<T> execute(Class<T> tClass, HttpClientConnectionManager connManager) throws IOException {
         String executeUrl;
         if(ValueUtils.isNotBlank(this.params)){
             executeUrl = HttpUtils.urlMergePatterns(this.url, this.params);
         }else executeUrl = this.url;
         HttpClientBuilder httpClientBuilder = HttpClients.custom();
+        if(connManager != null){
+            httpClientBuilder.setConnectionManager(connManager);
+        }
         if(this.httpProxy != null){
             httpClientBuilder.setProxy(this.httpProxy);
         }
         return httpClientBuilder.build().execute(HttpFactory.getHttpRequest(executeUrl, this),
                 context, response -> HttpFactory.handleResponse(response, tClass));
+    }
+    public Response<T> execute(Class<T> tClass) throws IOException {
+
+        try{
+            // 仅测试用：构建一个“信任所有证书 + 不校验主机名”的 HttpClient，绕过 SSL 校验
+            SSLContext sslContext = SSLContexts.custom()
+                    .loadTrustMaterial(null, TrustAllStrategy.INSTANCE)
+                    .build();
+
+            SSLConnectionSocketFactory sslSocketFactory =
+                    new SSLConnectionSocketFactory(sslContext, NoopHostnameVerifier.INSTANCE);
+
+            var connManager = PoolingHttpClientConnectionManagerBuilder.create()
+                    .setSSLSocketFactory(sslSocketFactory)
+                    .build();
+            return this.execute(tClass, connManager);
+        } catch (KeyManagementException | NoSuchAlgorithmException | KeyStoreException e){
+            log.warn("Failed to create SSL context", e);
+            return this.execute(tClass, null);
+        }
     }
 
 

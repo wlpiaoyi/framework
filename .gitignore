@@ -38,7 +38,7 @@ log/
 lab/space/target/*
 lab/MetaMqtt/target/*
 lab/document/target/
-fw_config/selenium/chromedriver.*
+fw_config/selenium/chromedriver
 fw_config/selenium/chromedriver
 fw_config/selenium/cur_date.dat
 forwarding/client.socket/target/

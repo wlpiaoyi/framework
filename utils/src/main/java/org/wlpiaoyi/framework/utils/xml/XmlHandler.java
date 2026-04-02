@@ -145,13 +145,14 @@ class XmlHandler extends DefaultHandler {
         }
 
         this.maxDeep = maxDeep;
-        this.elementStack = new String[DEFAULT_ELEMENT_CAPACITY];
-        this.elementIndexes = new int[DEFAULT_ELEMENT_CAPACITY];
+        int capacity = Math.max(DEFAULT_ELEMENT_CAPACITY, maxDeep + 1);
+        this.elementStack = new String[capacity];
+        this.elementIndexes = new int[capacity];
         this.userData = userData;
         this.xmlParsing = xmlParsing;
 
-        log.debug("XmlHandler初始化完成: maxDeep={}, userData={}",
-                maxDeep, userData != null ? userData.getClass().getSimpleName() : "null");
+        log.debug("XmlHandler初始化完成: maxDeep={}, capacity={}, userData={}",
+                maxDeep, capacity, userData != null ? userData.getClass().getSimpleName() : "null");
     }
 
     // ==================== SAX事件处理方法 ====================
@@ -223,7 +224,7 @@ class XmlHandler extends DefaultHandler {
                              Attributes attributes) throws SAXException {
         try {
             // 深度检查
-            if (xmlDeep > maxDeep) {
+            if (xmlDeep >= maxDeep) {
                 String errorMsg = String.format("XML深度超出限制: 当前深度=%d, 最大深度=%d",
                         xmlDeep, maxDeep);
                 log.error(errorMsg);

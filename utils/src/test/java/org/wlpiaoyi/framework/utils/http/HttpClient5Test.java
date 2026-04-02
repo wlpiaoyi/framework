@@ -1,18 +1,26 @@
 package org.wlpiaoyi.framework.utils.http;
 
 import lombok.SneakyThrows;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.hc.client5.http.classic.methods.HttpPost;
 import org.apache.hc.client5.http.cookie.CookieStore;
 import org.apache.hc.client5.http.entity.mime.FileBody;
 import org.apache.hc.client5.http.entity.mime.MultipartEntityBuilder;
 import org.apache.hc.client5.http.impl.classic.CloseableHttpClient;
 import org.apache.hc.client5.http.impl.classic.HttpClients;
+import org.apache.hc.client5.http.impl.io.PoolingHttpClientConnectionManagerBuilder;
 import org.apache.hc.client5.http.protocol.HttpClientContext;
+import org.apache.hc.client5.http.ssl.NoopHostnameVerifier;
+import org.apache.hc.client5.http.ssl.SSLConnectionSocketFactory;
+import org.apache.hc.client5.http.ssl.TrustAllStrategy;
+import org.apache.hc.core5.http.ContentType;
 import org.apache.hc.core5.http.HttpEntity;
 import org.apache.hc.core5.http.HttpHeaders;
 import org.apache.hc.core5.http.HttpHost;
 import org.apache.hc.core5.http.impl.Http1StreamListener;
 import org.apache.hc.core5.http.io.HttpClientResponseHandler;
+import org.apache.hc.core5.http.io.entity.StringEntity;
+import org.apache.hc.core5.ssl.SSLContexts;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -24,6 +32,7 @@ import org.wlpiaoyi.framework.utils.http.factory.CookieFactory;
 import org.wlpiaoyi.framework.utils.http.request.Request;
 import org.wlpiaoyi.framework.utils.http.response.Response;
 
+import javax.net.ssl.SSLContext;
 import java.io.File;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
@@ -36,6 +45,7 @@ import java.util.Map;
  * <p><b>{@code @author:}</b>       wlpiaoyi</p>
  * <p><b>{@code @version:}</b>      1.0</p>
  */
+@Slf4j
 public class HttpClient5Test {
 
     @Before
@@ -166,6 +176,67 @@ public class HttpClient5Test {
                 return null;
             });
         }
+    }
+
+
+
+//    private String host = "https://10.17.99.143:443";
+    private String host = "https://10.17.99.233:443";
+    private String userName = "xianiot";
+    private String userPassword = "Huawei@vfr4";
+    private String domainName = "xianiot";
+    private String projectName = "iot-edge";
+
+    static final GsonBuilder gsonBuilder = GsonBuilder.instance();
+    private static final String TOKEN_URL = "/v3/auth/tokens";
+
+
+    HttpClientContext context = HttpClientContext.create();
+
+    public void getToken() throws Exception {
+
+        Request<byte[]> request = new Request<>(context, host + TOKEN_URL, Request.Method.Post);
+        String body = """
+                {\s
+                    "auth": {\s
+                        "identity": {\s
+                            "methods": [\s
+                                "password"\s
+                            ],\s
+                            "password": {\s
+                                "user": {\s
+                                    "name": "%s",\s
+                                    "password": "%s",\s
+                                    "domain": {\s
+                                        "name": "%s"\s
+                                    }\s
+                                }\s
+                            }\s
+                        },\s
+                        "scope": {\s
+                            "project": {\s
+                                "name": "%s"\s
+                            }\s
+                        }\s
+                    }\s
+                }
+                """.formatted(userName, userPassword, domainName, projectName);
+        request.setBody(body.getBytes());
+        try {
+            Response<byte[]> execute = request.execute(byte[].class);
+            String res = new String(execute.getBody());
+            Map jsonObject = gsonBuilder.createGson().fromJson(res, Map.class);
+            log.info("getToken res: {}", res);
+        } catch (IOException e) {
+            log.info("getToken error" , e);
+        }
+
+    }
+
+
+    @Test
+    public void iotdaTest() throws Exception {
+        this.getToken();
     }
 
     @After
