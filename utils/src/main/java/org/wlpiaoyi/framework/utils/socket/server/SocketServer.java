@@ -98,7 +98,7 @@ public class SocketServer {
      * <hr/>
      */
     public boolean start() {
-        log.debug("SocketServer.start. Starting server...");
+        log.info("SocketServer.start. Starting server...");
         this.lock.lock();
         if(this.running){
             log.warn("SocketServer.start. Server is already running.");
@@ -107,7 +107,7 @@ public class SocketServer {
         }
         try (ServerSocket serverSocket = new ServerSocket(this.port)) {
             this.lock.unlock();
-            log.debug("SocketServer.start. Server started successfully on port: {}", this.port);
+            log.info("SocketServer.start. Server started successfully on port: {}", this.port);
             this.listener(serverSocket);
             return true;
         } catch (Exception e) {
@@ -115,14 +115,14 @@ public class SocketServer {
             return false;
         } finally {
             this.lock.unlock();
-            log.debug("SocketServer.listener. Server shutdown.");
+            log.info("SocketServer.listener. Server shutdown.");
             stop(); // Ensure proper cleanup even if an error occurs
             this.synTagObj.notifyAll();
         }
     }
 
     private void listener(ServerSocket serverSocket) {
-        log.debug("SocketServer.listener. Server is running.");
+        log.info("SocketServer.listener. Server is running.");
         this.running = true;
         // Continuously accept new client connections while the server is running
         final AtomicInteger clientIndex = new AtomicInteger(0);
@@ -135,11 +135,11 @@ public class SocketServer {
                     clientIndex.incrementAndGet();
                 }
                 clientId = clientIndex.get();
-//                log.debug("SocketServer.listener. Waiting for client connections...");
+//                log.info("SocketServer.listener. Waiting for client connections...");
                 // Accept a new client connection
                 var clientSocket = serverSocket.accept();
                 clientSocket.setSoTimeout(this.timeOut * 1000);
-//                log.debug("SocketServer.listener. Accepted client connection from: {}", clientSocket.getInetAddress().getHostAddress());
+//                log.info("SocketServer.listener. Accepted client connection from: {}", clientSocket.getInetAddress().getHostAddress());
                 IReader reader = this.loadReader.loadReader(clientId);
                 if(reader == null){
                     log.warn("SocketServer.listener. No reader for client: {}", clientId);
@@ -160,7 +160,7 @@ public class SocketServer {
                 var future = Builder.getThreadPool().submit(client, onFinish);
 //                    var future = Builder.getThreadPool().submit();
                 onFinish.setFuture(future);
-//                log.debug("SocketServer.listener. Submitted client task for Client ID: {}", client.getClientId());
+//                log.info("SocketServer.listener. Submitted client task for Client ID: {}", client.getClientId());
             } catch (Exception e) {
                 log.warn("SocketServer.listener. Error accepting connection for Client ID: {}", clientId, e);
                 this.close(clientId);
@@ -203,11 +203,11 @@ public class SocketServer {
         try {
             this.lock.lock();
             this.running = false;
-            log.debug("SocketServer.stop. Shutting down the server...");
+            log.info("SocketServer.stop. Shutting down the server...");
             // 先关闭所有客户端连接，使任务尽快结束
             clientMaps.forEach((id, client) -> {
                 client.close();
-                log.debug("SocketServer.stop. Closed connection for Client ID: {}", id);
+                log.info("SocketServer.stop. Closed connection for Client ID: {}", id);
             });
             clientMaps.clear();
         } catch (Exception e) {
@@ -219,7 +219,7 @@ public class SocketServer {
 
     public void close(int clientId){
         try {
-            log.debug("SocketServer.close. Closing client for Client ID: {}", clientId);
+            log.info("SocketServer.close. Closing client for Client ID: {}", clientId);
             this.lock.lock();
             if(!this.clientMaps.containsKey(clientId)){
                 log.warn("SocketServer.close. No client for clientId: {}", clientId);
@@ -270,7 +270,7 @@ public class SocketServer {
                 // Clean up resources after the client disconnects
                 this.sClient.close();
                 Objects.requireNonNull(this.socketServer.get()).close(sClient.getClientId());
-                log.debug("ClientOnFinish.run. Client connection closed, Client ID: {}", sClient.getClientId());
+                log.info("ClientOnFinish.run. Client connection closed, Client ID: {}", sClient.getClientId());
             }
         }
     }

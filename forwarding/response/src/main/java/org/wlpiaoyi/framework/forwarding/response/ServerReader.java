@@ -85,21 +85,21 @@ public class ServerReader implements IReader {
             if(this.messageId < 0) this.messageId = 1;
             cOff = this.bufferCaches.loadIfNeed(bytes, off, len);
             if(cOff == -1){
-                log.debug("ServerReader.read.load.continue ClientId: {}, MessageId: {}", clientId, messageId);
+                log.info("ServerReader.read.load.continue ClientId: {}, MessageId: {}", clientId, messageId);
                 return 0;
             }
-            log.debug("ServerReader.read.load.end. ClientId: {}, MessageId: {}", clientId, messageId);
+            log.info("ServerReader.read.load.end. ClientId: {}, MessageId: {}", clientId, messageId);
             RequestMessage message = new RequestMessage(this.messageId);
             message.formatBytes(this.bufferCaches.getBuffers(), 0);
             if (!message.check()) throw new RuntimeException("message check error！clientId:" + clientId);
             // use server forwarding data
             var client = this.getClient(clientId, message.getHost(), message.getPort(), writer);
             if (message.getData() != null && message.getData().length > 0){
-                log.debug("R{} eMessage:\nToHost:{} ToPort:{}\nToData:{}\nR{}",
+                log.info("R{} eMessage:\nToHost:{} ToPort:{}\nToData:{}\nR{}",
                         SecurityUtils.getLineStart(), message.getHost(), message.getPort(), new String(message.getData()),SecurityUtils.getLineEnd());
                 var data = SecurityUtils.getSecurity().decrypt(message.getData(), 0, message.getData().length);
                 client.getWriter().write(clientId, data, data.length);
-                log.debug("R{} dMessage:\nToHost:{} ToPort:{}\nToData:{}\nR{}",
+                log.info("R{} dMessage:\nToHost:{} ToPort:{}\nToData:{}\nR{}",
                         SecurityUtils.getLineStart(), message.getHost(), message.getPort(), new String(message.getData()),SecurityUtils.getLineEnd());
             }
             return cOff;

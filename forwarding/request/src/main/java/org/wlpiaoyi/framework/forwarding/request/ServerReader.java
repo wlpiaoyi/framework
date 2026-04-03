@@ -36,13 +36,16 @@ public class ServerReader implements IReader {
 
     @Override
     public int begin(int clientId, String host, int port) {
-        log.debug("ServerReader.begin. ClientId: {}, Host: {}, Port: {}", clientId, host, port);
+        log.info("ServerReader.begin. ClientId: {}, Host: {}, Port: {}", clientId, host, port);
         return 1;
     }
 
     @Override
     public int read(IWriter writer, int clientId, byte[] bytes, int len) {
-//        log.debug("ServerReader.read. ClientId: {}, ReadLen: {}", clientId, readLen);
+        // TCP 分片/建立连接阶段可能会触发一次 readLen=0 的调用，
+        // 这种“空包”不应当构造并转发消息，否则容易造成不必要的连接创建与协议错位。
+        if (len <= 0) return 0;
+//        log.info("ServerReader.read. ClientId: {}, ReadLen: {}", clientId, readLen);
         this.messageId ++;
         if(this.messageId < 0) this.messageId = 1;
         RequestMessage message = new RequestMessage(this.messageId);
@@ -51,13 +54,9 @@ public class ServerReader implements IReader {
             message.setHost(addrs[0]);
             message.setPort(Integer.parseInt(addrs[1]));
         }
-        if(len > 0){
-            byte[] data = new byte[len];
-            System.arraycopy(bytes, 0, data, 0, len);
-            message.setData(SecurityUtils.getSecurity().encrypt(data, 0, data.length));
-        }else{
-            message.setData(null);
-        }
+        byte[] data = new byte[len];
+        System.arraycopy(bytes, 0, data, 0, len);
+        message.setData(SecurityUtils.getSecurity().encrypt(data, 0, data.length));
         SocketClient client;
         {
             var addrs = ForwardUtils.getResponseServerAddress().split(":");
@@ -67,7 +66,7 @@ public class ServerReader implements IReader {
         }
         int bLen = message.toBytes(this.bufferCaches, 0);
         client.getWriter().write(clientId, this.bufferCaches, bLen);
-        log.debug("ServerReader.read. request ClientId: {}, Host: {}, Port: {} ", clientId, message.getHost(), message.getPort());
+        log.info("ServerReader.read. request ClientId: {}, Host: {}, Port: {} ", clientId, message.getHost(), message.getPort());
         return 0;
     }
 
@@ -84,7 +83,7 @@ public class ServerReader implements IReader {
 
     @Override
     public void end(int clientId) {
-        log.debug("ServerReader.end. ClientId: {}", clientId);
+        log.info("ServerReader.end. ClientId: {}", clientId);
         synchronized (this.clientContentDict){
             this.clientContentDict.forEach((k, v) -> {
                 v.disConnect();

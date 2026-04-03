@@ -35,6 +35,9 @@ public class ClientReader implements IReader {
     @Override
     public synchronized int read(IWriter writer, int clientId, byte[] readBytes, int readLen) {
         log.debug("ClientReader.read. ClientId: {}, ReadLen: {}", clientId, readLen);
+        // 建立连接阶段/网络空读时可能会触发 readLen=0。
+        // 这种空包不应当被封装成消息转发，否则会造成多余连接/协议错位。
+        if (readLen <= 0) return 0;
         this.messageId++;
         if (this.messageId < 0) this.messageId = 1;
         ResponseMessage message = new ResponseMessage(this.messageId);

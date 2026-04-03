@@ -80,16 +80,24 @@ public class ResponseMessage extends Message implements Serializable {
         if (offset < 0) offset = 0;
         int start = offset;
         offset += super.formatBytes(bytes, offset);
+        // 使用消息头里的 len 做边界，避免 TCP 分包/粘包导致解析越界。
+        int msgLen = this.len & 0xFFFF;
+        int end = start + msgLen;
+        if (end > bytes.length) end = bytes.length;
+
         // 读取 data 长度和内容
         this.setData(null);
-        if(offset >= bytes.length) return offset - start;
+        if (offset + 2 > end) return offset - start;
+
         int dataLen = (int) ValueUtils.byteToLong(bytes, offset, 2);
-        if (dataLen == 0) return offset - start;
         offset += 2;
-        this.data = new byte[dataLen];
-        for (int i = 0; i < dataLen; i++){
-            this.data[i] = bytes[offset++];
+        if (dataLen <= 0) return offset - start;
+
+        if (offset + dataLen > end) {
+            throw new IllegalArgumentException("Buffer not enough for data. dataLen=" + dataLen);
         }
+        this.data = new byte[dataLen];
+        System.arraycopy(bytes, offset, this.data, 0, dataLen);
         offset += dataLen;
         return offset - start;  // 返回实际读取的总字节数
     }

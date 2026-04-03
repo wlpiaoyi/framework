@@ -158,26 +158,41 @@ public class RequestMessage extends Message implements java.io.Serializable{
         int start = off;
         off += super.formatBytes(bytes, off);
 
+        // 使用消息头里的 len 做边界，避免 TCP 分包/粘包导致解析越界。
+        int msgLen = this.len & 0xFFFF;
+        int end = start + msgLen;
+        if (end > bytes.length) end = bytes.length;
+
         // 读取 host 长度和内容
-//        int hostLen = ((bytes[off] & 0xFF) << 8) | (bytes[off + 1] & 0xFF);
+        if (off + 2 > end) return off - start;
         int hostLen = (int) ValueUtils.byteToLong(bytes, off, 2);
         off += 2;
+        if (hostLen < 0 || hostLen > 65535) {
+            throw new IllegalArgumentException("Invalid hostLen: " + hostLen);
+        }
+        if (off + hostLen > end) {
+            throw new IllegalArgumentException("Buffer not enough for host. hostLen=" + hostLen);
+        }
         this.host = new String(bytes, off, hostLen, StandardCharsets.UTF_8);
         off += hostLen;
 
-        off += readPort(bytes, off);        // port (4)
+        // port (4)
+        if (off + 4 > end) return off - start;
+        off += readPort(bytes, off);
 
-        // 读取 data 长度和内容
-//        int dataLen = ((bytes[off] & 0xFF) << 8) | (bytes[off + 1] & 0xFF);
+        // data（可选：仅当 toBytes 时 data != null 且长度 > 0 才会包含 dataLen + data）
         this.setData(null);
-        if (bytes.length <= off) return off - start;
+        if (off + 2 > end) return off - start;
+
         int dataLen = (int) ValueUtils.byteToLong(bytes, off, 2);
-        if(dataLen == 0) return off - start;
         off += 2;
-        this.data = new byte[dataLen];
-        for (int i = 0; i < dataLen; i++){
-            this.data[i] = bytes[off++];
+        if (dataLen <= 0) return off - start;
+
+        if (off + dataLen > end) {
+            throw new IllegalArgumentException("Buffer not enough for data. dataLen=" + dataLen);
         }
+        this.data = new byte[dataLen];
+        System.arraycopy(bytes, off, this.data, 0, dataLen);
         off += dataLen;
         return off - start;  // 返回实际读取的总字节数
     }
