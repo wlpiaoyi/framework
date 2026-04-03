@@ -20,7 +20,8 @@ public class ForwardUtils {
 
 //    public static final int MAX_CACHE_SIZE = 1024 * 1024 * 20;
 //    public static final int BUFF_CACHE_SIZE = 1024 * 1024 * 10;
-    protected static final String CONFIG_PATH = "fw_config/forwarding/config.json";
+    /** 相对工作目录的配置路径（{@link ReaderUtils#loadMap} 使用）。 */
+    public static final String CONFIG_PATH = "fw_config/forwarding/config.json";
     public static final int MAX_CACHE_SIZE = 1024 * 2;
     public static final int BUFF_CACHE_SIZE = 1024;
 

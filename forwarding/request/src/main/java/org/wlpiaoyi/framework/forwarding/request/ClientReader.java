@@ -17,13 +17,16 @@ import org.wlpiaoyi.framework.utils.socket.IWriter;
 public class ClientReader implements IReader {
 
     private final IWriter serverWriter;
+    /** 本侧转发监听端口（用于流量统计） */
+    private final int listenPort;
     private int messageId = 0;
 
     private final BufferCaches bufferCaches = new BufferCaches();
 
 
-    public ClientReader(IWriter serverWriter) {
+    public ClientReader(IWriter serverWriter, int listenPort) {
         this.serverWriter = serverWriter;
+        this.listenPort = listenPort;
     }
 
     @Override
@@ -69,6 +72,7 @@ public class ClientReader implements IReader {
             if (!message.check()) throw new RuntimeException("message check error clientId=" + clientId + " messageId=" + message.getId());
             // use server forwarding data
             var data = SecurityUtils.getSecurity().decrypt(message.getData(), 0, message.getData().length);
+            RequestTrafficRegistry.addDownstream(this.listenPort, data.length);
             log.debug("request.downstream clientId={} messageId={} plainLen={} peer={}:{}", clientId, message.getId(), data.length,
                     this.serverWriter.getServerHost(), this.serverWriter.getServerPort());
             ForwardingLog.tracePlain(log, "request.downstream", clientId, message.getId(),

@@ -37,6 +37,7 @@ public class ServerReader implements IReader {
     @Override
     public int begin(int clientId, String host, int port) {
         log.debug("ServerReader.begin clientId={} peer={}:{}", clientId, host, port);
+        RequestConnectionRegistry.onClientBegin(this.serverPort);
         return 1;
     }
 
@@ -45,6 +46,7 @@ public class ServerReader implements IReader {
         // TCP 分片/建立连接阶段可能会触发一次 readLen=0 的调用，
         // 这种“空包”不应当构造并转发消息，否则容易造成不必要的连接创建与协议错位。
         if (len <= 0) return 0;
+        RequestTrafficRegistry.addUpstream(this.serverPort, len);
 //        log.info("ServerReader.read. ClientId: {}, ReadLen: {}", clientId, readLen);
         this.messageId ++;
         if(this.messageId < 0) this.messageId = 1;
@@ -86,6 +88,7 @@ public class ServerReader implements IReader {
     @Override
     public void end(int clientId) {
         log.debug("ServerReader.end clientId={}", clientId);
+        RequestConnectionRegistry.onClientEnd(this.serverPort);
         synchronized (this.clientContentDict){
             this.clientContentDict.forEach((k, v) -> {
                 v.disConnect();
@@ -97,7 +100,8 @@ public class ServerReader implements IReader {
     public SocketClient getClient(int clientId, String respHost, int respPort, IWriter serverWriter) {
         return this.clientContentDict.computeIfAbsent(clientId + ":" + respHost + ":" + respPort, k -> {
             int timeOut = MapUtils.getInteger(ForwardUtils.getCONFIG_MAP(), "timeOut",60);
-            SocketClient socketClient = new SocketClient(respHost, respPort, clientId, timeOut, ForwardUtils.BUFF_CACHE_SIZE, new ClientReader(serverWriter));
+            SocketClient socketClient = new SocketClient(respHost, respPort, clientId, timeOut, ForwardUtils.BUFF_CACHE_SIZE,
+                    new ClientReader(serverWriter, this.serverPort));
             try {
                 socketClient.connect();
                 socketClient.asyncRun(null);

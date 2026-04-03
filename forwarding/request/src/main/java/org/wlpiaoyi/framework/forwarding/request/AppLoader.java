@@ -6,6 +6,11 @@ import lombok.extern.slf4j.Slf4j;
 public class AppLoader {
     public static void main(String[] args) {
         Server server = new Server();
+        RequestConfigConsole.printForwardingTable();
+        RequestConnectionRegistry.initFromDict();
+        RequestTrafficRegistry.initFromDict();
+        RequestPortStatusConsole.printInitialStatusSection();
+        RequestPortStatusConsole.startPeriodicRefresh();
         try {
             server.run();
             while (true){
