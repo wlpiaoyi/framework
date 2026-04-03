@@ -103,8 +103,12 @@ public class Security {
 
     public static void keyGenerator(){
         var rsa = RsaCipher.build(0, 512).loadRandomKey();
-        log.info("private key: \n{}", rsa.getPrivateKey());
-        log.info("public key: \n{}", rsa.getPublicKey());
+        if (log.isDebugEnabled()) {
+            log.debug("RSA key pair generated (save to files manually; keys are only printed at TRACE)");
+        }
+        if (log.isTraceEnabled()) {
+            log.trace("private:\n{}\npublic:\n{}", rsa.getPrivateKey(), rsa.getPublicKey());
+        }
     }
 
     public static void main(String[] args) throws IllegalBlockSizeException, BadPaddingException {

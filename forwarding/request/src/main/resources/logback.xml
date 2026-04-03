@@ -1,75 +1,61 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <configuration>
-    <!-- 日志存放路径 -->
-	<property name="log.path" value="./logs" />
-    <!-- 单文件最大 500MB -->
-	<property name="log.maxFileSize" value="500MB" />
-    <!-- 日志输出格式 -->
-	<property name="log.pattern" value="%d{HH:mm:ss.SSS} [%thread] %-5level %logger{20} - [%method,%line] - %msg%n" />
+    <!-- request：默认只写 logs 目录下文件，不输出控制台。
+         目录与级别可通过 JVM 覆盖，例如：-Dforwarding.log.path=./logs -Dforwarding.log.level=INFO -->
+    <property name="log.path" value="${forwarding.log.path:-./logs}" />
+    <property name="log.maxFileSize" value="${forwarding.log.maxFileSize:-100MB}" />
+    <property name="log.maxHistory" value="${forwarding.log.maxHistory:-14}" />
+    <property name="log.pattern"
+              value="%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n" />
+    <!-- 默认不写控制台，仅写文件；若需临时看控制台可取消下面 console 的注释并在 root 中增加 appender-ref -->
+    <!--
+    <appender name="console" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder>
+            <charset>UTF-8</charset>
+            <pattern>${log.pattern}</pattern>
+        </encoder>
+    </appender>
+    -->
 
-	<!-- 控制台输出 -->
-	<appender name="console" class="ch.qos.logback.core.ConsoleAppender">
-		<encoder>
-			<pattern>${log.pattern}</pattern>
-		</encoder>
-	</appender>
-
-	<!-- 系统日志输出：按天 + 按大小滚动，归档为 .gz -->
-	<appender name="file_info" class="ch.qos.logback.core.rolling.RollingFileAppender">
-	    <file>${log.path}/forwarding.client.log</file>
-        <!-- 循环策略：按时间 + 按大小滚动，并压缩历史日志 -->
-		<rollingPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">
-            <!-- 日志文件名格式，带日期和索引，历史文件 gzip 压缩 -->
-			<fileNamePattern>${log.path}/forwarding.client.%d{yyyy-MM-dd}.%i.log.gz</fileNamePattern>
-			<!-- 单个日志文件最大 500MB -->
-			<maxFileSize>${log.maxFileSize}</maxFileSize>
-			<!-- 日志历史最多保留 10 天（每天所有分片整体计算） -->
-			<maxHistory>10</maxHistory>
-		</rollingPolicy>
-		<encoder>
-			<pattern>${log.pattern}</pattern>
-		</encoder>
-		<filter class="ch.qos.logback.classic.filter.LevelFilter">
-            <!-- 过滤的级别 -->
-            <level>INFO</level>
-            <!-- 匹配时的操作：接收（记录） -->
-            <onMatch>ACCEPT</onMatch>
-            <!-- 不匹配时的操作：拒绝（不记录） -->
-            <onMismatch>ACCEPT</onMismatch>
-        </filter>
-	</appender>
-
-	<appender name="file_error" class="ch.qos.logback.core.rolling.RollingFileAppender">
-	    <file>${log.path}/forwarding.client-error.log</file>
-        <!-- 循环策略：按时间 + 按大小滚动，并压缩历史日志 -->
+    <!-- 业务 INFO 及以上写入 rolling 文件（不再误用 LevelFilter 导致全级别落盘） -->
+    <appender name="file_info" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>${log.path}/forwarding.request.log</file>
         <rollingPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">
-            <!-- 日志文件名格式，带日期和索引，历史文件 gzip 压缩 -->
-            <fileNamePattern>${log.path}/forwarding.client-error.%d{yyyy-MM-dd}.%i.log.gz</fileNamePattern>
-			<!-- 单个日志文件最大 500MB -->
-			<maxFileSize>${log.maxFileSize}</maxFileSize>
-			<!-- 日志历史最多保留 10 天 -->
-			<maxHistory>10</maxHistory>
+            <fileNamePattern>${log.path}/forwarding.request.%d{yyyy-MM-dd}.%i.log.gz</fileNamePattern>
+            <maxFileSize>${log.maxFileSize}</maxFileSize>
+            <maxHistory>${log.maxHistory}</maxHistory>
         </rollingPolicy>
         <encoder>
+            <charset>UTF-8</charset>
+            <pattern>${log.pattern}</pattern>
+        </encoder>
+        <filter class="ch.qos.logback.classic.filter.ThresholdFilter">
+            <level>INFO</level>
+        </filter>
+    </appender>
+
+    <appender name="file_error" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>${log.path}/forwarding.request-error.log</file>
+        <rollingPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">
+            <fileNamePattern>${log.path}/forwarding.request-error.%d{yyyy-MM-dd}.%i.log.gz</fileNamePattern>
+            <maxFileSize>${log.maxFileSize}</maxFileSize>
+            <maxHistory>${log.maxHistory}</maxHistory>
+        </rollingPolicy>
+        <encoder>
+            <charset>UTF-8</charset>
             <pattern>${log.pattern}</pattern>
         </encoder>
         <filter class="ch.qos.logback.classic.filter.LevelFilter">
-            <!-- 过滤的级别 -->
             <level>ERROR</level>
-			<!-- 匹配时的操作：接收（记录） -->
             <onMatch>ACCEPT</onMatch>
-			<!-- 不匹配时的操作：拒绝（不记录） -->
             <onMismatch>DENY</onMismatch>
         </filter>
     </appender>
-	<!-- 系统模块日志级别控制  -->
-	<logger name="org.wlpiaoyi.framework.lab.laser-wind-radar" level="info" />
-	<!-- Spring日志级别控制  -->
-	<logger name="org.springframework" level="warn" />
 
-	<!-- 根日志：控制台 + 文件 -->
-	<root level="info">
-		<appender-ref ref="console" />
+    <!-- forwarding：默认 INFO；排查协议/粘包可临时设为 TRACE（含 payload 预览，勿在生产长期开启） -->
+    <logger name="org.wlpiaoyi.framework.forwarding" level="${forwarding.log.level:-INFO}" />
+
+    <root level="${forwarding.root.level:-INFO}">
         <appender-ref ref="file_info" />
         <appender-ref ref="file_error" />
     </root>

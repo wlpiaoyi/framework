@@ -1,17 +1,11 @@
 package org.wlpiaoyi.framework.forwarding.request;
 
 import lombok.extern.slf4j.Slf4j;
-import org.wlpiaoyi.framework.forwarding.utils.socket.ForwardUtils;
+import org.wlpiaoyi.framework.forwarding.utils.socket.ForwardingLog;
 import org.wlpiaoyi.framework.forwarding.utils.socket.model.BufferCaches;
-import org.wlpiaoyi.framework.forwarding.utils.socket.model.RequestMessage;
 import org.wlpiaoyi.framework.forwarding.utils.socket.model.ResponseMessage;
-import org.wlpiaoyi.framework.utils.ValueUtils;
 import org.wlpiaoyi.framework.utils.socket.IReader;
 import org.wlpiaoyi.framework.utils.socket.IWriter;
-import org.wlpiaoyi.framework.utils.socket.client.SocketClient;
-
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * <p><b>{@code @author:}</b>wlpiaoyi</p>
@@ -34,7 +28,7 @@ public class ClientReader implements IReader {
 
     @Override
     public int begin(int clientId, String host, int port) {
-        log.info("ClientReader.begin. ClientId: {}, Host: {}, Port: {}", clientId, host, port);
+        log.debug("ClientReader.begin clientId={} peer={}:{}", clientId, host, port);
         return 1;
     }
 
@@ -55,7 +49,7 @@ public class ClientReader implements IReader {
 
     @Override
     public void end(int clientId) {
-        log.info("ClientReader.end. ClientId: {}", clientId);
+        log.debug("ClientReader.end clientId={}", clientId);
     }
 
 
@@ -72,9 +66,13 @@ public class ClientReader implements IReader {
 //            log.info("ClientReader.read.load.end. ClientId: {}, MessageId: {}", clientId, messageId);
             ResponseMessage message = new ResponseMessage(this.messageId);
             message.formatBytes(this.bufferCaches.getBuffers(), 0);
-            if (!message.check()) throw new RuntimeException("message check error！clientId:" + clientId);
+            if (!message.check()) throw new RuntimeException("message check error clientId=" + clientId + " messageId=" + message.getId());
             // use server forwarding data
             var data = SecurityUtils.getSecurity().decrypt(message.getData(), 0, message.getData().length);
+            log.debug("request.downstream clientId={} messageId={} plainLen={} peer={}:{}", clientId, message.getId(), data.length,
+                    this.serverWriter.getServerHost(), this.serverWriter.getServerPort());
+            ForwardingLog.tracePlain(log, "request.downstream", clientId, message.getId(),
+                    this.serverWriter.getServerHost(), this.serverWriter.getServerPort(), data);
             this.serverWriter.write(clientId, data, data.length);
 //            log.info("ClientReader.read. ClientId: {} write len:{} message: {}", clientId, message.getData().length, new String(message.getData()));
             return cOff;

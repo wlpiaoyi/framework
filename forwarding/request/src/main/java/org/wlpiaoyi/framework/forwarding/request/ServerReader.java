@@ -2,7 +2,7 @@ package org.wlpiaoyi.framework.forwarding.request;
 
 import lombok.extern.slf4j.Slf4j;
 import org.wlpiaoyi.framework.forwarding.utils.socket.ForwardUtils;
-import org.wlpiaoyi.framework.forwarding.utils.socket.Security;
+import org.wlpiaoyi.framework.forwarding.utils.socket.ForwardingLog;
 import org.wlpiaoyi.framework.forwarding.utils.socket.model.RequestMessage;
 import org.wlpiaoyi.framework.utils.MapUtils;
 import org.wlpiaoyi.framework.utils.socket.IReader;
@@ -36,7 +36,7 @@ public class ServerReader implements IReader {
 
     @Override
     public int begin(int clientId, String host, int port) {
-        log.info("ServerReader.begin. ClientId: {}, Host: {}, Port: {}", clientId, host, port);
+        log.debug("ServerReader.begin clientId={} peer={}:{}", clientId, host, port);
         return 1;
     }
 
@@ -66,7 +66,9 @@ public class ServerReader implements IReader {
         }
         int bLen = message.toBytes(this.bufferCaches, 0);
         client.getWriter().write(clientId, this.bufferCaches, bLen);
-        log.info("ServerReader.read. request ClientId: {}, Host: {}, Port: {} ", clientId, message.getHost(), message.getPort());
+        log.debug("request.upstream clientId={} messageId={} chunkLen={} target={}:{}", clientId, this.messageId, len,
+                message.getHost(), message.getPort());
+        ForwardingLog.traceChunk(log, "request.upstream", clientId, this.messageId, len, message.getHost(), message.getPort());
         return 0;
     }
 
@@ -83,7 +85,7 @@ public class ServerReader implements IReader {
 
     @Override
     public void end(int clientId) {
-        log.info("ServerReader.end. ClientId: {}", clientId);
+        log.debug("ServerReader.end clientId={}", clientId);
         synchronized (this.clientContentDict){
             this.clientContentDict.forEach((k, v) -> {
                 v.disConnect();

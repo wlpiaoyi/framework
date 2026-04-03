@@ -2,6 +2,7 @@ package org.wlpiaoyi.framework.forwarding.response;
 
 import lombok.extern.slf4j.Slf4j;
 import org.wlpiaoyi.framework.forwarding.utils.socket.ForwardUtils;
+import org.wlpiaoyi.framework.forwarding.utils.socket.ForwardingLog;
 import org.wlpiaoyi.framework.forwarding.utils.socket.model.BufferCaches;
 import org.wlpiaoyi.framework.forwarding.utils.socket.model.RequestMessage;
 import org.wlpiaoyi.framework.utils.MapUtils;
@@ -28,7 +29,7 @@ public class ServerReader implements IReader {
 
     @Override
     public int begin(int clientId, String host, int port) {
-        log.info("ServerReader.begin. ClientId: {}, Host: {}, Port: {}", clientId, host, port);
+        log.debug("ServerReader.begin clientId={} peer={}:{}", clientId, host, port);
         return 1;
     }
 
@@ -54,7 +55,7 @@ public class ServerReader implements IReader {
 
     @Override
     public void end(int clientId) {
-        log.info("ServerReader.end. ClientId: {}", clientId);
+        log.debug("ServerReader.end clientId={}", clientId);
         synchronized (this.clientContentDict){
             this.clientContentDict.forEach((k, v) -> {
                 v.disConnect();
@@ -85,22 +86,22 @@ public class ServerReader implements IReader {
             if(this.messageId < 0) this.messageId = 1;
             cOff = this.bufferCaches.loadIfNeed(bytes, off, len);
             if(cOff == -1){
-                log.info("ServerReader.read.load.continue ClientId: {}, MessageId: {}", clientId, messageId);
+                log.trace("ServerReader framing pending clientId={} messageId={}", clientId, messageId);
                 return 0;
             }
-            log.info("ServerReader.read.load.end. ClientId: {}, MessageId: {}", clientId, messageId);
+            log.trace("ServerReader frame complete clientId={} messageId={}", clientId, messageId);
             RequestMessage message = new RequestMessage(this.messageId);
             message.formatBytes(this.bufferCaches.getBuffers(), 0);
-            if (!message.check()) throw new RuntimeException("message check error！clientId:" + clientId);
+            if (!message.check()) throw new RuntimeException("message check error clientId=" + clientId + " messageId=" + message.getId());
             // use server forwarding data
             var client = this.getClient(clientId, message.getHost(), message.getPort(), writer);
             if (message.getData() != null && message.getData().length > 0){
-                log.info("R{} eMessage:\nToHost:{} ToPort:{}\nToData:{}\nR{}",
-                        SecurityUtils.getLineStart(), message.getHost(), message.getPort(), new String(message.getData()),SecurityUtils.getLineEnd());
+                log.debug("response.forward clientId={} messageId={} target={}:{} cipherLen={}", clientId, message.getId(),
+                        message.getHost(), message.getPort(), message.getData().length);
+                ForwardingLog.traceCipher(log, "response.req", clientId, message.getId(), message.getHost(), message.getPort(), message.getData());
                 var data = SecurityUtils.getSecurity().decrypt(message.getData(), 0, message.getData().length);
+                ForwardingLog.tracePlain(log, "response.req.dec", clientId, message.getId(), message.getHost(), message.getPort(), data);
                 client.getWriter().write(clientId, data, data.length);
-                log.info("R{} dMessage:\nToHost:{} ToPort:{}\nToData:{}\nR{}",
-                        SecurityUtils.getLineStart(), message.getHost(), message.getPort(), new String(message.getData()),SecurityUtils.getLineEnd());
             }
             return cOff;
         }finally {

@@ -1,7 +1,6 @@
 package org.wlpiaoyi.framework.forwarding.utils.socket.model;
 
 import lombok.Getter;
-import lombok.extern.slf4j.Slf4j;
 import org.wlpiaoyi.framework.forwarding.utils.socket.ForwardUtils;
 import org.wlpiaoyi.framework.utils.ValueUtils;
 
@@ -11,7 +10,6 @@ import org.wlpiaoyi.framework.utils.ValueUtils;
  * <p><b>{@code @date:}</b>2026-02-19 12:41:18</p>
  * <p><b>{@code @version:}:</b>1.0</p>
  */
-@Slf4j
 public class BufferCaches {
 
     @Getter

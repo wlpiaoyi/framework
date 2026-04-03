@@ -11,13 +11,6 @@ import org.wlpiaoyi.framework.forwarding.utils.socket.Security;
  */
 public class SecurityUtils {
 
-
-    @Getter
-    private static final String lineStart = ">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>";
-
-    @Getter
-    private static final String lineEnd   = "<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<";
-
     @Getter
     private static final Security security = new Security(0);
 }

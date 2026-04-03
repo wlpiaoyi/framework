@@ -2,12 +2,10 @@ package org.wlpiaoyi.framework.forwarding.response;
 
 import lombok.extern.slf4j.Slf4j;
 import org.wlpiaoyi.framework.forwarding.utils.socket.ForwardUtils;
-import org.wlpiaoyi.framework.forwarding.utils.socket.Security;
+import org.wlpiaoyi.framework.forwarding.utils.socket.ForwardingLog;
 import org.wlpiaoyi.framework.forwarding.utils.socket.model.ResponseMessage;
-import org.wlpiaoyi.framework.utils.data.DataUtils;
 import org.wlpiaoyi.framework.utils.socket.IReader;
 import org.wlpiaoyi.framework.utils.socket.IWriter;
-import org.wlpiaoyi.framework.utils.socket.client.SocketClient;
 
 /**
  * <p><b>{@code @author:}</b>wlpiaoyi</p>
@@ -34,28 +32,26 @@ public class ClientReader implements IReader {
 
     @Override
     public synchronized int read(IWriter writer, int clientId, byte[] readBytes, int readLen) {
-        log.debug("ClientReader.read. ClientId: {}, ReadLen: {}", clientId, readLen);
         // 建立连接阶段/网络空读时可能会触发 readLen=0。
         // 这种空包不应当被封装成消息转发，否则会造成多余连接/协议错位。
         if (readLen <= 0) return 0;
         this.messageId++;
         if (this.messageId < 0) this.messageId = 1;
         ResponseMessage message = new ResponseMessage(this.messageId);
-        if (this.messageId < 0) this.messageId = 1;
+        ForwardingLog.traceResponseChunk(log, "response.resp", clientId, message.getId(), readLen,
+                this.serverWriter.getServerHost(), this.serverWriter.getServerPort());
         byte[] data = new byte[readLen];
         System.arraycopy(readBytes, 0, data, 0, readLen);
-        // use server forwarding data
-        log.debug("S{} dMessage:\nReHost:{} RePort:{}\nToData:{}\nR{}",
-                SecurityUtils.getLineStart(), this.serverWriter.getServerHost(), this.serverWriter.getServerPort(),
-                new String(data), SecurityUtils.getLineEnd());
+        log.debug("response.return clientId={} messageId={} chunkLen={} peer={}:{}", clientId, message.getId(), readLen,
+                this.serverWriter.getServerHost(), this.serverWriter.getServerPort());
+        ForwardingLog.tracePlain(log, "response.resp.fromTarget", clientId, message.getId(),
+                this.serverWriter.getServerHost(), this.serverWriter.getServerPort(), data);
         message.setData(SecurityUtils.getSecurity().encrypt(data, 0, data.length));
-        log.debug("S{} eMessage:\nReHost:{} RePort:{}\nToData:{}\nR{}",
-                SecurityUtils.getLineStart(), this.serverWriter.getServerHost(), this.serverWriter.getServerPort(),
-                new String(message.getData()), SecurityUtils.getLineEnd());
-        if (!message.check()) throw new RuntimeException("message check error！clientId:" + clientId);
+        ForwardingLog.traceCipher(log, "response.resp.cipher", clientId, message.getId(),
+                this.serverWriter.getServerHost(), this.serverWriter.getServerPort(), message.getData());
+        if (!message.check()) throw new RuntimeException("message check error clientId=" + clientId + " messageId=" + message.getId());
         message.toBytes(this.bufferCaches, 0);
         this.serverWriter.write(clientId, this.bufferCaches, message.getLen());
-//        log.debug("ClientReader.read. write len:{} message: {}", message.getLen(), DataUtils.base64Encode(this.bufferCaches));
         return 0;
     }
 
