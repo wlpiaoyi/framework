@@ -149,13 +149,21 @@ public class BrowserCabgov extends BrowserBase {
         if (tindex != 999){
             throw new BusinessException("选择车辆类型失败");
         }
-        log.info("BrowserCabgov.submitHT 准备选择租赁类型");
-        var webElements = addBoxEle.findElement(By.id("zllx_lr")).findElements(By.xpath("option"));
-        WebElementUtils.click(browser, webElements.getLast());
-        log.info("BrowserCabgov.submitHT 选择租赁类型成功");
-        try {
-            Thread.sleep(1000);
-        } catch (InterruptedException e) {
+        {
+            log.info("BrowserCabgov.submitHT 准备选择租赁类型");
+            var count = 3;
+            while (count -- >= 0){
+                var webElements = addBoxEle.findElement(By.id("zllx_lr")).findElements(By.xpath("option"));
+                WebElementUtils.click(browser, webElements.getLast());
+                try {
+                    Thread.sleep(1000);
+                } catch (InterruptedException e) {
+                }
+                if(webElements.getLast().isSelected()){
+                    log.info("BrowserCabgov.submitHT 选择租赁类型成功");
+                    break;
+                }
+            }
         }
 
 
