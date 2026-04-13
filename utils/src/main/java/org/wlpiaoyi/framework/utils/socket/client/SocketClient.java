@@ -5,6 +5,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.wlpiaoyi.framework.utils.socket.Builder;
 import org.wlpiaoyi.framework.utils.socket.IReader;
 import org.wlpiaoyi.framework.utils.socket.IWriter;
+import org.wlpiaoyi.framework.utils.socket.SocketQuietErrors;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -102,6 +103,10 @@ public class SocketClient{
      * <p><b>{@code @author:}</b>wlpiaoyi</p>
      */
     public Integer syncRun(java.lang.Runnable onFinishCallback){
+        if (this.socket == null) {
+            log.warn("SocketClient.syncRun. Skipping run, socket not connected {}:{} clientId:{}", this.host, this.port, this.clientId);
+            return 0;
+        }
         // 使用 try-with-resources 确保 Socket 和相关流自动关闭
         try {
 //            log.debug("SocketClient.run. Connected to server {}:{} clientId:{}", socket.getInetAddress(), socket.getPort(), this.clientId);
@@ -128,7 +133,11 @@ public class SocketClient{
 //            log.debug("SocketClient.run. Disconnected from server {}:{} clientId:{}", socket.getInetAddress(), socket.getPort(), this.clientId);
         } catch (Exception e) {
             this.reader.error(this.clientId, e);
-            log.error("SocketClient.run. Error occurred while connecting to server {}:{} clientId:{}", this.host, this.port, this.clientId, e);
+            if (SocketQuietErrors.isBenignClose(e)) {
+                log.debug("SocketClient.run. Connection closed {}:{} clientId:{} ({})", this.host, this.port, this.clientId, e.toString());
+            } else {
+                log.error("SocketClient.run. Error occurred while connecting to server {}:{} clientId:{}", this.host, this.port, this.clientId, e);
+            }
         }finally {
             reader.end(this.clientId);
             this.disConnect();
@@ -141,6 +150,9 @@ public class SocketClient{
     }
     public void disConnect(){
         log.debug("SocketClient.disConnect. Disconnecting client with ID: {}", this.clientId);
+        if (this.socket == null) {
+            return;
+        }
         try {
             if(!this.socket.isInputShutdown()){
                 this.socket.shutdownInput();

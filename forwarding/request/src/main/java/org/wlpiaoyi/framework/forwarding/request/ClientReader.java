@@ -6,6 +6,7 @@ import org.wlpiaoyi.framework.forwarding.utils.socket.model.BufferCaches;
 import org.wlpiaoyi.framework.forwarding.utils.socket.model.ResponseMessage;
 import org.wlpiaoyi.framework.utils.socket.IReader;
 import org.wlpiaoyi.framework.utils.socket.IWriter;
+import org.wlpiaoyi.framework.utils.socket.SocketQuietErrors;
 /**
  * <p><b>{@code @author:}</b>wlpiaoyi</p>
  * <p><b>{@code @description:}</b></p>
@@ -42,7 +43,11 @@ public class ClientReader implements IReader {
 
     @Override
     public void error(int clientId, Exception e) {
-        log.error("[fw-req] hub-read-error clientId={}", clientId, e);
+        if (SocketQuietErrors.isBenignClose(e)) {
+            log.debug("[fw-req] hub-read-closed clientId={} ({})", clientId, e.toString());
+        } else {
+            log.error("[fw-req] hub-read-error clientId={}", clientId, e);
+        }
     }
 
     @Override

@@ -7,6 +7,7 @@ import org.wlpiaoyi.framework.forwarding.utils.socket.model.BufferCaches;
 import org.wlpiaoyi.framework.forwarding.utils.socket.model.RequestMessage;
 import org.wlpiaoyi.framework.utils.MapUtils;
 import org.wlpiaoyi.framework.utils.socket.IReader;
+import org.wlpiaoyi.framework.utils.socket.SocketQuietErrors;
 import org.wlpiaoyi.framework.utils.socket.IWriter;
 import org.wlpiaoyi.framework.utils.socket.client.SocketClient;
 
@@ -44,7 +45,11 @@ public class ServerReader implements IReader {
 
     @Override
     public void error(int clientId, Exception e) {
-        log.error("[fw-res] peer-error clientId={}", clientId, e);
+        if (SocketQuietErrors.isBenignClose(e)) {
+            log.debug("[fw-res] peer-tcp-end clientId={} ({})", clientId, e.toString());
+        } else {
+            log.error("[fw-res] peer-error clientId={}", clientId, e);
+        }
         synchronized (this.clientContentDict){
             this.clientContentDict.forEach((k, v) -> {
                 v.disConnect();
@@ -65,18 +70,23 @@ public class ServerReader implements IReader {
     }
 
     private SocketClient getClient(int clientId, String respHost, int respPort, IWriter serverWriter) {
-        return this.clientContentDict.computeIfAbsent(clientId + ":" + respHost + ":" + respPort, k -> {
-            int timeOut = MapUtils.getInteger(ForwardUtils.getCONFIG_MAP(), "timeOut",60);
+        String key = clientId + ":" + respHost + ":" + respPort;
+        return this.clientContentDict.compute(key, (k, v) -> {
+            if (v != null) {
+                return v;
+            }
+            int timeOut = MapUtils.getInteger(ForwardUtils.getCONFIG_MAP(), "timeOut", 60);
             SocketClient socketClient = new SocketClient(respHost, respPort, timeOut, clientId, ForwardUtils.BUFF_CACHE_SIZE,
                     new ClientReader(serverWriter));
             try {
                 socketClient.connect();
                 socketClient.asyncRun(null);
                 log.info("[fw-res] target-channel-open clientId={} target={}:{}", clientId, respHost, respPort);
+                return socketClient;
             } catch (IOException e) {
                 log.error("[fw-res] target-connect-fail clientId={} target={}:{}", clientId, respHost, respPort, e);
+                return null;
             }
-            return socketClient;
         });
     }
 
@@ -96,6 +106,10 @@ public class ServerReader implements IReader {
             message.formatBytes(this.bufferCaches.getBuffers(), 0);
             if (!message.check()) throw new RuntimeException("message check error！clientId:" + clientId);
             var client = this.getClient(clientId, message.getHost(), message.getPort(), writer);
+            if (client == null) {
+                log.warn("[fw-res] target unavailable, drop frame clientId={} target={}:{}", clientId, message.getHost(), message.getPort());
+                return cOff;
+            }
             if (message.getData() != null && message.getData().length > 0){
                 log.debug("[fw-res] request cipher clientId={} msgId={} target={}:{} encLen={} encHex={}",
                         clientId, message.getId(), message.getHost(), message.getPort(), message.getData().length,
@@ -104,7 +118,12 @@ public class ServerReader implements IReader {
                 log.debug("[fw-res] request plain clientId={} msgId={} target={}:{} plainLen={} previewHex={}",
                         clientId, message.getId(), message.getHost(), message.getPort(), data.length,
                         ForwardingLog.hexPreview(data, 0, data.length, ForwardingLog.DEFAULT_HEX_PREVIEW_BYTES));
-                client.getWriter().write(clientId, data, data.length);
+                var tw = client.getWriter();
+                if (tw == null) {
+                    log.warn("[fw-res] target writer missing clientId={} target={}:{}", clientId, message.getHost(), message.getPort());
+                    return cOff;
+                }
+                tw.write(clientId, data, data.length);
             } else {
                 log.debug("[fw-res] request no-payload clientId={} msgId={} target={}:{}",
                         clientId, message.getId(), message.getHost(), message.getPort());
