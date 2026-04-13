@@ -13,7 +13,9 @@
     运行时可通过 JVM 系统属性覆盖路径与文件名（见下方 property 说明）。
 
     是否在控制台与文件中输出日志，还可由 config.json 的 logEnabled 控制（默认 true）；
-    false 时由 ForwardUtils.loadMap() 后 ForwardingLogging 关闭 root 追加器并置相关 logger 为 OFF。
+    false 时由 ForwardUtils.loadMap() 后 ForwardingLogging 关闭 root 追加器并置相关 logger 为 OFF；
+    request 进程另由 ForwardingConsoleDashboard 每秒在控制台刷新转发端口表格（不经 Logback）。
+    原地刷新、不污染主屏滚动历史可加：-Dforwarding.console.vt=true（需支持 VT 的终端，如 Windows Terminal）。
 -->
 <configuration>
     <!--

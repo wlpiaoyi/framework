@@ -28,6 +28,7 @@ public final class ForwardingLogging {
         }
         boolean enabled = Boolean.TRUE.equals(MapUtils.getBoolean(cfg, "logEnabled", Boolean.TRUE));
         if (enabled) {
+            ForwardingConsoleDashboard.stop();
             return;
         }
         if (!(LoggerFactory.getILoggerFactory() instanceof LoggerContext lc)) {

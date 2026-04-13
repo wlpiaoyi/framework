@@ -1,6 +1,6 @@
 {
   "host": "182.150.116.84:30010",
-  "logEnabled": true,
+  "logEnabled": false,
   "timeOut": 3600,
   "privateKey": "fw_config/forwarding/key.pri",
   "publicKey": "fw_config/forwarding/key.pub",

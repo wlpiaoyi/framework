@@ -44,4 +44,15 @@ public class ForwardUtils {
         return MapUtils.getMap(CONFIG_MAP, "dict");
     }
 
+    /**
+     * {@code logEnabled} 缺省为 true；仅当配置为 {@code false} 时为静默模式（关日志并可配合 request 侧控制台表格）。
+     */
+    @SuppressWarnings("rawtypes")
+    public static boolean isLogEnabled() {
+        if (CONFIG_MAP == null) {
+            return true;
+        }
+        return !Boolean.FALSE.equals(MapUtils.getBoolean(CONFIG_MAP, "logEnabled", Boolean.TRUE));
+    }
+
 }

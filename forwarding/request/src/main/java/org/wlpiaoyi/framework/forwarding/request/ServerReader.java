@@ -2,6 +2,7 @@ package org.wlpiaoyi.framework.forwarding.request;
 
 import lombok.extern.slf4j.Slf4j;
 import org.wlpiaoyi.framework.forwarding.utils.socket.ForwardUtils;
+import org.wlpiaoyi.framework.forwarding.utils.socket.ForwardingPortStats;
 import org.wlpiaoyi.framework.forwarding.utils.socket.ForwardingLog;
 import org.wlpiaoyi.framework.forwarding.utils.socket.model.RequestMessage;
 import org.wlpiaoyi.framework.utils.MapUtils;
@@ -37,6 +38,7 @@ public class ServerReader implements IReader {
 
     @Override
     public int begin(int clientId, String host, int port) {
+        ForwardingPortStats.onConnectionOpen(serverPort);
         log.info("[fw-req] peer-open listenPort={} clientId={} peer={}:{}", serverPort, clientId, host, port);
         return 1;
     }
@@ -56,6 +58,7 @@ public class ServerReader implements IReader {
             message.setPort(Integer.parseInt(addrs[1]));
         }
         if(len > 0){
+            ForwardingPortStats.addBytesUp(serverPort, len);
             byte[] data = new byte[len];
             System.arraycopy(bytes, 0, data, 0, len);
             message.setData(SecurityUtils.getSecurity().encrypt(data, 0, data.length));
@@ -86,6 +89,7 @@ public class ServerReader implements IReader {
 
     @Override
     public void error(int clientId, Exception e) {
+        ForwardingPortStats.onConnectionClose(serverPort);
         if (SocketQuietErrors.isBenignClose(e)) {
             log.debug("[fw-req] peer-tcp-end listenPort={} clientId={} ({})", serverPort, clientId, e.toString());
         } else {
@@ -101,6 +105,7 @@ public class ServerReader implements IReader {
 
     @Override
     public void end(int clientId) {
+        ForwardingPortStats.onConnectionClose(serverPort);
         log.info("[fw-req] peer-close listenPort={} clientId={}", serverPort, clientId);
         synchronized (this.clientContentDict){
             this.clientContentDict.forEach((k, v) -> {
@@ -117,7 +122,7 @@ public class ServerReader implements IReader {
                 return v;
             }
             int timeOut = MapUtils.getInteger(ForwardUtils.getCONFIG_MAP(), "timeOut", 60);
-            SocketClient socketClient = new SocketClient(respHost, respPort, timeOut, clientId, ForwardUtils.BUFF_CACHE_SIZE, new ClientReader(serverWriter));
+            SocketClient socketClient = new SocketClient(respHost, respPort, timeOut, clientId, ForwardUtils.BUFF_CACHE_SIZE, new ClientReader(serverWriter, serverPort));
             try {
                 socketClient.connect();
                 socketClient.asyncRun(() -> {

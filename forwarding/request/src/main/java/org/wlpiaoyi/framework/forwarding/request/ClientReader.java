@@ -2,6 +2,7 @@ package org.wlpiaoyi.framework.forwarding.request;
 
 import lombok.extern.slf4j.Slf4j;
 import org.wlpiaoyi.framework.forwarding.utils.socket.ForwardingLog;
+import org.wlpiaoyi.framework.forwarding.utils.socket.ForwardingPortStats;
 import org.wlpiaoyi.framework.forwarding.utils.socket.model.BufferCaches;
 import org.wlpiaoyi.framework.forwarding.utils.socket.model.ResponseMessage;
 import org.wlpiaoyi.framework.utils.socket.IReader;
@@ -17,13 +18,15 @@ import org.wlpiaoyi.framework.utils.socket.SocketQuietErrors;
 public class ClientReader implements IReader {
 
     private final IWriter serverWriter;
+    private final int listenPort;
     private int messageId = 0;
 
     private final BufferCaches bufferCaches = new BufferCaches();
 
 
-    public ClientReader(IWriter serverWriter) {
+    public ClientReader(IWriter serverWriter, int listenPort) {
         this.serverWriter = serverWriter;
+        this.listenPort = listenPort;
     }
 
     @Override
@@ -83,6 +86,7 @@ public class ClientReader implements IReader {
                 return cOff;
             }
             var data = SecurityUtils.getSecurity().decrypt(enc, 0, enc.length);
+            ForwardingPortStats.addBytesDown(listenPort, data.length);
             this.serverWriter.write(clientId, data, data.length);
             log.debug("[fw-req] hub->client delivered clientId={} respMsgId={} wireDeclaredLen={} encLen={} plainLen={} wireHeadHex={} plainPreviewHex={}",
                     clientId, message.getId(), message.getLen(), enc.length, data.length,

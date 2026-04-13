@@ -49,6 +49,9 @@ public class SocketServer {
 
     private LoadReader loadReader;
 
+    /** 在 {@link ServerSocket} 绑定成功之后、进入 accept 循环之前调用一次；可用于标记监听已就绪。 */
+    private Runnable onBound;
+
     private final Lock lock = new ReentrantLock();
 
     private final Object synTagObj = new Object();
@@ -85,6 +88,11 @@ public class SocketServer {
         return this;
     }
 
+    public SocketServer setOnBound(Runnable onBound) {
+        this.onBound = onBound;
+        return this;
+    }
+
     /**
      * <p><b>{@code @description:}</b>
      * <div style='border-radius: 12px; padding: 5px; margin-left: 5px; margin-bottom: 5px;'>
@@ -108,6 +116,13 @@ public class SocketServer {
         try (ServerSocket serverSocket = new ServerSocket(this.port)) {
             this.lock.unlock();
             log.debug("SocketServer.start. Server started successfully on port: {}", this.port);
+            if (this.onBound != null) {
+                try {
+                    this.onBound.run();
+                } catch (Throwable t) {
+                    log.warn("SocketServer.start. onBound failed: {}", t.toString());
+                }
+            }
             this.listener(serverSocket);
             return true;
         } catch (Exception e) {
