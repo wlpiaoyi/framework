@@ -46,8 +46,9 @@ public class ClientReader implements IReader {
         if (!message.check()) throw new RuntimeException("message check error！clientId:" + clientId);
         message.toBytes(this.bufferCaches, 0);
         this.serverWriter.write(clientId, this.bufferCaches, message.getLen());
-        log.debug("[fw-res] target->hub wire clientId={} msgId={} frameLen={} encPayloadLen={} encHex={}",
+        log.debug("[fw-res] target->hub wire clientId={} msgId={} frameLen={} encPayloadLen={} wireHeadHex={} encHex={}",
                 clientId, message.getId(), message.getLen(), message.getData().length,
+                ForwardingLog.hexPreview(this.bufferCaches, 0, Math.min(message.getLen(), this.bufferCaches.length), 16),
                 ForwardingLog.hexPreview(message.getData()));
         return 0;
     }

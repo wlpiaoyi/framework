@@ -106,6 +106,11 @@ class ClientRunner implements Runnable<java.lang.Runnable, Integer> {
                     log.warn("ClientRunner.run. Server {}:{} clientId:{} disconnected", this.sClient.getInetAddress(), this.sClient.getPort(), this.clientId);
                     break;
                 }
+                if (log.isDebugEnabled()) {
+                    log.debug("[fw-tcp] ingress-read localPort={} clientId={} peer={}:{} chunkLen={}",
+                            this.sClient.getLocalPort(), this.clientId,
+                            this.sClient.getInetAddress().getHostAddress(), this.sClient.getPort(), readLen);
+                }
                 if(this.reader.read(this.writer, this.clientId, readBytes, readLen) == -1) break;
             }
             log.debug("ClientRunner.run. Data reception completed for Client ID: {}", this.clientId);

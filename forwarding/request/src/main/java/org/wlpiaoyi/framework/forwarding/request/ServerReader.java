@@ -45,6 +45,10 @@ public class ServerReader implements IReader {
     public int read(IWriter writer, int clientId, byte[] bytes, int len) {
         this.messageId ++;
         if(this.messageId < 0) this.messageId = 1;
+        if (log.isDebugEnabled()) {
+            log.debug("[fw-req] ingress-tcp-chunk listenPort={} clientId={} seq={} chunkLen={} (0=ClientRunner首调或空读)",
+                    serverPort, clientId, this.messageId, len);
+        }
         RequestMessage message = new RequestMessage(this.messageId);
         {
             String[] addrs = ForwardUtils.getRequestServerAddress(this.serverPort).split(":");

@@ -90,7 +90,6 @@ public class ResponseMessage extends Message implements Serializable {
         for (int i = 0; i < dataLen; i++){
             this.data[i] = bytes[offset++];
         }
-        offset += dataLen;
         return offset - start;  // 返回实际读取的总字节数
     }
 }

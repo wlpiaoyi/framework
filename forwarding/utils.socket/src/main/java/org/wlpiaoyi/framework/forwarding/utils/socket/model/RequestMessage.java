@@ -178,7 +178,6 @@ public class RequestMessage extends Message implements java.io.Serializable{
         for (int i = 0; i < dataLen; i++){
             this.data[i] = bytes[off++];
         }
-        off += dataLen;
         return off - start;  // 返回实际读取的总字节数
     }
 }

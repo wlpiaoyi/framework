@@ -91,10 +91,13 @@ public class ServerReader implements IReader {
     }
 
     private int read(IWriter writer, int clientId, byte[] bytes, int off,  int len) {
-        int cOff = 0;
+        int cOff = -1;
         try{
             this.messageId ++;
             if(this.messageId < 0) this.messageId = 1;
+            if (log.isDebugEnabled()) {
+                log.debug("[fw-res] hub-tcp-assemble clientId={} slice=[{}, {}) readCallLen={}", clientId, off, len, len);
+            }
             cOff = this.bufferCaches.loadIfNeed(bytes, off, len);
             if(cOff == -1){
                 if (log.isTraceEnabled()) {
@@ -105,6 +108,12 @@ public class ServerReader implements IReader {
             RequestMessage message = new RequestMessage(this.messageId);
             message.formatBytes(this.bufferCaches.getBuffers(), 0);
             if (!message.check()) throw new RuntimeException("message check error！clientId:" + clientId);
+            if (log.isDebugEnabled()) {
+                int encN = message.getData() == null ? 0 : message.getData().length;
+                log.debug("[fw-res] request-parsed clientId={} wireMsgId={} wireDeclaredLen={} target={}:{} encPayloadLen={} wireHeadHex={}",
+                        clientId, message.getId(), message.getLen(), message.getHost(), message.getPort(), encN,
+                        ForwardingLog.hexPreview(this.bufferCaches.getBuffers(), 0, Math.min(message.getLen(), this.bufferCaches.getBuffers().length), 16));
+            }
             var client = this.getClient(clientId, message.getHost(), message.getPort(), writer);
             if (client == null) {
                 log.warn("[fw-res] target unavailable, drop frame clientId={} target={}:{}", clientId, message.getHost(), message.getPort());

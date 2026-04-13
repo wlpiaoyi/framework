@@ -128,6 +128,9 @@ public class SocketClient{
                     log.warn("SocketClient.run. Server {}:{} clientId:{} disconnected", socket.getInetAddress(), socket.getPort(), this.clientId);
                     break;
                 }
+                if (log.isDebugEnabled()) {
+                    log.debug("[fw-tcp] outbound-read {}:{} clientId={} chunkLen={}", this.host, this.port, this.clientId, readLen);
+                }
                 if(this.reader.read(this.writer, this.clientId, readBytes, readLen) == -1) break;
             }
 //            log.debug("SocketClient.run. Disconnected from server {}:{} clientId:{}", socket.getInetAddress(), socket.getPort(), this.clientId);
