@@ -70,7 +70,7 @@ public class ServerReader implements IReader {
     }
 
     private SocketClient getClient(int clientId, String respHost, int respPort, IWriter serverWriter) {
-        String key = clientId + ":" + respHost + ":" + respPort;
+        final String key = clientId + ":" + respHost + ":" + respPort;
         return this.clientContentDict.compute(key, (k, v) -> {
             if (v != null) {
                 return v;
@@ -80,7 +80,10 @@ public class ServerReader implements IReader {
                     new ClientReader(serverWriter));
             try {
                 socketClient.connect();
-                socketClient.asyncRun(null);
+                socketClient.asyncRun(() -> {
+                    this.clientContentDict.remove(key);
+                    log.debug("[fw-res] target-client-removed-from-map clientId={} key={}", clientId, key);
+                });
                 log.info("[fw-res] target-channel-open clientId={} target={}:{}", clientId, respHost, respPort);
                 return socketClient;
             } catch (IOException e) {

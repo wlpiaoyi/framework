@@ -31,4 +31,10 @@ public interface IWriter {
 
     int getServerPort();
 
+    /**
+     * 关闭底层 TCP（全关）。用于上游/Hub 已结束时级联释放对端连接。
+     */
+    default void closeSocket(int clientId) {
+    }
+
 }

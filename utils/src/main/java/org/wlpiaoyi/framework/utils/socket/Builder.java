@@ -10,8 +10,10 @@ import org.wlpiaoyi.framework.utils.thread.ThreadPoolExecutorBuilder;
 
 import java.io.IOException;
 import java.io.OutputStream;
+import java.net.Socket;
 import java.nio.charset.StandardCharsets;
 import java.util.Map;
+import java.util.Objects;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -112,6 +114,10 @@ public class Builder {
         return threadPool;
     }
 
+    public static IWriter getWriter(Socket socket, String serverHost, int serverPort) throws IOException {
+        return new ClientWriter(socket, serverHost, serverPort);
+    }
+
     public static IWriter getWriter(OutputStream out, String serverHost, int serverPort){
         return new ClientWriter(out, serverHost, serverPort);
     }
@@ -131,8 +137,9 @@ public class Builder {
     @Slf4j
     static class ClientWriter implements IWriter {
 
-        // Output stream for sending data to the client
         private final OutputStream out;
+
+        private final Socket socket;
 
         @Getter
         private final String serverHost;
@@ -140,10 +147,32 @@ public class Builder {
         @Getter
         private final int serverPort;
 
+        ClientWriter(Socket socket, String serverHost, int serverPort) throws IOException {
+            this.socket = Objects.requireNonNull(socket);
+            this.out = socket.getOutputStream();
+            this.serverHost = serverHost;
+            this.serverPort = serverPort;
+        }
+
         ClientWriter(OutputStream out, String serverHost, int serverPort) {
+            this.socket = null;
             this.out = out;
             this.serverHost = serverHost;
             this.serverPort = serverPort;
+        }
+
+        @Override
+        public void closeSocket(int clientId) {
+            if (this.socket == null) {
+                return;
+            }
+            try {
+                if (!this.socket.isClosed()) {
+                    this.socket.close();
+                }
+            } catch (IOException e) {
+                log.debug("ClientWriter.closeSocket clientId={} ({})", clientId, e.toString());
+            }
         }
 
         @Override

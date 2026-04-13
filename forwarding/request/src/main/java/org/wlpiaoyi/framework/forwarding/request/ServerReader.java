@@ -111,7 +111,7 @@ public class ServerReader implements IReader {
     }
 
     public SocketClient getClient(int clientId, String respHost, int respPort, IWriter serverWriter) {
-        String key = clientId + ":" + respHost + ":" + respPort;
+        final String key = clientId + ":" + respHost + ":" + respPort;
         return this.clientContentDict.compute(key, (k, v) -> {
             if (v != null) {
                 return v;
@@ -120,7 +120,10 @@ public class ServerReader implements IReader {
             SocketClient socketClient = new SocketClient(respHost, respPort, timeOut, clientId, ForwardUtils.BUFF_CACHE_SIZE, new ClientReader(serverWriter));
             try {
                 socketClient.connect();
-                socketClient.asyncRun(null);
+                socketClient.asyncRun(() -> {
+                    this.clientContentDict.remove(key);
+                    log.debug("[fw-req] hub-client-removed-from-map clientId={} key={}", clientId, key);
+                });
                 log.info("[fw-req] hub-channel-open clientId={} hub={}:{}", clientId, respHost, respPort);
                 return socketClient;
             } catch (IOException e) {

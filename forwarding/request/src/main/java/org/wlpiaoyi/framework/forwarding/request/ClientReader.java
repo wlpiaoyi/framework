@@ -52,7 +52,9 @@ public class ClientReader implements IReader {
 
     @Override
     public void end(int clientId) {
-        log.info("[fw-req] hub-read-end clientId={}", clientId);
+        log.info("[fw-req] hub-read-end clientId={} (cascade-close browser peer)", clientId);
+        // Hub 已结束（通常因 response 侧目标关闭后关了 Hub）：关闭浏览器侧 TCP，与上游生命周期对齐
+        this.serverWriter.closeSocket(clientId);
     }
 
 

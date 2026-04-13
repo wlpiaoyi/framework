@@ -64,6 +64,8 @@ public class ClientReader implements IReader {
 
     @Override
     public void end(int clientId) {
-        log.info("[fw-res] target-read-end clientId={}", clientId);
+        log.info("[fw-res] target-read-end clientId={} (cascade-close hub toward request)", clientId);
+        // 转发目标已 FIN：关闭本侧 Hub 会话 TCP，使 request 上读 Hub 的线程结束并关闭浏览器
+        this.serverWriter.closeSocket(clientId);
     }
 }
