@@ -2,7 +2,7 @@
   "superTemplateId": "CDS-SD-YHZHSD-TDG",
   "superDeviceId": "CDS-SD-YHZHSD-TDG",
   "mqtt": {
-    "broker": "tcp://10.28.136.213:30015",
+    "broker": "tcp://10.28.136.215:1883",
     "clientId": "CDS-SD-YHZHSD-TDG",
     "username": "CDS-SD-YHZHSD-TDG",
     "password": "bdf22ee282c8cac9"

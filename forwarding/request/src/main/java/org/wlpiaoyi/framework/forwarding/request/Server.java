@@ -1,5 +1,6 @@
 package org.wlpiaoyi.framework.forwarding.request;
 
+import lombok.extern.slf4j.Slf4j;
 import org.wlpiaoyi.framework.forwarding.utils.socket.ForwardUtils;
 import org.wlpiaoyi.framework.utils.MapUtils;
 import org.wlpiaoyi.framework.utils.socket.Builder;
@@ -15,6 +16,7 @@ import java.util.Map;
  * <p><b>{@code @date:}</b>2026-02-16 14:50:55</p>
  * <p><b>{@code @version:}:</b>1.0</p>
  */
+@Slf4j
 public class Server {
 
     static {
@@ -26,10 +28,15 @@ public class Server {
     }
 
     public void run() throws InterruptedException {
+        log.info("[fw-req] bootstrap hub={} listenEntries={} buffer={}B timeout={}s",
+                ForwardUtils.getResponseServerAddress(), ForwardUtils.getDict().size(),
+                ForwardUtils.BUFF_CACHE_SIZE, MapUtils.getInteger(ForwardUtils.getCONFIG_MAP(), "timeOut", 60));
         ForwardUtils.getDict().forEach((k, v) -> {
             Builder.getThreadPool().submit((Runnable<Object, Object>) (taskId, param) -> {
                 int port = Integer.parseInt(k.toString());
                 int timeOut = MapUtils.getInteger(ForwardUtils.getCONFIG_MAP(), "timeOut",60);
+                String target = ForwardUtils.getRequestServerAddress(port);
+                log.info("[fw-req] listen port={} -> target {}", port, target);
                 var server = SocketServer.build(port, ForwardUtils.BUFF_CACHE_SIZE, timeOut).setLoadReader(clientId -> new ServerReader(port));
                 server.start();
                 return 0;

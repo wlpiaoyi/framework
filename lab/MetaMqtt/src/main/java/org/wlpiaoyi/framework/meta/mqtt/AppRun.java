@@ -32,7 +32,7 @@ public class AppRun {
     public static void main(String[] args) {
         try {
             // 从配置文件加载配置
-            AppConfig config = ConfigLoader.loadConfig(DataUtils.USER_DIR + "/config/mqtt/data.json");
+            AppConfig config = ConfigLoader.loadConfig(DataUtils.USER_DIR + "/fw_config/mqtt/data.json");
 
             AppConfig.MqttConfig mqttConfig = config.getMqtt();
             List<AppConfig.DeviceConfig> deviceConfigs = config.getDevices();

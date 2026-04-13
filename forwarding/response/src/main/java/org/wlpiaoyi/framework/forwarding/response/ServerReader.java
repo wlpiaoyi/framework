@@ -2,6 +2,7 @@ package org.wlpiaoyi.framework.forwarding.response;
 
 import lombok.extern.slf4j.Slf4j;
 import org.wlpiaoyi.framework.forwarding.utils.socket.ForwardUtils;
+import org.wlpiaoyi.framework.forwarding.utils.socket.ForwardingLog;
 import org.wlpiaoyi.framework.forwarding.utils.socket.model.BufferCaches;
 import org.wlpiaoyi.framework.forwarding.utils.socket.model.RequestMessage;
 import org.wlpiaoyi.framework.utils.MapUtils;
@@ -28,7 +29,7 @@ public class ServerReader implements IReader {
 
     @Override
     public int begin(int clientId, String host, int port) {
-        log.info("ServerReader.begin. ClientId: {}, Host: {}, Port: {}", clientId, host, port);
+        log.info("[fw-res] peer-open clientId={} peer={}:{}", clientId, host, port);
         return 1;
     }
 
@@ -43,7 +44,7 @@ public class ServerReader implements IReader {
 
     @Override
     public void error(int clientId, Exception e) {
-        log.error("ServerReader.error. ClientId: {}", clientId, e);
+        log.error("[fw-res] peer-error clientId={}", clientId, e);
         synchronized (this.clientContentDict){
             this.clientContentDict.forEach((k, v) -> {
                 v.disConnect();
@@ -54,7 +55,7 @@ public class ServerReader implements IReader {
 
     @Override
     public void end(int clientId) {
-        log.info("ServerReader.end. ClientId: {}", clientId);
+        log.info("[fw-res] peer-close clientId={}", clientId);
         synchronized (this.clientContentDict){
             this.clientContentDict.forEach((k, v) -> {
                 v.disConnect();
@@ -71,8 +72,9 @@ public class ServerReader implements IReader {
             try {
                 socketClient.connect();
                 socketClient.asyncRun(null);
+                log.info("[fw-res] target-channel-open clientId={} target={}:{}", clientId, respHost, respPort);
             } catch (IOException e) {
-                log.error("ServerReader.getClient. ClientId: {} connect fail", clientId, e);
+                log.error("[fw-res] target-connect-fail clientId={} target={}:{}", clientId, respHost, respPort, e);
             }
             return socketClient;
         });
@@ -85,22 +87,27 @@ public class ServerReader implements IReader {
             if(this.messageId < 0) this.messageId = 1;
             cOff = this.bufferCaches.loadIfNeed(bytes, off, len);
             if(cOff == -1){
-                log.debug("ServerReader.read.load.continue ClientId: {}, MessageId: {}", clientId, messageId);
+                if (log.isTraceEnabled()) {
+                    log.trace("[fw-res] hub tcp chunk clientId={} frame-incomplete bytesThisCall={}", clientId, len - off);
+                }
                 return 0;
             }
-            log.debug("ServerReader.read.load.end. ClientId: {}, MessageId: {}", clientId, messageId);
             RequestMessage message = new RequestMessage(this.messageId);
             message.formatBytes(this.bufferCaches.getBuffers(), 0);
             if (!message.check()) throw new RuntimeException("message check error！clientId:" + clientId);
-            // use server forwarding data
             var client = this.getClient(clientId, message.getHost(), message.getPort(), writer);
             if (message.getData() != null && message.getData().length > 0){
-                log.debug("R{} eMessage:\nToHost:{} ToPort:{}\nToData:{}\nR{}",
-                        SecurityUtils.getLineStart(), message.getHost(), message.getPort(), new String(message.getData()),SecurityUtils.getLineEnd());
+                log.debug("[fw-res] request cipher clientId={} msgId={} target={}:{} encLen={} encHex={}",
+                        clientId, message.getId(), message.getHost(), message.getPort(), message.getData().length,
+                        ForwardingLog.hexPreview(message.getData()));
                 var data = SecurityUtils.getSecurity().decrypt(message.getData(), 0, message.getData().length);
+                log.debug("[fw-res] request plain clientId={} msgId={} target={}:{} plainLen={} previewHex={}",
+                        clientId, message.getId(), message.getHost(), message.getPort(), data.length,
+                        ForwardingLog.hexPreview(data, 0, data.length, ForwardingLog.DEFAULT_HEX_PREVIEW_BYTES));
                 client.getWriter().write(clientId, data, data.length);
-                log.debug("R{} dMessage:\nToHost:{} ToPort:{}\nToData:{}\nR{}",
-                        SecurityUtils.getLineStart(), message.getHost(), message.getPort(), new String(message.getData()),SecurityUtils.getLineEnd());
+            } else {
+                log.debug("[fw-res] request no-payload clientId={} msgId={} target={}:{}",
+                        clientId, message.getId(), message.getHost(), message.getPort());
             }
             return cOff;
         }finally {

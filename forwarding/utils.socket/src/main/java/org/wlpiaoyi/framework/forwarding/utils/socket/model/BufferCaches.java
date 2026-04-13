@@ -30,17 +30,21 @@ public class BufferCaches {
             this.bufferLen = (int) ValueUtils.byteToLong(bytes, off, 4);
             if(this.bufferLen > ForwardUtils.MAX_CACHE_SIZE)
                 throw new RuntimeException("BufferCaches.loadIfNeed.bufferLen > MAX_CACHE_SIZE");
-//            log.debug("BufferCaches.loadIfNeed.load. bufferLen: {}", this.bufferLen);
+            if (log.isTraceEnabled()) {
+                log.trace("[fw] frame assemble start declaredTotal={}B maxBuffer={}B", this.bufferLen, ForwardUtils.MAX_CACHE_SIZE);
+            }
         }
         int cOff = -1;
         for (int i = off; i < len; i++){
             this.buffers[this.bufferOff++] = bytes[i];
             if(this.bufferOff >= this.bufferLen){
                 cOff = i + 1;
+                if (log.isTraceEnabled()) {
+                    log.trace("[fw] frame assemble done bytes={}", this.bufferLen);
+                }
                 break;
             }
         }
-//        log.debug("BufferCaches.loadIfNeed.read. bufferOff: {}, bufferLen: {}", this.bufferOff, this.bufferLen);
         return cOff == len ? 0 : cOff;
     }
 

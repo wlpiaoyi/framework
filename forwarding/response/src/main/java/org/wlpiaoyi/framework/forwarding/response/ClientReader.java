@@ -2,9 +2,8 @@ package org.wlpiaoyi.framework.forwarding.response;
 
 import lombok.extern.slf4j.Slf4j;
 import org.wlpiaoyi.framework.forwarding.utils.socket.ForwardUtils;
-import org.wlpiaoyi.framework.forwarding.utils.socket.Security;
+import org.wlpiaoyi.framework.forwarding.utils.socket.ForwardingLog;
 import org.wlpiaoyi.framework.forwarding.utils.socket.model.ResponseMessage;
-import org.wlpiaoyi.framework.utils.data.DataUtils;
 import org.wlpiaoyi.framework.utils.socket.IReader;
 import org.wlpiaoyi.framework.utils.socket.IWriter;
 import org.wlpiaoyi.framework.utils.socket.client.SocketClient;
@@ -28,41 +27,38 @@ public class ClientReader implements IReader {
 
     @Override
     public int begin(int clientId, String host, int port) {
-        log.debug("ClientReader.begin. ClientId: {}, Host: {}, Port: {}", clientId, host, port);
+        log.info("[fw-res] target-socket-ready clientId={} targetPeer={}:{}", clientId, host, port);
         return 1;
     }
 
     @Override
     public synchronized int read(IWriter writer, int clientId, byte[] readBytes, int readLen) {
-        log.debug("ClientReader.read. ClientId: {}, ReadLen: {}", clientId, readLen);
         this.messageId++;
         if (this.messageId < 0) this.messageId = 1;
         ResponseMessage message = new ResponseMessage(this.messageId);
         if (this.messageId < 0) this.messageId = 1;
         byte[] data = new byte[readLen];
         System.arraycopy(readBytes, 0, data, 0, readLen);
-        // use server forwarding data
-        log.debug("S{} dMessage:\nReHost:{} RePort:{}\nToData:{}\nR{}",
-                SecurityUtils.getLineStart(), this.serverWriter.getServerHost(), this.serverWriter.getServerPort(),
-                new String(data), SecurityUtils.getLineEnd());
+        log.debug("[fw-res] target->hub plain clientId={} msgId={} rawLen={} previewHex={}",
+                clientId, message.getId(), readLen,
+                ForwardingLog.hexPreview(readBytes, 0, readLen, ForwardingLog.DEFAULT_HEX_PREVIEW_BYTES));
         message.setData(SecurityUtils.getSecurity().encrypt(data, 0, data.length));
-        log.debug("S{} eMessage:\nReHost:{} RePort:{}\nToData:{}\nR{}",
-                SecurityUtils.getLineStart(), this.serverWriter.getServerHost(), this.serverWriter.getServerPort(),
-                new String(message.getData()), SecurityUtils.getLineEnd());
         if (!message.check()) throw new RuntimeException("message check error！clientId:" + clientId);
         message.toBytes(this.bufferCaches, 0);
         this.serverWriter.write(clientId, this.bufferCaches, message.getLen());
-//        log.debug("ClientReader.read. write len:{} message: {}", message.getLen(), DataUtils.base64Encode(this.bufferCaches));
+        log.debug("[fw-res] target->hub wire clientId={} msgId={} frameLen={} encPayloadLen={} encHex={}",
+                clientId, message.getId(), message.getLen(), message.getData().length,
+                ForwardingLog.hexPreview(message.getData()));
         return 0;
     }
 
     @Override
     public void error(int clientId, Exception e) {
-        log.error("ClientReader.error. ClientId: {}", clientId, e);
+        log.error("[fw-res] target-read-error clientId={}", clientId, e);
     }
 
     @Override
     public void end(int clientId) {
-        log.debug("ClientReader.end. ClientId: {}", clientId);
+        log.info("[fw-res] target-read-end clientId={}", clientId);
     }
 }

@@ -2,7 +2,7 @@ package org.wlpiaoyi.framework.forwarding.request;
 
 import lombok.extern.slf4j.Slf4j;
 import org.wlpiaoyi.framework.forwarding.utils.socket.ForwardUtils;
-import org.wlpiaoyi.framework.forwarding.utils.socket.Security;
+import org.wlpiaoyi.framework.forwarding.utils.socket.ForwardingLog;
 import org.wlpiaoyi.framework.forwarding.utils.socket.model.RequestMessage;
 import org.wlpiaoyi.framework.utils.MapUtils;
 import org.wlpiaoyi.framework.utils.socket.IReader;
@@ -36,13 +36,12 @@ public class ServerReader implements IReader {
 
     @Override
     public int begin(int clientId, String host, int port) {
-        log.debug("ServerReader.begin. ClientId: {}, Host: {}, Port: {}", clientId, host, port);
+        log.info("[fw-req] peer-open listenPort={} clientId={} peer={}:{}", serverPort, clientId, host, port);
         return 1;
     }
 
     @Override
     public int read(IWriter writer, int clientId, byte[] bytes, int len) {
-//        log.debug("ServerReader.read. ClientId: {}, ReadLen: {}", clientId, readLen);
         this.messageId ++;
         if(this.messageId < 0) this.messageId = 1;
         RequestMessage message = new RequestMessage(this.messageId);
@@ -58,22 +57,22 @@ public class ServerReader implements IReader {
         }else{
             message.setData(null);
         }
-        SocketClient client;
-        {
-            var addrs = ForwardUtils.getResponseServerAddress().split(":");
-            String respHost = addrs[0];
-            int respPort = Integer.parseInt(addrs[1]);
-            client = this.getClient(clientId, respHost, respPort, writer);
-        }
+        var hub = ForwardUtils.getResponseServerAddress().split(":");
+        String respHost = hub[0];
+        int respPort = Integer.parseInt(hub[1]);
+        SocketClient client = this.getClient(clientId, respHost, respPort, writer);
         int bLen = message.toBytes(this.bufferCaches, 0);
         client.getWriter().write(clientId, this.bufferCaches, bLen);
-        log.debug("ServerReader.read. request ClientId: {}, Host: {}, Port: {} ", clientId, message.getHost(), message.getPort());
+        int encLen = message.getData() == null ? 0 : message.getData().length;
+        log.debug("[fw-req] client->hub listenPort={} clientId={} msgId={} plainLen={} encPayloadLen={} target={}:{} hub={}:{} wireFrameLen={} encHex={}",
+                serverPort, clientId, message.getId(), len, encLen, message.getHost(), message.getPort(), respHost, respPort, bLen,
+                encLen > 0 ? ForwardingLog.hexPreview(message.getData()) : "-");
         return 0;
     }
 
     @Override
     public void error(int clientId, Exception e) {
-        log.error("ServerReader.error. ClientId: {}", clientId, e);
+        log.error("[fw-req] peer-error listenPort={} clientId={}", serverPort, clientId, e);
         synchronized (this.clientContentDict){
             this.clientContentDict.forEach((k, v) -> {
                 v.disConnect();
@@ -84,7 +83,7 @@ public class ServerReader implements IReader {
 
     @Override
     public void end(int clientId) {
-        log.debug("ServerReader.end. ClientId: {}", clientId);
+        log.info("[fw-req] peer-close listenPort={} clientId={}", serverPort, clientId);
         synchronized (this.clientContentDict){
             this.clientContentDict.forEach((k, v) -> {
                 v.disConnect();
@@ -96,12 +95,13 @@ public class ServerReader implements IReader {
     public SocketClient getClient(int clientId, String respHost, int respPort, IWriter serverWriter) {
         return this.clientContentDict.computeIfAbsent(clientId + ":" + respHost + ":" + respPort, k -> {
             int timeOut = MapUtils.getInteger(ForwardUtils.getCONFIG_MAP(), "timeOut",60);
-            SocketClient socketClient = new SocketClient(respHost, respPort, clientId, timeOut, ForwardUtils.BUFF_CACHE_SIZE, new ClientReader(serverWriter));
+            SocketClient socketClient = new SocketClient(respHost, respPort, timeOut, clientId, ForwardUtils.BUFF_CACHE_SIZE, new ClientReader(serverWriter));
             try {
                 socketClient.connect();
                 socketClient.asyncRun(null);
+                log.info("[fw-req] hub-channel-open clientId={} hub={}:{}", clientId, respHost, respPort);
             } catch (IOException e) {
-                log.error("ServerReader.getClient. ClientId: {} connect fail", clientId, e);
+                log.error("[fw-req] hub-connect-fail clientId={} hub={}:{}", clientId, respHost, respPort, e);
             }
             return socketClient;
         });
