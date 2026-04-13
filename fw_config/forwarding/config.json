@@ -1,14 +1,10 @@
 {
-  "host1": "182.150.116.84:30010",
-  "host": "127.0.0.1:8080",
+  "host": "182.150.116.84:30010",
+  "logEnabled": true,
   "timeOut": 3600,
   "privateKey": "fw_config/forwarding/key.pri",
   "publicKey": "fw_config/forwarding/key.pub",
   "dict": {
-    "28789":{
-      "name":"OpenClawWeb",
-      "host": "10.28.136.162:18789"
-    },
     "22722":{
       "name":"物理主机227-22",
       "host": "10.28.136.227:22"

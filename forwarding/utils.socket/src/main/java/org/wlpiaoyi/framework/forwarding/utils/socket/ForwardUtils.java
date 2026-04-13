@@ -29,6 +29,7 @@ public class ForwardUtils {
 
     public static void loadMap() throws IOException {
         CONFIG_MAP = Collections.unmodifiableMap(Objects.requireNonNull(ReaderUtils.loadMap(CONFIG_PATH, StandardCharsets.UTF_8)));
+        ForwardingLogging.applyFromConfig();
     }
 
     public static String getResponseServerAddress() {
