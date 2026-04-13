@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration>
+    <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder>
+            <pattern>%d{HH:mm:ss.SSS} [%thread] %-5level %logger{36} -- %msg%n</pattern>
+        </encoder>
+    </appender>
+
+    <!-- 隧道排查：默认 DEBUG；要更安静改 INFO -->
+    <logger name="org.wlpiaoyi.framework.forwarding" level="DEBUG"/>
+    <logger name="org.wlpiaoyi.framework.utils.socket" level="DEBUG"/>
+    <!-- 更细：BufferCaches 半包可把下面改成 TRACE -->
+    <!-- <logger name="org.wlpiaoyi.framework.forwarding.utils.socket.model.BufferCaches" level="TRACE"/> -->
+
+    <root level="INFO">
+        <appender-ref ref="STDOUT"/>
+    </root>
+</configuration>

@@ -113,12 +113,7 @@ public class SocketClient{
             int readLen;
             byte[] readBytes = new byte[this.bufferSize];
             final InputStream in = socket.getInputStream();
-            if(reader.begin(clientId, socket.getInetAddress().getHostAddress(), socket.getPort()) == -1){
-                log.warn("SocketServer.start. Reader begin failed for client: {}", clientId);
-                this.disConnect();
-                return 0;
-            }
-            if(this.reader.read(this.writer, this.clientId, readBytes, 0) == -1) return 0;
+            // begin() 已在 connect() 中调用；勿再 read(...,0)，否则会多打一帧「空明文」响应到 Hub（易与排障日志混淆）
             while (true){
 //                if(!Thread.currentThread().isInterrupted()){
 //                    log.warn("SocketClient.run. Error occurred while reading from server {}:{} clientId:{}", socket.getInetAddress(), socket.getPort(), this.clientId);
@@ -144,7 +139,6 @@ public class SocketClient{
         }finally {
             reader.end(this.clientId);
             this.disConnect();
-            this.reader.end(this.clientId);
             if(onFinishCallback != null){
                 onFinishCallback.run();
             }
