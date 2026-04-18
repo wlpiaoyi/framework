@@ -1,8 +1,6 @@
 package org.wlpiaoyi.framework.forwarding.utils.socket;
 
-import lombok.Getter;
 import lombok.SneakyThrows;
-import lombok.Value;
 import lombok.extern.slf4j.Slf4j;
 import org.wlpiaoyi.framework.utils.MapUtils;
 import org.wlpiaoyi.framework.utils.StringUtils;
@@ -16,92 +14,127 @@ import javax.crypto.IllegalBlockSizeException;
 import java.io.IOException;
 
 /**
- * <p><b>{@code @author:}</b>wlpiaoyi</p>
- * <p><b>{@code @description:}</b></p>
- * <p><b>{@code @date:}</b>2026-02-19 17:46:57</p>
- * <p><b>{@code @version:}:</b>1.0</p>
+ * RSA + AES 混合加密实现类。
+ * <p>
+ * 加密流程（每次加密独立）：
+ * <ol>
+ *   <li>生成随机 AES 密钥（32 字节，取 UUID 的 hex）。</li>
+ *   <li>用 RSA 加密 AES 密钥（512bit RSA 输出固定 64 字节）。</li>
+ *   <li>用 AES 加密实际业务数据。</li>
+ *   <li>最终输出格式：{@code [64-byte RSA加密后的AESKey] + [AES加密后的数据]}。</li>
+ * </ol>
+ * </p>
+ * <p>
+ * 解密流程为上述逆过程：先拆分前 64 字节用 RSA 解密得到 AES 密钥，再用 AES 解密后续数据。
+ * </p>
+ * <p>
+ * {@code type} 参数决定使用哪一侧密钥：
+ * <ul>
+ *   <li>{@code type=0}：使用<b>私钥</b>（response 侧）。</li>
+ *   <li>{@code type=1}：使用<b>公钥</b>（request 侧）。</li>
+ * </ul>
+ * </p>
  */
 @Slf4j
 public class Security {
 
+    /** RSA 加密器 */
     private final RsaCipher rasE;
+    /** RSA 解密器 */
     private final RsaCipher rasD;
-    
+
     /**
-     * <p><b>{@code @description:}</b>
-     * <div style='padding: 5px; margin-left: 5px; margin-bottom: 5px;'>
-     * TODO
-     * </div>
-     * </p>
+     * 构造 Security 实例。
      *
-     * <p><b>{@code @param}</b> <b>key</b>
-     * {@link String}
-     * </p>
-     *
-     * <p><b>{@code @param}</b> <b>type</b>
-     * {@link int}
-     * 0: key is private key
-     * 1: key is public key
-     * </p>
-     *
-     * <p><b>{@code @date:}</b>2026/2/19 17:55</p>
-     * <p><b>{@code @return:}</b>{@link }</p>
-     * <p><b>{@code @author:}</b>wlpiaoyi</p>
-     * <hr/>
+     * @param type 密钥类型：0 表示使用私钥；1 表示使用公钥
      */
     @SneakyThrows
     public Security(int type) {
-        if(ForwardUtils.getCONFIG_MAP() == null){
+        // 若配置尚未加载，主动加载一次
+        if (ForwardUtils.getCONFIG_MAP() == null) {
             try {
                 ForwardUtils.loadMap();
             } catch (IOException e) {
                 throw new RuntimeException(e);
             }
         }
-        if(type == 0){
-            String key = ReaderUtils.loadString(MapUtils.getString(ForwardUtils.getCONFIG_MAP(), "privateKey"),  null);
+        if (type == 0) {
+            // 私钥侧：rasE 用私钥加密，rasD 用私钥解密
+            String key = ReaderUtils.loadString(MapUtils.getString(ForwardUtils.getCONFIG_MAP(), "privateKey"), null);
             this.rasE = RsaCipher.build(0, 512).setPrivateKey(key).loadConfig();
             this.rasD = RsaCipher.build(1, 512).setPrivateKey(key).loadConfig();
-        }else{
-            String key = ReaderUtils.loadString(MapUtils.getString(ForwardUtils.getCONFIG_MAP(), "publicKey"),  null);
+        } else {
+            // 公钥侧：rasD 用公钥解密，rasE 用公钥加密
+            String key = ReaderUtils.loadString(MapUtils.getString(ForwardUtils.getCONFIG_MAP(), "publicKey"), null);
             this.rasD = RsaCipher.build(0, 512).setPublicKey(key).loadConfig();
             this.rasE = RsaCipher.build(1, 512).setPublicKey(key).loadConfig();
         }
     }
 
-    private byte[] rsaEncrypt(byte[] bytes){
+    /** 使用 rasE 对字节数组进行 RSA 加密 */
+    private byte[] rsaEncrypt(byte[] bytes) {
         return this.rasE.encrypt(bytes);
     }
 
-    private byte[] rsaDecrypt(byte[] bytes){
+    /** 使用 rasD 对字节数组进行 RSA 解密 */
+    private byte[] rsaDecrypt(byte[] bytes) {
         return this.rasD.decrypt(bytes);
     }
 
+    /**
+     * 对数据进行 RSA+AES 混合加密。
+     *
+     * @param bytes  原始数据
+     * @param offset 数据起始偏移
+     * @param len    数据长度
+     * @return 加密后的字节数组（前 64 字节为 RSA 加密后的 AES 密钥，后续为 AES 密文）
+     */
     @SneakyThrows
-    public byte[] encrypt(byte[] bytes, int offset, int len){
+    public byte[] encrypt(byte[] bytes, int offset, int len) {
+        // 生成随机 AES 密钥（16 字节 hex → 32 字符 → 16 字节原始值）
         byte[] aesKey = ValueUtils.hexToBytes(StringUtils.getUUID32());
+        // 用 RSA 加密 AES 密钥
         byte[] eKey = this.rsaEncrypt(aesKey);
+        // 用 AES 加密业务数据
         AesCipher aes = AesCipher.build().setKey(ValueUtils.bytesToHex(aesKey)).loadConfig();
         byte[] eData = aes.encrypt(bytes, offset, len);
+        // 拼接：RSA密钥(64B) + AES密文
         byte[] res = new byte[eKey.length + eData.length];
         System.arraycopy(eKey, 0, res, 0, eKey.length);
         System.arraycopy(eData, 0, res, eKey.length, eData.length);
         return res;
     }
 
+    /**
+     * 对数据进行 RSA+AES 混合解密。
+     *
+     * @param bytes  加密后的字节数组（前 64 字节为 RSA 加密后的 AES 密钥）
+     * @param offset 数据起始偏移
+     * @param len    数据总长度
+     * @return 解密后的原始字节数组
+     */
     @SneakyThrows
-    public byte[] decrypt(byte[] bytes, int offset, int len){
+    public byte[] decrypt(byte[] bytes, int offset, int len) {
+        // 拆分前 64 字节为 RSA 加密的 AES 密钥
         byte[] eKey = new byte[64];
         System.arraycopy(bytes, offset, eKey, 0, eKey.length);
+        // 剩余部分为 AES 密文
         byte[] eData = new byte[len - eKey.length];
         System.arraycopy(bytes, offset + eKey.length, eData, 0, eData.length);
+        // RSA 解密得到 AES 密钥
         String key = ValueUtils.bytesToHex(this.rsaDecrypt(eKey));
+        // AES 解密得到原始数据
         AesCipher aes = AesCipher.build().setKey(key).loadConfig();
         return aes.decrypt(eData);
     }
 
-
-    public static void keyGenerator(){
+    /**
+     * 生成 512-bit RSA 密钥对并打印到日志。
+     * <p>
+     * 供命令行手动生成公私钥使用，生成后需写入 config.json 的 {@code privateKey} 和 {@code publicKey} 字段。
+     * </p>
+     */
+    public static void keyGenerator() {
         var rsa = RsaCipher.build(0, 512).loadRandomKey();
         log.info("private key: \n{}", rsa.getPrivateKey());
         log.info("public key: \n{}", rsa.getPublicKey());

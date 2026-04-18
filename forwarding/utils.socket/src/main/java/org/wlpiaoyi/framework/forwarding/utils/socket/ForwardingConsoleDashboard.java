@@ -10,22 +10,28 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicReference;
 
 /**
- * {@code logEnabled:false} 且运行于 request 侧时，在控制台周期性刷新固定列表格（不依赖 Logback 追加器）。
+ * 静默模式（{@code logEnabled=false}）下，request 侧控制台的实时监控面板。
+ * <p>
+ * 以 ASCII 表格形式每秒刷新各监听端口的状态、连接数、上下行速率，不依赖 Logback 追加器。
+ * </p>
  * <p>
  * 列宽按「终端显示宽度」计算（CJK 等宽字符计为 2），避免 Windows 控制台中英混排错位。
- * <p>
- * 默认使用 {@code ESC[2J ESC[H} 清屏重绘，向上滚动仍可能看到历史帧。若终端支持 VT（如 Windows Terminal、新版 conhost），可加上 JVM 参数
- * {@code -Dforwarding.console.vt=true}：进入备用屏幕缓冲区并仅在当前屏内重绘（{@code ESC[H} + {@code ESC[0J}），退出时恢复主屏与光标。
+ * 默认使用 {@code ESC[2J ESC[H} 清屏重绘；若终端支持 VT（如 Windows Terminal），可加上 JVM 参数
+ * {@code -Dforwarding.console.vt=true} 进入备用屏幕缓冲区，避免污染主屏历史。
+ * </p>
  */
 public final class ForwardingConsoleDashboard {
 
+    /** 控制是否使用 VT 备用屏幕缓冲区的系统属性名 */
     private static final String PROP_VT = "forwarding.console.vt";
 
+    /** 定时任务调度器 */
     private static final AtomicReference<ScheduledExecutorService> SCHED = new AtomicReference<>();
 
     /** 已执行 {@code ESC[?1049h} 进入备用屏时为 true */
     private static final AtomicBoolean VT_ALT_ACTIVE = new AtomicBoolean(false);
 
+    /** 是否已注册 JVM shutdown hook 恢复 VT 屏幕 */
     private static final AtomicBoolean VT_SHUTDOWN_HOOK = new AtomicBoolean(false);
 
     /** 各列内容区显示宽度（不含边框竖线） */
@@ -37,8 +43,16 @@ public final class ForwardingConsoleDashboard {
     private static final int W_DOWN = 14;
 
     private ForwardingConsoleDashboard() {
+        // 工具类禁止实例化
     }
 
+    /**
+     * 启动控制台监控面板。
+     * <p>
+     * 若当前为日志模式（{@code logEnabled=true}）则直接返回。
+     * 以守护线程方式每秒调度 {@link #renderOnce()}。
+     * </p>
+     */
     public static synchronized void start() {
         if (ForwardUtils.isLogEnabled()) {
             return;
@@ -55,6 +69,9 @@ public final class ForwardingConsoleDashboard {
         ex.scheduleAtFixedRate(ForwardingConsoleDashboard::renderOnce, 0, 1, TimeUnit.SECONDS);
     }
 
+    /**
+     * 停止控制台监控面板，若处于 VT 备用屏则恢复主屏。
+     */
     public static synchronized void stop() {
         ScheduledExecutorService ex = SCHED.getAndSet(null);
         if (ex != null) {
@@ -63,10 +80,12 @@ public final class ForwardingConsoleDashboard {
         leaveVtAlternateScreenIfActive();
     }
 
+    /** 判断是否启用 VT 备用屏 */
     private static boolean vtConsoleEnabled() {
         return Boolean.parseBoolean(System.getProperty(PROP_VT, "false"));
     }
 
+    /** 进入 VT 备用屏幕缓冲区（仅执行一次） */
     private static void enterVtAlternateScreenOnce() {
         if (!vtConsoleEnabled()) {
             return;
@@ -78,6 +97,7 @@ public final class ForwardingConsoleDashboard {
         }
     }
 
+    /** 离开 VT 备用屏幕缓冲区（若当前处于备用屏） */
     private static void leaveVtAlternateScreenIfActive() {
         if (VT_ALT_ACTIVE.compareAndSet(true, false)) {
             System.out.print("\033[?25h\033[?1049l");
@@ -85,6 +105,7 @@ public final class ForwardingConsoleDashboard {
         }
     }
 
+    /** 注册 shutdown hook 确保 JVM 退出时恢复 VT 主屏 */
     private static void installVtShutdownHookOnce() {
         if (VT_SHUTDOWN_HOOK.compareAndSet(false, true)) {
             Runtime.getRuntime().addShutdownHook(new Thread(() -> {
@@ -97,6 +118,7 @@ public final class ForwardingConsoleDashboard {
         }
     }
 
+    /** 单次渲染：计算速率 → 取快照 → 绘制表格 → 输出到控制台 */
     private static void renderOnce() {
         try {
             ForwardingPortStats.tickRates();
@@ -130,6 +152,8 @@ public final class ForwardingConsoleDashboard {
             // 静默模式避免抛到未捕获处理器刷屏
         }
     }
+
+    // --- 表格边框绘制 ---
 
     private static void appendTableTop(StringBuilder sb) {
         sb.append('┌')
@@ -186,6 +210,7 @@ public final class ForwardingConsoleDashboard {
                 .append('│').append('\n');
     }
 
+    /** 将 ListenState 枚举转为中文标签 */
     private static String stateLabel(ForwardingPortStats.ListenState s) {
         return switch (s) {
             case RUNNING -> "运行中";
@@ -194,6 +219,7 @@ public final class ForwardingConsoleDashboard {
         };
     }
 
+    /** 将速率（字节/秒）格式化为人类可读字符串 */
     private static String formatRate(double bps) {
         if (bps < 0) {
             bps = 0;
@@ -207,7 +233,7 @@ public final class ForwardingConsoleDashboard {
         return String.format(Locale.ROOT, "%.2f MB/s", bps / (1024.0 * 1024.0));
     }
 
-    // --- 显示宽度（与常见 East Asian 终端一致：宽字符宽度 2）---
+    // --- 显示宽度计算（与常见 East Asian 终端一致：宽字符宽度 2） ---
 
     private static int displayWidth(String s) {
         if (s == null || s.isEmpty()) {
@@ -255,6 +281,7 @@ public final class ForwardingConsoleDashboard {
         return 1;
     }
 
+    /** 右补空格到目标显示宽度 */
     private static String padRightDisplay(String s, int targetDw) {
         if (s == null) {
             s = "";
@@ -286,6 +313,7 @@ public final class ForwardingConsoleDashboard {
         return out.toString();
     }
 
+    /** 重复字符 n 次 */
     private static String repeat(char c, int n) {
         if (n <= 0) {
             return "";

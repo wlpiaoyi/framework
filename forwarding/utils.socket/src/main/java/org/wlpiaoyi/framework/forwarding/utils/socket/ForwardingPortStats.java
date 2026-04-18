@@ -11,10 +11,15 @@ import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.LongAdder;
 
 /**
- * request 侧各转发监听端口的连接数与累计流量（用于静默模式控制台表格）。
+ * request 侧各转发监听端口的连接数与流量统计（用于静默模式控制台表格）。
+ * <p>
+ * 仅在 {@code logEnabled=false} 时生效，为 {@link ForwardingConsoleDashboard} 提供数据源。
+ * 使用 {@link ConcurrentHashMap} + {@link AtomicInteger} + {@link LongAdder} 保证高并发线程安全。
+ * </p>
  */
 public final class ForwardingPortStats {
 
+    /** 监听端口状态枚举 */
     public enum ListenState {
         /** 尚未绑定或线程未跑到 bind */
         PENDING,
@@ -24,19 +29,25 @@ public final class ForwardingPortStats {
         STOPPED
     }
 
+    /** 单条端口统计记录 */
     public static final class Row {
         public final int port;
         public volatile String name;
+        /** 当前活跃连接数 */
         public final AtomicInteger connections = new AtomicInteger();
+        /** 累计上行字节（request → response） */
         public final LongAdder bytesUp = new LongAdder();
+        /** 累计下行字节（response → request） */
         public final LongAdder bytesDown = new LongAdder();
         public volatile ListenState listenState = ListenState.PENDING;
 
+        // 内部快照字段，用于计算速率
         volatile long snapUp;
         volatile long snapDown;
         volatile long snapTimeNanos;
-        /** 字节/秒，由静默模式控制台定时任务每秒更新 */
+        /** 上行速率（字节/秒），由静默模式控制台定时任务每秒更新 */
         public volatile double upRateBps;
+        /** 下行速率（字节/秒），由静默模式控制台定时任务每秒更新 */
         public volatile double downRateBps;
 
         Row(int port, String name) {
@@ -45,11 +56,19 @@ public final class ForwardingPortStats {
         }
     }
 
+    /** 按端口索引的统计表 */
     private static final ConcurrentHashMap<Integer, Row> BY_PORT = new ConcurrentHashMap<>();
 
     private ForwardingPortStats() {
+        // 工具类禁止实例化
     }
 
+    /**
+     * 从配置字典 {@code dict} 初始化端口统计行。
+     * <p>
+     * 读取每个端口的 {@code name} 字段作为展示名称。
+     * </p>
+     */
     @SuppressWarnings("rawtypes")
     public static void initFromDict() {
         Map dict = ForwardUtils.getDict();
@@ -70,6 +89,7 @@ public final class ForwardingPortStats {
         }
     }
 
+    /** 标记指定端口监听已启动 */
     public static void markListenRunning(int port) {
         if (!ForwardUtils.isLogEnabled()) {
             Row r = BY_PORT.get(port);
@@ -79,6 +99,7 @@ public final class ForwardingPortStats {
         }
     }
 
+    /** 标记指定端口监听已停止 */
     public static void markListenStopped(int port) {
         if (!ForwardUtils.isLogEnabled()) {
             Row r = BY_PORT.get(port);
@@ -88,6 +109,7 @@ public final class ForwardingPortStats {
         }
     }
 
+    /** 指定端口新增一个连接 */
     public static void onConnectionOpen(int port) {
         if (!ForwardUtils.isLogEnabled()) {
             Row r = BY_PORT.get(port);
@@ -97,6 +119,7 @@ public final class ForwardingPortStats {
         }
     }
 
+    /** 指定端口减少一个连接（不会减到负数） */
     public static void onConnectionClose(int port) {
         if (!ForwardUtils.isLogEnabled()) {
             Row r = BY_PORT.get(port);
@@ -106,6 +129,7 @@ public final class ForwardingPortStats {
         }
     }
 
+    /** 为指定端口增加上行字节统计 */
     public static void addBytesUp(int port, int len) {
         if (len <= 0 || ForwardUtils.isLogEnabled()) {
             return;
@@ -116,6 +140,7 @@ public final class ForwardingPortStats {
         }
     }
 
+    /** 为指定端口增加下行字节统计 */
     public static void addBytesDown(int port, int len) {
         if (len <= 0 || ForwardUtils.isLogEnabled()) {
             return;
@@ -126,13 +151,19 @@ public final class ForwardingPortStats {
         }
     }
 
-    /** 按端口排序的快照，供表格渲染。 */
+    /** 按端口排序的快照，供表格渲染 */
     public static List<Row> snapshotRowsSorted() {
         List<Row> list = new ArrayList<>(BY_PORT.values());
         list.sort(Comparator.comparingInt(r -> r.port));
         return list;
     }
 
+    /**
+     * 计算各端口上下行速率（字节/秒）。
+     * <p>
+     * 由 {@link ForwardingConsoleDashboard} 每秒调用一次，基于前后两次快照的差值计算。
+     * </p>
+     */
     static void tickRates() {
         long now = System.nanoTime();
         for (Row r : BY_PORT.values()) {

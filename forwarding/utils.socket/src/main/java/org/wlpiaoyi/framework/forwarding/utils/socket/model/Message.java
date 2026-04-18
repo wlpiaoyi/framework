@@ -9,15 +9,19 @@ import java.io.Serializable;
 import java.util.Random;
 
 /**
- * <p><b>{@code @author:}</b>         wlpiaoyi</p>
- * <p><b>{@code @description:}</b>
- * <div style='border-radius: 12px; padding: 5px; margin-left: 5px; margin-bottom: 5px;'>
- * TODO
- * </div>
+ * 转发框架自定义二进制消息协议的基类。
+ * <p>
+ * 消息头固定格式（共 10 字节）：
+ * <pre>
+ * | 字段 | 长度 | 说明                |
+ * |------|------|---------------------|
+ * | len  | 4 B  | 消息总长度（大端序）|
+ * | id   | 4 B  | 消息唯一标识        |
+ * | key  | 1 B  | 校验键（id % seed） |
+ * | type | 1 B  | 消息类型            |
+ * </pre>
+ * 子类 {@link RequestMessage}（type=2）和 {@link ResponseMessage}（type=1）在此基础上扩展消息体。
  * </p>
- * <p><b>{@code @date:}</b>           2026/2/17 14:50</p>
- * <p><b>{@code @version:}</b>       1.0</p>
- * <hr/>
  */
 @EqualsAndHashCode
 class Message implements Serializable {
@@ -42,7 +46,7 @@ class Message implements Serializable {
     @Getter
     private byte key;
 
-    /** 消息类型（业务自定义） */
+    /** 消息类型（业务自定义：1=ResponseMessage, 2=RequestMessage） */
     @Getter
     private byte type;
 
@@ -72,13 +76,12 @@ class Message implements Serializable {
         this.key = (byte) (this.id % SEEDS[random.nextInt(SEEDS.length)]);
     }
 
-
     /**
-     * 将 len 字段写入字节数组（2 字节，大端序）。
+     * 将 len 字段写入字节数组（4 字节，大端序）。
      *
      * @param bytes  目标字节数组
      * @param offset 起始偏移量
-     * @return 写入的字节数（始终为 2）
+     * @return 写入的字节数（始终为 4）
      */
     private int writeLen(byte[] bytes, int offset) {
         ValueUtils.longToBytes(this.len, bytes, offset, 4);
@@ -86,11 +89,11 @@ class Message implements Serializable {
     }
 
     /**
-     * 从字节数组读取 len 字段（2 字节，大端序）。
+     * 从字节数组读取 len 字段（4 字节，大端序）。
      *
      * @param bytes  源字节数组
      * @param offset 起始偏移量
-     * @return 读取的字节数（始终为 2）
+     * @return 读取的字节数（始终为 4）
      */
     private int readLen(byte[] bytes, int offset) {
         this.len = (short) ValueUtils.byteToLong(bytes, offset, 4);
@@ -121,8 +124,6 @@ class Message implements Serializable {
         return 4;
     }
 
-
-
     /**
      * 将当前消息对象序列化为字节数组。
      * <p>
@@ -130,8 +131,9 @@ class Message implements Serializable {
      * 如果提供的字节数组容量不足，会抛出 ArrayIndexOutOfBoundsException。
      * </p>
      *
-     * @param bytes  目标字节数组（需保证长度足够）
-     * @param offset 起始写入偏移量（若为负数则视为 0）
+     * @param bytes   目标字节数组（需保证长度足够）
+     * @param offset  起始写入偏移量（若为负数则视为 0）
+     * @param bodyLen 消息体长度（不含固定头）
      * @return 实际写入的字节数（即消息总长度）
      */
     public int toBytes(byte[] bytes, int offset, int bodyLen) {
@@ -146,13 +148,12 @@ class Message implements Serializable {
         this.len = (short) totalLen;  // 如果 totalLen > 65535，会溢出，但实际场景通常不会
 
         // 写入各字段
-        offset += writeLen(bytes, offset);      // len (2)
+        offset += writeLen(bytes, offset);      // len (4)
         offset += writeId(bytes, offset);       // id (4)
         bytes[offset++] = this.key;             // key (1)
         bytes[offset++] = this.type;            // type (1)
         return offset - start;  // 返回总写入字节数
     }
-
 
     /**
      * 从字节数组中解析并填充当前消息对象。
@@ -169,12 +170,10 @@ class Message implements Serializable {
         if (offset < 0) offset = 0;
         int start = offset;
 
-        offset += readLen(bytes, offset);        // len (2)
+        offset += readLen(bytes, offset);        // len (4)
         offset += readId(bytes, offset);         // id (4)
         this.key = bytes[offset++];               // key (1)
         this.type = bytes[offset++];              // type (1)
         return offset - start;  // 返回实际读取的总字节数
     }
-
-
 }

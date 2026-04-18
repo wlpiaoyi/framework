@@ -304,6 +304,9 @@ class ValueParseUtils extends ValueBlankUtils{
     }
     public static long byteToLong(byte @NotNull [] bytes, int off, int len){
         int pow = off + len;
+        if (pow > bytes.length) {
+            throw new BusinessException("byte array out of range");
+        }
         long res = 0;
         int ci = 0;
         for (int i = pow - 1; i >= off; i --){

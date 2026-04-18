@@ -6,29 +6,40 @@ import org.wlpiaoyi.framework.utils.ValueUtils;
 
 import java.io.Serial;
 import java.nio.charset.StandardCharsets;
-import java.util.Random;
 
 /**
- * <p><b>{@code @author:}</b>wlpiaoyi</p>
- * <p><b>{@code @description:}</b></p>
- * <p><b>{@code @date:}</b>2026-02-17 14:43:25</p>
- * <p><b>{@code @version:}:</b>1.0</p>
+ * 请求消息实体（request → response）。
+ * <p>
+ * 在 {@link Message} 固定头（10 字节）基础上扩展以下字段：
+ * <pre>
+ * | 字段    | 长度 | 说明                  |
+ * |---------|------|-----------------------|
+ * | hostLen | 2 B  | 目标主机字符串长度    |
+ * | host    | N B  | 目标主机（UTF-8）     |
+ * | port    | 4 B  | 目标端口（大端序）    |
+ * | dataLen | 2 B  | 加密数据长度          |
+ * | data    | N B  | RSA+AES 加密后的数据  |
+ * </pre>
+ * </p>
  */
-public class RequestMessage extends Message implements java.io.Serializable{
+public class RequestMessage extends Message implements java.io.Serializable {
 
     @Serial
     private static final long serialVersionUID = 1L;
 
     /** 目标主机名或 IP */
-    @Getter @Setter
+    @Getter
+    @Setter
     private String host;
 
     /** 目标端口号 */
-    @Getter @Setter
+    @Getter
+    @Setter
     private int port;
 
-    /** 数据 */
-    @Getter @Setter
+    /** 加密后的业务数据 */
+    @Getter
+    @Setter
     private byte[] data;
 
     public RequestMessage(int id) {
@@ -98,8 +109,17 @@ public class RequestMessage extends Message implements java.io.Serializable{
     /**
      * 将当前消息对象序列化为字节数组。
      * <p>
-     * 此方法会自动计算消息总长度并填充 len 字段，然后按固定格式写入所有字段。
-     * 如果提供的字节数组容量不足，会抛出 ArrayIndexOutOfBoundsException。
+     * 完整格式：{@code [Message头(10B)] + [hostLen(2B) + host] + [port(4B)] + [dataLen(2B) + data]}
+     * </p>
+     *
+     * @param bytes  目标字节数组（需保证长度足够）
+     * @param offset 起始写入偏移量（若为负数则视为 0）
+     * @return 实际写入的字节数（即消息总长度）
+     */
+    /**
+     * 将当前消息对象序列化为字节数组。
+     * <p>
+     * 完整格式：{@code [Message头(10B)] + [hostLen(2B) + host] + [port(4B)] + [dataLen(2B) + data]}
      * </p>
      *
      * @param bytes  目标字节数组（需保证长度足够）
@@ -121,18 +141,21 @@ public class RequestMessage extends Message implements java.io.Serializable{
             throw new IllegalArgumentException("Data length exceeds 65535 bytes");
         }
 
-        // 计算消息总长度并设置 len
-        int totalLen =  2 + hostLen  // host 长度 + host 数据
+        // 计算消息体长度（不含 Message 固定头）
+        int totalLen = 2 + hostLen  // host 长度 + host 数据
                 + 4;       // port
-        if(bodyLen > 0) totalLen += (2 + bodyLen);
+        if (bodyLen > 0) totalLen += (2 + bodyLen);
         offset += super.toBytes(bytes, offset, totalLen);
+
         // 写入 host 长度和内容
         ValueUtils.longToBytes(hostLen, bytes, offset, 2);
         offset += 2;
         System.arraycopy(hostBytes, 0, bytes, offset, hostLen);
         offset += hostLen;
+
         offset += writePort(bytes, offset);     // port (4)
-        if (bodyLen > 0){
+
+        if (bodyLen > 0) {
             // 写入 data 长度和内容
             ValueUtils.longToBytes(bodyLen, bytes, offset, 2);
             offset += 2;
@@ -144,22 +167,18 @@ public class RequestMessage extends Message implements java.io.Serializable{
 
     /**
      * 从字节数组中解析并填充当前消息对象。
-     * <p>
-     * 此方法按照固定格式依次读取各字段，不依赖 len 字段进行数据校验（len 会被读取，但仅用于记录）。
-     * 如果提供的字节数组数据不足，会抛出 ArrayIndexOutOfBoundsException。
-     * </p>
      *
-     * @param bytes  源字节数组
-     * @param off 起始读取偏移量（若为负数则视为 0）
+     * @param bytes 源字节数组
+     * @param off   起始读取偏移量（若为负数则视为 0）
      * @return 实际读取的字节数（即消息总长度）
      */
+    @Override
     public int formatBytes(byte[] bytes, int off) {
         if (off < 0) off = 0;
         int start = off;
         off += super.formatBytes(bytes, off);
 
         // 读取 host 长度和内容
-//        int hostLen = ((bytes[off] & 0xFF) << 8) | (bytes[off + 1] & 0xFF);
         int hostLen = (int) ValueUtils.byteToLong(bytes, off, 2);
         off += 2;
         this.host = new String(bytes, off, hostLen, StandardCharsets.UTF_8);
@@ -168,14 +187,13 @@ public class RequestMessage extends Message implements java.io.Serializable{
         off += readPort(bytes, off);        // port (4)
 
         // 读取 data 长度和内容
-//        int dataLen = ((bytes[off] & 0xFF) << 8) | (bytes[off + 1] & 0xFF);
         this.setData(null);
         if (bytes.length <= off) return off - start;
         int dataLen = (int) ValueUtils.byteToLong(bytes, off, 2);
-        if(dataLen == 0) return off - start;
+        if (dataLen == 0) return off - start;
         off += 2;
         this.data = new byte[dataLen];
-        for (int i = 0; i < dataLen; i++){
+        for (int i = 0; i < dataLen; i++) {
             this.data[i] = bytes[off++];
         }
         return off - start;  // 返回实际读取的总字节数

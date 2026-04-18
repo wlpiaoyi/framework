@@ -4,12 +4,17 @@ import lombok.Getter;
 import org.wlpiaoyi.framework.forwarding.utils.socket.Security;
 
 /**
- * <p><b>{@code @author:}</b>wlpiaoyi</p>
- * <p><b>{@code @description:}</b></p>
- * <p><b>{@code @date:}</b>2026-02-19 19:28:02</p>
- * <p><b>{@code @version:}:</b>1.0</p>
+ * request 侧加密工具单例持有者。
+ * <p>
+ * 使用 {@code new Security(1)} 初始化，type=1 表示使用<b>公钥</b>进行 RSA 加解密。
+ * 与 response 侧的 {@code new Security(0)}（私钥侧）配对，构成完整的 RSA+AES 混合加密链路。
+ * </p>
+ *
+ * @see Security
  */
 public class SecurityUtils {
+
+    /** 单例 Security 实例，全局复用以避免重复初始化密钥 */
     @Getter
     private static final Security security = new Security(1);
 }
