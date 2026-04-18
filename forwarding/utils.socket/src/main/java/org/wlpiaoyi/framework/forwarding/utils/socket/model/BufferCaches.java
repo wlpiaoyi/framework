@@ -6,6 +6,8 @@ import org.wlpiaoyi.framework.forwarding.utils.socket.ForwardUtils;
 import org.wlpiaoyi.framework.forwarding.utils.socket.ForwardingLog;
 import org.wlpiaoyi.framework.utils.ValueUtils;
 
+import java.util.Arrays;
+
 /**
  * TCP 粘包/拆包缓冲器。
  * <p>
@@ -47,7 +49,7 @@ public class BufferCaches {
      * @param bytes 外部读取到的字节数组
      * @param off   本次处理的起始偏移（必须在 [0, len) 范围内）
      * @param len   外部数组本次读取的总长度
-     * @return 下一帧在输入数组中的起始偏移；若当前帧不完整返回 -1；若刚好读完返回 0
+     * @return 下一帧在输入数组中的起始偏移；若当前数据还未读完需要继续read 返回-1；刚好读完 返回0; 否则当前数据流offset下一帧数据
      */
     public synchronized int loadIfNeed(byte[] bytes, int off, int len) {
         if (len <= 0) return -1;
@@ -55,25 +57,39 @@ public class BufferCaches {
             throw new RuntimeException("BufferCaches.loadIfNeed.off < 0 || off >= len");
         }
         // 新帧开始：解析 4 字节长度头
-        if (this.bufferOff == -1 || this.bufferLen == -1) {
+        if (this.bufferOff == -1 && this.bufferLen == -1) {
+            this.bufferOff = 0;
             int chunkAvail = len - off;
-            if (chunkAvail < 4) {
+            if (chunkAvail < 10) {
                 log.warn("[fw-frame] header-split-risk chunkAvail={}B (need 4 for wire length) off={} totalReadCall={} hex={} — TCP 拆包时此处会误解析长度，表现为卡死或巨帧",
                         chunkAvail, off, len, ForwardingLog.hexPreview(bytes, off, chunkAvail, 16));
-            }
-            this.bufferOff = 0;
-            this.bufferLen = (int) ValueUtils.byteToLong(bytes, off, 4);
-            if (log.isDebugEnabled()) {
-                log.debug("[fw-frame] new-frame declaredWireTotal={} maxBuffer={}B chunkAvail={} first4hex={}",
-                        this.bufferLen, ForwardUtils.MAX_CACHE_SIZE, chunkAvail,
-                        chunkAvail >= 4 ? ForwardingLog.hexPreview(bytes, off, 4, 4) : ForwardingLog.hexPreview(bytes, off, chunkAvail, chunkAvail));
-            }
-            if (this.bufferLen > ForwardUtils.MAX_CACHE_SIZE)
-                throw new RuntimeException("BufferCaches.loadIfNeed.bufferLen > MAX_CACHE_SIZE");
-            if (log.isTraceEnabled()) {
-                log.trace("[fw-frame] assemble start declaredTotal={}B", this.bufferLen);
+                for (int i = off; i < len; i++) {
+                    this.buffers[this.bufferOff++] = bytes[i];
+                }
+                return -1;
+            }else{
+                this.bufferLen = (int) ValueUtils.byteToLong(bytes, off, 4);
+                if (log.isDebugEnabled()) {
+                    log.debug("[fw-frame] new-frame declaredWireTotal={} maxBuffer={}B chunkAvail={} first4hex={}",
+                            this.bufferLen, ForwardUtils.MAX_CACHE_SIZE, chunkAvail,
+                            chunkAvail >= 10 ? ForwardingLog.hexPreview(bytes, off, 10, 10) : ForwardingLog.hexPreview(bytes, off, chunkAvail, chunkAvail));
+                }
+                if (this.bufferLen > ForwardUtils.MAX_CACHE_SIZE)
+                    throw new RuntimeException("BufferCaches.loadIfNeed.bufferLen > MAX_CACHE_SIZE");
+                if (log.isTraceEnabled()) {
+                    log.trace("[fw-frame] assemble start declaredTotal={}B", this.bufferLen);
+                }
             }
         }
+        if (this.bufferLen == -1){
+            int coff = off;
+            for (int i = coff; i < 10 - this.bufferOff; i++) {
+                this.buffers[this.bufferOff++] = bytes[i];
+                off ++;
+            }
+            this.bufferLen = (int) ValueUtils.byteToLong(this.buffers, 0, 4);
+        }
+
         int cOff = -1;
         for (int i = off; i < len; i++) {
             this.buffers[this.bufferOff++] = bytes[i];
@@ -91,14 +107,15 @@ public class BufferCaches {
         if (cOff < 0 && this.bufferLen > 0 && log.isDebugEnabled()) {
             log.debug("[fw-frame] partial have={}/{}B (await more TCP)", this.bufferOff, this.bufferLen);
         }
-        return cOff == len ? 0 : cOff;
+        return cOff >= len ? 0 : cOff;
     }
 
     /**
      * 重置缓冲区状态，准备接收下一帧。
      */
-    public synchronized void init() {
+    public synchronized void reset() {
         this.bufferOff = -1;
         this.bufferLen = -1;
+        Arrays.fill(this.buffers, (byte) 0);
     }
 }

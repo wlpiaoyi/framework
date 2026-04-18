@@ -25,11 +25,11 @@ public class ForwardUtils {
     /** 配置文件相对路径 */
     protected static final String CONFIG_PATH = "fw_config/forwarding/config.json";
 
-    /** 单帧消息最大字节数（用于序列化缓冲与粘包缓冲区上限） */
-    public static final int MAX_CACHE_SIZE = 1024 * 4;      // 2048 字节
-
     /** Socket 读写缓冲区的默认大小 */
-    public static final int BUFF_CACHE_SIZE = 1024;         // 1024 字节
+    public static final int BUFF_CACHE_SIZE = 128;         // 1024 字节
+
+    /** 单帧消息最大字节数（用于序列化缓冲与粘包缓冲区上限） */
+    public static final int MAX_CACHE_SIZE = BUFF_CACHE_SIZE * 4;      // 2048 字节
 
     /** 加载后的全局配置 Map（只读） */
     @Getter

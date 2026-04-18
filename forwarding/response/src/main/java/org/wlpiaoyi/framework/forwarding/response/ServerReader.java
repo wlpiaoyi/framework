@@ -6,6 +6,7 @@ import org.wlpiaoyi.framework.forwarding.utils.socket.ForwardingLog;
 import org.wlpiaoyi.framework.forwarding.utils.socket.model.BufferCaches;
 import org.wlpiaoyi.framework.forwarding.utils.socket.model.RequestMessage;
 import org.wlpiaoyi.framework.utils.MapUtils;
+import org.wlpiaoyi.framework.utils.ValueUtils;
 import org.wlpiaoyi.framework.utils.socket.IReader;
 import org.wlpiaoyi.framework.utils.socket.SocketQuietErrors;
 import org.wlpiaoyi.framework.utils.socket.IWriter;
@@ -69,6 +70,13 @@ public class ServerReader implements IReader {
      */
     @Override
     public int read(IWriter writer, int clientId, byte[] readBytes, int readLen) {
+        if(ForwardUtils.isLogEnabled()){
+            log.debug("[fw-res] peer-read clientId={} msgLen={} msg={}", clientId, readLen, ForwardingLog.hexPreview(readBytes));
+        }
+        long len = ValueUtils.byteToLong(readBytes, 0, 4);
+        if(len > ForwardUtils.BUFF_CACHE_SIZE * 4 || len < 0){
+            System.out.println();
+        }
         int off = this.read(writer, clientId, readBytes, 0, readLen);
         while (off > 0) {
             off = this.read(writer, clientId, readBytes, off, readLen);
@@ -180,7 +188,6 @@ public class ServerReader implements IReader {
             if (log.isDebugEnabled()) {
                 log.debug("[fw-res] hub-tcp-assemble clientId={} slice=[{}, {}) readCallLen={}", clientId, off, len, len);
             }
-
             // 粘包处理
             cOff = this.bufferCaches.loadIfNeed(bytes, off, len);
             if (cOff == -1) {
@@ -232,7 +239,7 @@ public class ServerReader implements IReader {
             return cOff;
         } finally {
             // 处理完一帧后重置缓冲区
-            if (cOff != -1) this.bufferCaches.init();
+            if (cOff != -1) this.bufferCaches.reset();
         }
     }
 }

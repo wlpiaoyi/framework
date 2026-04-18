@@ -172,7 +172,7 @@ public class ClientReader implements IReader {
             return cOff;
         } finally {
             // 若已处理完一帧，重置缓冲区准备接收下一帧
-            if (cOff != -1) this.bufferCaches.init();
+            if (cOff != -1) this.bufferCaches.reset();
         }
     }
 }

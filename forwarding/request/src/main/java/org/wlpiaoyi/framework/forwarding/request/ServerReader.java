@@ -128,19 +128,13 @@ public class ServerReader implements IReader {
 
         // 序列化并发送
         int bLen = message.toBytes(this.bufferCaches, 0);
-//        var len1 = ValueUtils.byteToLong(this.bufferCaches, 0, 4);
-//        if(len1 < 0 || len1 > ForwardUtils.MAX_CACHE_SIZE){
-//            throw new RuntimeException("[fw-req] message length error listenPort=" + serverPort + " clientId=" + clientId);
-//        }
-        if(bLen > 1500){
-            System.out.println();
-        }
         hubWriter.write(clientId, this.bufferCaches, bLen);
 
         int encLen = message.getData() == null ? 0 : message.getData().length;
-        log.debug("[fw-req] client->hub listenPort={} clientId={} msgId={} plainLen={} encPayloadLen={} target={}:{} hub={}:{} wireFrameLen={} encHex={}",
-                serverPort, clientId, message.getId(), len, encLen, message.getHost(), message.getPort(), respHost, respPort, bLen,
-                encLen > 0 ? ForwardingLog.hexPreview(message.getData()) : "-");
+        if(log.isDebugEnabled()){
+            log.debug("[fw-req] client->hub listenPort={} clientId={} msgId={} plainLen={} encPayloadLen={} target={}:{} hub={}:{} wireFrameLen={} encHex={}",
+                    serverPort, clientId, message.getId(), len, encLen, message.getHost(), message.getPort(), respHost, respPort, bLen, ForwardingLog.hexPreview(bufferCaches));
+        }
         return 0;
     }
 
