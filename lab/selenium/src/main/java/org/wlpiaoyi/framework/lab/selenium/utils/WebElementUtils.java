@@ -288,7 +288,7 @@ public class WebElementUtils {
         /**
          * Runs this operation.
          */
-        boolean run();
+        boolean run(int times);
     }
 
 
@@ -318,7 +318,7 @@ public class WebElementUtils {
             try {
                 int sleep = random.nextInt(400) + 100;
                 Thread.sleep(sleep);
-                if(runnable.run()) break;
+                if(runnable.run(i)) break;
                 sleep = random.nextInt(200) + 500;
                 Thread.sleep(sleep);
             } catch (Exception e) {

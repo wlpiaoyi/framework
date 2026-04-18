@@ -191,7 +191,7 @@ public class BrowserCabgov extends BrowserBase {
                 if(pageTotal < 1 || pageTotal > 10){
                     AtomicReference<List<WebElement>> pageEles = new AtomicReference();
                     AtomicReference<WebElement> pageELe = new AtomicReference<>();
-                    WebElementUtils.whileDo(() -> {
+                    WebElementUtils.whileDo((times) -> {
                         try{
                             pageELe.set(browser.getDriver().findElement(By.id("mypagination1")));
                             Thread.sleep(1000);
@@ -284,7 +284,7 @@ public class BrowserCabgov extends BrowserBase {
                 }
 
                 if(pageTotal < 1 || pageTotal > 10){
-                    WebElementUtils.whileDo(() -> {
+                    WebElementUtils.whileDo((times) -> {
                         if(this.browser.isClosed()){
                             throw new BusinessException("浏览器已关闭");
                         }
@@ -326,7 +326,7 @@ public class BrowserCabgov extends BrowserBase {
                     for(WebElement ele : webElements.get()){
                         removes.add(ele);
                         if("active".equals(ele.getAttribute("class"))){
-                            log.warn("BrowserCabgov.filterItem.while.while error. 获取翻页控件分页Active异常");
+                            log.info("BrowserCabgov.filterItem.while.while. 活动翻页控件分页");
                             break;
                         }
                     }
@@ -419,14 +419,18 @@ public class BrowserCabgov extends BrowserBase {
                 log.info("BrowserCabgov.openAndLogin.while.click.end 请选择服务类型:{}", "非营运机动车信息服务");
                 Thread.sleep(1000);
                 log.info("BrowserCabgov.openAndLogin.while.click.start 交通违法查询");
-                var userSidebarEl = browser.getDriver().findElement(By.id("userSidebar"));
                 log.info("BrowserCabgov.openAndLogin.while.click.start. 交通违法查询 userSidebar");
-                WebElementUtils.click(browser, userSidebarEl.findElement(By.id("sidebar_menu_5")));
-                log.info("BrowserCabgov.openAndLogin.while.click.end 交通违法查询 sidebar_menu_5.1");
-                Thread.sleep(1000);
-                WebElementUtils.click(browser, browser.getDriver().findElement(By.id("sidebar_menu_5")));
-                log.info("BrowserCabgov.openAndLogin.while.click.end 交通违法查询 sidebar_menu_5.2");
-                Thread.sleep(1000);
+                WebElementUtils.whileDo((times) -> {
+                    try {
+                        WebElementUtils.click(browser, browser.getDriver().findElement(By.id("userSidebar")).findElement(By.id("sidebar_menu_5")));
+                        String attValue = browser.getDriver().findElement(By.id("userSidebar")).findElement(By.id("sidebar_menu_5")).getAttribute("class");
+                        log.info("BrowserCabgov.openAndLogin.while.click.end 交通违法查询 sidebar_menu_5 times:{}", times);
+                        return "active".equals(attValue);
+                    } catch (Exception e) {
+                        log.warn("BrowserCabgov.openAndLogin.while.click.warn. 交通违法查询 sidebar_menu_5", e);
+                    }
+                    return false;
+                }, 4);
                 break;
             } catch (Exception e) {
                 log.info("BrowserCabgov.openAndLogin.while error. i:{}", i);

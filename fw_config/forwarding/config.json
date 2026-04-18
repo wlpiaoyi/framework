@@ -1,6 +1,7 @@
 {
-  "host": "182.150.116.84:30010",
-  "logEnabled": false,
+  "host1": "182.150.116.84:30010",
+  "host": "127.0.0.1:8080",
+  "logEnabled": true,
   "timeOut": 3600,
   "privateKey": "fw_config/forwarding/key.pri",
   "publicKey": "fw_config/forwarding/key.pub",

@@ -24,7 +24,7 @@ public class Server {
         try {
             ForwardUtils.loadMap();
         } catch (IOException e) {
-            e.printStackTrace();
+            log.error("[fw-req] load map error", e);
         }
     }
 
