@@ -1,0 +1,122 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+    forwarding / utils.socket 模块日志配置（Logback）
+    ======================================================================
+    作用：
+      - 控制台输出：便于本地、IDE、前台运行排错。
+      - 文件输出：按「日期 + 单文件大小」滚动，控制磁盘占用与保留天数。
+
+    覆盖范围：
+      - 依赖本 JAR 且未自带其他 logback.xml 的进程（如 request/response 若打包进该资源则会生效；
+        若 classpath 上另有 logback.xml，则以优先级更高的为准）。
+
+    运行时可通过 JVM 系统属性覆盖路径与文件名（见下方 property 说明）。
+
+    是否在控制台与文件中输出日志，还可由 config.json 的 logEnabled 控制（默认 true）；
+    false 时由 ForwardUtils.loadMap() 后 ForwardingLogging 关闭 root 追加器并置相关 logger 为 OFF；
+    request 进程另由 ForwardingConsoleDashboard 每秒在控制台刷新转发端口表格（不经 Logback）。
+    原地刷新、不污染主屏滚动历史可加：-Dforwarding.console.vt=true（需支持 VT 的终端，如 Windows Terminal）。
+-->
+<configuration>
+    <!--
+        LOG_PATH：日志目录。默认 "logs"（相对于进程当前工作目录 cwd）。
+        示例：java -DLOG_PATH=D:/var/log/forwarding -jar app.jar
+        语法 ${LOG_PATH:-logs} 表示：若未设置系统属性 LOG_PATH，则用默认值 logs。
+    -->
+    <property name="LOG_PATH" value="${LOG_PATH:-.logs}"/>
+    <!--
+        LOG_FILE：日志文件主名（不含扩展名）。默认 "forwarding"。
+        当前写入：${LOG_PATH}/${LOG_FILE}.log
+        归档示例：${LOG_PATH}/${LOG_FILE}.2026-04-13.0.log
+        示例：java -DLOG_FILE=fw-tunnel -jar app.jar
+    -->
+    <property name="LOG_FILE" value="${LOG_FILE:-forwarder}"/>
+
+    <!--
+        STDOUT：控制台追加器
+        - 开发/联调时直接看终端；生产若由 systemd/docker 收集 stdout，也可保留。
+        pattern 说明：
+          %d{HH:mm:ss.SSS}  时间（仅时分秒毫秒，当天排错够用）
+          [%thread]         线程名（隧道多线程时便于对照）
+          %-5level          级别，左对齐占 5 字符（DEBUG/INFO/WARN/ERROR）
+          %logger{36}       日志名缩写，最长 36 字符
+          %msg              正文
+          %n                换行
+    -->
+    <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder>
+            <pattern>%d{HH:mm:ss.SSS} [%thread] %-5level %logger{36} -- %msg%n</pattern>
+        </encoder>
+    </appender>
+
+    <!--
+        FILE：滚动文件追加器（RollingFileAppender）
+        <file>：
+          正在写入的「当前文件」固定路径，便于 tail -f 跟踪。
+
+        rollingPolicy：SizeAndTimeBasedRollingPolicy（时间 + 大小双维度）
+          - 每到新自然日会滚动到新日期的归档名；
+          - 同一天内若当前文件超过 maxFileSize，则 %i 递增生成 forwarding.yyyy-MM-dd.0.log、.1.log …
+
+        fileNamePattern 中占位符：
+          %d{yyyy-MM-dd}   按天归档的日期
+          %i               同一天内的分卷序号（从 0 递增）
+          注意：SizeAndTimeBasedRollingPolicy 要求同时包含 %d 与 %i。
+
+        maxFileSize：
+          单个归档分片最大 500MB，避免单文件过大难以打开或拷贝。
+
+        maxHistory：
+          保留最近 30「天」的归档（按滚动策略的时间单位理解；与分卷数无关）。
+          超过 30 天的历史文件会被删除。
+
+        totalSizeCap：
+          所有归档文件合计上限 20GB；与 maxHistory 同时生效，先触发的限制会先删旧文件。
+          若希望完全只按天数、不限制总大小，可删除本节点（不推荐，易占满磁盘）。
+
+        cleanHistoryOnStart：
+          false = 进程启动时不立刻扫盘删历史，仅在滚动时清理；启动更快。
+          true  = 启动时即按 maxHistory/totalSizeCap 清理，适合磁盘极紧张环境。
+    -->
+    <appender name="FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>${LOG_PATH}/${LOG_FILE}.log</file>
+        <encoder>
+            <!-- 文件里带完整日期，便于跨天检索；logger{50} 略长于控制台，便于区分类名 -->
+            <pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{50} -- %msg%n</pattern>gai
+            <charset>UTF-8</charset>
+        </encoder>
+        <rollingPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">
+            <fileNamePattern>${LOG_PATH}/${LOG_FILE}.%d{yyyy-MM-dd}.%i.log.gz</fileNamePattern>
+            <maxFileSize>500MB</maxFileSize>
+            <maxHistory>30</maxHistory>
+            <totalSizeCap>20GB</totalSizeCap>
+            <cleanHistoryOnStart>false</cleanHistoryOnStart>
+        </rollingPolicy>
+    </appender>
+
+    <!--
+        按包调整级别（会覆盖 root 上同名 logger 的默认级别）
+        org.wlpiaoyi.framework.forwarding
+          隧道业务（request/response 等）排障日志，默认 DEBUG。
+        org.wlpiaoyi.framework.utils.socket
+          底层 Socket 读写、ClientRunner/SocketClient 等，默认 DEBUG。
+
+        生产环境若日志过大，可将二者改为 INFO，或仅对个别类开 DEBUG（单独增加 logger）。
+    -->
+    <logger name="org.wlpiaoyi.framework.forwarding" level="DEBUG"/>
+    <logger name="org.wlpiaoyi.framework.utils.socket" level="DEBUG"/>
+    <!--
+        半包/粘包帧组装更细：取消下行注释并改为 TRACE，可看到 BufferCaches 每条组包细节（量很大）。
+    -->
+    <!-- <logger name="org.wlpiaoyi.framework.forwarding.utils.socket.model.BufferCaches" level="TRACE"/> -->
+
+    <!--
+        root：未单独配置过的 logger 均继承此处。
+        level=INFO：第三方库默认 INFO，避免刷屏；上面两个包已单独降为 DEBUG。
+        appender-ref：同时输出到控制台与文件；若只要文件，可去掉 STDOUT。
+    -->
+    <root level="INFO">
+        <appender-ref ref="STDOUT"/>
+        <appender-ref ref="FILE"/>
+    </root>
+</configuration>
