@@ -1,6 +1,7 @@
 package org.wlpiaoyi.framework.lab.selenium.utils;
 
 import org.openqa.selenium.*;
+import org.openqa.selenium.interactions.Actions;
 import org.wlpiaoyi.framework.lab.selenium.Browser;
 import org.wlpiaoyi.framework.utils.ValueUtils;
 
@@ -215,6 +216,26 @@ public class WebElementUtils {
         }catch (Exception e){
             ((JavascriptExecutor)browser.getDriver()).executeScript("arguments[0].click();", ele);
         }
+    }
+
+    /**
+     * <p><b>{@code @description:}</b>
+     * 双击击元素
+     * </p>
+     *
+     * <p><b>@param</b> <b>driver</b>
+     * {@link WebDriver}
+     * </p>
+     *
+     * <p><b>@param</b> <b>element</b>
+     * {@link WebElement}
+     * </p>
+     *
+     * <p>
+     */
+    public static void doubleClick(WebDriver driver, WebElement element) {
+        Actions actions = new Actions(driver);
+        actions.doubleClick(element).perform();
     }
 
     /**

@@ -35,10 +35,14 @@ public final class ForwardingPortStats {
         public volatile String name;
         /** 当前活跃连接数 */
         public final AtomicInteger connections = new AtomicInteger();
+        /** 历史峰值连接数 */
+        public volatile int peakConnections;
         /** 累计上行字节（request → response） */
         public final LongAdder bytesUp = new LongAdder();
         /** 累计下行字节（response → request） */
         public final LongAdder bytesDown = new LongAdder();
+        /** 累计连接异常次数 */
+        public final LongAdder errors = new LongAdder();
         public volatile ListenState listenState = ListenState.PENDING;
 
         // 内部快照字段，用于计算速率
@@ -109,12 +113,20 @@ public final class ForwardingPortStats {
         }
     }
 
-    /** 指定端口新增一个连接 */
+    /** 指定端口新增一个连接，并更新峰值 */
     public static void onConnectionOpen(int port) {
         if (!ForwardUtils.isLogEnabled()) {
             Row r = BY_PORT.get(port);
             if (r != null) {
-                r.connections.incrementAndGet();
+                int curr = r.connections.incrementAndGet();
+                // 简单自旋更新峰值
+                int peak;
+                while ((peak = r.peakConnections) < curr) {
+                    if (peak == curr - 1 || r.peakConnections == peak) {
+                        r.peakConnections = curr;
+                        break;
+                    }
+                }
             }
         }
     }
@@ -125,6 +137,16 @@ public final class ForwardingPortStats {
             Row r = BY_PORT.get(port);
             if (r != null) {
                 r.connections.updateAndGet(c -> c > 0 ? c - 1 : 0);
+            }
+        }
+    }
+
+    /** 指定端口记录一次连接异常 */
+    public static void onConnectionError(int port) {
+        if (!ForwardUtils.isLogEnabled()) {
+            Row r = BY_PORT.get(port);
+            if (r != null) {
+                r.errors.increment();
             }
         }
     }

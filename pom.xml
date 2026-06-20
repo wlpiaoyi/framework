@@ -15,6 +15,7 @@
 <!--        <module>sshd</module>-->
         <module>lab</module>
         <module>port-forwarder</module>
+        <module>lab/iotda</module>
     </modules>
 
 

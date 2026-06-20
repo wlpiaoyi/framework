@@ -1,0 +1,9 @@
+511133196701140016:保存失败[合同结束时间有误，无法更新租赁关系]
+510524198202110158:invalid session id
+Build info: version: '4.39.0', revision: '126f156aee'
+System info: os.name: 'Windows 11', os.arch: 'amd64', os.version: '10.0', java.version: '21.0.4'
+Driver info: org.openqa.selenium.chrome.ChromeDriver
+Command: [da30495347026a7516e430b72b819273, getElementAttribute {name=value, id=f.578C1405345AF74D8D1BB9055739C1A1.d.300D9939836DC7BB8B2C73DDE0EE2783.e.70}]
+Capabilities {acceptInsecureCerts: false, browserName: chrome, browserVersion: 127.0.6533.73, chrome: {chromedriverVersion: 127.0.6533.73 (b59f345ebd6c..., userDataDir: C:\Users\wlpiaoyi\AppData\L...}, fedcm:accounts: true, goog:chromeOptions: {debuggerAddress: localhost:65067}, networkConnectionEnabled: false, pageLoadStrategy: normal, platformName: windows, proxy: Proxy(), se:cdp: ws://localhost:65067/devtoo..., se:cdpVersion: 127.0.6533.73, setWindowRect: true, strictFileInteractability: false, timeouts: {implicit: 0, pageLoad: 300000, script: 30000}, unhandledPromptBehavior: dismiss and notify, webauthn:extension:credBlob: true, webauthn:extension:largeBlob: true, webauthn:extension:minPinLength: true, webauthn:extension:prf: true, webauthn:virtualAuthenticators: true}
+Element: [[[[ChromeDriver: chrome on windows (da30495347026a7516e430b72b819273)] -> id: htlrModal]] -> id: htbh_lr]
+Session ID: da30495347026a7516e430b72b819273

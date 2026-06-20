@@ -153,6 +153,7 @@ public class ServerReader implements IReader {
         if (SocketQuietErrors.isBenignClose(e)) {
             log.debug("[fw-req] peer-tcp-end listenPort={} clientId={} ({})", serverPort, clientId, e.toString());
         } else {
+            ForwardingPortStats.onConnectionError(serverPort);
             log.error("[fw-req] peer-error listenPort={} clientId={}", serverPort, clientId, e);
         }
         synchronized (this.clientContentDict) {

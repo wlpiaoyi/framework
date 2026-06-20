@@ -26,6 +26,11 @@ public class AppRun {
                     bc.start();
                 }
                 break;
+                case 3: {
+                    bc = new org.wlpiaoyi.framework.lab.selenium.for12123.zllist.BrowserCabgov(type);
+                    bc.start();
+                }
+                break;
                 case 100: {
                     {
                         bc = new org.wlpiaoyi.framework.lab.selenium.for12123.violate.test.BrowserCabgov(0);

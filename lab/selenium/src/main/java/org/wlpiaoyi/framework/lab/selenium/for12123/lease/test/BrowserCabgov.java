@@ -41,6 +41,8 @@ public class BrowserCabgov extends BrowserBase {
             for (int i = 0; i < 5; i++) {
                 if(this.runData(i)){hasError = true; break;};
             }
+        }catch (Exception e){
+            log.info("BrowserCabgov.start error", e);
         }finally {
             try{
                 Thread.sleep(2000);
