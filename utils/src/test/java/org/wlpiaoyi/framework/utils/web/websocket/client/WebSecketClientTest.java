@@ -7,6 +7,7 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
+import java.util.HashMap;
 import java.util.concurrent.TimeUnit;
 
 public class WebSecketClientTest implements Runnable, WebSocketIntrface {
@@ -35,10 +36,11 @@ public class WebSecketClientTest implements Runnable, WebSocketIntrface {
     public void run() {
         try {
 //            WebSocketClient wsClient = new WebSocketClient("ws://121.40.165.18:8800", this);
-
-            WebSocketClient wsClient = new WebSocketClient("ws://192.168.1.86:9001/friendship/ws/message.do", this);
+            String url = "ws://127.0.0.1:28108/ws/message?userId=1&deptId=1&roleCode=admin&account=admin&topics=topic1%2C575";
+            WebSocketClient wsClient = new WebSocketClient(url, this);
 //            wsClient.setProxy(new Proxy(Proxy.Type.SOCKS, new InetSocketAddress("172.20.170.61", 8010)));
 //            WebSocketClient wsClient = new WebSocketClient("ws://127.0.0.1:8001/wlpiaoyi/test/111", this);
+
             wsClient.synConnect(5000, TimeUnit.MILLISECONDS);
 //            wsClient.send(System.currentTimeMillis());
         } catch (Exception e) {
@@ -66,7 +68,7 @@ public class WebSecketClientTest implements Runnable, WebSocketIntrface {
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
-            webSocketClient.send("test:", wsData);
+            webSocketClient.send(wsData);
         }).start();
     }
 

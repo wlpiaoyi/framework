@@ -34,7 +34,7 @@ import java.util.concurrent.ConcurrentHashMap;
  * 使用前必须先配置接入地址与 CA 证书文件路径，例如：
  * <pre>
  * IoTDeviceManager.init("ssl://xxx.st1.iotda-device.cn-north-4.myhuaweicloud.com:8883",
- *         "C:/path/to/mqtts_ca_cert.jks");
+ *         "C:/path/to/mqtts_ca_cert.247.jks");
  * IoTDevice device = IoTDeviceManager.getAndOnlineDevice(deviceId, deviceSecret);
  * IoTDeviceManager.offlineDevice(deviceId);
  * </pre>
@@ -55,25 +55,30 @@ public class IoTDeviceManager {
      * {@code ssl://{id}.st1.iotda-device.cn-north-4.myhuaweicloud.com:8883}
      */
     @Setter
-    private static volatile String iotServerUri;
+    private volatile String iotServerUri;
 
     /**
      * CA 证书文件路径（磁盘路径，由调用方指定）。
      * TLS（ssl://...:8883）时必须配置且文件存在；非 TLS 可置空。
      */
     @Setter
-    private static volatile String iotRootCAPath;
+    private volatile String iotRootCAPath;
 
     /** 已上线设备缓存：deviceId -> IoTDevice */
-    private static final Map<String, IoTDevice> ONLINE_DEVICES = new ConcurrentHashMap<>();
+    private final Map<String, IoTDevice> ONLINE_DEVICES = new ConcurrentHashMap<>();
 
     /** 按 deviceId 细粒度锁，防止同一设备并发重复建链 */
-    private static final Map<String, Object> DEVICE_LOCKS = new ConcurrentHashMap<>();
+    private final Map<String, Object> DEVICE_LOCKS = new ConcurrentHashMap<>();
 
     /** 复用的连接选项 */
-    private static volatile CustomOptions customOptions;
+    private volatile CustomOptions customOptions;
 
-    private IoTDeviceManager() {
+    private IoTDeviceManager(String serverUri, String caPath) {
+        this.init(serverUri, caPath);
+    }
+
+    public static IoTDeviceManager getInstance(String serverUri, String caPath) {
+        return new IoTDeviceManager(serverUri, caPath);
     }
 
     /**
@@ -82,7 +87,7 @@ public class IoTDeviceManager {
      * @param serverUri MQTT 接入地址（ssl://...:8883 或 tcp://...:1883）
      * @param caPath    CA 证书 jks 磁盘路径，非 TLS 可传 null
      */
-    public static void init(String serverUri, String caPath) {
+     protected void init(String serverUri, String caPath) {
         setIotServerUri(serverUri);
         setIotRootCAPath(caPath);
         validateServerUri(serverUri);
@@ -132,7 +137,7 @@ public class IoTDeviceManager {
      * @param deviceSecret 设备密钥
      * @return 已连接设备；参数非法、建链失败或 CA 不存在时返回 {@code null}
      */
-    public static IoTDevice getAndOnlineDevice(String deviceId, String deviceSecret) {
+    public IoTDevice getAndOnlineDevice(String deviceId, String deviceSecret) {
         if (ValueUtils.isBlank(deviceId)) {
             log.warn("getAndOnlineDevice rejected: deviceId is blank");
             return null;
@@ -181,7 +186,7 @@ public class IoTDeviceManager {
      * @param deviceId 设备 ID
      * @return {@code true} 表示此前在线且已成功关闭；{@code false} 表示设备未在缓存中
      */
-    public static boolean offlineDevice(String deviceId) {
+    public boolean offlineDevice(String deviceId) {
         if (ValueUtils.isBlank(deviceId)) {
             log.warn("offlineDevice rejected: deviceId is blank");
             return false;
@@ -203,29 +208,26 @@ public class IoTDeviceManager {
         return true;
     }
 
-    /**
-     * @deprecated 请使用 {@link #offlineDevice(String)}
-     */
-    @Deprecated
-    public static boolean offLineDevice(String deviceId) {
-        return offlineDevice(deviceId);
-    }
 
     /**
      * 判断设备是否在本地缓存中（已调用过 {@link #getAndOnlineDevice} 且未下线）。
      */
-    public static boolean isOnline(String deviceId) {
+    public boolean isOnline(String deviceId) {
         return deviceId != null && ONLINE_DEVICES.containsKey(deviceId);
     }
 
     /**
      * 当前缓存的在线设备数量（仅进程内统计，不代表平台侧真实状态）。
      */
-    public static int onlineDeviceCount() {
+    public int onlineDeviceCount() {
         return ONLINE_DEVICES.size();
     }
 
-    private static IoTDevice createAndConnect(String deviceId, String deviceSecret) throws IOException {
+    public IoTDeviceReport report() {
+        return IoTDeviceReport.build();
+    }
+
+    private IoTDevice createAndConnect(String deviceId, String deviceSecret) throws IOException {
         File caFile = resolveCaCertFile();
         if (caFile != null) {
             log.debug("building IoTDevice, deviceId={}, caFile={}", deviceId, caFile.getAbsolutePath());
@@ -249,7 +251,7 @@ public class IoTDeviceManager {
     /**
      * 连接选项：关闭 SDK 默认重连，使用自定义退避（参考官方 {@code ReConnect} demo）。
      */
-    private static @NotNull CustomOptions buildCustomOptions() {
+    private @NotNull CustomOptions buildCustomOptions() {
         CustomOptions options = customOptions;
         if (options != null) {
             return options;
@@ -296,7 +298,7 @@ public class IoTDeviceManager {
      * 解析 CA 证书文件。{@code iotRootCAPath} 为磁盘路径，不存在时抛异常。
      * 未配置时返回 {@code null}（适用于无 TLS 的 tcp 接入）。
      */
-    private static File resolveCaCertFile() throws IOException {
+    private File resolveCaCertFile() throws IOException {
         if (ValueUtils.isBlank(iotRootCAPath)) {
             return null;
         }
@@ -322,7 +324,7 @@ public class IoTDeviceManager {
                 } catch (IOException e) {
                     throw new IOException(
                             "JKS 无法以空密码加载（华为 SDK 仅支持 storepass 为空）。"
-                                    + "请用: keytool -importcert -file mqtts_ca_cert.pem -keystore mqtts_ca_cert.jks"
+                                    + "请用: keytool -importcert -file mqtts_ca_cert.pem -keystore mqtts_ca_cert.247.jks"
                                     + " -storetype JKS -storepass \"\" -noprompt 重新生成。原因: " + e.getMessage(),
                             e);
                 }
@@ -371,7 +373,7 @@ public class IoTDeviceManager {
                         "文件实际是 PKCS12 格式（magic 0x3082），不是 JKS。SDK 用 JKS 解析会得到 0 条目，"
                                 + "TLS 握手必失败。请用 keytool 重建并加 -storetype JKS：\n"
                                 + "  keytool -importcert -alias huawei-iot -file mqtts_ca_cert.pem "
-                                + "-keystore mqtts_ca_cert.jks -storetype JKS -storepass \"\" -noprompt\n"
+                                + "-keystore mqtts_ca_cert.247.jks -storetype JKS -storepass \"\" -noprompt\n"
                                 + "或改用华为官方多区域 ca.jks。文件: " + caFile.getAbsolutePath());
             }
             throw new IOException(String.format(
@@ -390,7 +392,7 @@ public class IoTDeviceManager {
         return count;
     }
 
-    private static Object deviceLock(String deviceId) {
+    private Object deviceLock(String deviceId) {
         return DEVICE_LOCKS.computeIfAbsent(deviceId, key -> new Object());
     }
 }

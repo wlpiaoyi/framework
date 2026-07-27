@@ -2,16 +2,46 @@ package org.wlpiaoyi.framework.utils;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import lombok.extern.slf4j.Slf4j;
 
 import java.io.*;
+import java.security.SecureRandom;
 import java.util.Base64;
+import java.util.Random;
 import java.util.UUID;
 
+@Slf4j
 public class StringUtils {
 
-    static {
+    private static final String CHARACTERS = "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
+    private static final Random RANDOM = new SecureRandom(); // 或 new Random()
 
+    /**
+     * 生成随机字符串（包含数字、大小写字母）
+     *
+     * @param length 目标字符串长度
+     * @return 随机字符串
+     * @throws IllegalArgumentException 当 length <= 0 时抛出
+     */
+    public static String generateRandomString(int length) {
+        if (length <= 0) {
+            throw new IllegalArgumentException("长度必须大于0");
+        }
+
+        StringBuilder sb = new StringBuilder(length);
+        for (int i = 0; i < length; i++) {
+            int index = RANDOM.nextInt(CHARACTERS.length());
+            sb.append(CHARACTERS.charAt(index));
+        }
+        return sb.toString();
     }
+//
+//    // 测试
+//    public static void main(String[] args) {
+//        System.out.println(generateRandomString(10)); // 例如：aB3dEfG9hJ
+//        System.out.println(generateRandomString(8));  // 例如：Zx9yQ2wP
+//    }
+
 
     /**
      * 已废弃请使用org.wlpiaoyi.framework.utils.data.DataUtils.base64Encode
@@ -23,11 +53,11 @@ public class StringUtils {
         return Base64.getMimeEncoder().encodeToString(bytes);
     }
     @Deprecated
-    public static String base64Encode(String encodeStr, String charseName){
+    public static String base64Encode(String encodeStr, String charsName){
         try {
-            return Base64.getMimeEncoder().encodeToString(encodeStr.getBytes(charseName));
+            return Base64.getMimeEncoder().encodeToString(encodeStr.getBytes(charsName));
         } catch (IOException e) {
-            e.printStackTrace();
+            log.error("base64Encode. Error occurred while encoding string to base64.", e);
         }
         return null;
     }
@@ -42,7 +72,7 @@ public class StringUtils {
             byte[] bytes = StringUtils.base64DecodeToBytes(decodeStr);
             return new String(bytes, charseName);
         } catch (IOException e) {
-            e.printStackTrace();
+            log.error("base64Decode. Error occurred while decoding base64 to string.", e);
         }
         return null;
     }
@@ -62,7 +92,7 @@ public class StringUtils {
      */
     @Deprecated
     public static boolean isBlank(String arg){
-        return arg == null || arg.length() == 0;
+        return arg == null || arg.isEmpty();
     }
     @Deprecated
     public static String toJson(Object obj){
@@ -119,8 +149,7 @@ public class StringUtils {
      * @return String UUID
      */
     public static String getUUID32(){
-        String uuid = UUID.randomUUID().toString().replace("-", "");
-        return uuid;
+        return UUID.randomUUID().toString().replace("-", "");
     }
 
     /**
@@ -129,16 +158,15 @@ public class StringUtils {
      * @return
      */
     public static String parseUnderlineToHump(String name){
-        String[] args = name.split("\\_");
-        StringBuffer sb = new StringBuffer();
+        String[] args = name.split("_");
+        StringBuilder sb = new StringBuilder();
         for (String arg : args){
             if(ValueUtils.isBlank(arg)){ continue; }
             if(arg.length() == 1){ sb.append(arg.toUpperCase()); continue; }
             sb.append(arg.substring(0, 1).toUpperCase());
-            if(arg.length() == 1){ continue; }
             sb.append(arg.substring(1).toLowerCase());
         }
-        if(sb.length() == 0){ return name; }
+        if(sb.isEmpty()){ return name; }
         return sb.toString();
     }
     /**

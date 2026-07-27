@@ -5,8 +5,8 @@ import com.google.gson.Gson;
 import lombok.Getter;
 import lombok.NonNull;
 import org.jetbrains.annotations.Nullable;
-import org.wlpiaoyi.framework.utils.exception.CatchException;
 import org.wlpiaoyi.framework.utils.ValueUtils;
+import org.wlpiaoyi.framework.utils.exception.SystemException;
 import org.wlpiaoyi.framework.utils.gson.GsonBuilder;
 
 import jakarta.websocket.Session;
@@ -87,10 +87,10 @@ public class WsBootService {
      * @param message
      */
 //    @OnMessage
-    protected final <T> T onWsMessage(String headSuffix, String message, Class<T> clazz) throws CatchException {
+    protected final <T> T onWsMessage(String headSuffix, String message, Class<T> clazz) throws SystemException {
         if(!ValueUtils.isBlank(headSuffix)){
             if(!message.startsWith(headSuffix)) {
-                throw new CatchException("message had not start with \"" + headSuffix + "\"");
+                throw new SystemException("message had not start with \"" + headSuffix + "\"");
             }
             message = message.substring(headSuffix.length());
         }
@@ -102,7 +102,7 @@ public class WsBootService {
         T obj = null;
         try {
             obj = this.onWsMessage(null, message, clazz);
-        } catch (CatchException e) {
+        } catch (SystemException e) {
             e.printStackTrace();
         }
         return obj;

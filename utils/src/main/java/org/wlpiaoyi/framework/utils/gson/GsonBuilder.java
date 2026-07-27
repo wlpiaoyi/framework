@@ -9,9 +9,7 @@ import org.wlpiaoyi.framework.utils.gson.type.adapter.*;
 import java.lang.reflect.Method;
 import java.time.ZoneId;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 public class GsonBuilder  {
 

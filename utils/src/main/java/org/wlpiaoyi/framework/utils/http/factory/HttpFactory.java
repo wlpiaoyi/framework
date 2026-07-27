@@ -63,7 +63,9 @@ public class HttpFactory {
                 httpRequest = new HttpDelete(executeUrl);
             }
             default -> {
-                httpRequest = new HttpPatch(executeUrl);
+                HttpPatch httpPatch = new HttpPatch(executeUrl);
+                httpPatch.setEntity(bodyEntity(request, null, null));
+                httpRequest = httpPatch;
             }
         }
         RequestConfig requestConfig = RequestConfig.custom()

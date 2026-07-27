@@ -569,7 +569,7 @@ class ValueParseUtils extends ValueBlankUtils{
             Double[] longs = new Double[arr.length];
 
             for(int i = 0; i < arr.length; ++i) {
-                Double v = Double.valueOf(arr[i]);
+                double v = Double.parseDouble(arr[i]);
                 longs[i] = v;
             }
 

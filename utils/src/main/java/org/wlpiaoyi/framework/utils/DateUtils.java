@@ -659,9 +659,6 @@ public class DateUtils {
      * <p><b>{@code @author:}</b>wlpia</p>
      */
     public static LocalDate parseLocalDate(@NonNull Date date, ZoneId zoneId) {
-        if (date == null) {
-            throw new IllegalArgumentException("参数不能为空");
-        }
         if(zoneId == null){
             zoneId = ZoneId.systemDefault();
         }

@@ -28,7 +28,7 @@ public class ObjectInvocationProxy<T> implements InvocationHandler {
             result = method.invoke(target, args);
         }catch (Exception e){
             if(this.progress != null){
-                e = this.progress.exceptionInterceptorProgress(proxy, method, args,e);
+                e = this.progress.exceptionInterceptorProgress(proxy, method, args, e);
             }
             if(e != null) {
                 throw e;
@@ -44,8 +44,7 @@ public class ObjectInvocationProxy<T> implements InvocationHandler {
         ClassLoader loader = this.target.getClass().getClassLoader();
         Class<?>[] interfaces = target.getClass().getInterfaces();
         // 主要装载器、一组接口及调用处理动态代理实例
-        T proxyInstance = (T) Proxy.newProxyInstance(loader, interfaces, this);
-        return proxyInstance;
+        return (T) Proxy.newProxyInstance(loader, interfaces, this);
     }
 
 

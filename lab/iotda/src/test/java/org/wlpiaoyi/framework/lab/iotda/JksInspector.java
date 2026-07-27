@@ -12,7 +12,7 @@ import java.util.Enumeration;
 public class JksInspector {
     public static void main(String[] args) throws Exception {
         String path = args.length > 0 ? args[0]
-                : "c:/Home/Document/Develop/Java/framework/lab/iotda/src/main/resources/mqtts_ca_cert.jks";
+                : "c:/Home/Document/Develop/Java/framework/lab/iotda/src/main/resources/mqtts_ca_cert.247.jks";
         try (FileInputStream raw = new FileInputStream(path)) {
             byte[] head = raw.readNBytes(4);
             System.out.printf("magic bytes: %02X %02X %02X %02X%n",

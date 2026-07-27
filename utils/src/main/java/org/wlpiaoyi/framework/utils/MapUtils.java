@@ -66,7 +66,6 @@ public class MapUtils {
      * @param <T>       类型参数
      * @return 如果值存在且是 valueType 类型（或其子类型），返回 true；否则返回 false
      */
-    @SuppressWarnings("rawtypes")
     public static <T> boolean checkValueType(Map map, Object key, Class<T> valueType){
         if(map == null || map.isEmpty()) {
             return false;
@@ -95,7 +94,6 @@ public class MapUtils {
      * @throws NullPointerException     如果路径中的中间键对应的值为 null
      * @throws IndexOutOfBoundsException 如果索引越界
      */
-    @SuppressWarnings({"rawtypes"})
     public static <T> T getValueByKeyPath(Map map, String keyPath, T defaultValue, Class<T> clazz){
         if(map == null || map.isEmpty()) {
             return  defaultValue;
@@ -219,7 +217,6 @@ public class MapUtils {
      * @param <T>         返回值类型（通常为 Object 子类）
      * @return 键对应的值，若为 null 则返回 defaultValue
      */
-    @SuppressWarnings({"rawtypes"})
     public static <T> T get(Map map, Object key, T defaultValue){
         if(map == null || map.isEmpty()) {
             return  defaultValue;
@@ -239,7 +236,6 @@ public class MapUtils {
      * @param <T> 返回值类型
      * @return 键对应的值，可能为 null
      */
-    @SuppressWarnings("rawtypes")
     public static <T> T get(Map map, Object key) {
         return get(map, key,null);
     }
@@ -255,7 +251,6 @@ public class MapUtils {
      * @return 转换后的值，若无法转换则返回 defaultValue
      * @throws IllegalArgumentException 如果目标类型不受支持
      */
-    @SuppressWarnings("rawtypes")
     public static <T> T get(Map map, Object key, Class<T> tClass, T defaultValue){
         if(map == null || map.isEmpty()) {
             return  defaultValue;
@@ -276,7 +271,6 @@ public class MapUtils {
      * @param <T>    目标类型
      * @return 转换后的值，若值为 null 或转换失败则返回 null
      */
-    @SuppressWarnings("rawtypes")
     public static <T> T get(Map map, Object key, Class<T> tClass){
         return get(map, key, tClass, null);
     }
@@ -288,7 +282,6 @@ public class MapUtils {
      * @param key 键
      * @return 转换后的 String，若值为 null 则返回 null
      */
-    @SuppressWarnings("rawtypes")
     public static String getString(Map map, Object key){
         return MapUtils.getString(map, key, null);
     }
@@ -301,7 +294,6 @@ public class MapUtils {
      * @param defaultValue 默认值
      * @return 转换后的 String，若值为 null 则返回 defaultValue
      */
-    @SuppressWarnings("rawtypes")
     public static String getString(Map map, Object key, String defaultValue){
         if(map == null || map.isEmpty()) {
             return defaultValue;
@@ -317,7 +309,6 @@ public class MapUtils {
      * @param key 键
      * @return 转换后的 Float，若值为 null 则返回 null
      */
-    @SuppressWarnings("rawtypes")
     public static Float getFloat(Map map, Object key){
         return MapUtils.getFloat(map, key, null);
     }
@@ -330,7 +321,6 @@ public class MapUtils {
      * @param defaultValue 默认值
      * @return 转换后的 Float，若值为 null 则返回 defaultValue
      */
-    @SuppressWarnings("rawtypes")
     public static Float getFloat(Map map, Object key, Float defaultValue){
         if(map == null || map.isEmpty()) {
             return  defaultValue;
@@ -346,7 +336,6 @@ public class MapUtils {
      * @param key 键
      * @return 转换后的 Double，若值为 null 则返回 null
      */
-    @SuppressWarnings("rawtypes")
     public static Double getDouble(Map map, Object key){
         return MapUtils.getDouble(map, key, null);
     }
@@ -359,7 +348,6 @@ public class MapUtils {
      * @param defaultValue 默认值
      * @return 转换后的 Double，若值为 null 则返回 defaultValue
      */
-    @SuppressWarnings("rawtypes")
     public static Double getDouble(Map map, Object key, Double defaultValue){
         if(map == null || map.isEmpty()) {
             return  defaultValue;
@@ -375,7 +363,6 @@ public class MapUtils {
      * @param key 键
      * @return 转换后的 Boolean，若值为 null 则返回 null
      */
-    @SuppressWarnings("rawtypes")
     public static Boolean getBoolean(Map map, Object key){
         return MapUtils.getBoolean(map, key, null);
     }
@@ -388,7 +375,6 @@ public class MapUtils {
      * @param defaultValue 默认值
      * @return 转换后的 Boolean，若值为 null 则返回 defaultValue
      */
-    @SuppressWarnings("rawtypes")
     public static Boolean getBoolean(Map map, Object key, Boolean defaultValue){
         if(map == null || map.isEmpty()) {
             return  defaultValue;
@@ -404,7 +390,6 @@ public class MapUtils {
      * @param key 键
      * @return 转换后的 Byte，若值为 null 则返回 null
      */
-    @SuppressWarnings("rawtypes")
     public static Byte getByte(Map map, Object key){
         return MapUtils.getByte(map, key, null);
     }
@@ -417,7 +402,6 @@ public class MapUtils {
      * @param defaultValue 默认值
      * @return 转换后的 Byte，若值为 null 则返回 defaultValue
      */
-    @SuppressWarnings("rawtypes")
     public static Byte getByte(Map map, Object key, Byte defaultValue){
         if(map == null || map.isEmpty()) {
             return  defaultValue;
@@ -433,7 +417,6 @@ public class MapUtils {
      * @param key 键
      * @return 转换后的 Short，若值为 null 则返回 null
      */
-    @SuppressWarnings("rawtypes")
     public static Short getShort(Map map, Object key){
         return MapUtils.getShort(map, key, null);
     }
@@ -446,7 +429,6 @@ public class MapUtils {
      * @param defaultValue 默认值
      * @return 转换后的 Short，若值为 null 则返回 defaultValue
      */
-    @SuppressWarnings("rawtypes")
     public static Short getShort(Map map, Object key, Short defaultValue){
         if(map == null || map.isEmpty()) {
             return  defaultValue;
@@ -462,7 +444,6 @@ public class MapUtils {
      * @param key 键
      * @return 转换后的 Integer，若值为 null 则返回 null
      */
-    @SuppressWarnings("rawtypes")
     public static Integer getInteger(Map map, Object key){
         return MapUtils.getInteger(map, key, null);
     }
@@ -475,7 +456,6 @@ public class MapUtils {
      * @param defaultValue 默认值
      * @return 转换后的 Integer，若值为 null 则返回 defaultValue
      */
-    @SuppressWarnings("rawtypes")
     public static Integer getInteger(Map map, Object key, Integer defaultValue){
         if(map == null || map.isEmpty()) {
             return  defaultValue;
@@ -491,7 +471,6 @@ public class MapUtils {
      * @param key 键
      * @return 转换后的 Long，若值为 null 则返回 null
      */
-    @SuppressWarnings("rawtypes")
     public static Long getLong(Map map, Object key){
         return MapUtils.getLong(map, key, null);
     }
@@ -504,7 +483,6 @@ public class MapUtils {
      * @param defaultValue 默认值
      * @return 转换后的 Long，若值为 null 则返回 defaultValue
      */
-    @SuppressWarnings("rawtypes")
     public static Long getLong(Map map, Object key, Long defaultValue){
         if(map == null || map.isEmpty()) {
             return  defaultValue;
@@ -520,7 +498,6 @@ public class MapUtils {
      * @param key 键
      * @return 转换后的 LocalDateTime，若值为 null 则返回 null
      */
-    @SuppressWarnings("rawtypes")
     public static LocalDateTime getLocalDateTime(Map map, Object key){
         return MapUtils.getLocalDateTime(map, key, null);
     }
@@ -533,7 +510,6 @@ public class MapUtils {
      * @param defaultValue 默认值
      * @return 转换后的 LocalDateTime，若值为 null 则返回 defaultValue
      */
-    @SuppressWarnings("rawtypes")
     public static LocalDateTime getLocalDateTime(Map map, Object key, LocalDateTime defaultValue){
         if(map == null || map.isEmpty()) {
             return  defaultValue;
@@ -549,7 +525,6 @@ public class MapUtils {
      * @param key 键
      * @return 转换后的 LocalDate，若值为 null 则返回 null
      */
-    @SuppressWarnings("rawtypes")
     public static LocalDate getLocalDate(Map map, Object key){
         return MapUtils.getLocalDate(map, key, null);
     }
@@ -562,7 +537,6 @@ public class MapUtils {
      * @param defaultValue 默认值
      * @return 转换后的 LocalDate，若值为 null 则返回 defaultValue
      */
-    @SuppressWarnings("rawtypes")
     public static LocalDate getLocalDate(Map map, Object key, LocalDate defaultValue){
         if(map == null || map.isEmpty()) {
             return  defaultValue;
@@ -571,12 +545,10 @@ public class MapUtils {
         return ValueParse.toLocalDate(value, defaultValue);
     }
 
-    @SuppressWarnings("rawtypes")
     public static Date getDate(Map map, Object key){
         return MapUtils.getDate(map, key, null);
     }
 
-    @SuppressWarnings("rawtypes")
     public static Date getDate(Map map, Object key, Date defaultValue){
         if(map == null || map.isEmpty()) {
             return  defaultValue;
@@ -585,12 +557,10 @@ public class MapUtils {
         return ValueParse.toDate(value, defaultValue);
     }
 
-    @SuppressWarnings("rawtypes")
     public static Map getMap(Map map, Object key){
         return MapUtils.getMap(map, key, null);
     }
 
-    @SuppressWarnings("rawtypes")
     public static Map getMap(Map map, Object key, Map defaultValue){
         if(map == null || map.isEmpty()) {
             return  defaultValue;
@@ -602,12 +572,10 @@ public class MapUtils {
         return ValueParse.toMap(value, defaultValue);
     }
 
-    @SuppressWarnings("rawtypes")
     public static Object[] getArray(Map map, Object key){
         return MapUtils.getArray(map, key, null);
     }
 
-    @SuppressWarnings("rawtypes")
     public static Object[] getArray(Map map, Object key, Object[] defaultValue){
         if(map == null || map.isEmpty()) {
             return  defaultValue;
@@ -615,19 +583,16 @@ public class MapUtils {
         return ValueParse.toArray(map.get(key));
     }
 
-    @SuppressWarnings("rawtypes")
     public static <T> T[] getArrayGeneric(Map map, Object key, Class<T> clazz, T[] defaultValue){
         var res = MapUtils.getArray(map, key, defaultValue);
         if(res == defaultValue) return defaultValue;
         return ValueParse.toArrayGeneric(res, clazz, defaultValue);
     }
 
-    @SuppressWarnings("rawtypes")
     public static List getList(Map map, Object key){
         return getList(map, key, null);
     }
 
-    @SuppressWarnings({"rawtypes"})
     public static List getList(Map map, Object key, List defaultValue){
         if(map == null || map.isEmpty()) {
             return  defaultValue;
@@ -635,24 +600,20 @@ public class MapUtils {
         return ValueParse.toList(map.get(key), defaultValue);
     }
 
-    @SuppressWarnings("rawtypes")
     public static <T> List<T> getListGeneric(Map map, Object key, Class<T> clazz){
         return getListGeneric(map, key, clazz, null);
     }
 
-    @SuppressWarnings({"rawtypes"})
     public static <T> List<T> getListGeneric(Map map, Object key, Class<T> clazz, List<T> defaultValue){
         var res = MapUtils.getList(map, key, defaultValue);
         if(res == defaultValue) return defaultValue;
         return ValueParse.toListGeneric(res, clazz, defaultValue);
     }
 
-    @SuppressWarnings("rawtypes")
     public static Set getSet(Map map, Object key){
         return getSet(map, key, null);
     }
 
-    @SuppressWarnings({"rawtypes"})
     public static Set getSet(Map map, Object key, Set defaultValue){
         if(map == null || map.isEmpty()) {
             return  defaultValue;
@@ -660,7 +621,6 @@ public class MapUtils {
         return ValueParse.toSet(map.get(key), defaultValue);
     }
 
-    @SuppressWarnings("rawtypes")
     public static <T> Set<T> getSetGeneric(Map map, Object key, Class<T> clazz){
         return getSetGeneric(map, key, clazz, null);
     }

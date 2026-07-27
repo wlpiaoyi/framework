@@ -75,9 +75,9 @@ public class IdWorker {
      * @date: 2023/12/25 16:51
      */
     public IdWorker(byte workerId, byte datacenterId, long timerEpoch) {
-        this.workerIdBits = 6L;
-        this.datacenterIdBits = 6L;
-        this.sequenceBits = 10L;
+        this.workerIdBits = 3L;
+        this.datacenterIdBits = 3L;
+        this.sequenceBits = 15L;
         this.workerIdShift = this.sequenceBits;
         this.datacenterIdShift = this.sequenceBits + this.workerIdBits;
         this.timestampLeftShift = this.sequenceBits + this.workerIdBits + this.datacenterIdBits;
