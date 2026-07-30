@@ -1,13 +1,21 @@
 package org.wlpiaoyi.framework.utils.security;
 
-import org.wlpiaoyi.framework.utils.DateUtils;
-import org.wlpiaoyi.framework.utils.StringUtils;
+import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import org.wlpiaoyi.framework.utils.data.DataUtils;
+import org.wlpiaoyi.framework.utils.security.condition.ConditionSm2;
 
 import javax.crypto.Cipher;
 import javax.crypto.NoSuchPaddingException;
 import java.nio.charset.StandardCharsets;
-import java.security.*;
+import java.security.InvalidKeyException;
+import java.security.Key;
+import java.security.KeyFactory;
+import java.security.KeyPair;
+import java.security.KeyPairGenerator;
+import java.security.NoSuchAlgorithmException;
+import java.security.SecureRandom;
+import java.security.Signature;
+import java.security.spec.ECGenParameterSpec;
 import java.security.spec.InvalidKeySpecException;
 import java.security.spec.PKCS8EncodedKeySpec;
 import java.security.spec.X509EncodedKeySpec;
@@ -19,6 +27,21 @@ import java.security.spec.X509EncodedKeySpec;
  * {@code @version:}:       1.0
  */
 class SecurityTools {
+
+    static {
+        if (java.security.Security.getProvider(BouncyCastleProvider.PROVIDER_NAME) == null) {
+            java.security.Security.addProvider(new BouncyCastleProvider());
+        }
+    }
+
+    /**
+     * 确保已注册 BouncyCastle Provider（国密算法依赖）
+     */
+    static void ensureBcProvider() {
+        if (java.security.Security.getProvider(BouncyCastleProvider.PROVIDER_NAME) == null) {
+            java.security.Security.addProvider(new BouncyCastleProvider());
+        }
+    }
 
     /**
      * 签名工具
@@ -108,6 +131,38 @@ class SecurityTools {
     }
 
     /**
+     * 创建 SM2 私钥 Cipher
+     * @param privateKey Base64 私钥（PKCS8）
+     * @param opmode Cipher.ENCRYPT_MODE / DECRYPT_MODE
+     */
+    static Cipher createSm2PrivateCipher(String privateKey, int opmode) throws Exception {
+        ensureBcProvider();
+        byte[] keyBytes = DataUtils.base64Decode(privateKey.getBytes(StandardCharsets.UTF_8));
+        PKCS8EncodedKeySpec pkcs8EncodedKeySpec = new PKCS8EncodedKeySpec(keyBytes);
+        KeyFactory keyFactory = KeyFactory.getInstance(ConditionSm2.KEY_PAIR_ALGORITHM, ConditionSm2.PROVIDER);
+        Key key = keyFactory.generatePrivate(pkcs8EncodedKeySpec);
+        Cipher cipher = Cipher.getInstance(ConditionSm2.CIPHER_ALGORITHM, ConditionSm2.PROVIDER);
+        cipher.init(opmode, key);
+        return cipher;
+    }
+
+    /**
+     * 创建 SM2 公钥 Cipher
+     * @param publicKey Base64 公钥（X509）
+     * @param opmode Cipher.ENCRYPT_MODE / DECRYPT_MODE
+     */
+    static Cipher createSm2PublicCipher(String publicKey, int opmode) throws Exception {
+        ensureBcProvider();
+        byte[] keyBytes = DataUtils.base64Decode(publicKey.getBytes(StandardCharsets.UTF_8));
+        X509EncodedKeySpec x509EncodedKeySpec = new X509EncodedKeySpec(keyBytes);
+        KeyFactory keyFactory = KeyFactory.getInstance(ConditionSm2.KEY_PAIR_ALGORITHM, ConditionSm2.PROVIDER);
+        Key key = keyFactory.generatePublic(x509EncodedKeySpec);
+        Cipher cipher = Cipher.getInstance(ConditionSm2.CIPHER_ALGORITHM, ConditionSm2.PROVIDER);
+        cipher.init(opmode, key);
+        return cipher;
+    }
+
+    /**
      * 初始化密钥
      * @param keyPairSize 密钥长度 ,512,1024,...
      * @param keyAlgorithm 秘钥算法
@@ -128,5 +183,22 @@ class SecurityTools {
         };
 
         return keyArgs;
+    }
+
+    /**
+     * 初始化 SM2 密钥对（sm2p256v1）
+     * @return [privateKey, publicKey] Base64
+     */
+    static String[] initSm2Key() throws Exception {
+        ensureBcProvider();
+        ECGenParameterSpec sm2Spec = new ECGenParameterSpec(ConditionSm2.CURVE_NAME);
+        KeyPairGenerator keyPairGenerator = KeyPairGenerator.getInstance(
+                ConditionSm2.KEY_PAIR_ALGORITHM, ConditionSm2.PROVIDER);
+        keyPairGenerator.initialize(sm2Spec, new SecureRandom());
+        KeyPair keyPair = keyPairGenerator.generateKeyPair();
+        return new String[]{
+                new String(DataUtils.base64Encode(keyPair.getPrivate().getEncoded())),
+                new String(DataUtils.base64Encode(keyPair.getPublic().getEncoded())),
+        };
     }
 }
