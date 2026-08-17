@@ -11,7 +11,7 @@ import lombok.Getter;
  * <p><b>{@code @version:}</b>1.0</p>
  */
 @Getter
-public class SystemException extends Exception{
+public class SystemException extends RuntimeException{
 
     protected int code;
     

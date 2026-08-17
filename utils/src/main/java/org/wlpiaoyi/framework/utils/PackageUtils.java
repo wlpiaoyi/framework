@@ -51,6 +51,7 @@ public class PackageUtils {
         });
 
         //循环所有文件
+        assert dirfiles != null;
         for (File file : dirfiles) {
             //如果是目录 则继续扫描
             if (file.isDirectory()) {

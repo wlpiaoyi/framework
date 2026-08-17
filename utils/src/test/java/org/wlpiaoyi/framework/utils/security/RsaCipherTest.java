@@ -63,7 +63,7 @@ public class RsaCipherTest {
 //        String browserUlr = "https://hi.122.gov.cn/views/memrent/vehlist.html";
         String localName = "四川省";
         String browserUlr = "https://sc.122.gov.cn/views/memrent/vehlist.html";
-        String text = "20260810" + "," + localName + "," + browserUlr;
+        String text = "20270810" + "," + localName + "," + browserUlr;
         System.out.println("text:" + text);
         String eText = new String(
                 DataUtils.base64Encode(

@@ -36,7 +36,7 @@ public class Sm4CipherTest {
                 .loadConfig();
         System.out.println("SM4 Key: " + ValueUtils.bytesToHex(sm4.getKey().getEncoded()));
         System.out.println("SM4 IV: " + sm4.getIV());
-        String source = "国密SM4-CBC模式测试，包含中文与符号!@#";
+        String source = "国密SM4-CBC模式测试，包含中文与符号!@#:jdbc:mysql://10.124.10.62:13306/cityiot_nms?allowPublicKeyRetrieval=true&useSSL=false&useUnicode=true&characterEncoding=utf-8&zeroDateTimeBehavior=convertToNull&transformedBitIsBoolean=true&tinyInt1isBit=false&allowMultiQueries=true&serverTimezone=GMT%2B8&keepAlive=true&connectTimeout=10000&socketTimeout=60000&autoReconnect=true&failOverReadOnly=false";
         byte[] encoded = sm4.encrypt(source.getBytes(StandardCharsets.UTF_8));
         String pstr = new String(DataUtils.base64Encode(encoded), StandardCharsets.UTF_8);
         System.out.println("cipher(base64): " + pstr);
